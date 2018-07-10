@@ -3,6 +3,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:onesignal/onesignal.dart';
+import 'package:onesignal/src/notification.dart';
 
 void main() => runApp(new MyApp());
 
@@ -30,10 +31,20 @@ class _MyAppState extends State<MyApp> {
       platformVersion = 'Failed to get platform version.';
     }
 
-    OneSignal.setLogLevel(OneSignalLogLevel.verbose, OneSignalLogLevel.none);
+    OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
-    OneSignal.init("78e8aff3-7ce2-401f-9da0-2d41f287ebaf");
+    OneSignal.shared.init("13f8ef36-d990-4fb2-baf4-0f442255755a", <String, dynamic> {});
+
+    OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
+      var title = notification.payload.title;
+      print("RECEIVED NOTIFICATION: $title");
+    });
     
+    OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+      var id = result.actionId;
+      print("OPENED NOTIFICATION WITH ID: $id");
+    });
+
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
