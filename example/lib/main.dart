@@ -4,6 +4,8 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:onesignal/onesignal.dart';
 import 'package:onesignal/src/notification.dart';
+import 'package:onesignal/src/subscription.dart';
+import 'package:onesignal/src/defines.dart';
 
 void main() => runApp(new MyApp());
 
@@ -33,16 +35,26 @@ class _MyAppState extends State<MyApp> {
 
     OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
-    OneSignal.shared.init("13f8ef36-d990-4fb2-baf4-0f442255755a", <String, dynamic> {});
+    var settings = { 
+      OSiOSSettings.autoPrompt : false, 
+      OSiOSSettings.inFocusDisplayOption : OSNotificationDisplayType.alert,
+      OSiOSSettings.promptBeforeOpeningPushUrl : true 
+    };
+
+    OneSignal.shared.init("78e8aff3-7ce2-401f-9da0-2d41f287ebaf", iOSSettings: settings);
 
     OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
-      var title = notification.payload.title;
-      print("RECEIVED NOTIFICATION: $title");
+      var title = notification.payload.body;
+      print("RECEIVED NOTIFICATION in dart: $title");
     });
     
     OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      var id = result.actionId;
-      print("OPENED NOTIFICATION WITH ID: $id");
+      var id = result.action.actionId;
+      print("OPENED NOTIFICATION WITH ID in dart: $id");
+    });
+
+    OneSignal.shared.setSubscriptionObserver((OSSubscriptionStateChanges changes) {
+      print("SUBSCRIPTION STATE CHANGED FROM ${changes.from.userId} TO ${changes.to.userId}");
     });
 
     // If the widget was removed from the tree while the asynchronous platform

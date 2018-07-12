@@ -48,11 +48,11 @@
 -(NSDictionary *)toJson {
     NSMutableDictionary *json = [NSMutableDictionary new];
     
-    json[@"notificationId"] = self.notificationID;
     json[@"contentAvailable"] = @(self.contentAvailable);
     json[@"mutableContent"] = @(self.mutableContent);
-    json[@"rawPayload"] = self.rawPayload;
     
+    if (self.notificationID) json[@"notificationId"] = self.notificationID;
+    if (self.rawPayload) json[@"rawPayload"] = self.rawPayload;
     if (self.templateName) json[@"templateName"] = self.templateName;
     if (self.templateID) json[@"templateId"] = self.templateID;
     if (self.badge) json[@"badge"] = @(self.badge);

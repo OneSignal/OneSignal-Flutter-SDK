@@ -5,6 +5,7 @@ author:
 homepage:
 
 dependencies:
+  mockito: ^2.0.2
   flutter:
     sdk: flutter
 
