@@ -24,8 +24,8 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
- 
- #import "OneSignalCategories.h"
+
+#import "OneSignalCategories.h"
 
 @implementation OSNotification (Flutter)
 - (NSDictionary *)toJson {
@@ -79,5 +79,11 @@
     json[@"action"] = @{@"type" : @((int)self.action.type), @"id" : self.action.actionID};
     
     return json;
+}
+@end
+
+@implementation NSError (Flutter)
+- (FlutterError *)flutterError {
+    return [FlutterError errorWithCode:[NSString stringWithFormat:@"%i", (int)self.code] message:self.localizedDescription details:nil];
 }
 @end

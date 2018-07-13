@@ -24,28 +24,23 @@ class OneSignal {
   /// mostly share the same state.
   static OneSignal shared = new OneSignal();
 
-  static const MethodChannel _channel = const MethodChannel('onesignal');
+  static const MethodChannel _channel = const MethodChannel('OneSignal');
+  static const MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
 
   
   OneSignal() {
     OneSignal._channel.setMethodCallHandler(_handleMethod);
-
-    _onesignalLog(OSLogLevel.verbose, "Initializing the OneSignal Flutter SDK ($sdkVersion)");
   }
   
   ReceivedNotificationHandler _onReceivedNotification;
   OpenedNotificationHandler _onOpenedNotification;
   SubscriptionChangedHandler _onSubscriptionChangedHandler;
-  UserGrantedPermission _promptPermissionCallback;
-
-  static Future<String> get platformVersion async {
-    final String version = await _channel.invokeMethod('getPlatformVersion');
-    return version;
-  }
 
   /// The initializer for OneSignal. Note that this initializer
   /// accepts an iOSSettings object, in Android you can pass null.
   Future<void> init(String appId, {Map<OSiOSSettings, dynamic> iOSSettings}) async {
+    _onesignalLog(OSLogLevel.verbose, "Initializing the OneSignal Flutter SDK ($sdkVersion)");
+
     var finalSettings = _processSettings(iOSSettings);
 
     await _channel.invokeMethod('OneSignal#init', <String, dynamic> { 
@@ -111,14 +106,42 @@ class OneSignal {
     return val as bool;
   }
 
-  Future<void> promptUserForPushNotificationPermission(UserGrantedPermission callback, {bool fallbackToSettings = false}) async {
-    _promptPermissionCallback = callback;
-
-    await _channel.invokeMethod("OneSignal#promptPermission", <String, dynamic> {
+  /// in iOS, will prompt the user for permission to send push notifications.
+  Future<bool> promptUserForPushNotificationPermission({bool fallbackToSettings = false}) async {
+    bool result = await _channel.invokeMethod("OneSignal#promptPermission", <String, dynamic> {
       'fallback' : fallbackToSettings
     });
+
+    return result;
   }
 
+  /// in iOS, takes the user to the iOS Settings page for this app.
+  Future<void> presentApplicationSettings() async {
+    await _channel.invokeMethod("OneSignal#presentSettings");
+  }
+
+  /// The current setting that controls how notifications are displayed.
+  Future<OSNotificationDisplayType> inFocusDisplayType() async {
+    int type = await _channel.invokeMethod("OneSignal#inFocusDisplayType");
+    return OSNotificationDisplayType.values[type];
+  }
+
+  /// Sends a single key/value pair to tags to OneSignal. 
+  /// Please do not send hashmaps/arrays as values as this will fail.
+  Future<Map<dynamic, dynamic>> sendTag(dynamic key, dynamic value) async {
+    return await this.sendTags(<String, dynamic> { key : value });
+  }
+  
+  /// Updates the user's OneSignal tags. This method is additive
+  Future<Map<dynamic, dynamic>> sendTags(Map<dynamic, dynamic> tags) async {
+    return await _tagsChannel.invokeMethod("OneSignal#sendTags", tags);
+  }
+
+  /// An asynchronous method that makes an HTTP request to OneSignal's
+  /// API to retrieve the current user's tags.
+  Future<Map<dynamic, dynamic>> getTags() async {
+    return await _tagsChannel.invokeMethod("OneSignal#getTags");
+  }
 
   Future<Null> _handleMethod(MethodCall call) async {
     print('Handling method call: ' + call.method);
@@ -134,9 +157,6 @@ class OneSignal {
       case 'OneSignal#subscriptionChanged': 
         var args = call.arguments as List<dynamic>;
         return this._onSubscriptionChangedHandler(OSSubscriptionStateChanges(args.first as Map<dynamic, dynamic>));
-      case 'OneSignal#userAnsweredPrompt':
-        var allowed = call.arguments as List<dynamic>;
-        return this._promptPermissionCallback(allowed.first as bool);
     }
   }
 

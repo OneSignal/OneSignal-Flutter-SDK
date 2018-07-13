@@ -25,26 +25,38 @@
  * THE SOFTWARE.
  */
 
+#import "OneSignalTagsController.h"
 #import <OneSignal/OneSignal.h>
-#import <Flutter/Flutter.h>
+#import "OneSignalCategories.h"
 
-#ifndef OneSignalCategories_h 
-#define OneSignalCategories_h
+@implementation OneSignalTagsController
++ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
+    NSLog(@"Registering tags controller");
+    
+    OneSignalTagsController *instance = [OneSignalTagsController new];
+    
+    instance.channel = [FlutterMethodChannel
+                        methodChannelWithName:@"OneSignal#tags"
+                        binaryMessenger:[registrar messenger]];
+    
+    [registrar addMethodCallDelegate:instance channel:instance.channel];
+}
 
-@interface OSNotificationPayload (Flutter)
-- (NSDictionary *)toJson;
+-(void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSLog(@"TAGS controller handling method call");
+    
+    if ([@"OneSignal#sendTags" isEqualToString:call.method]) {
+        [OneSignal sendTags:(NSDictionary *)call.arguments onSuccess:^(NSDictionary *tags) {
+            result(tags);
+        } onFailure:^(NSError *error) {
+            result(error.flutterError);
+        }];
+    } else if ([@"OneSignal#getTags" isEqualToString:call.method]) {
+        [OneSignal getTags:^(NSDictionary *tags) {
+            result(tags);
+        } onFailure:^(NSError *error) {
+            result(error.flutterError);
+        }];
+    }
+}
 @end
-
-@interface OSNotification (Flutter)
-- (NSDictionary *)toJson;
-@end
-
-@interface OSNotificationOpenedResult (Flutter)
-- (NSDictionary *)toJson;
-@end
-
-@interface NSError (Flutter)
-- (FlutterError *)flutterError;
-@end
-
-#endif

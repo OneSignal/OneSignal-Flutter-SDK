@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+
+//TODO: Figure out how to get all of these classes/enums imported just by importing OneSignal.dart,
+//without having to create a giant onesignal file.
 import 'package:onesignal/onesignal.dart';
 import 'package:onesignal/src/notification.dart';
 import 'package:onesignal/src/subscription.dart';
@@ -15,7 +18,7 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _platformVersion = 'Unknown';
+  String _tagsJson = "";
 
   @override
   void initState() {
@@ -25,13 +28,6 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
-    String platformVersion;
-    // Platform messages may fail, so we use a try/catch PlatformException.
-    try {
-      platformVersion = await OneSignal.platformVersion;
-    } on PlatformException {
-      platformVersion = 'Failed to get platform version.';
-    }
 
     OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
@@ -40,8 +36,6 @@ class _MyAppState extends State<MyApp> {
       OSiOSSettings.inFocusDisplayOption : OSNotificationDisplayType.alert,
       OSiOSSettings.promptBeforeOpeningPushUrl : true 
     };
-
-    OneSignal.shared.init("78e8aff3-7ce2-401f-9da0-2d41f287ebaf", iOSSettings: settings);
 
     OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
       var title = notification.payload.body;
@@ -57,14 +51,20 @@ class _MyAppState extends State<MyApp> {
       print("SUBSCRIPTION STATE CHANGED FROM ${changes.from.userId} TO ${changes.to.userId}");
     });
 
+    OneSignal.shared.init("78e8aff3-7ce2-401f-9da0-2d41f287ebaf", iOSSettings: settings);
+
+    try {
+      print("Sending tags");
+      var tags = await OneSignal.shared.sendTag("test", "value");
+      print("Successfully sent tags: $tags");
+    } catch (error) {
+      print("Encountered exception sending tags: $error");
+    }
+
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
     if (!mounted) return;
-
-    setState(() {
-      _platformVersion = platformVersion;
-    });
   }
 
   @override
@@ -72,11 +72,63 @@ class _MyAppState extends State<MyApp> {
     return new MaterialApp(
       home: new Scaffold(
         appBar: new AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('OneSignal Flutter Demo'),
+          backgroundColor: Color.fromARGB(255, 212, 86, 83),
         ),
-        body: new Center(
-          child: new Text('Running on: $_platformVersion\n'),
-        ),
+        body: Container(
+          padding: EdgeInsets.all(10.0),
+          child: new Table(
+            children: [
+              new TableRow(
+                children: [
+                  new FlatButton(
+                    color: Color.fromARGB(255, 212, 86, 83),
+                    textColor: Color.fromARGB(255, 255, 255, 255),
+                    padding: EdgeInsets.all(8.0),
+                    child: new Text("Get Tags"),
+                    onPressed: () {
+                      OneSignal.shared.getTags().then((tags) {
+                        setState((() {
+                          _tagsJson = "$tags";
+                        }));
+                      }).catchError((error) {
+                        setState(() {
+                          _tagsJson = "$error";
+                        });
+                      });
+                    },
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  new FlatButton(
+                    color: Color.fromARGB(255, 212, 86, 83),
+                    textColor: Color.fromARGB(255, 255, 255, 255),
+                    padding: EdgeInsets.all(8.0),
+                    child: new Text("Send Tags"),
+                    onPressed: () {
+                      print("Sending tags");
+                      OneSignal.shared.sendTag("test1", "val1").then((result) {
+                        print("Successfully sent tags: $result");
+                      }).catchError((error) {
+                        print("Encountered an error sending tags: $error");
+                      });
+                    },
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  new Container(
+                    child: new Text(_tagsJson),
+                    alignment: Alignment.center,
+                  )
+                ]
+              )
+            ],
+          ),
+        )
       ),
     );
   }

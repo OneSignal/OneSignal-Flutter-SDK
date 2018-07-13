@@ -25,26 +25,11 @@
  * THE SOFTWARE.
  */
 
-#import <OneSignal/OneSignal.h>
+#import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
 
-#ifndef OneSignalCategories_h 
-#define OneSignalCategories_h
+@interface OneSignalTagsController : NSObject<FlutterPlugin>
 
-@interface OSNotificationPayload (Flutter)
-- (NSDictionary *)toJson;
+@property (strong, nonatomic) FlutterMethodChannel *channel;
+
 @end
-
-@interface OSNotification (Flutter)
-- (NSDictionary *)toJson;
-@end
-
-@interface OSNotificationOpenedResult (Flutter)
-- (NSDictionary *)toJson;
-@end
-
-@interface NSError (Flutter)
-- (FlutterError *)flutterError;
-@end
-
-#endif
