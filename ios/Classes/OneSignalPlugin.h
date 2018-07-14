@@ -28,7 +28,7 @@
 #import <Flutter/Flutter.h>
 #import <OneSignal/OneSignal.h>
 
-@interface OneSignalPlugin : NSObject<FlutterPlugin, OSSubscriptionObserver>
+@interface OneSignalPlugin : NSObject<FlutterPlugin, OSSubscriptionObserver, OSPermissionObserver, OSEmailSubscriptionObserver>
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 + (instancetype)sharedInstance;
 @end

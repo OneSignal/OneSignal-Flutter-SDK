@@ -1,5 +1,4 @@
-
-
+import 'dart:convert';
 
 enum OSNotificationDisplayType { none, alert, notification }
 
@@ -14,5 +13,14 @@ enum OSNotificationPermission { notDetermined, denied, authorized, provisional }
 enum OSLogLevel { none, fatal, error, warn, info, debug, verbose }
 
 enum OSiOSSettings { autoPrompt, inAppAlerts, inAppLaunchUrl, promptBeforeOpeningPushUrl, inFocusDisplayOption }
+
+abstract class JSONStringRepresentable {
+  String jsonRepresentation();
+
+  String convertToJsonString(Map<String, dynamic> object) {
+    JsonEncoder encoder = JsonEncoder.withIndent('  ');
+    return encoder.convert(object);
+  }
+}
 
 String sdkVersion = "0.1.0";

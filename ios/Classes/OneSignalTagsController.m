@@ -43,8 +43,6 @@
 }
 
 -(void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    NSLog(@"TAGS controller handling method call");
-    
     if ([@"OneSignal#sendTags" isEqualToString:call.method]) {
         [OneSignal sendTags:(NSDictionary *)call.arguments onSuccess:^(NSDictionary *tags) {
             result(tags);
@@ -54,6 +52,12 @@
     } else if ([@"OneSignal#getTags" isEqualToString:call.method]) {
         [OneSignal getTags:^(NSDictionary *tags) {
             result(tags);
+        } onFailure:^(NSError *error) {
+            result(error.flutterError);
+        }];
+    } else if ([@"OneSignal#deleteTags" isEqualToString:call.method]) {
+        [OneSignal deleteTags:(NSArray *)call.arguments onSuccess:^(NSDictionary *response) {
+            result(response);
         } onFailure:^(NSError *error) {
             result(error.flutterError);
         }];

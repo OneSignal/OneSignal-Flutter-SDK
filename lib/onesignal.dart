@@ -2,16 +2,18 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 import 'package:meta/meta.dart';
-
-import 'package:onesignal/src/defines.dart';
-import 'package:onesignal/src/notification.dart';
-import 'package:onesignal/src/subscription.dart';
-
+import 'package:onesignal/permission.dart';
+import 'package:onesignal/subscription.dart';
+import 'package:onesignal/defines.dart';
+import 'package:onesignal/notification.dart';
 
 // Handlers for various events
-typedef Future<dynamic> ReceivedNotificationHandler(OSNotification notification);
-typedef Future<dynamic> OpenedNotificationHandler(OSNotificationOpenedResult openedResult);
-typedef Future<dynamic> SubscriptionChangedHandler(OSSubscriptionStateChanges changes);
+typedef void ReceivedNotificationHandler(OSNotification notification);
+typedef void OpenedNotificationHandler(OSNotificationOpenedResult openedResult);
+typedef void SubscriptionChangedHandler(OSSubscriptionStateChanges changes);
+typedef void EmailSubscriptionChangeHandler(OSEmailSubscriptionStateChanges changes);
+typedef void PermissionChangeHandler(OSPermissionStateChanges changes);
+
 
 // Bridged Callbacks 
 typedef Future<dynamic> UserGrantedPermission(bool granted);
@@ -24,17 +26,21 @@ class OneSignal {
   /// mostly share the same state.
   static OneSignal shared = new OneSignal();
 
+  // private channels used to bridge to ObjC/Java
   static const MethodChannel _channel = const MethodChannel('OneSignal');
   static const MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
 
-  
+  // constructor method
   OneSignal() {
     OneSignal._channel.setMethodCallHandler(_handleMethod);
   }
   
+  // event handlers
   ReceivedNotificationHandler _onReceivedNotification;
   OpenedNotificationHandler _onOpenedNotification;
   SubscriptionChangedHandler _onSubscriptionChangedHandler;
+  EmailSubscriptionChangeHandler _onEmailSubscriptionChangedHandler;
+  PermissionChangeHandler _onPermissionChangedHandler;
 
   /// The initializer for OneSignal. Note that this initializer
   /// accepts an iOSSettings object, in Android you can pass null.
@@ -43,7 +49,7 @@ class OneSignal {
 
     var finalSettings = _processSettings(iOSSettings);
 
-    await _channel.invokeMethod('OneSignal#init', <String, dynamic> { 
+    await _channel.invokeMethod('OneSignal#init', { 
       'appId' : appId,
       'settings' : finalSettings
     });
@@ -53,7 +59,7 @@ class OneSignal {
   /// how verbose logs in the console/logcat are, while the visual log level
   /// controls if the SDK will show alerts for each logged message
   Future<void> setLogLevel(OSLogLevel logLevel, OSLogLevel visualLevel) async {
-    await _channel.invokeMethod("OneSignal#setLogLevel", <String, int> { 
+    await _channel.invokeMethod("OneSignal#setLogLevel", { 
       'console' : logLevel.index,
       'visual' : visualLevel.index
     });
@@ -77,12 +83,26 @@ class OneSignal {
   void setSubscriptionObserver(SubscriptionChangedHandler handler) {
     _onSubscriptionChangedHandler = handler;
   }
+
+  /// The permission handler will be called whenever the user's Permission
+  /// state changes, which is applicable to iOS (Android does not prompt the
+  /// user for permission to receive push notifications).
+  void setPermissionObserver(PermissionChangeHandler handler) {
+    _onPermissionChangedHandler = handler;
+  }
+
+  /// The email subscription handler will be called whenever the user's email
+  /// subscription changes (OneSignal can also send emails in addition to push 
+  /// notifications). For example, if you call setEmail() or logoutEmail().
+  void setEmailSubscriptionObserver(EmailSubscriptionChangeHandler handler) {
+    _onEmailSubscriptionChangedHandler = handler;
+  }
   
   /// Allows you to completely disable the SDK until your app calls the 
   /// OneSignal.consentGranted(true) function. This is useful if you want
   /// to show a Terms and Conditions or privacy popup for GDPR.
   Future<void> setRequiresUserPrivacyConsent(bool required) async {
-    await _channel.invokeMethod("OneSignal#setRequiresUserPrivacyConsent", <String, dynamic> {
+    await _channel.invokeMethod("OneSignal#setRequiresUserPrivacyConsent", {
       'required' : required
     });
   }
@@ -92,7 +112,7 @@ class OneSignal {
   /// the user gives their consent. This will cause the OneSignal SDK 
   /// to initialize.
   Future<void> consentGranted(bool granted) async {
-    await _channel.invokeMethod("OneSignal#consentGranted", <String, dynamic> {
+    await _channel.invokeMethod("OneSignal#consentGranted", {
       'granted' : granted
     });
   }
@@ -108,11 +128,12 @@ class OneSignal {
 
   /// in iOS, will prompt the user for permission to send push notifications.
   Future<bool> promptUserForPushNotificationPermission({bool fallbackToSettings = false}) async {
-    bool result = await _channel.invokeMethod("OneSignal#promptPermission", <String, dynamic> {
+    dynamic result = await _channel.invokeMethod("OneSignal#promptPermission", {
       'fallback' : fallbackToSettings
     });
 
-    return result;
+    print("Prompted for permission with result: $result");
+    return result as bool;
   }
 
   /// in iOS, takes the user to the iOS Settings page for this app.
@@ -129,7 +150,7 @@ class OneSignal {
   /// Sends a single key/value pair to tags to OneSignal. 
   /// Please do not send hashmaps/arrays as values as this will fail.
   Future<Map<dynamic, dynamic>> sendTag(dynamic key, dynamic value) async {
-    return await this.sendTags(<String, dynamic> { key : value });
+    return await this.sendTags({ key : value });
   }
   
   /// Updates the user's OneSignal tags. This method is additive
@@ -143,8 +164,73 @@ class OneSignal {
     return await _tagsChannel.invokeMethod("OneSignal#getTags");
   }
 
+  /// Allows you to delete a single key/value pair from the user's tags
+  /// by specifying the key
+  Future<Map<dynamic, dynamic>> deleteTag(String key) async {
+    return this.deleteTags([key]);
+  }
+
+  /// Allows you to delete an array of tags by specifying an
+  /// array of keys.
+  Future<Map<dynamic, dynamic>> deleteTags(List<String> keys) async {
+    return await _tagsChannel.invokeMethod("OneSignal#deleteTags", keys);
+  }
+  
+  /// Returns an `OSPermissionSubscriptionState` object, which contains three properties:
+  ///   1. `subscriptionStatus` : Describes the current user's OneSignal Push notification subscription
+  ///   2. `emailSubscriptionStatus` : The current user's email subscription state
+  ///   3. `permissionStatus` : The current user's permission, ie. have they answered the iOS permission prompt
+  Future<OSPermissionSubscriptionState> getPermissionSubscriptionState() async {
+    var json = await _channel.invokeMethod("OneSignal#getPermissionSubscriptionState");
+
+    return OSPermissionSubscriptionState(json);
+  }
+
+  /// Allows you to manually disable or enable push notifications for this user.
+  /// Note: This method does not change the user's system (iOS) push notification
+  /// permission status. If the user disabled (or never allowed) your application
+  /// to send push notifications, calling setSubscription(true) will not change that.
+  void setSubscription(bool enable) {
+    _channel.invokeMethod("OneSignal#setSubscription", enable);
+  }
+
+  /// Allows you to post a notification to the current user (or a different user 
+  /// if you specify their OneSignal user ID).
+  Future<Map<dynamic, dynamic>> postNotification(Map<dynamic, dynamic> json) async {
+    return await _channel.invokeMethod("OneSignal#postNotification", json);
+  }
+
+  /// Allows you to prompt the user for permission to use location services
+  Future<void> promptLocationPermission() async {
+    return await _channel.invokeMethod("OneSignal#promptLocation");
+  }
+
+  /// Allows you to determine if the user's location data is shared with OneSignal.
+  /// This allows you to do things like geofenced notifications, etc.
+  Future<void> setLocationShared(bool shared) async {
+    return await _channel.invokeMethod("OneSignal#setLocationShared", shared);
+  }
+
+  /// Sets the user's email so you can send them emails through the OneSignal dashboard
+  /// and API. The `emailAuthHashToken` is optional (but highly recommended) as part of 
+  /// Identity Verification. The email auth hash is a hash of your app's API key and the 
+  /// user ID. We recommend you generate this token from your backend server, do NOT
+  /// store your API key in your app as this is highly insecure.
+  Future<void> setEmail({String email, String emailAuthHashToken}) async {
+    return await _channel.invokeMethod("OneSignal#setEmail", {
+      'email' : email,
+      'emailAuthHashToken' : emailAuthHashToken
+    });
+  }
+
+  /// Dissociates the user's email from OneSignal, akin to turning off push notifications 
+  /// for email.
+  Future<void> logoutEmail() async {
+    return await _channel.invokeMethod("OneSignal#logoutEmail");
+  }
+
+  // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
-    print('Handling method call: ' + call.method);
     switch (call.method) {
       case 'OneSignal#handleReceivedNotification':
         final List<dynamic> args = call.arguments;
@@ -157,6 +243,12 @@ class OneSignal {
       case 'OneSignal#subscriptionChanged': 
         var args = call.arguments as List<dynamic>;
         return this._onSubscriptionChangedHandler(OSSubscriptionStateChanges(args.first as Map<dynamic, dynamic>));
+      case 'OneSignal#permissionChanged':
+        var args = call.arguments as List<dynamic>;
+        return this._onPermissionChangedHandler(OSPermissionStateChanges(args.first as Map<dynamic, dynamic>));
+      case 'OneSignal#emailSubscriptionChanged':
+        var args = call.arguments as List<dynamic>;
+        return this._onEmailSubscriptionChangedHandler(OSEmailSubscriptionStateChanges(args.first as Map<dynamic, dynamic>));
     }
   }
 

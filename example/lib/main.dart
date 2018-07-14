@@ -1,14 +1,10 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:flutter/services.dart';
-
-//TODO: Figure out how to get all of these classes/enums imported just by importing OneSignal.dart,
-//without having to create a giant onesignal file.
+// TODO: Figure out how to get all of these classes/enums imported just 
+// by importing OneSignal.dart, create some sort of umbrella declaration
+// without having to create a giant onesignal file.
 import 'package:onesignal/onesignal.dart';
-import 'package:onesignal/src/notification.dart';
-import 'package:onesignal/src/subscription.dart';
-import 'package:onesignal/src/defines.dart';
 
 void main() => runApp(new MyApp());
 
@@ -19,6 +15,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _tagsJson = "";
+  String _emailAddress;
 
   @override
   void initState() {
@@ -48,7 +45,15 @@ class _MyAppState extends State<MyApp> {
     });
 
     OneSignal.shared.setSubscriptionObserver((OSSubscriptionStateChanges changes) {
-      print("SUBSCRIPTION STATE CHANGED FROM ${changes.from.userId} TO ${changes.to.userId}");
+      print("SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
+    });
+
+    OneSignal.shared.setPermissionObserver((OSPermissionStateChanges changes) {
+      print("PERMISSION STATE CHANGED: ${changes.jsonRepresentation()}");
+    });
+
+    OneSignal.shared.setEmailSubscriptionObserver((OSEmailSubscriptionStateChanges changes) {
+      print("EMAIL SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
     });
 
     OneSignal.shared.init("78e8aff3-7ce2-401f-9da0-2d41f287ebaf", iOSSettings: settings);
@@ -102,6 +107,13 @@ class _MyAppState extends State<MyApp> {
               ),
               new TableRow(
                 children: [
+                  Container(
+                    height: 8.0,
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
                   new FlatButton(
                     color: Color.fromARGB(255, 212, 86, 83),
                     textColor: Color.fromARGB(255, 255, 255, 255),
@@ -115,6 +127,113 @@ class _MyAppState extends State<MyApp> {
                         print("Encountered an error sending tags: $error");
                       });
                     },
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  Container(
+                    height: 8.0,
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  new FlatButton(
+                    color: Color.fromARGB(255, 212, 86, 83),
+                    textColor: Color.fromARGB(255, 255, 255, 255),
+                    padding: EdgeInsets.all(8.0),
+                    child: new Text("Prompt for Push Permission"),
+                    onPressed: () {
+                      print("Prompting for Permission");
+                      OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
+                        print("Accepted permission: $accepted");
+                      });
+                    },
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  Container(
+                    height: 8.0,
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  new FlatButton(
+                    color: Color.fromARGB(255, 212, 86, 83),
+                    textColor: Color.fromARGB(255, 255, 255, 255),
+                    padding: EdgeInsets.all(8.0),
+                    child: new Text("Get Permission Subscription State"),
+                    onPressed: () {
+                      print("Getting permissionSubscriptionState");
+                      OneSignal.shared.getPermissionSubscriptionState().then((status) {
+                        this.setState(() {
+                          _tagsJson = status.jsonRepresentation();
+                        });
+                      });
+                    },
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  Container(
+                    height: 8.0,
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  new TextField(
+                    textAlign: TextAlign.center,
+                    decoration: InputDecoration(
+                      hintText: "Email Address",
+                      labelStyle: TextStyle(
+                        color: Color.fromARGB(255, 212, 86, 83),
+                      )
+                    ),
+                    onChanged: (text) {
+                      this.setState(() {
+                        _emailAddress = text == "" ? null : text;
+                      });
+                    },
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  Container(
+                    height: 8.0,
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  new FlatButton(
+                    color: Color.fromARGB(255, 212, 86, 83),
+                    textColor: Color.fromARGB(255, 255, 255, 255),
+                    padding: EdgeInsets.all(8.0),
+                    child: new Text("Set Email"),
+                    onPressed: () {
+                      if (_emailAddress == null) return;
+
+                      print("Setting email");
+                      OneSignal.shared.setEmail(email: _emailAddress).then((response) {
+                        print("Successfully set email: $response");
+                      }, onError: (error) {
+                        print("Failed to set email with error: $error");
+                      });
+                    },
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  Container(
+                    height: 8.0,
                   )
                 ]
               ),
