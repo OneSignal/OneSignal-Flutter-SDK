@@ -4,11 +4,6 @@ version: 0.0.1
 author:
 homepage:
 
-dependencies:
-  mockito: ^2.0.2
-  flutter:
-    sdk: flutter
-
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
 
@@ -17,6 +12,15 @@ flutter:
   plugin:
     androidPackage: com.onesignal.onesignal
     pluginClass: OneSignalPlugin
+
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

@@ -92,8 +92,6 @@ class OSEmailSubscriptionStateChanges extends JSONStringRepresentable {
   OSEmailSubscriptionState to;
 
   OSEmailSubscriptionStateChanges(Map<dynamic, dynamic> json) {
-    print("Received email subscription changes: $json");
-
     if (json.containsKey('from')) this.from = OSEmailSubscriptionState(json['from']);
     if (json.containsKey('to')) this.to = OSEmailSubscriptionState(json['to']);
   }

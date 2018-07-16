@@ -1,16 +1,17 @@
-import 'package:flutter_test/flutter_test.dart';
-import 'package:mockito/mockito.dart';
-import 'package:onesignal/onesignal.dart'
+import 'package:test/test.dart';
+import 'package:onesignal/onesignal.dart';
+import 'dart:convert';
+import 'dart:io';
+import 'package:onesignal/subscription.dart';
+import 'package:onesignal/notification.dart';
+import 'package:onesignal/defines.dart';
 
 void main() {
   OneSignal onesignal;
 
   setUp() {
     onesignal = OneSignal();
-    onesignal.init("test_app_id", <String, dynamic>{});
   }
-  
-  test('initializes OneSignal correctly', () {
-    
-  });
+
+  // TODO: Add some integration tests
 }

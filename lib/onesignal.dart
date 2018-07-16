@@ -1,7 +1,7 @@
+import 'dart:convert';
 import 'dart:async';
 
 import 'package:flutter/services.dart';
-import 'package:meta/meta.dart';
 import 'package:onesignal/permission.dart';
 import 'package:onesignal/subscription.dart';
 import 'package:onesignal/defines.dart';
@@ -27,12 +27,12 @@ class OneSignal {
   static OneSignal shared = new OneSignal();
 
   // private channels used to bridge to ObjC/Java
-  static const MethodChannel _channel = const MethodChannel('OneSignal');
-  static const MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
+  MethodChannel _channel = const MethodChannel('OneSignal');
+  MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
 
   // constructor method
   OneSignal() {
-    OneSignal._channel.setMethodCallHandler(_handleMethod);
+    this._channel.setMethodCallHandler(_handleMethod);
   }
   
   // event handlers
