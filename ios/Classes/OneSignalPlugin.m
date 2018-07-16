@@ -100,6 +100,8 @@
         result(@(OneSignal.inFocusDisplayType));
     } else if ([@"OneSignal#getPermissionSubscriptionState" isEqualToString:call.method]) {
         result(OneSignal.getPermissionSubscriptionState.toDictionary);
+    } else if ([@"OneSignal#setInFocusDisplayType" isEqualToString:call.method]) {
+        [OneSignal setInFocusDisplayType:(OSNotificationDisplayType)[call.arguments[@"displayType"] intValue]];
     } else if ([@"OneSignal#setSubscription" isEqualToString:call.method]) {
         [OneSignal setSubscription:[call.arguments boolValue]];
     } else if ([@"OneSignal#setSubscription" isEqualToString:call.method]) {

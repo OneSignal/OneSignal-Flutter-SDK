@@ -1,0 +1,140 @@
+import 'dart:async';
+import 'package:flutter/services.dart';
+import 'package:onesignal/defines.dart';
+import 'package:onesignal/notification.dart';
+
+/*
+  This class mocks an iOS or Android host device
+  It has a OneSignalState object that reflects changes to
+  state that the various requests make.
+*/
+
+class OneSignalMockChannelController {
+  
+  MethodChannel _channel = const MethodChannel('OneSignal');
+  MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
+
+  OneSignalState state;
+
+  OneSignalMockChannelController() {
+    this._channel.setMockMethodCallHandler(_handleMethod);
+    this._tagsChannel.setMockMethodCallHandler(_handleMethod);
+  }
+
+  void resetState() {
+    state = OneSignalState();
+  }
+
+  Future<Null> _handleMethod(MethodCall call) async {
+    print("Mock method called: ${call.method}");
+    switch (call.method) {
+      case "OneSignal#init":
+        this.state.initialize(call.arguments);
+        break;
+      case "OneSignal#setLogLevel":
+        this.state.setLogLevel(call.arguments);
+        break;
+      case "OneSignal#consentGranted":
+        this.state.consentGranted = (call.arguments as Map<dynamic, dynamic>)['granted'] as bool;
+        break;
+      case "OneSignal#promptPermission":
+        this.state.calledPromptPermission = true;
+        break;
+      case "OneSignal#log":
+        this.state.log(call.arguments);
+        break;
+      case "OneSignal#setInFocusDisplayType":
+        this.state.setDisplayType(call.arguments);
+        break;
+      case "OneSignal#setSubscription":
+        this.state.subscriptionState = call.arguments as bool;
+        break;
+      case "OneSignal#postNotification":
+        this.state.postNotificationJson = call.arguments as Map<dynamic, dynamic>;
+        break;
+      case "OneSignal#setLocationShared":
+        this.state.locationShared = call.arguments as bool;
+        break;
+      case "OneSignal#setEmail":
+        this.state.setEmail(call.arguments);
+        break;
+      case "OneSignal#sendTags":
+        this.state.tags = call.arguments;
+        break;
+      case "OneSignal#deleteTags":
+        this.state.deleteTags = call.arguments;
+        break;
+    }
+  }
+}
+
+class OneSignalState {
+
+  //initialization
+  String appId;
+  Map<dynamic, dynamic> iosSettings;
+
+  //email
+  String email;
+  String emailAuthHashToken;
+
+  // logging
+  String latestLogStatement;
+  OSLogLevel latestLogLevel;
+
+  // miscellaneous params
+  bool requiresPrivacyConsent = false;
+  OSLogLevel logLevel;
+  OSLogLevel visualLevel;
+  bool consentGranted = false;
+  bool calledPromptPermission;
+  bool locationShared;
+  OSNotificationDisplayType inFocusDisplayType;
+  bool subscriptionState;
+
+  // tags
+  Map<dynamic, dynamic> tags;
+  List<dynamic> deleteTags;
+
+  // notifications
+  Map<dynamic, dynamic> postNotificationJson;
+
+  /*
+    All of the following functions parse the MethodCall
+    parameters, and sets properties on the object itself
+  */
+
+  void initialize(Map<dynamic, dynamic> params) {
+    this.iosSettings = params['settings'];
+    this.appId = params['appId'];
+  }
+
+  void setLogLevel(Map<dynamic, dynamic> params) {
+    int level = params['console'] as int;
+    int visual = params['visual'] as int;
+
+    if (level != null) this.logLevel = OSLogLevel.values[level];
+    if (visual != null) this.visualLevel = OSLogLevel.values[visual];
+  }
+
+  void setRequiresPrivacyConsent(Map<dynamic, dynamic> params) {
+    this.requiresPrivacyConsent = params['required'] as bool;
+  }
+
+  void log(Map<dynamic, dynamic> params) {
+    var level = params['logLevel'] as int;
+    
+    if (level != null) this.latestLogLevel = OSLogLevel.values[level];
+    this.latestLogStatement = params['message'];
+  }
+
+  void setDisplayType(Map<dynamic, dynamic> params) {
+    var type = params['displayType'] as int; 
+    if (type != null) this.inFocusDisplayType = OSNotificationDisplayType.values[type];
+  }
+
+  void setEmail(Map<dynamic, dynamic> params) {
+    this.email = params['email'] as String;
+    this.emailAuthHashToken = params['emailAuthHashToken'] as String;
+  }
+}

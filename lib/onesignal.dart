@@ -1,6 +1,4 @@
-import 'dart:convert';
 import 'dart:async';
-
 import 'package:flutter/services.dart';
 import 'package:onesignal/permission.dart';
 import 'package:onesignal/subscription.dart';
@@ -13,7 +11,6 @@ typedef void OpenedNotificationHandler(OSNotificationOpenedResult openedResult);
 typedef void SubscriptionChangedHandler(OSSubscriptionStateChanges changes);
 typedef void EmailSubscriptionChangeHandler(OSEmailSubscriptionStateChanges changes);
 typedef void PermissionChangeHandler(OSPermissionStateChanges changes);
-
 
 // Bridged Callbacks 
 typedef Future<dynamic> UserGrantedPermission(bool granted);
@@ -131,8 +128,7 @@ class OneSignal {
     dynamic result = await _channel.invokeMethod("OneSignal#promptPermission", {
       'fallback' : fallbackToSettings
     });
-
-    print("Prompted for permission with result: $result");
+    
     return result as bool;
   }
 
@@ -145,6 +141,12 @@ class OneSignal {
   Future<OSNotificationDisplayType> inFocusDisplayType() async {
     int type = await _channel.invokeMethod("OneSignal#inFocusDisplayType");
     return OSNotificationDisplayType.values[type];
+  }
+
+  Future<void> setInFocusDisplayType(OSNotificationDisplayType displayType) async {
+    await _channel.invokeMethod("OneSignal#setInFocusDisplayType", {
+      "displayType" : displayType.index
+    });
   }
 
   /// Sends a single key/value pair to tags to OneSignal. 
@@ -167,7 +169,7 @@ class OneSignal {
   /// Allows you to delete a single key/value pair from the user's tags
   /// by specifying the key
   Future<Map<dynamic, dynamic>> deleteTag(String key) async {
-    return this.deleteTags([key]);
+    return await this.deleteTags([key]);
   }
 
   /// Allows you to delete an array of tags by specifying an
@@ -190,8 +192,8 @@ class OneSignal {
   /// Note: This method does not change the user's system (iOS) push notification
   /// permission status. If the user disabled (or never allowed) your application
   /// to send push notifications, calling setSubscription(true) will not change that.
-  void setSubscription(bool enable) {
-    _channel.invokeMethod("OneSignal#setSubscription", enable);
+  Future<void> setSubscription(bool enable) async {
+    await _channel.invokeMethod("OneSignal#setSubscription", enable);
   }
 
   /// Allows you to post a notification to the current user (or a different user 
