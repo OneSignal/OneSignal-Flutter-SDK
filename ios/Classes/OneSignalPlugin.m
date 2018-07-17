@@ -135,6 +135,8 @@
 }
 
 - (void)handleReceivedNotification:(OSNotification *)notification {
+    NSString *json = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:notification.toJson options:NSJSONWritingPrettyPrinted error:nil] encoding:NSUTF8StringEncoding];
+    NSLog(@"Received notification with json: %@", json);
     [self.channel invokeMethod:@"OneSignal#handleReceivedNotification" arguments:notification.toJson ? @[notification.toJson] : @[]];
 }
 
