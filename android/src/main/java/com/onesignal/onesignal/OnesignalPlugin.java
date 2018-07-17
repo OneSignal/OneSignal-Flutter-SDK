@@ -25,6 +25,8 @@ import org.json.JSONException;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.ArrayList;
 
 import android.app.Activity;
 import android.content.BroadcastReceiver;
@@ -45,13 +47,15 @@ public class OneSignalPlugin implements MethodCallHandler {
 
   /** Plugin registration. */
   private Registrar flutterRegistrar;
+  private MethodChannel channel;
 
   public static void registerWith(Registrar registrar) {
-    final MethodChannel channel = new MethodChannel(registrar.messenger(), "OneSignal");
 
     OneSignalPlugin plugin = new OneSignalPlugin();
 
-    channel.setMethodCallHandler(plugin);
+    plugin.channel = new MethodChannel(registrar.messenger(), "OneSignal");
+
+    plugin.channel.setMethodCallHandler(plugin);
 
     plugin.flutterRegistrar = registrar;
 
@@ -67,7 +71,7 @@ public class OneSignalPlugin implements MethodCallHandler {
               new NotificationOpenedHandler() {
                 @Override
                 public void notificationOpened(OSNotificationOpenResult result) {
-
+                  
                 }
               },
               new NotificationReceivedHandler() {
@@ -84,7 +88,7 @@ public class OneSignalPlugin implements MethodCallHandler {
 
       OneSignal.setLogLevel(console, visual);
 
-      result.success(new Object());
+      result.success(null);
     } else if (call.method.contentEquals("OneSignal#requiresUserPrivacyConsent")) {
       result.success(!OneSignal.userProvidedPrivacyConsent());
     } else if (call.method.contentEquals("OneSignal#consentGranted")) {
@@ -92,15 +96,75 @@ public class OneSignalPlugin implements MethodCallHandler {
 
       OneSignal.provideUserConsent((Boolean)args.get("granted"));
 
-      result.success(new Object());
+      result.success(null);
     } else if (call.method.contentEquals("OneSignal#setRequiresUserPrivacyConsent")) {
       Map<String, Object> args = (Map<String, Object>)call.arguments;
 
       OneSignal.setRequiresUserPrivacyConsent((Boolean)args.get("granted"));
+
+      result.success(null);
     } else if (call.method.contentEquals("OneSignal#log")) {
       //TODO: Implement
     } else if (call.method.contentEquals("OneSignal#inFocusDisplayType")) {
-      
+      //TODO: Implement
+    } else if (call.method.contentEquals("OneSignal#getPermissionSubscriptionState")) {
+      OSPermissionSubscriptionState state = OneSignal.getPermissionSubscriptionState();
+
+      result.success(OneSignalSerializer.permissionSubscriptionStateToMap(state));
+    } else if (call.method.contentEquals("OneSignal#setInFocusDisplayType")) {
+      Map<String, Object> args = (Map<String, Object>)call.arguments;
+      OneSignal.setInFocusDisplaying((int)args.get("displayType"));
+    } else if (call.method.contentEquals("OneSignal#setSubscription")) {
+      OneSignal.setSubscription((boolean)call.arguments);
+    } else if (call.method.contentEquals("OneSignal#postNotification")) {
+      JSONObject json = new JSONObject((Map<String, Object>)call.arguments);
+      final Result reply = result;
+      OneSignal.postNotification(json, new OneSignal.PostNotificationResponseHandler() {
+        @Override
+        public void onFailure(JSONObject response) {
+          reply.error("onesignal", "Encountered an error attempting to post notification: " + response.toString(), response);
+        }
+
+        @Override
+        public void onSuccess(JSONObject response) {
+          reply.success(response);
+        }
+      });
+    } else if (call.method.contentEquals("OneSignal#promptLocation")) {
+      OneSignal.promptLocation();
+      result.success(null);
+    } else if (call.method.contentEquals("OneSignal#setLocationShared")) {
+      boolean shared = (boolean)call.arguments;
+      OneSignal.setLocationShared(shared);
+    } else if (call.method.contentEquals("OneSignal#setEmail")) {
+      Map<String, Object> args = (Map<String, Object>)call.arguments;
+      final Result reply = result;
+
+      OneSignal.setEmail((String) args.get("email"), (String) args.get("emailAuthHashToken"), new EmailUpdateHandler() {
+        @Override
+        public void onSuccess() {
+          reply.success(null);
+        }
+
+        @Override
+        public void onFailure(EmailUpdateError error) {
+          reply.error("onesignal", "Encountered an error setting email: " + error.getMessage(), null);
+        }
+      });
+    } else if (call.method.contentEquals("OneSignal#logoutEmail")) {
+      final Result reply = result;
+
+      OneSignal.logoutEmail(new EmailUpdateHandler() {
+        @Override
+        public void onSuccess() {
+          reply.success(null);
+        }
+
+        @Override
+        public void onFailure(EmailUpdateError error) {
+          reply.error("onesignal", "Encountered an error loggoing out of email: " + error.getMessage(), null);
+        }
+      });
     } else {
       result.notImplemented();
     }

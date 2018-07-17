@@ -104,8 +104,6 @@
         [OneSignal setInFocusDisplayType:(OSNotificationDisplayType)[call.arguments[@"displayType"] intValue]];
     } else if ([@"OneSignal#setSubscription" isEqualToString:call.method]) {
         [OneSignal setSubscription:[call.arguments boolValue]];
-    } else if ([@"OneSignal#setSubscription" isEqualToString:call.method]) {
-        [OneSignal setSubscription:[call.arguments boolValue]];
     } else if ([@"OneSignal#postNotification" isEqualToString:call.method]) {
         [OneSignal postNotification:(NSDictionary *)call.arguments onSuccess:^(NSDictionary *response) {
             result(response);

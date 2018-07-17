@@ -2,18 +2,30 @@ import 'package:onesignal/subscription.dart';
 import 'package:onesignal/defines.dart';
 
 class OSPermissionState extends JSONStringRepresentable {
-  bool hasPrompted;
-  bool provisional;
+  bool hasPrompted; // iOS only
+  bool provisional; //iOS only
   OSNotificationPermission status;
   
   OSPermissionState(Map<dynamic, dynamic> json) {
-    this.hasPrompted = json['hasPrompted'] as bool;
-    this.status = OSNotificationPermission.values[json['status'] as int];
+    
+    if (json.containsKey('status')) {
+      //ios
+      this.status = OSNotificationPermission.values[json['status'] as int];
+    } else if (json.containsKey('enabled')) {
+      bool enabled = json['enabled'] as bool;
+      this.status = enabled ? OSNotificationPermission.authorized : OSNotificationPermission.denied;
+    }
 
     if (json.containsKey('provisional')) {
       this.provisional = json['provisional'] as bool;
     } else {
       this.provisional = false;
+    }
+
+    if (json.containsKey('hasPrompted')) {
+      this.hasPrompted = json['hasPrompted'] as bool;
+    } else {
+      this.hasPrompted = false;
     }
   }
 
