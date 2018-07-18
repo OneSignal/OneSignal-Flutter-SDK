@@ -28,9 +28,7 @@
     "notification_parsing_test" : {
       "shown" : true,
       "payload" : {
-        "rawPayload" : {
-           "test" : "raw payload"
-        },
+        "rawPayload" : "{ \"test\" : \"raw payload\" }",
         "additionalData" : {
            "additional" : "data"
         },

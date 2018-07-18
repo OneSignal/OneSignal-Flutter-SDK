@@ -235,9 +235,7 @@ class OneSignal {
   Future<Null> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case 'OneSignal#handleReceivedNotification':
-        OSNotification not = OSNotification(call.arguments as Map<dynamic, dynamic>);
-        print("Created notification");
-        return this._onReceivedNotification(not);
+        return this._onReceivedNotification(OSNotification(call.arguments as Map<dynamic, dynamic>));
       case 'OneSignal#handleOpenedNotification':
         return this._onOpenedNotification(OSNotificationOpenedResult(call.arguments as Map<dynamic, dynamic>));
       case 'OneSignal#subscriptionChanged': 

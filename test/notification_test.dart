@@ -12,7 +12,7 @@ void main() {
   });
 
   test ('expect buttons to be parsed correctly', () {
-    expect(notification.payload.buttons.first['id'], "test1");
+    expect(notification.payload.buttons.first.id, "test1");
   });
 
   test ('expect content available to be parsed correctly', () {
