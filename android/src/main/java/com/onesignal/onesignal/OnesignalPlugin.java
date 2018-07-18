@@ -2,16 +2,23 @@ package com.onesignal.onesignal;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
+import com.onesignal.OSEmailSubscriptionObserver;
+import com.onesignal.OSEmailSubscriptionStateChanges;
 import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationOpenResult;
+import com.onesignal.OSPermissionObserver;
 import com.onesignal.OSPermissionState;
+import com.onesignal.OSPermissionStateChanges;
 import com.onesignal.OSPermissionSubscriptionState;
+import com.onesignal.OSSubscriptionObserver;
 import com.onesignal.OSSubscriptionState;
 import com.onesignal.OSEmailSubscriptionState;
+import com.onesignal.OSSubscriptionStateChanges;
 import com.onesignal.OneSignal;
 import com.onesignal.OneSignal.NotificationOpenedHandler;
 import com.onesignal.OneSignal.NotificationReceivedHandler;
@@ -40,7 +47,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 
 /** OnesignalPlugin */
-public class OneSignalPlugin implements MethodCallHandler {
+public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedHandler, NotificationOpenedHandler, OSSubscriptionObserver, OSEmailSubscriptionObserver, OSPermissionObserver {
   public static final String NOTIFICATION_OPENED_INTENT_FILTER = "GTNotificationOpened";
   public static final String NOTIFICATION_RECEIVED_INTENT_FILTER = "GTNotificationReceived";
   public static final String HIDDEN_MESSAGE_KEY = "hidden";
@@ -67,19 +74,12 @@ public class OneSignalPlugin implements MethodCallHandler {
     if (call.method.contentEquals("OneSignal#init")) {
       Map<String, Object> args = (Map<String, Object>)call.arguments;
       Context context = flutterRegistrar.context();
-      OneSignal.init(context, null, (String)args.get("appId"),
-              new NotificationOpenedHandler() {
-                @Override
-                public void notificationOpened(OSNotificationOpenResult result) {
-                  
-                }
-              },
-              new NotificationReceivedHandler() {
-                @Override
-                public void notificationReceived(OSNotification notification) {
 
-                }
-              });
+      OneSignal.init(context, null, (String)args.get("appId"), this, this);
+
+      OneSignal.addSubscriptionObserver(this);
+      OneSignal.addEmailSubscriptionObserver(this);
+      OneSignal.addPermissionObserver(this);
     } else if (call.method.contentEquals("OneSignal#setLogLevel")) {
       Map<String, Object> args = (Map<String, Object>)call.arguments;
 
@@ -110,7 +110,7 @@ public class OneSignalPlugin implements MethodCallHandler {
     } else if (call.method.contentEquals("OneSignal#getPermissionSubscriptionState")) {
       OSPermissionSubscriptionState state = OneSignal.getPermissionSubscriptionState();
 
-      result.success(OneSignalSerializer.permissionSubscriptionStateToMap(state));
+      result.success(OneSignalSerializer.convertPermissionSubscriptionStateToMap(state));
     } else if (call.method.contentEquals("OneSignal#setInFocusDisplayType")) {
       Map<String, Object> args = (Map<String, Object>)call.arguments;
       OneSignal.setInFocusDisplaying((int)args.get("displayType"));
@@ -170,7 +170,36 @@ public class OneSignalPlugin implements MethodCallHandler {
     }
   }
 
-  void initOneSignal(String appId) {
-    
+  @Override
+  public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
+    this.channel.invokeMethod("OneSignal#subscriptionChanged", OneSignalSerializer.convertSubscriptionStateChangesToMap(stateChanges));
+  }
+
+  @Override
+  public void onOSEmailSubscriptionChanged(OSEmailSubscriptionStateChanges stateChanges) {
+    this.channel.invokeMethod("OneSignal#emailSubscriptionChanged", OneSignalSerializer.convertEmailSubscriptionStateChangesToMap(stateChanges));
+  }
+
+  @Override
+  public void onOSPermissionChanged(OSPermissionStateChanges stateChanges) {
+    this.channel.invokeMethod("OneSignal#permissionChanged", OneSignalSerializer.convertPermissionStateChangesToMap(stateChanges));
+  }
+
+  @Override
+  public void notificationReceived(OSNotification notification) {
+    try {
+      this.channel.invokeMethod("OneSignal#handleReceivedNotification", OneSignalSerializer.convertNotificationToMap(notification));
+    } catch (JSONException exception) {
+      Log.e("onesignal", "Encountered an error attempting to convert OSNotification object to hash map: " + exception.getMessage() + "\n" + exception.getStackTrace());
+    }
+  }
+
+  @Override
+  public void notificationOpened(OSNotificationOpenResult result) {
+    try {
+      this.channel.invokeMethod("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationOpenResultToMap(result));
+    } catch (JSONException exception) {
+      Log.e("onesignal", "Encountered an error attempting to convert OSNotificationOpenResult object to hash map: " + exception.getMessage() + "\n" + exception.getStackTrace());
+    }
   }
 }

@@ -39,8 +39,7 @@ class _MyAppState extends State<MyApp> {
     };
 
     OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
-      var title = notification.payload.body;
-      print("RECEIVED NOTIFICATION in dart: $title");
+      print("RECEIVED NOTIFICATION in dart: ${notification.jsonRepresentation()}");
     });
     
     OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {

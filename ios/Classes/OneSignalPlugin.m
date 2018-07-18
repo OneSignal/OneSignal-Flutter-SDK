@@ -135,24 +135,24 @@
 - (void)handleReceivedNotification:(OSNotification *)notification {
     NSString *json = [[NSString alloc] initWithData:[NSJSONSerialization dataWithJSONObject:notification.toJson options:NSJSONWritingPrettyPrinted error:nil] encoding:NSUTF8StringEncoding];
     NSLog(@"Received notification with json: %@", json);
-    [self.channel invokeMethod:@"OneSignal#handleReceivedNotification" arguments:notification.toJson ? @[notification.toJson] : @[]];
+    [self.channel invokeMethod:@"OneSignal#handleReceivedNotification" arguments:notification.toJson ? notification.toJson : @[]];
 }
 
 - (void)handleNotificationOpened:(OSNotificationOpenedResult *)result {
     NSLog(@"Handling notification opened? %@", result);
-    [self.channel invokeMethod:@"OneSignal#handleOpenedNotification" arguments:@[result.toJson]];
+    [self.channel invokeMethod:@"OneSignal#handleOpenedNotification" arguments:result.toJson];
 }
 
 - (void)onOSSubscriptionChanged:(OSSubscriptionStateChanges*)stateChanges {
-   [self.channel invokeMethod:@"OneSignal#subscriptionChanged" arguments: @[stateChanges.toDictionary]];
+   [self.channel invokeMethod:@"OneSignal#subscriptionChanged" arguments: stateChanges.toDictionary];
 }
 
 -(void)onOSPermissionChanged:(OSPermissionStateChanges *)stateChanges {
-    [self.channel invokeMethod:@"OneSignal#permissionChanged" arguments:@[stateChanges.toDictionary]];
+    [self.channel invokeMethod:@"OneSignal#permissionChanged" arguments:stateChanges.toDictionary];
 }
 
 -(void)onOSEmailSubscriptionChanged:(OSEmailSubscriptionStateChanges *)stateChanges {
-    [self.channel invokeMethod:@"OneSignal#emailSubscriptionChanged" arguments:@[stateChanges.toDictionary]];
+    [self.channel invokeMethod:@"OneSignal#emailSubscriptionChanged" arguments:stateChanges.toDictionary];
 }
 
 @end

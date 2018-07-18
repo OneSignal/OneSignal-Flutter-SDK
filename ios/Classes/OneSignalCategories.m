@@ -58,8 +58,18 @@
     json[@"contentAvailable"] = @(self.contentAvailable);
     json[@"mutableContent"] = @(self.mutableContent);
     
+    NSError *jsonError;
+    if (self.rawPayload) {
+        NSData *data = [NSJSONSerialization dataWithJSONObject:self.rawPayload options:NSJSONWritingPrettyPrinted error:&jsonError];
+        
+        if (!jsonError) {
+            NSString *rawPayloadString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+            
+            if (self.rawPayload) json[@"rawPayload"] = rawPayloadString;
+        }
+    }
+    
     if (self.notificationID) json[@"notificationId"] = self.notificationID;
-    if (self.rawPayload) json[@"rawPayload"] = self.rawPayload;
     if (self.templateName) json[@"templateName"] = self.templateName;
     if (self.templateID) json[@"templateId"] = self.templateID;
     if (self.badge) json[@"badge"] = @(self.badge);

@@ -5,7 +5,7 @@ import 'test_data.dart';
 
 void main() {
   final notificationJson = TestData.jsonForTest('notification_parsing_test');
-  final notification = OSNotification.fromJson(notificationJson);
+  final notification = OSNotification(notificationJson);
   
   test ('expect notification ID to be set', () {
     expect(notification.payload.notificationId, "8e0eeec2-aa42-4ff7-a74b-bce9ca9e588b");

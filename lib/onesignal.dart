@@ -235,22 +235,17 @@ class OneSignal {
   Future<Null> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case 'OneSignal#handleReceivedNotification':
-        final List<dynamic> args = call.arguments;
-        final Map<dynamic, dynamic> map = args.first;
-        OSNotification notification = OSNotification.fromJson(map);
-        return this._onReceivedNotification(notification);
+        OSNotification not = OSNotification(call.arguments as Map<dynamic, dynamic>);
+        print("Created notification");
+        return this._onReceivedNotification(not);
       case 'OneSignal#handleOpenedNotification':
-        var args = call.arguments as List<dynamic>;
-        return this._onOpenedNotification(OSNotificationOpenedResult.fromJson(args.first as Map<dynamic, dynamic>));
+        return this._onOpenedNotification(OSNotificationOpenedResult(call.arguments as Map<dynamic, dynamic>));
       case 'OneSignal#subscriptionChanged': 
-        var args = call.arguments as List<dynamic>;
-        return this._onSubscriptionChangedHandler(OSSubscriptionStateChanges(args.first as Map<dynamic, dynamic>));
+        return this._onSubscriptionChangedHandler(OSSubscriptionStateChanges(call.arguments as Map<dynamic, dynamic>));
       case 'OneSignal#permissionChanged':
-        var args = call.arguments as List<dynamic>;
-        return this._onPermissionChangedHandler(OSPermissionStateChanges(args.first as Map<dynamic, dynamic>));
+        return this._onPermissionChangedHandler(OSPermissionStateChanges(call.arguments as Map<dynamic, dynamic>));
       case 'OneSignal#emailSubscriptionChanged':
-        var args = call.arguments as List<dynamic>;
-        return this._onEmailSubscriptionChangedHandler(OSEmailSubscriptionStateChanges(args.first as Map<dynamic, dynamic>));
+        return this._onEmailSubscriptionChangedHandler(OSEmailSubscriptionStateChanges(call.arguments as Map<dynamic, dynamic>));
     }
   }
 
