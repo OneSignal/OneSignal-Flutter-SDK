@@ -72,21 +72,11 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
   @Override
   public void onMethodCall(MethodCall call, Result result) {
     if (call.method.contentEquals("OneSignal#init")) {
-      Map<String, Object> args = (Map<String, Object>)call.arguments;
-      Context context = flutterRegistrar.context();
-
-      OneSignal.init(context, null, (String)args.get("appId"), this, this);
-
-      OneSignal.addSubscriptionObserver(this);
-      OneSignal.addEmailSubscriptionObserver(this);
-      OneSignal.addPermissionObserver(this);
+      initOneSignal(call, result);
     } else if (call.method.contentEquals("OneSignal#setLogLevel")) {
       Map<String, Object> args = (Map<String, Object>)call.arguments;
 
-      int console = (int)args.get("console");
-      int visual = (int)args.get("visual");
-
-      OneSignal.setLogLevel(console, visual);
+      OneSignal.setLogLevel((int)args.get("console"), (int)args.get("visual"));
 
       result.success(null);
     } else if (call.method.contentEquals("OneSignal#requiresUserPrivacyConsent")) {
@@ -100,7 +90,7 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     } else if (call.method.contentEquals("OneSignal#setRequiresUserPrivacyConsent")) {
       Map<String, Object> args = (Map<String, Object>)call.arguments;
 
-      OneSignal.setRequiresUserPrivacyConsent((Boolean)args.get("granted"));
+      OneSignal.setRequiresUserPrivacyConsent((boolean)args.get("required"));
 
       result.success(null);
     } else if (call.method.contentEquals("OneSignal#log")) {
@@ -168,6 +158,17 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     } else {
       result.notImplemented();
     }
+  }
+
+  public void initOneSignal(MethodCall call, Result result) {
+    Map<String, Object> args = (Map<String, Object>)call.arguments;
+    Context context = flutterRegistrar.context();
+
+    OneSignal.init(context, null, (String)args.get("appId"), this, this);
+
+    OneSignal.addSubscriptionObserver(this);
+    OneSignal.addEmailSubscriptionObserver(this);
+    OneSignal.addPermissionObserver(this);
   }
 
   @Override

@@ -1,4 +1,4 @@
-# onesignal
+# onesignal [![Build Status](https://travis-ci.org/OneSignal/OneSignal-Flutter-SDK.svg?branch=master)](https://travis-ci.org/OneSignal/OneSignal-Flutter-SDK)
 
 A new flutter plugin project.
 
