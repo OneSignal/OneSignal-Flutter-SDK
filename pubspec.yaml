@@ -10,7 +10,7 @@ homepage:
 # The following section is specific to Flutter.
 flutter:
   plugin:
-    androidPackage: com.onesignal.onesignal
+    androidPackage: com.onesignal.flutter
     pluginClass: OneSignalPlugin
 
 

@@ -1,4 +1,4 @@
-package com.onesignal.onesignal;
+package com.onesignal.flutter;
 
 import android.util.Log;
 import com.onesignal.OSNotificationPayload.BackgroundImageLayout;

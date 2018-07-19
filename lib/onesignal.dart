@@ -151,23 +151,34 @@ class OneSignal {
 
   /// Sends a single key/value pair to tags to OneSignal. 
   /// Please do not send hashmaps/arrays as values as this will fail.
+  /// This method can often take more than five seconds to complete,
+  /// so please do NOT block any user-interactive content while
+  /// waiting for this request to complete.
   Future<Map<dynamic, dynamic>> sendTag(dynamic key, dynamic value) async {
     return await this.sendTags({ key : value });
   }
   
   /// Updates the user's OneSignal tags. This method is additive
+  /// This method can often take more than five seconds to complete,
+  /// so please do NOT block any user-interactive content while
+  /// waiting for this request to complete.
   Future<Map<dynamic, dynamic>> sendTags(Map<dynamic, dynamic> tags) async {
     return await _tagsChannel.invokeMethod("OneSignal#sendTags", tags);
   }
 
   /// An asynchronous method that makes an HTTP request to OneSignal's
   /// API to retrieve the current user's tags.
+  /// This request can take a while to complete: please do NOT block
+  /// any user-interactive content while waiting for this request
+  /// to finish.
   Future<Map<dynamic, dynamic>> getTags() async {
     return await _tagsChannel.invokeMethod("OneSignal#getTags");
   }
 
   /// Allows you to delete a single key/value pair from the user's tags
-  /// by specifying the key
+  /// by specifying the key. This method can often take more than five 
+  /// seconds to complete, so please do NOT block any user-interactive 
+  /// content while waiting for this request to complete.
   Future<Map<dynamic, dynamic>> deleteTag(String key) async {
     return await this.deleteTags([key]);
   }

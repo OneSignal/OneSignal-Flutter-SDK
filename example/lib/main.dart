@@ -61,14 +61,6 @@ class _MyAppState extends State<MyApp> {
 
     OneSignal.shared.init("78e8aff3-7ce2-401f-9da0-2d41f287ebaf", iOSSettings: settings);
 
-    try {
-      print("Sending tags");
-      var tags = await OneSignal.shared.sendTag("test", "value");
-      print("Successfully sent tags: $tags");
-    } catch (error) {
-      print("Encountered exception sending tags: $error");
-    }
-
     // If the widget was removed from the tree while the asynchronous platform
     // message was in flight, we want to discard the reply rather than calling
     // setState to update our non-existent appearance.
@@ -124,7 +116,7 @@ class _MyAppState extends State<MyApp> {
                     child: new Text("Send Tags"),
                     onPressed: () {
                       print("Sending tags");
-                      OneSignal.shared.sendTag("test1", "val1").then((result) {
+                      OneSignal.shared.sendTag("test2", "val2").then((result) {
                         print("Successfully sent tags: $result");
                       }).catchError((error) {
                         print("Encountered an error sending tags: $error");
@@ -228,6 +220,50 @@ class _MyAppState extends State<MyApp> {
                         print("Successfully set email: $response");
                       }, onError: (error) {
                         print("Failed to set email with error: $error");
+                      });
+                    },
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  Container(
+                    height: 8.0,
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  new FlatButton(
+                    color: Color.fromARGB(255, 212, 86, 83),
+                    textColor: Color.fromARGB(255, 255, 255, 255),
+                    padding: EdgeInsets.all(8.0),
+                    child: new Text("Set Consent"),
+                    onPressed: () {
+                      OneSignal.shared.consentGranted(true);
+                    },
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  Container(
+                    height: 8.0,
+                  )
+                ]
+              ),
+              new TableRow(
+                children: [
+                  new FlatButton(
+                    color: Color.fromARGB(255, 212, 86, 83),
+                    textColor: Color.fromARGB(255, 255, 255, 255),
+                    padding: EdgeInsets.all(8.0),
+                    child: new Text("Delete Tag"),
+                    onPressed: () {
+                      OneSignal.shared.deleteTag("test2").then((tags) {
+                        print("Successfully deleted tags, current tags = $tags");
+                      }).catchError((error) {
+                        print("Encountered error deleting tag: $error");
                       });
                     },
                   )

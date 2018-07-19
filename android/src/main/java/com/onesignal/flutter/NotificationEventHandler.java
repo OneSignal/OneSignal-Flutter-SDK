@@ -1,6 +1,6 @@
-package com.onesignal.onesignal;
+package com.onesignal.flutter;
 
-import com.onesignal.onesignal.OneSignalPlugin;
+import com.onesignal.flutter.OneSignalPlugin;
 import org.json.JSONObject;
 import android.content.Intent;
 import android.os.Bundle;

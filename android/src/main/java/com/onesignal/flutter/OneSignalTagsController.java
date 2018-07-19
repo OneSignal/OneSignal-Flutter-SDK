@@ -1,4 +1,4 @@
-package com.onesignal.onesignal;
+package com.onesignal.flutter;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -24,6 +24,9 @@ import com.onesignal.OneSignal.NotificationOpenedHandler;
 import com.onesignal.OneSignal.NotificationReceivedHandler;
 import com.onesignal.OneSignal.EmailUpdateHandler;
 import com.onesignal.OneSignal.EmailUpdateError;
+import com.onesignal.OneSignal.GetTagsHandler;
+import com.onesignal.OneSignal.ChangeTagsUpdateHandler;
+import com.onesignal.OneSignal.SendTagsError;
 
 import org.json.JSONObject;
 import org.json.JSONArray;
@@ -50,36 +53,63 @@ import android.content.pm.PackageManager;
  * Created by bradhesse on 7/17/18.
  */
 
-public class OneSignalTagsController implements MethodCallHandler {
+public class OneSignalTagsController implements MethodCallHandler, ChangeTagsUpdateHandler, GetTagsHandler {
     private MethodChannel channel;
+    private Result sendTagsResult;
+    private Result getTagsResult;
 
     public static void registerWith(Registrar registrar) {
         OneSignalTagsController controller = new OneSignalTagsController();
-
         controller.channel = new MethodChannel(registrar.messenger(), "OneSignal#tags");
-
         controller.channel.setMethodCallHandler(controller);
     }
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
         if (call.method.contentEquals("OneSignal#getTags")) {
-            final Result reply = result;
-            OneSignal.getTags(new OneSignal.GetTagsHandler() {
-                @Override
-                public void tagsAvailable(JSONObject tags) {
-                    try {
-                        reply.success(OneSignalSerializer.convertJSONObjectToHashMap(tags));
-                    } catch (JSONException exception) {
-                        reply.error("onesignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
-                    }
-                }
-            });
+            getTagsResult = result;
+            OneSignal.getTags(this);
         } else if (call.method.contentEquals("OneSignal#sendTags")) {
-            Map<String, Object> args = (Map<String, Object>)call.arguments;
-            OneSignal.sendTags(new JSONObject(args));
-        } else if (call.method.contentEquals("OneSignal#deleteTags")) {
-            OneSignal.deleteTags((List<String>)call.arguments);
+            sendTagsResult = result;
+            OneSignal.sendTags(new JSONObject((Map<String, Object>)call.arguments), this);
+        } else if (call.method.contentEquals("OneSignal#deleteTags")
+                ) {
+            sendTagsResult = result;
+            OneSignal.deleteTags((List<String>)call.arguments, this);
+        }
+    }
+
+    @Override
+    public void onSuccess(JSONObject tags) {
+        if (sendTagsResult != null) {
+            try {
+                sendTagsResult.success(OneSignalSerializer.convertJSONObjectToHashMap(tags));
+            } catch (JSONException exception) {
+                sendTagsResult.error("onesignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
+            }
+
+            sendTagsResult = null;
+        }
+    }
+
+    @Override
+    public void onFailure(SendTagsError error) {
+        if (sendTagsResult != null) {
+            sendTagsResult.error("onesignal", "Encountered an error updating tags (" + String.valueOf(error.getCode()) + "): " + error.getMessage(), null);
+            sendTagsResult = null;
+        }
+    }
+
+    @Override
+    public void tagsAvailable(JSONObject jsonObject) {
+        if (getTagsResult != null) {
+            try {
+                getTagsResult.success(OneSignalSerializer.convertJSONObjectToHashMap(jsonObject));
+            } catch (JSONException exception) {
+                getTagsResult.error("onesignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
+            }
+
+            getTagsResult = null;
         }
     }
 }
