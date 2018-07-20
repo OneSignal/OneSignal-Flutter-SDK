@@ -1,9 +1,14 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:onesignal/permission.dart';
-import 'package:onesignal/subscription.dart';
-import 'package:onesignal/defines.dart';
-import 'package:onesignal/notification.dart';
+import 'package:OneSignalFlutter/src/permission.dart';
+import 'package:OneSignalFlutter/src/subscription.dart';
+import 'package:OneSignalFlutter/src/defines.dart';
+import 'package:OneSignalFlutter/src/notification.dart';
+
+export 'src/notification.dart';
+export 'src/subscription.dart';
+export 'src/permission.dart';
+export 'src/defines.dart';
 
 // Handlers for various events
 typedef void ReceivedNotificationHandler(OSNotification notification);
@@ -11,9 +16,6 @@ typedef void OpenedNotificationHandler(OSNotificationOpenedResult openedResult);
 typedef void SubscriptionChangedHandler(OSSubscriptionStateChanges changes);
 typedef void EmailSubscriptionChangeHandler(OSEmailSubscriptionStateChanges changes);
 typedef void PermissionChangeHandler(OSPermissionStateChanges changes);
-
-// Bridged Callbacks 
-typedef Future<dynamic> UserGrantedPermission(bool granted);
 
 class OneSignal {
 

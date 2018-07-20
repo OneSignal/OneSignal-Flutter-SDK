@@ -1,6 +1,5 @@
 import 'package:test/test.dart';
-import 'package:onesignal/onesignal.dart';
-import 'package:onesignal/defines.dart';
+import 'package:OneSignalFlutter/onesignal.dart';
 import 'mock_channel.dart';
 
 void main() {

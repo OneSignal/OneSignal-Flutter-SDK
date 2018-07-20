@@ -1,14 +1,14 @@
 PODS:
   - Flutter (1.0.0)
-  - onesignal (0.0.1):
+  - OneSignal (2.8.5)
+  - OneSignalFlutter (0.0.1):
     - Flutter
     - OneSignal
-  - OneSignal (2.8.5)
 
 DEPENDENCIES:
   - Flutter (from `.symlinks/flutter/ios-release`)
-  - onesignal (from `.symlinks/plugins/onesignal/ios`)
-  - OneSignal (~> 2.8.5)
+  - OneSignal (< 3.0, >= 2.8.5)
+  - OneSignalFlutter (from `.symlinks/plugins/OneSignalFlutter/ios`)
 
 SPEC REPOS:
   https://github.com/CocoaPods/Specs.git:
@@ -17,14 +17,14 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: ".symlinks/flutter/ios-release"
-  onesignal:
-    :path: ".symlinks/plugins/onesignal/ios"
+  OneSignalFlutter:
+    :path: ".symlinks/plugins/OneSignalFlutter/ios"
 
 SPEC CHECKSUMS:
   Flutter: 9d0fac939486c9aba2809b7982dfdbb47a7b0296
   OneSignal: 42dae269c7eca517aee34963820e1eb922390031
-  onesignal: 8f7d7b910ffa16ade2fa6baaabe32db9d920c6a9
+  OneSignalFlutter: d16f1045e4f4ea30190d9da8beb5376067a1b71f
 
-PODFILE CHECKSUM: 23a712595d142aaca238d28c1fa4e21e102b73a3
+PODFILE CHECKSUM: c9a3a5716001f4e2fe1389a29e9ff4ef6296b9ad
 
 COCOAPODS: 1.5.0

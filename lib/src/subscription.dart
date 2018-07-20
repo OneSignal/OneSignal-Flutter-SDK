@@ -1,4 +1,4 @@
-import 'package:onesignal/defines.dart';
+import 'package:OneSignalFlutter/src/defines.dart';
 
 
 /// Represents the current user's subscription state with OneSignal

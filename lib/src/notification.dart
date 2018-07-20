@@ -1,4 +1,4 @@
-import 'package:onesignal/defines.dart';
+import 'package:OneSignalFlutter/src/defines.dart';
 import 'dart:convert';
 
 /// A class representing the notification, including the

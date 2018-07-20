@@ -50,5 +50,17 @@
       "displayType" : 1,
       "appInFocus" : true,
       "silent" : true
+    },
+    "permission_parsing_test" : {
+       "from" : {
+          "hasPrompted" : false,
+          "provisional" : false,
+          "status" : 0
+       },
+       "to" : {
+          "hasPrompted" : true,
+          "provisional" : true,
+          "status" : 2
+       }
     }
 }

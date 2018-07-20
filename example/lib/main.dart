@@ -1,14 +1,8 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-// TODO: Figure out how to get all of these classes/enums imported just 
-// by importing OneSignal.dart, create some sort of umbrella declaration
-// without having to create a giant onesignal file.
-import 'package:onesignal/onesignal.dart';
-import 'package:onesignal/notification.dart';
-import 'package:onesignal/subscription.dart';
-import 'package:onesignal/permission.dart';
-import 'package:onesignal/defines.dart';
+//import OneSignal
+import 'package:OneSignalFlutter/onesignal.dart';
 
 void main() => runApp(new MyApp());
 
