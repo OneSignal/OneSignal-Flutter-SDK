@@ -31,14 +31,11 @@ import android.util.Log;
 
 /** OnesignalPlugin */
 public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedHandler, NotificationOpenedHandler, OSSubscriptionObserver, OSEmailSubscriptionObserver, OSPermissionObserver {
-  public static final String NOTIFICATION_OPENED_INTENT_FILTER = "GTNotificationOpened";
-  public static final String NOTIFICATION_RECEIVED_INTENT_FILTER = "GTNotificationReceived";
-  public static final String HIDDEN_MESSAGE_KEY = "hidden";
 
   /** Plugin registration. */
   private Registrar flutterRegistrar;
   private MethodChannel channel;
-
+  private boolean didSetRequiresPrivacyConsent = false;
   private boolean waitingForUserPrivacyConsent = false;
 
   public static void registerWith(Registrar registrar) {
@@ -54,8 +51,6 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     plugin.flutterRegistrar = registrar;
 
     OneSignalTagsController.registerWith(registrar);
-
-    OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
   }
 
   @Override
@@ -101,7 +96,7 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
 
     OneSignal.init(context, null, (String)args.get("appId"), this, this);
 
-    if (!OneSignal.userProvidedPrivacyConsent()) {
+    if (didSetRequiresPrivacyConsent) {
       this.waitingForUserPrivacyConsent = true;
     } else {
       this.addObservers();
@@ -109,6 +104,7 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
   }
 
   public void addObservers() {
+    Log.d("onesignal", "adding observers");
     OneSignal.addSubscriptionObserver(this);
     OneSignal.addEmailSubscriptionObserver(this);
     OneSignal.addPermissionObserver(this);
@@ -132,8 +128,12 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
 
   public void setRequiresUserPrivacyConsent(MethodCall call, Result result) {
     Map<String, Object> args = (Map<String, Object>)call.arguments;
+    
+    boolean required = (boolean)args.get("required");
 
-    OneSignal.setRequiresUserPrivacyConsent((boolean)args.get("required"));
+    didSetRequiresPrivacyConsent = required;
+
+    OneSignal.setRequiresUserPrivacyConsent(required);
 
     result.success(null);
   }
@@ -224,6 +224,7 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
 
   @Override
   public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
+    Log.d("onesignal", "Subscription changed calling observer");
     this.channel.invokeMethod("OneSignal#subscriptionChanged", OneSignalSerializer.convertSubscriptionStateChangesToMap(stateChanges));
   }
 

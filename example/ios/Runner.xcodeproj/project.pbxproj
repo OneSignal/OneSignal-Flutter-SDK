@@ -24,43 +24,12 @@
 		B0FF352B7B84E776AAB7ECDB /* libPods-Runner.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 39608820A78EFC26683593B5 /* libPods-Runner.a */; };
 		CA2C87DA21014E1800D5D35D /* SystemConfiguration.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA2C87D921014E1800D5D35D /* SystemConfiguration.framework */; };
 		CA2C87DC21014E1C00D5D35D /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA2C87DB21014E1C00D5D35D /* UIKit.framework */; };
-		CA2C87EC2101530900D5D35D /* OneSignal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA2C87E62101510A00D5D35D /* OneSignal.framework */; };
-		CA2C87ED2101530900D5D35D /* OneSignal.framework in Embed Frameworks */ = {isa = PBXBuildFile; fileRef = CA2C87E62101510A00D5D35D /* OneSignal.framework */; settings = {ATTRIBUTES = (CodeSignOnCopy, RemoveHeadersOnCopy, ); }; };
-		CA2C87F02101531400D5D35D /* OneSignal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA2C87E62101510A00D5D35D /* OneSignal.framework */; };
 		CA2C87F221015A8D00D5D35D /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA2C87F121015A8C00D5D35D /* UserNotifications.framework */; };
 		CAB34E9320F96BDA0024CA6B /* NotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = CAB34E9220F96BDA0024CA6B /* NotificationService.m */; };
 		CAB34E9D20F96F460024CA6B /* OneSignalNotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CAB34E8F20F96BDA0024CA6B /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		CA2C87E32101510A00D5D35D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = CA2C87DD2101510900D5D35D /* OneSignal.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 37747F9319147D6500558FAD;
-			remoteInfo = OneSignal;
-		};
-		CA2C87E52101510A00D5D35D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = CA2C87DD2101510900D5D35D /* OneSignal.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 3E2400381D4FFC31008BDE70;
-			remoteInfo = "OneSignal-Dynamic";
-		};
-		CA2C87E72101510A00D5D35D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = CA2C87DD2101510900D5D35D /* OneSignal.xcodeproj */;
-			proxyType = 2;
-			remoteGlobalIDString = 911E2CBA1E398AB3003112A4;
-			remoteInfo = UnitTests;
-		};
-		CA2C87EE2101530900D5D35D /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = CA2C87DD2101510900D5D35D /* OneSignal.xcodeproj */;
-			proxyType = 1;
-			remoteGlobalIDString = 3E2400371D4FFC31008BDE70;
-			remoteInfo = "OneSignal-Dynamic";
-		};
 		CAB34E9E20F96F460024CA6B /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 97C146E61CF9000F007C117D /* Project object */;
@@ -79,7 +48,6 @@
 			files = (
 				3B80C3951E831B6300D905FE /* App.framework in Embed Frameworks */,
 				9705A1C71CF904A300538489 /* Flutter.framework in Embed Frameworks */,
-				CA2C87ED2101530900D5D35D /* OneSignal.framework in Embed Frameworks */,
 			);
 			name = "Embed Frameworks";
 			runOnlyForDeploymentPostprocessing = 0;
@@ -122,7 +90,6 @@
 		CA23C3A020F4095B00835044 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		CA2C87D921014E1800D5D35D /* SystemConfiguration.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SystemConfiguration.framework; path = System/Library/Frameworks/SystemConfiguration.framework; sourceTree = SDKROOT; };
 		CA2C87DB21014E1C00D5D35D /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
-		CA2C87DD2101510900D5D35D /* OneSignal.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; name = OneSignal.xcodeproj; path = "../../../../OneSignal-iOS-SDK/iOS_SDK/OneSignalSDK/OneSignal.xcodeproj"; sourceTree = "<group>"; };
 		CA2C87F121015A8C00D5D35D /* UserNotifications.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UserNotifications.framework; path = System/Library/Frameworks/UserNotifications.framework; sourceTree = SDKROOT; };
 		CAB34E8F20F96BDA0024CA6B /* OneSignalNotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalNotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAB34E9120F96BDA0024CA6B /* NotificationService.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = NotificationService.h; sourceTree = "<group>"; };
@@ -139,7 +106,6 @@
 				9705A1C61CF904A100538489 /* Flutter.framework in Frameworks */,
 				3B80C3941E831B6300D905FE /* App.framework in Frameworks */,
 				B0FF352B7B84E776AAB7ECDB /* libPods-Runner.a in Frameworks */,
-				CA2C87EC2101530900D5D35D /* OneSignal.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -148,7 +114,6 @@
 			buildActionMask = 2147483647;
 			files = (
 				CA2C87F221015A8D00D5D35D /* UserNotifications.framework in Frameworks */,
-				CA2C87F02101531400D5D35D /* OneSignal.framework in Frameworks */,
 				CA2C87DC21014E1C00D5D35D /* UIKit.framework in Frameworks */,
 				CA2C87DA21014E1800D5D35D /* SystemConfiguration.framework in Frameworks */,
 			);
@@ -226,20 +191,9 @@
 			name = "Supporting Files";
 			sourceTree = "<group>";
 		};
-		CA2C87DE2101510900D5D35D /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				CA2C87E42101510A00D5D35D /* libOneSignal.a */,
-				CA2C87E62101510A00D5D35D /* OneSignal.framework */,
-				CA2C87E82101510A00D5D35D /* UnitTests.xctest */,
-			);
-			name = Products;
-			sourceTree = "<group>";
-		};
 		CAB34E9020F96BDA0024CA6B /* OneSignalNotificationServiceExtension */ = {
 			isa = PBXGroup;
 			children = (
-				CA2C87DD2101510900D5D35D /* OneSignal.xcodeproj */,
 				CAB34E9C20F96BE60024CA6B /* OneSignalNotificationServiceExtension.entitlements */,
 				CAB34E9120F96BDA0024CA6B /* NotificationService.h */,
 				CAB34E9220F96BDA0024CA6B /* NotificationService.m */,
@@ -281,7 +235,6 @@
 			);
 			dependencies = (
 				CAB34E9F20F96F460024CA6B /* PBXTargetDependency */,
-				CA2C87EF2101530900D5D35D /* PBXTargetDependency */,
 			);
 			name = Runner;
 			productName = Runner;
@@ -350,12 +303,6 @@
 			mainGroup = 97C146E51CF9000F007C117D;
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
-			projectReferences = (
-				{
-					ProductGroup = CA2C87DE2101510900D5D35D /* Products */;
-					ProjectRef = CA2C87DD2101510900D5D35D /* OneSignal.xcodeproj */;
-				},
-			);
 			projectRoot = "";
 			targets = (
 				97C146ED1CF9000F007C117D /* Runner */,
@@ -363,30 +310,6 @@
 			);
 		};
 /* End PBXProject section */
-
-/* Begin PBXReferenceProxy section */
-		CA2C87E42101510A00D5D35D /* libOneSignal.a */ = {
-			isa = PBXReferenceProxy;
-			fileType = archive.ar;
-			path = libOneSignal.a;
-			remoteRef = CA2C87E32101510A00D5D35D /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		CA2C87E62101510A00D5D35D /* OneSignal.framework */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.framework;
-			path = OneSignal.framework;
-			remoteRef = CA2C87E52101510A00D5D35D /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-		CA2C87E82101510A00D5D35D /* UnitTests.xctest */ = {
-			isa = PBXReferenceProxy;
-			fileType = wrapper.cfbundle;
-			path = UnitTests.xctest;
-			remoteRef = CA2C87E72101510A00D5D35D /* PBXContainerItemProxy */;
-			sourceTree = BUILT_PRODUCTS_DIR;
-		};
-/* End PBXReferenceProxy section */
 
 /* Begin PBXResourcesBuildPhase section */
 		97C146EC1CF9000F007C117D /* Resources */ = {
@@ -519,11 +442,6 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		CA2C87EF2101530900D5D35D /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			name = "OneSignal-Dynamic";
-			targetProxy = CA2C87EE2101530900D5D35D /* PBXContainerItemProxy */;
-		};
 		CAB34E9F20F96F460024CA6B /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = CAB34E8E20F96BDA0024CA6B /* OneSignalNotificationServiceExtension */;
