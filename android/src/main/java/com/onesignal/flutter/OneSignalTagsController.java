@@ -21,10 +21,30 @@ import java.util.Map;
  * Created by bradhesse on 7/17/18.
  */
 
-public class OneSignalTagsController implements MethodCallHandler, ChangeTagsUpdateHandler, GetTagsHandler {
+class OSFlutterChangeTagsHandler implements ChangeTagsUpdateHandler {
+    private Result result;
+
+    OSFlutterChangeTagsHandler(Result res) {
+        this.result = res;
+    }
+
+    @Override
+    public void onSuccess(JSONObject tags) {
+        try {
+            this.result.success(OneSignalSerializer.convertJSONObjectToHashMap(tags));
+        } catch (JSONException exception) {
+            this.result.error("onesignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
+        }
+    }
+
+    @Override
+    public void onFailure(SendTagsError error) {
+        this.result.error("onesignal", "Encountered an error updating tags (" + String.valueOf(error.getCode()) + "): " + error.getMessage(), null);
+    }
+}
+
+public class OneSignalTagsController implements MethodCallHandler {
     private MethodChannel channel;
-    private Result sendTagsResult;
-    private Result getTagsResult;
 
     public static void registerWith(Registrar registrar) {
         OneSignalTagsController controller = new OneSignalTagsController();
@@ -35,49 +55,22 @@ public class OneSignalTagsController implements MethodCallHandler, ChangeTagsUpd
     @Override
     public void onMethodCall(MethodCall call, Result result) {
         if (call.method.contentEquals("OneSignal#getTags")) {
-            getTagsResult = result;
-            OneSignal.getTags(this);
+            final Result res = result;
+            OneSignal.getTags(new GetTagsHandler() {
+                @Override
+                public void tagsAvailable(JSONObject tags) {
+                    try {
+                        res.success(OneSignalSerializer.convertJSONObjectToHashMap(tags));
+                    } catch (JSONException exception) {
+                        res.error("onesignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
+                    }
+                }
+            });
         } else if (call.method.contentEquals("OneSignal#sendTags")) {
-            sendTagsResult = result;
-            OneSignal.sendTags(new JSONObject((Map<String, Object>)call.arguments), this);
+            OneSignal.sendTags(new JSONObject((Map<String, Object>) call.arguments), new OSFlutterChangeTagsHandler(result));
         } else if (call.method.contentEquals("OneSignal#deleteTags")
                 ) {
-            sendTagsResult = result;
-            OneSignal.deleteTags((List<String>)call.arguments, this);
-        }
-    }
-
-    @Override
-    public void onSuccess(JSONObject tags) {
-        if (sendTagsResult != null) {
-            try {
-                sendTagsResult.success(OneSignalSerializer.convertJSONObjectToHashMap(tags));
-            } catch (JSONException exception) {
-                sendTagsResult.error("onesignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
-            }
-
-            sendTagsResult = null;
-        }
-    }
-
-    @Override
-    public void onFailure(SendTagsError error) {
-        if (sendTagsResult != null) {
-            sendTagsResult.error("onesignal", "Encountered an error updating tags (" + String.valueOf(error.getCode()) + "): " + error.getMessage(), null);
-            sendTagsResult = null;
-        }
-    }
-
-    @Override
-    public void tagsAvailable(JSONObject jsonObject) {
-        if (getTagsResult != null) {
-            try {
-                getTagsResult.success(OneSignalSerializer.convertJSONObjectToHashMap(jsonObject));
-            } catch (JSONException exception) {
-                getTagsResult.error("onesignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
-            }
-
-            getTagsResult = null;
+            OneSignal.deleteTags((List<String>)call.arguments, new OSFlutterChangeTagsHandler(result));
         }
     }
 }
