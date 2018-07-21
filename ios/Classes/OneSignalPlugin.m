@@ -167,7 +167,14 @@ BOOL waitingForUserConsent;
 }
 
 - (void)setEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal setEmail:call.arguments[@"email"] withEmailAuthHashToken:call.arguments[@"emailAuthHashToken"] withSuccess:^{
+    
+    NSString *email = call.arguments[@"email"];
+    NSString *emailAuthHashToken = call.arguments[@"emailAuthHashToken"];
+    
+    if ([emailAuthHashToken isKindOfClass:[NSNull class]])
+        emailAuthHashToken = nil;
+    
+    [OneSignal setEmail:email withEmailAuthHashToken:emailAuthHashToken withSuccess:^{
         result(@[]);
     } withFailure:^(NSError *error) {
         result(error.flutterError);

@@ -23,12 +23,12 @@ class _MyAppState extends State<MyApp> {
 
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
+    if (!mounted) return;
 
     OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
     var settings = { 
-      OSiOSSettings.autoPrompt : false, 
-      OSiOSSettings.inFocusDisplayOption : OSNotificationDisplayType.alert,
+      OSiOSSettings.autoPrompt : false,
       OSiOSSettings.promptBeforeOpeningPushUrl : true 
     };
 
@@ -53,12 +53,86 @@ class _MyAppState extends State<MyApp> {
       print("EMAIL SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
     });
 
-    OneSignal.shared.init("78e8aff3-7ce2-401f-9da0-2d41f287ebaf", iOSSettings: settings);
+    await OneSignal.shared.init("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
+  }
 
-    // If the widget was removed from the tree while the asynchronous platform
-    // message was in flight, we want to discard the reply rather than calling
-    // setState to update our non-existent appearance.
-    if (!mounted) return;
+  void handleGetTags() {
+    OneSignal.shared.getTags().then((tags) {
+      if (tags == null) return;
+
+      setState((() {
+        _tagsJson = "$tags";
+      }));
+    }).catchError((error) {
+      setState(() {
+        _tagsJson = "$error";
+      });
+    });
+  }
+
+  void handleSendTags() {
+    print("Sending tags");
+    OneSignal.shared.sendTag("test2", "val2").then((result) {
+      print("Successfully sent tags: $result");
+    }).catchError((error) {
+      print("Encountered an error sending tags: $error");
+    });
+  }
+
+  void handlePromptForPushPermission() {
+    print("Prompting for Permission");
+    OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
+      print("Accepted permission: $accepted");
+    });
+  }
+
+  void handleGetPermissionSubscriptionState() {
+    print("Getting permissionSubscriptionState");
+    OneSignal.shared.getPermissionSubscriptionState().then((status) {
+      this.setState(() {
+        _tagsJson = status.jsonRepresentation();
+      });
+    });
+  }
+
+  void handleSetEmail() {
+    if (_emailAddress == null) return;
+
+    print("Setting email");
+
+    OneSignal.shared.setEmail(email: _emailAddress).whenComplete(() {
+      print("Successfully set email");
+    }).catchError((error) {
+      print("Failed to set email with error: $error");
+    });
+  }
+
+  void handleLogoutEmail() {
+    print("Logging out of email");
+    OneSignal.shared.logoutEmail().then((v) {
+      print("Successfully logged out of email");
+    }).catchError((error) {
+      print("Failed to log out of email: $error");
+    });
+  }
+
+  void handleSetConsent() {
+    print("Setting consent to true");
+    OneSignal.shared.consentGranted(true);
+  }
+
+  void handleSetLocationShared() {
+    print("Setting location shared to true");
+    OneSignal.shared.setLocationShared(true);
+  }
+
+  void handleDeleteTag() {
+    print("Deleting tag");
+    OneSignal.shared.deleteTag("test2").then((tags) {
+      print("Successfully deleted tags, current tags = $tags");
+    }).catchError((error) {
+      print("Encountered error deleting tag: $error");
+    });
   }
 
   @override
@@ -75,103 +149,22 @@ class _MyAppState extends State<MyApp> {
             children: [
               new TableRow(
                 children: [
-                  new FlatButton(
-                    color: Color.fromARGB(255, 212, 86, 83),
-                    textColor: Color.fromARGB(255, 255, 255, 255),
-                    padding: EdgeInsets.all(8.0),
-                    child: new Text("Get Tags"),
-                    onPressed: () {
-                      OneSignal.shared.getTags().then((tags) {
-                        setState((() {
-                          _tagsJson = "$tags";
-                        }));
-                      }).catchError((error) {
-                        setState(() {
-                          _tagsJson = "$error";
-                        });
-                      });
-                    },
-                  )
+                  new OneSignalButton("Get Tags", handleGetTags)
                 ]
               ),
               new TableRow(
                 children: [
-                  Container(
-                    height: 8.0,
-                  )
+                  new OneSignalButton("Send Tags", handleSendTags)
                 ]
               ),
               new TableRow(
                 children: [
-                  new FlatButton(
-                    color: Color.fromARGB(255, 212, 86, 83),
-                    textColor: Color.fromARGB(255, 255, 255, 255),
-                    padding: EdgeInsets.all(8.0),
-                    child: new Text("Send Tags"),
-                    onPressed: () {
-                      print("Sending tags");
-                      OneSignal.shared.sendTag("test2", "val2").then((result) {
-                        print("Successfully sent tags: $result");
-                      }).catchError((error) {
-                        print("Encountered an error sending tags: $error");
-                      });
-                    },
-                  )
+                  new OneSignalButton("Prompt for Push Permission", handlePromptForPushPermission)
                 ]
               ),
               new TableRow(
                 children: [
-                  Container(
-                    height: 8.0,
-                  )
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new FlatButton(
-                    color: Color.fromARGB(255, 212, 86, 83),
-                    textColor: Color.fromARGB(255, 255, 255, 255),
-                    padding: EdgeInsets.all(8.0),
-                    child: new Text("Prompt for Push Permission"),
-                    onPressed: () {
-                      print("Prompting for Permission");
-                      OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
-                        print("Accepted permission: $accepted");
-                      });
-                    },
-                  )
-                ]
-              ),
-              new TableRow(
-                children: [
-                  Container(
-                    height: 8.0,
-                  )
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new FlatButton(
-                    color: Color.fromARGB(255, 212, 86, 83),
-                    textColor: Color.fromARGB(255, 255, 255, 255),
-                    padding: EdgeInsets.all(8.0),
-                    child: new Text("Get Permission Subscription State"),
-                    onPressed: () {
-                      print("Getting permissionSubscriptionState");
-                      OneSignal.shared.getPermissionSubscriptionState().then((status) {
-                        this.setState(() {
-                          _tagsJson = status.jsonRepresentation();
-                        });
-                      });
-                    },
-                  )
-                ]
-              ),
-              new TableRow(
-                children: [
-                  Container(
-                    height: 8.0,
-                  )
+                  new OneSignalButton("Print Permission Subscription State", handleGetPermissionSubscriptionState)
                 ]
               ),
               new TableRow(
@@ -201,73 +194,27 @@ class _MyAppState extends State<MyApp> {
               ),
               new TableRow(
                 children: [
-                  new FlatButton(
-                    color: Color.fromARGB(255, 212, 86, 83),
-                    textColor: Color.fromARGB(255, 255, 255, 255),
-                    padding: EdgeInsets.all(8.0),
-                    child: new Text("Set Email"),
-                    onPressed: () {
-                      if (_emailAddress == null) return;
-
-                      print("Setting email");
-                      OneSignal.shared.setEmail(email: _emailAddress).then((response) {
-                        print("Successfully set email: $response");
-                      }, onError: (error) {
-                        print("Failed to set email with error: $error");
-                      });
-                    },
-                  )
+                  new OneSignalButton("Set Email", handleSetEmail)
                 ]
               ),
               new TableRow(
                 children: [
-                  Container(
-                    height: 8.0,
-                  )
+                  new OneSignalButton("Logout Email", handleLogoutEmail)
                 ]
               ),
               new TableRow(
                 children: [
-                  new FlatButton(
-                    color: Color.fromARGB(255, 212, 86, 83),
-                    textColor: Color.fromARGB(255, 255, 255, 255),
-                    padding: EdgeInsets.all(8.0),
-                    child: new Text("Set Consent"),
-                    onPressed: () {
-                      OneSignal.shared.consentGranted(true);
-                    },
-                  )
+                  new OneSignalButton("Provide GDPR Consent", handleSetConsent)
                 ]
               ),
               new TableRow(
                 children: [
-                  Container(
-                    height: 8.0,
-                  )
+                  new OneSignalButton("Set Location Shared", handleSetLocationShared)
                 ]
               ),
               new TableRow(
                 children: [
-                  new FlatButton(
-                    color: Color.fromARGB(255, 212, 86, 83),
-                    textColor: Color.fromARGB(255, 255, 255, 255),
-                    padding: EdgeInsets.all(8.0),
-                    child: new Text("Delete Tag"),
-                    onPressed: () {
-                      OneSignal.shared.deleteTag("test2").then((tags) {
-                        print("Successfully deleted tags, current tags = $tags");
-                      }).catchError((error) {
-                        print("Encountered error deleting tag: $error");
-                      });
-                    },
-                  )
-                ]
-              ),
-              new TableRow(
-                children: [
-                  Container(
-                    height: 8.0,
-                  )
+                  new OneSignalButton("Delete Tag", handleDeleteTag)
                 ]
               ),
               new TableRow(
@@ -284,4 +231,44 @@ class _MyAppState extends State<MyApp> {
       ),
     );
   }
+}
+
+typedef void OnButtonPressed();
+
+class OneSignalButton extends StatefulWidget {
+  final String title;
+  final OnButtonPressed onPressed;
+
+  OneSignalButton(this.title, this.onPressed);
+
+  State<StatefulWidget> createState() => new OneSignalButtonState();
+}
+
+class OneSignalButtonState extends State<OneSignalButton> {
+  @override
+    Widget build(BuildContext context) {
+      // TODO: implement build
+      return new Table(
+        children: [
+          new TableRow(
+            children: [
+              new FlatButton(
+                color: Color.fromARGB(255, 212, 86, 83),
+                textColor: Color.fromARGB(255, 255, 255, 255),
+                padding: EdgeInsets.all(8.0),
+                child: new Text(widget.title),
+                onPressed: widget.onPressed,
+              )
+            ]
+          ),
+          new TableRow(
+            children: [
+              Container(
+                height: 8.0,
+              )
+            ]
+          ),
+        ],
+      );
+    }
 }

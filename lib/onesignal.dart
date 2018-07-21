@@ -246,18 +246,19 @@ class OneSignal {
 
   // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
-    switch (call.method) {
-      case 'OneSignal#handleReceivedNotification':
-        return this._onReceivedNotification(OSNotification(call.arguments as Map<dynamic, dynamic>));
-      case 'OneSignal#handleOpenedNotification':
-        return this._onOpenedNotification(OSNotificationOpenedResult(call.arguments as Map<dynamic, dynamic>));
-      case 'OneSignal#subscriptionChanged': 
-        return this._onSubscriptionChangedHandler(OSSubscriptionStateChanges(call.arguments as Map<dynamic, dynamic>));
-      case 'OneSignal#permissionChanged':
-        return this._onPermissionChangedHandler(OSPermissionStateChanges(call.arguments as Map<dynamic, dynamic>));
-      case 'OneSignal#emailSubscriptionChanged':
-        return this._onEmailSubscriptionChangedHandler(OSEmailSubscriptionStateChanges(call.arguments as Map<dynamic, dynamic>));
+    if (call.method == 'OneSignal#handleReceivedNotification' && this._onReceivedNotification != null) {
+      return this._onReceivedNotification(OSNotification(call.arguments as Map<dynamic, dynamic>));
+    } else if (call.method == 'OneSignal#handleOpenedNotification' && this._onOpenedNotification != null) {
+      return this._onOpenedNotification(OSNotificationOpenedResult(call.arguments as Map<dynamic, dynamic>));
+    } else if (call.method == 'OneSignal#subscriptionChanged' && this._onSubscriptionChangedHandler != null) {
+      return this._onSubscriptionChangedHandler(OSSubscriptionStateChanges(call.arguments as Map<dynamic, dynamic>));
+    } else if (call.method == 'OneSignal#permissionChanged' && this._onPermissionChangedHandler != null) {
+      return this._onPermissionChangedHandler(OSPermissionStateChanges(call.arguments as Map<dynamic, dynamic>));
+    } else if (call.method == 'OneSignal#emailSubscriptionChanged' && this._onEmailSubscriptionChangedHandler != null) {
+      return this._onEmailSubscriptionChangedHandler(OSEmailSubscriptionStateChanges(call.arguments as Map<dynamic, dynamic>));
     }
+
+    return null;
   }
 
   //PRIVATE METHODS
