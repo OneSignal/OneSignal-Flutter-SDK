@@ -60,7 +60,7 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     } else if (call.method.contentEquals("OneSignal#setLogLevel")) {
       this.setLogLevel(call, result);
     } else if (call.method.contentEquals("OneSignal#requiresUserPrivacyConsent")) {
-      result.success(!OneSignal.userProvidedPrivacyConsent());
+      result.success(!OneSignal.requiresUserPrivacyConsent());
     } else if (call.method.contentEquals("OneSignal#consentGranted")) {
       this.consentGranted(call, result);
     } else if (call.method.contentEquals("OneSignal#setRequiresUserPrivacyConsent")) {
