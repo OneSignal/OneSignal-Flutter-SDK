@@ -42,7 +42,7 @@ dynamic convertEnumCaseToValue(dynamic key) {
 
   switch (key) {
     case OSCreateNotificationDelayOption.lastActive:
-      return "last-active";
+      return "last_active";
     case OSCreateNotificationDelayOption.timezone:
       return "timezone";
   }
@@ -63,5 +63,8 @@ dynamic convertEnumCaseToValue(dynamic key) {
 abstract class JSONStringRepresentable {
   String jsonRepresentation();
 
-  String convertToJsonString(Map<String, dynamic> object) => JsonEncoder.withIndent('  ').convert(object);
+  String convertToJsonString(Map<String, dynamic> object) => JsonEncoder.withIndent('  ')
+    .convert(object)
+    .replaceAll("\\n", "\n")
+    .replaceAll("\\", "");
 }

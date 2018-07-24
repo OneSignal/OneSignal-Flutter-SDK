@@ -41,6 +41,7 @@ class OSNotification extends JSONStringRepresentable {
     this.shown = json['shown'] as bool;
     this.appInFocus = json['appInFocus'] as bool;
     this.silent = json['silent'] as bool;
+    
     if (json.containsKey("androidNotificationId")) this.androidNotificationId = json['androidNotificationId'] as int;
     if (json.containsKey('displayType')) this.displayType = OSNotificationDisplayType.values[json['displayType'] as int];
   }
@@ -242,7 +243,10 @@ class OSNotificationPayload extends JSONStringRepresentable {
     if (json.containsKey('body')) this.body = json['body'] as String;
     if (json.containsKey('launchUrl')) this.launchUrl = json['launchUrl'] as String;
     if (json.containsKey('additionalData')) this.additionalData = json['additionalData'] as Map<dynamic, dynamic>;
-    if (json.containsKey('backgroundImageLayout')) this.backgroundImageLayout = OSAndroidBackgroundImageLayout(json['backgroundImageLayout'] as Map<dynamic, dynamic>);
+    
+    if (json.containsKey('backgroundImageLayout')) {
+      this.backgroundImageLayout = OSAndroidBackgroundImageLayout(json['backgroundImageLayout'] as Map<dynamic, dynamic>);
+    }
 
     // raw payload comes as a JSON string
     if (json.containsKey('rawPayload')) { 
@@ -277,7 +281,10 @@ class OSNotificationOpenedResult {
   //constructor
   OSNotificationOpenedResult(Map<dynamic, dynamic> json) {
     this.notification = OSNotification(json['notification'] as Map<dynamic, dynamic>);
-    this.action = OSNotificationAction(json['action'] as Map<dynamic, dynamic>);
+
+    if (json.containsKey('action')) { 
+      this.action = OSNotificationAction(json['action'] as Map<dynamic, dynamic>); 
+    }
   }
 }
 

@@ -8,90 +8,90 @@ import 'package:OneSignalFlutter/onesignal.dart';
 /// a Create Notification object as an entirely different class
 class OSCreateNotification extends JSONStringRepresentable {
 
-      /// An array of user ID's that should receive this notification
-      List<String> playerIds;
+  /// An array of user ID's that should receive this notification
+  List<String> playerIds;
 
-      /// The notification's content (excluding title)
-      String content;
+  /// The notification's content (excluding title)
+  String content;
 
-      /// The language code (ie. "en" for English) for this notification
-      /// defaults to "en" (English)
-      String languageCode;
+  /// The language code (ie. "en" for English) for this notification
+  /// defaults to "en" (English)
+  String languageCode;
 
-      /// The title/heading for the notification
-      String heading;
+  /// The title/heading for the notification
+  String heading;
 
-      /// The subtitle for the notification (iOS 10+ only)
-      String subtitle;
+  /// The subtitle for the notification (iOS 10+ only)
+  String subtitle;
 
-      /// Tells the app to launch in the background (iOS only)
-      bool contentAvailable;
+  /// Tells the app to launch in the background (iOS only)
+  bool contentAvailable;
 
-      /// Tells the app to launch the Notification Service extension,
-      /// which can mutate your notification (ie. download attachments)
-      bool mutableContent;
+  /// Tells the app to launch the Notification Service extension,
+  /// which can mutate your notification (ie. download attachments)
+  bool mutableContent;
 
-      /// Additional data you wish to send with the notification
-      Map<String, dynamic> additionalData;
+  /// Additional data you wish to send with the notification
+  Map<String, dynamic> additionalData;
 
-      /// The URL to open when the user taps the notification
-      String url;
+  /// The URL to open when the user taps the notification
+  String url;
 
-      /// Media (images, videos, etc.) for iOS
-      /// Maps a custom ID to a resource URL
-      /// in the format {'id' : 'https://.....'}
-      Map<String, String> iosAttachments;
+  /// Media (images, videos, etc.) for iOS
+  /// Maps a custom ID to a resource URL
+  /// in the format {'id' : 'https://.....'}
+  Map<String, String> iosAttachments;
 
-      /// An image to use as the big picture (android only)
-      String bigPicture;
+  /// An image to use as the big picture (android only)
+  String bigPicture;
 
-      /// A list of buttons to attach to the notification
-      List<OSActionButton> buttons;
+  /// A list of buttons to attach to the notification
+  List<OSActionButton> buttons;
 
-      /// The category identifier for iOS (controls various aspects
-      /// of the notification, for example, whether to launch a 
-      /// Notification Content Extension) (iOS only)
-      String iosCategory;
+  /// The category identifier for iOS (controls various aspects
+  /// of the notification, for example, whether to launch a 
+  /// Notification Content Extension) (iOS only)
+  String iosCategory;
 
-      /// The sound to play (iOS only)
-      String iosSound;
+  /// The sound to play (iOS only)
+  String iosSound;
 
-      /// The sound to play (Android only)
-      String androidSound;
+  /// The sound to play (Android only)
+  String androidSound;
 
-      /// A small icon (Android only)
-      /// Can be a drawable resource name or a URL
-      String androidSmallIcon;
+  /// A small icon (Android only)
+  /// Can be a drawable resource name or a URL
+  String androidSmallIcon;
 
-      /// A large icon (android only)
-      /// Can be a drawable resource name or a URL
-      String androidLargeIcon;
+  /// A large icon (android only)
+  /// Can be a drawable resource name or a URL
+  String androidLargeIcon;
 
-      /// The Android Oreo Notification Category to send the notification under
-      String androidChannelId;
+  /// The Android Oreo Notification Category to send the notification under
+  String androidChannelId;
 
-      /// can be 'Increase' or 'SetTo'
-      OSCreateNotificationBadgeType iosBadgeType;
+  /// can be 'Increase' or 'SetTo'
+  OSCreateNotificationBadgeType iosBadgeType;
 
-      /// The actual badge count to either set to directly, or increment by
-      /// To decrement the user's badge count, send a negative value
-      int iosBadgeCount;
+  /// The actual badge count to either set to directly, or increment by
+  /// To decrement the user's badge count, send a negative value
+  int iosBadgeCount;
 
-      /// If multiple notifications have the same collapse ID, only the most
-      /// recent notification will be shown
-      String collapseId;
+  /// If multiple notifications have the same collapse ID, only the most
+  /// recent notification will be shown
+  String collapseId;
 
-      /// Allows you to send a notification at a specific date
-      DateTime sendAfter;
+  /// Allows you to send a notification at a specific date
+  DateTime sendAfter;
 
-      /// You can use several options to send notifications at specific times
-      /// ie. you can send notifications to different user's at the same time
-      /// in each timezone with the 'timezone' delayedOption
-      OSCreateNotificationDelayOption delayedOption;
+  /// You can use several options to send notifications at specific times
+  /// ie. you can send notifications to different user's at the same time
+  /// in each timezone with the 'timezone' delayedOption
+  OSCreateNotificationDelayOption delayedOption;
 
-      /// Used with delayedOption == timezone, lets you specify what time of day 
-      /// each user should receive the notification, ie. "9:00 AM"
-      String deliveryTimeOfDay;
+  /// Used with delayedOption == timezone, lets you specify what time of day 
+  /// each user should receive the notification, ie. "9:00 AM"
+  String deliveryTimeOfDay;
 
   OSCreateNotification({
     @required this.playerIds,
@@ -140,7 +140,7 @@ class OSCreateNotification extends JSONStringRepresentable {
     // add optional parameters to payload if present
     if (this.content != null) json['contents'] = { this.languageCode : this.content };
     if (this.heading != null) json['headings'] = { this.languageCode : this.heading };
-    if (this.subtitle != null) json['subtitle'] = { this.languageCode : this.heading };
+    if (this.subtitle != null) json['subtitle'] = { this.languageCode : this.subtitle };
     if (this.contentAvailable != null) json['content_available'] = this.contentAvailable;
     if (this.mutableContent != null) json['mutable_content'] = this.mutableContent;
     if (this.additionalData != null) json['data'] = this.additionalData;
@@ -164,9 +164,9 @@ class OSCreateNotification extends JSONStringRepresentable {
 
     // adds buttons
     if (this.buttons != null) {
-      json['buttons'] = this.buttons.map((btn) {
-        return btn.mapRepresentation();
-      });
+      var btns = List<Map<String, dynamic>>();
+      this.buttons.forEach((btn) => btns.add(btn.mapRepresentation()));
+      json['buttons'] = btns;
     }
 
     return json;
