@@ -55,7 +55,7 @@ void main() {
   });
 
   test ('post notification', () {
-    onesignal.postNotification({"content_available" : true, "include_player_ids" : [testPlayerId]}).then(expectAsync1((v) {
+    onesignal.postNotificationWithJson({"content_available" : true, "include_player_ids" : [testPlayerId]}).then(expectAsync1((v) {
       expect(channelController.state.postNotificationJson['content_available'], true);
       expect(channelController.state.postNotificationJson['include_player_ids'], [testPlayerId]);
     }));

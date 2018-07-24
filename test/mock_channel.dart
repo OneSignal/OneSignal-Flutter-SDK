@@ -24,7 +24,7 @@ class OneSignalMockChannelController {
     state = OneSignalState();
   }
 
-  Future<Null> _handleMethod(MethodCall call) async {
+  Future<dynamic> _handleMethod(MethodCall call) async {
     print("Mock method called: ${call.method}");
     switch (call.method) {
       case "OneSignal#init":
@@ -59,10 +59,10 @@ class OneSignalMockChannelController {
         break;
       case "OneSignal#sendTags":
         this.state.tags = call.arguments;
-        break;
+        return {"success" : true};
       case "OneSignal#deleteTags":
         this.state.deleteTags = call.arguments;
-        break;
+        return {"success" : true};
     }
   }
 }
