@@ -12,8 +12,12 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  String _tagsJson = "";
+  String _debugLabelString = "";
   String _emailAddress;
+  bool _enableConsentButton = false;
+
+  // CHANGE THIS parameter to true if you want to test GDPR privacy consent
+  bool requireConsent = false;
 
   @override
   void initState() {
@@ -27,18 +31,27 @@ class _MyAppState extends State<MyApp> {
 
     OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
+    OneSignal.shared.setRequiresUserPrivacyConsent(requireConsent);
+
     var settings = { 
       OSiOSSettings.autoPrompt : false,
       OSiOSSettings.promptBeforeOpeningPushUrl : true 
     };
 
     OneSignal.shared.setNotificationReceivedHandler((notification) {
-      print("RECEIVED NOTIFICATION in dart: ${notification.jsonRepresentation()}");
+      this.setState(() {
+        _debugLabelString = "Received notification: \n${notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
     });
     
     OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      var id = result.action.actionId;
-      print("OPENED NOTIFICATION WITH ID in dart: $id");
+      this.setState(() {
+        _debugLabelString = "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });
+
+    OneSignal.shared.setSubscriptionObserver((OSSubscriptionStateChanges changes) {
+      print("SUBSCRIPTION STATE CHANGED: ${changes.jsonRepresentation()}");
     });
 
     OneSignal.shared.setPermissionObserver((OSPermissionStateChanges changes) {
@@ -49,33 +62,32 @@ class _MyAppState extends State<MyApp> {
       print("EMAIL SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
     });
 
-    await OneSignal.shared.init("78e8aff3-7ce2-401f-9da0-2d41f287ebaf", iOSSettings: settings);
+    await OneSignal.shared.init("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
 
     OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
 
-    print("Getting tags");
-    OneSignal.shared.getTags().then((Map<String, dynamic> tags) {
-      print("Received tags: $tags");
-    }).catchError((dynamic error) {
-      print("Encountered error getting tags $error");
+    bool requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
+
+    this.setState(() {
+      _enableConsentButton = requiresConsent;
     });
   }
 
-  void handleGetTags() {
+  void _handleGetTags() {
     OneSignal.shared.getTags().then((tags) {
       if (tags == null) return;
       
       setState((() {
-        _tagsJson = "$tags";
+        _debugLabelString = "$tags";
       }));
     }).catchError((error) {
       setState(() {
-        _tagsJson = "$error";
+        _debugLabelString = "$error";
       });
     });
   }
 
-  void handleSendTags() {
+  void _handleSendTags() {
     print("Sending tags");
     OneSignal.shared.sendTag("test2", "val2").then((response) {
       print("Successfully sent tags with response: $response");
@@ -84,23 +96,23 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void handlePromptForPushPermission() {
+  void _handlePromptForPushPermission() {
     print("Prompting for Permission");
     OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
       print("Accepted permission: $accepted");
     });
   }
 
-  void handleGetPermissionSubscriptionState() {
+  void _handleGetPermissionSubscriptionState() {
     print("Getting permissionSubscriptionState");
     OneSignal.shared.getPermissionSubscriptionState().then((status) {
       this.setState(() {
-        _tagsJson = status.jsonRepresentation();
+        _debugLabelString = status.jsonRepresentation();
       });
     });
   }
 
-  void handleSetEmail() {
+  void _handleSetEmail() {
     if (_emailAddress == null) return;
 
     print("Setting email");
@@ -112,7 +124,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void handleLogoutEmail() {
+  void _handleLogoutEmail() {
     print("Logging out of email");
     OneSignal.shared.logoutEmail().then((v) {
       print("Successfully logged out of email");
@@ -121,17 +133,22 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void handleSetConsent() {
+  void _handleConsent() {
     print("Setting consent to true");
     OneSignal.shared.consentGranted(true);
+
+    print("Setting state");
+    this.setState(() {
+      _enableConsentButton = false;
+    });
   }
 
-  void handleSetLocationShared() {
+  void _handleSetLocationShared() {
     print("Setting location shared to true");
     OneSignal.shared.setLocationShared(true);
   }
 
-  void handleDeleteTag() {
+  void _handleDeleteTag() {
     print("Deleting tag");
     OneSignal.shared.deleteTag("test2").then((response) {
       print("Successfully deleted tags with response $response");
@@ -140,7 +157,7 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void handleSendNotification() async {
+  void _handleSendNotification() async {
     var status = await OneSignal.shared.getPermissionSubscriptionState();
 
     var playerId = status.subscriptionStatus.userId;
@@ -148,12 +165,37 @@ class _MyAppState extends State<MyApp> {
     var notification = OSCreateNotification(
       playerIds: [playerId],
       content: "this is a test from OneSignal's Flutter SDK",
-      heading: "Test Notification"
+      heading: "Test Notification",
+      buttons: [
+        OSActionButton(text: "test1", id: "id1"),
+        OSActionButton(text: "test2", id: "id2")
+      ]
     );
     
     var response = await OneSignal.shared.postNotification(notification);
 
-    print("Sent notification with response: $response");
+    this.setState(() {
+      _debugLabelString = "Sent notification with response: $response";
+    });
+  }
+
+  void _handleSendSilentNotification() async {
+    var status = await OneSignal.shared.getPermissionSubscriptionState();
+
+    var playerId = status.subscriptionStatus.userId;
+
+    var notification = OSCreateNotification.silentNotification(
+      playerIds: [playerId],
+      additionalData: {
+        'test' : 'value'
+      }
+    );
+    
+    var response = await OneSignal.shared.postNotification(notification);
+
+    this.setState(() {
+      _debugLabelString = "Sent notification with response: $response";
+    });
   }
 
   @override
@@ -166,92 +208,99 @@ class _MyAppState extends State<MyApp> {
         ),
         body: Container(
           padding: EdgeInsets.all(10.0),
-          child: new Table(
-            children: [
-              new TableRow(
-                children: [
-                  new OneSignalButton("Get Tags", handleGetTags)
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new OneSignalButton("Send Tags", handleSendTags)
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new OneSignalButton("Prompt for Push Permission", handlePromptForPushPermission)
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new OneSignalButton("Print Permission Subscription State", handleGetPermissionSubscriptionState)
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new TextField(
-                    textAlign: TextAlign.center,
-                    decoration: InputDecoration(
-                      hintText: "Email Address",
-                      labelStyle: TextStyle(
-                        color: Color.fromARGB(255, 212, 86, 83),
-                      )
-                    ),
-                    onChanged: (text) {
-                      this.setState(() {
-                        _emailAddress = text == "" ? null : text;
-                      });
-                    },
-                  )
-                ]
-              ),
-              new TableRow(
-                children: [
-                  Container(
-                    height: 8.0,
-                  )
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new OneSignalButton("Set Email", handleSetEmail)
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new OneSignalButton("Logout Email", handleLogoutEmail)
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new OneSignalButton("Provide GDPR Consent", handleSetConsent)
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new OneSignalButton("Set Location Shared", handleSetLocationShared)
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new OneSignalButton("Delete Tag", handleDeleteTag)
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new OneSignalButton("Post Test Notification", handleSendNotification)
-                ]
-              ),
-              new TableRow(
-                children: [
-                  new Container(
-                    child: new Text(_tagsJson),
-                    alignment: Alignment.center,
-                  )
-                ]
-              )
-            ],
+          child: SingleChildScrollView(
+            child: new Table(
+              children: [
+                new TableRow(
+                  children: [
+                    new OneSignalButton("Get Tags", _handleGetTags, true)
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new OneSignalButton("Send Tags", _handleSendTags, true)
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new OneSignalButton("Prompt for Push Permission", _handlePromptForPushPermission, true)
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new OneSignalButton("Print Permission Subscription State", _handleGetPermissionSubscriptionState, true)
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new TextField(
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                        hintText: "Email Address",
+                        labelStyle: TextStyle(
+                          color: Color.fromARGB(255, 212, 86, 83),
+                        )
+                      ),
+                      onChanged: (text) {
+                        this.setState(() {
+                          _emailAddress = text == "" ? null : text;
+                        });
+                      },
+                    )
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    Container(
+                      height: 8.0,
+                    )
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new OneSignalButton("Set Email", _handleSetEmail, true)
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new OneSignalButton("Logout Email", _handleLogoutEmail, true)
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new OneSignalButton("Provide GDPR Consent", _handleConsent, _enableConsentButton)
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new OneSignalButton("Set Location Shared", _handleSetLocationShared, true)
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new OneSignalButton("Delete Tag", _handleDeleteTag, true)
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new OneSignalButton("Post Notification", _handleSendNotification, true)
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new OneSignalButton("Post Silent Notification", _handleSendSilentNotification, true)
+                  ]
+                ),
+                new TableRow(
+                  children: [
+                    new Container(
+                      child: new Text(_debugLabelString),
+                      alignment: Alignment.center,
+                    )
+                  ]
+                )
+              ],
+            ),
           ),
         )
       ),
@@ -264,8 +313,9 @@ typedef void OnButtonPressed();
 class OneSignalButton extends StatefulWidget {
   final String title;
   final OnButtonPressed onPressed;
+  final bool enabled;
 
-  OneSignalButton(this.title, this.onPressed);
+  OneSignalButton(this.title, this.onPressed, this.enabled);
 
   State<StatefulWidget> createState() => new OneSignalButtonState();
 }
@@ -279,11 +329,13 @@ class OneSignalButtonState extends State<OneSignalButton> {
           new TableRow(
             children: [
               new FlatButton(
+                disabledColor: Color.fromARGB(180, 212, 86, 83),
+                disabledTextColor: Colors.white,
                 color: Color.fromARGB(255, 212, 86, 83),
-                textColor: Color.fromARGB(255, 255, 255, 255),
+                textColor: Colors.white,
                 padding: EdgeInsets.all(8.0),
                 child: new Text(widget.title),
-                onPressed: widget.onPressed,
+                onPressed: widget.enabled ? widget.onPressed : null,
               )
             ]
           ),
