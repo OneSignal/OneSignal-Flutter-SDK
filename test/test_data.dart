@@ -20,7 +20,7 @@ const String testEmail = "test@example.com";
 const String testEmailAuthHashToken = "4f1916b13a164a765b42b3205b49670a40309127179cb2687ea7feae6f61ee45";
 
 final silentNotification = OSCreateNotification.silentNotification(
-  playerIds: ['testPlayerID'],
+  playerIds: [testPlayerId],
   additionalData: {'test' : 'value'}
 );
 
