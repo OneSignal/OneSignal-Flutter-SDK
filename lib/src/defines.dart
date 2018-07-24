@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 String sdkVersion = "0.1.0";
 
 /// Determines how notifications should be displayed
@@ -46,9 +44,16 @@ enum OSiOSSettings {
   inFocusDisplayOption 
 }
 
-/// An abstract class to provide JSON decoding
-abstract class JSONStringRepresentable {
-  String jsonRepresentation();
+/// Applies to iOS notifications only
+/// Determines if the badgeCount is used to increment
+/// the existing badge count, or sets the badge count directly
+enum OSCreateNotificationBadgeType {
+  increase, setTo
+}
 
-  String convertToJsonString(Map<String, dynamic> object) => JsonEncoder.withIndent('  ').convert(object);
+/// control how the notification is delayed
+///   timezone: Deliver at a specific time of day in each user's timezone
+///   last-active: Deliver at the same time the user last used your app
+enum OSCreateNotificationDelayOption {
+  timezone, lastActive
 }

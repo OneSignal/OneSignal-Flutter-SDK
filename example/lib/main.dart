@@ -32,17 +32,13 @@ class _MyAppState extends State<MyApp> {
       OSiOSSettings.promptBeforeOpeningPushUrl : true 
     };
 
-    OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
+    OneSignal.shared.setNotificationReceivedHandler((notification) {
       print("RECEIVED NOTIFICATION in dart: ${notification.jsonRepresentation()}");
     });
     
     OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {
       var id = result.action.actionId;
       print("OPENED NOTIFICATION WITH ID in dart: $id");
-    });
-
-    OneSignal.shared.setSubscriptionObserver((OSSubscriptionStateChanges changes) {
-      print("SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
     });
 
     OneSignal.shared.setPermissionObserver((OSPermissionStateChanges changes) {
@@ -53,13 +49,22 @@ class _MyAppState extends State<MyApp> {
       print("EMAIL SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
     });
 
-    await OneSignal.shared.init("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
+    await OneSignal.shared.init("78e8aff3-7ce2-401f-9da0-2d41f287ebaf", iOSSettings: settings);
+
+    OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
+
+    print("Getting tags");
+    OneSignal.shared.getTags().then((Map<String, dynamic> tags) {
+      print("Received tags: $tags");
+    }).catchError((dynamic error) {
+      print("Encountered error getting tags $error");
+    });
   }
 
   void handleGetTags() {
     OneSignal.shared.getTags().then((tags) {
       if (tags == null) return;
-
+      
       setState((() {
         _tagsJson = "$tags";
       }));
@@ -72,8 +77,8 @@ class _MyAppState extends State<MyApp> {
 
   void handleSendTags() {
     print("Sending tags");
-    OneSignal.shared.sendTag("test2", "val2").then((result) {
-      print("Successfully sent tags: $result");
+    OneSignal.shared.sendTag("test2", "val2").then((response) {
+      print("Successfully sent tags with response: $response");
     }).catchError((error) {
       print("Encountered an error sending tags: $error");
     });
@@ -128,11 +133,27 @@ class _MyAppState extends State<MyApp> {
 
   void handleDeleteTag() {
     print("Deleting tag");
-    OneSignal.shared.deleteTag("test2").then((tags) {
-      print("Successfully deleted tags, current tags = $tags");
+    OneSignal.shared.deleteTag("test2").then((response) {
+      print("Successfully deleted tags with response $response");
     }).catchError((error) {
       print("Encountered error deleting tag: $error");
     });
+  }
+
+  void handleSendNotification() async {
+    var status = await OneSignal.shared.getPermissionSubscriptionState();
+
+    var playerId = status.subscriptionStatus.userId;
+
+    var notification = OSCreateNotification(
+      playerIds: [playerId],
+      content: "this is a test from OneSignal's Flutter SDK",
+      heading: "Test Notification"
+    );
+    
+    var response = await OneSignal.shared.postNotification(notification);
+
+    print("Sent notification with response: $response");
   }
 
   @override
@@ -215,6 +236,11 @@ class _MyAppState extends State<MyApp> {
               new TableRow(
                 children: [
                   new OneSignalButton("Delete Tag", handleDeleteTag)
+                ]
+              ),
+              new TableRow(
+                children: [
+                  new OneSignalButton("Post Test Notification", handleSendNotification)
                 ]
               ),
               new TableRow(

@@ -3,12 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:OneSignalFlutter/src/permission.dart';
 import 'package:OneSignalFlutter/src/subscription.dart';
 import 'package:OneSignalFlutter/src/defines.dart';
+import 'package:OneSignalFlutter/src/utils.dart';
 import 'package:OneSignalFlutter/src/notification.dart';
+import 'package:OneSignalFlutter/src/create_notification.dart';
 
 export 'src/notification.dart';
 export 'src/subscription.dart';
 export 'src/permission.dart';
 export 'src/defines.dart';
+export 'src/create_notification.dart';
 
 // Handlers for various events
 typedef void ReceivedNotificationHandler(OSNotification notification);
@@ -28,11 +31,6 @@ class OneSignal {
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal');
   MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
-
-  // constructor method
-  OneSignal() {
-    this._channel.setMethodCallHandler(_handleMethod);
-  }
   
   // event handlers
   ReceivedNotificationHandler _onReceivedNotification;
@@ -41,11 +39,16 @@ class OneSignal {
   EmailSubscriptionChangeHandler _onEmailSubscriptionChangedHandler;
   PermissionChangeHandler _onPermissionChangedHandler;
 
+  // constructor method
+  OneSignal() {
+    this._channel.setMethodCallHandler(_handleMethod);
+  }
+
   /// The initializer for OneSignal. Note that this initializer
   /// accepts an iOSSettings object, in Android you can pass null.
   Future<void> init(String appId, {Map<OSiOSSettings, dynamic> iOSSettings}) async {
     _onesignalLog(OSLogLevel.verbose, "Initializing the OneSignal Flutter SDK ($sdkVersion)");
-
+    
     var finalSettings = _processSettings(iOSSettings);
 
     await _channel.invokeMethod('OneSignal#init', { 
@@ -156,16 +159,18 @@ class OneSignal {
   /// This method can often take more than five seconds to complete,
   /// so please do NOT block any user-interactive content while
   /// waiting for this request to complete.
-  Future<Map<dynamic, dynamic>> sendTag(dynamic key, dynamic value) async {
-    return await this.sendTags({ key : value });
+  Future<Map<String, dynamic>> sendTag(dynamic key, dynamic value) async {
+    Map<dynamic, dynamic> response = await this.sendTags({ key : value });
+    return response.cast<String, dynamic>();
   }
   
   /// Updates the user's OneSignal tags. This method is additive
   /// This method can often take more than five seconds to complete,
   /// so please do NOT block any user-interactive content while
   /// waiting for this request to complete.
-  Future<Map<dynamic, dynamic>> sendTags(Map<dynamic, dynamic> tags) async {
-    return await _tagsChannel.invokeMethod("OneSignal#sendTags", tags);
+  Future<Map<String, dynamic>> sendTags(Map<dynamic, dynamic> tags) async {
+    Map<dynamic, dynamic> response = await _tagsChannel.invokeMethod("OneSignal#sendTags", tags);
+    return response.cast<String, dynamic>();
   }
 
   /// An asynchronous method that makes an HTTP request to OneSignal's
@@ -173,22 +178,25 @@ class OneSignal {
   /// This request can take a while to complete: please do NOT block
   /// any user-interactive content while waiting for this request
   /// to finish.
-  Future<Map<dynamic, dynamic>> getTags() async {
-    return await _tagsChannel.invokeMethod("OneSignal#getTags");
+  Future<Map<String, dynamic>> getTags() async {
+    Map<dynamic, dynamic> tags = await _tagsChannel.invokeMethod("OneSignal#getTags");
+    return tags.cast<String, dynamic>();
   }
 
   /// Allows you to delete a single key/value pair from the user's tags
   /// by specifying the key. This method can often take more than five 
   /// seconds to complete, so please do NOT block any user-interactive 
   /// content while waiting for this request to complete.
-  Future<Map<dynamic, dynamic>> deleteTag(String key) async {
-    return await this.deleteTags([key]);
+  Future<Map<String, dynamic>> deleteTag(String key) async {
+    Map<dynamic, dynamic> response = await this.deleteTags([key]);
+    return response.cast<String, dynamic>();
   }
 
   /// Allows you to delete an array of tags by specifying an
   /// array of keys.
-  Future<Map<dynamic, dynamic>> deleteTags(List<String> keys) async {
-    return await _tagsChannel.invokeMethod("OneSignal#deleteTags", keys);
+  Future<Map<String, dynamic>> deleteTags(List<String> keys) async {
+    Map<dynamic, dynamic> response = await _tagsChannel.invokeMethod("OneSignal#deleteTags", keys);
+    return response.cast<String, dynamic>();
   }
   
   /// Returns an `OSPermissionSubscriptionState` object, which contains three properties:
@@ -211,8 +219,12 @@ class OneSignal {
 
   /// Allows you to post a notification to the current user (or a different user 
   /// if you specify their OneSignal user ID).
-  Future<Map<dynamic, dynamic>> postNotification(Map<dynamic, dynamic> json) async {
+  Future<Map<dynamic, dynamic>> postNotificationWithJson(Map<dynamic, dynamic> json) async {
     return await _channel.invokeMethod("OneSignal#postNotification", json);
+  }
+
+  Future<Map<dynamic, dynamic>> postNotification(OSCreateNotification notification) async {
+    return await _channel.invokeMethod("OneSignal#postNotification", notification.mapRepresentation());
   }
 
   /// Allows you to prompt the user for permission to use location services
@@ -269,44 +281,12 @@ class OneSignal {
     });
   }
 
-  // in some places, we want to send an enum value to
-  // ObjC. Before we can do this, we must convert it 
-  // to a string/int/etc. 
-  // However, in some places such as iOS init settings,
-  // there could be multiple different types of enum,
-  // so we've combined it into this one function.
-  dynamic _convertEnumCaseToValue(dynamic key) {
-    switch (key) {
-      case OSiOSSettings.autoPrompt:
-        return "kOSSettingsKeyAutoPrompt";
-      case OSiOSSettings.inAppAlerts:
-        return "kOSSettingsKeyInAppAlerts";
-      case OSiOSSettings.inAppLaunchUrl: 
-        return "kOSSettingsKeyInAppLaunchURL";
-      case OSiOSSettings.inFocusDisplayOption:
-        return "kOSSettingsKeyInFocusDisplayOption";
-      case OSiOSSettings.promptBeforeOpeningPushUrl:
-        return "kOSSSettingsKeyPromptBeforeOpeningPushURL";
-    }
-
-    switch (key) {
-      case OSNotificationDisplayType.none: 
-        return 0;
-      case OSNotificationDisplayType.alert: 
-        return 1;
-      case OSNotificationDisplayType.notification:
-        return 2;
-    }
-
-    return key;
-  }
-
   Map<String, dynamic> _processSettings(Map<OSiOSSettings, dynamic> settings) {
     var finalSettings = Map<String, dynamic>();
 
     for (OSiOSSettings key in settings.keys) {
-      var settingsKey = _convertEnumCaseToValue(key);
-      var settingsValue = _convertEnumCaseToValue(settings[key]);
+      var settingsKey = convertEnumCaseToValue(key);
+      var settingsValue = convertEnumCaseToValue(settings[key]);
 
       if (settingsKey == null) 
         continue;

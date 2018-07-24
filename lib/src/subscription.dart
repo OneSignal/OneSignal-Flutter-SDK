@@ -1,5 +1,4 @@
-import 'package:OneSignalFlutter/src/defines.dart';
-
+import 'package:OneSignalFlutter/src/utils.dart';
 
 /// Represents the current user's subscription state with OneSignal
 class OSSubscriptionState extends JSONStringRepresentable {

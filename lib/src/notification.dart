@@ -1,4 +1,6 @@
 import 'package:OneSignalFlutter/src/defines.dart';
+import 'package:OneSignalFlutter/src/utils.dart';
+import 'package:flutter/foundation.dart';
 import 'dart:convert';
 
 /// A class representing the notification, including the
@@ -254,7 +256,7 @@ class OSNotificationPayload extends JSONStringRepresentable {
       var btns = json['buttons'] as List<dynamic>;
       for (var btn in btns) {
         var serialized = btn as Map<dynamic, dynamic>;
-        this.buttons.add(OSActionButton(serialized));
+        this.buttons.add(OSActionButton.fromJson(serialized));
       }
     }
   }
@@ -319,19 +321,25 @@ class OSActionButton extends JSONStringRepresentable {
   /// button's icon
   String icon;
 
-  OSActionButton(Map<dynamic, dynamic> json) {
+  OSActionButton({@required this.id, @required this.text, this.icon});
+
+  OSActionButton.fromJson(Map<dynamic, dynamic> json) {
     this.id = json['id'] as String;
     this.text = json['text'] as String;
 
     if (json.containsKey('icon')) this.icon = json['icon'] as String;
   }
 
-  String jsonRepresentation() {
-    return convertToJsonString({
+  Map<String, dynamic> mapRepresentation() {
+    return {
       'id' : this.id,
       'text' : this.text,
       'icon' : this.icon
-    });
+    };
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString(this.mapRepresentation());
   }
 }
 
