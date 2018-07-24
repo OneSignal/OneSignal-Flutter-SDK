@@ -1,16 +1,11 @@
 import 'package:test/test.dart';
 import 'package:OneSignalFlutter/onesignal.dart';
 import 'mock_channel.dart';
+import 'test_data.dart';
 
 void main() {
   OneSignalMockChannelController channelController = OneSignalMockChannelController();
   OneSignal onesignal = OneSignal();
-
-  // test values 
-  const String testAppId = "35b3mbq4-7ce2-401f-9da0-2d41f287ebaf";
-  const String testPlayerId = "c1b395fc-3b17-4c18-aaa6-195cd3461311";
-  const String testEmail = "test@example.com";
-  const String testEmailAuthHashToken = "4f1916b13a164a765b42b3205b49670a40309127179cb2687ea7feae6f61ee45";
 
   setUp(() {
     channelController.resetState();
