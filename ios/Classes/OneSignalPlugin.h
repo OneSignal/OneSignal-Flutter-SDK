@@ -29,6 +29,8 @@
 #import <OneSignal/OneSignal.h>
 
 @interface OneSignalPlugin : NSObject<FlutterPlugin, OSSubscriptionObserver, OSPermissionObserver, OSEmailSubscriptionObserver>
-@property (strong, nonatomic) FlutterMethodChannel *channel;
+
+// Do NOT initialize instances of this class.
+// You must only reference the shared instance.
 + (instancetype)sharedInstance;
 @end

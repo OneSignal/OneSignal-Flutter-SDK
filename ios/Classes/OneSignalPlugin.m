@@ -30,12 +30,32 @@
 #import "OneSignalTagsController.h"
 
 @interface OneSignalPlugin ()
-@property (nonatomic) BOOL waitingForUserConsent;
+
+@property (strong, nonatomic) FlutterMethodChannel *channel;
+
+/*
+    Will be true if the SDK is waiting for the
+    user's consent before initializing.
+    This is important because if the plugin
+    doesn't know the SDK is waiting for consent,
+    it will add the observers (ie. subscription)
+*/
+@property (atomic) BOOL waitingForUserConsent;
+
+/*
+    holds reference to any notifications received before the
+    flutter runtime channel has been opened
+    Thus, if a user taps a notification while the app is
+    terminated, the SDK will still notify the app once the
+    channel is open
+*/
+@property (strong, nonatomic) OSNotificationOpenedResult *coldStartOpenResult;
+
 @end
 
-@implementation OneSignalPlugin
 
-BOOL waitingForUserConsent;
+
+@implementation OneSignalPlugin
 
 + (instancetype)sharedInstance
 {
@@ -50,7 +70,10 @@ BOOL waitingForUserConsent;
 
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    [OneSignal initWithLaunchOptions:nil appId:nil];
+    
+    [OneSignal initWithLaunchOptions:nil appId:nil handleNotificationAction:^(OSNotificationOpenedResult *result) {
+        
+    }];
     
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
                                      methodChannelWithName:@"OneSignal"
@@ -111,7 +134,7 @@ BOOL waitingForUserConsent;
     // until consent has been provided.
     
     if (OneSignal.requiresUserPrivacyConsent) {
-        waitingForUserConsent = true;
+        self.waitingForUserConsent = true;
     } else {
         [self addObservers];
     }
@@ -135,7 +158,7 @@ BOOL waitingForUserConsent;
     
     [OneSignal consentGranted:granted];
     
-    if (waitingForUserConsent && granted) {
+    if (self.waitingForUserConsent && granted) {
         [self addObservers];
     }
     
