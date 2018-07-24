@@ -120,17 +120,25 @@ class OSCreateNotification extends JSONStringRepresentable {
     this.deliveryTimeOfDay
   });
 
+  OSCreateNotification.silentNotification({
+    @required this.playerIds, 
+    this.additionalData, 
+    this.sendAfter, 
+    this.delayedOption, 
+    this.deliveryTimeOfDay
+  }) {
+    this.contentAvailable = true;
+  }
+
   Map<String, dynamic> mapRepresentation() {
     if (this.languageCode == null) this.languageCode = "en";
 
-    var json = {
-      "include_player_ids" : this.playerIds,
-      "contents" : {
-        this.languageCode : this.content
-      }
+    var json = <String, dynamic> {
+      "include_player_ids" : this.playerIds
     };
 
     // add optional parameters to payload if present
+    if (this.content != null) json['contents'] = { this.languageCode : this.content };
     if (this.heading != null) json['headings'] = { this.languageCode : this.heading };
     if (this.subtitle != null) json['subtitle'] = { this.languageCode : this.heading };
     if (this.contentAvailable != null) json['content_available'] = this.contentAvailable;
