@@ -72,7 +72,9 @@
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     
     [OneSignal initWithLaunchOptions:nil appId:nil handleNotificationAction:^(OSNotificationOpenedResult *result) {
-        
+        @synchronized (OneSignalPlugin.sharedInstance.coldStartOpenResult) {
+            OneSignalPlugin.sharedInstance.coldStartOpenResult = result;
+        }
     }];
     
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
@@ -137,6 +139,12 @@
         self.waitingForUserConsent = true;
     } else {
         [self addObservers];
+    }
+    
+    @synchronized(self.coldStartOpenResult) {
+        if (self.coldStartOpenResult) {
+            [self handleNotificationOpened:self.coldStartOpenResult];
+        }
     }
     
     result(@[]);
