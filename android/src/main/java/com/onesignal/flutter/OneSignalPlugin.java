@@ -40,6 +40,8 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
 
   public static void registerWith(Registrar registrar) {
 
+    OneSignal.sdkType = "flutter";
+
     OneSignalPlugin plugin = new OneSignalPlugin();
 
     plugin.waitingForUserPrivacyConsent = false;
@@ -94,6 +96,9 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     Map<String, Object> args = (Map<String, Object>)call.arguments;
     Context context = flutterRegistrar.context();
 
+    OneSignal.Builder builder = OneSignal.getCurrentOrNewInitBuilder();
+    builder.unsubscribeWhenNotificationsAreDisabled(true);
+    builder.filterOtherGCMReceivers(true);
     OneSignal.init(context, null, (String)args.get("appId"), this, this);
 
     if (didSetRequiresPrivacyConsent) {
@@ -101,6 +106,8 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     } else {
       this.addObservers();
     }
+
+    result.success(null);
   }
 
   public void addObservers() {
