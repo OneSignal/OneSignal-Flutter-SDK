@@ -71,6 +71,8 @@
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     
+    [OneSignal setMSDKType:@"flutter"];
+    
     // Wrapper SDK's call init with no app ID early on in the
     // app lifecycle. The developer will call init() later on
     // from the Flutter plugin channel.
@@ -122,6 +124,8 @@
         [self setEmail:call withResult:result];
     } else if ([@"OneSignal#logoutEmail" isEqualToString:call.method]) {
         [self logoutEmail:call withResult:result];
+    } else if ([@"OneSignal#didSetNotificationOpenedHandler" isEqualToString:call.method]) {
+        [self didSetNotificationOpenedHandler];
     } else {
         result(FlutterMethodNotImplemented);
     }
@@ -143,19 +147,6 @@
     } else {
         [self addObservers];
     }
-    
-    //since the developer may add the NotificationOpened handler
-    //after they call OneSignal.init(), we delay this check to
-    //make sure the app has had enough time to reasonably add
-    //the NotificationOpened handler.
-    
-    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
-        @synchronized(self.coldStartOpenResult) {
-            if (self.coldStartOpenResult) {
-                [self handleNotificationOpened:self.coldStartOpenResult];
-            }
-        }
-    });
     
     result(@[]);
 }
@@ -232,6 +223,13 @@
 
 - (void)oneSignalLog:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal onesignal_Log:(ONE_S_LOG_LEVEL)[call.arguments[@"logLevel"] integerValue] message:(NSString *)call.arguments[@"message"]];
+}
+
+- (void)didSetNotificationOpenedHandler {
+    if (self.coldStartOpenResult) {
+        [self handleNotificationOpened:self.coldStartOpenResult];
+        self.coldStartOpenResult = nil;
+    }
 }
 
 #pragma mark Received & Opened Notification Handlers

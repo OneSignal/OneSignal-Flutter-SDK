@@ -37,6 +37,8 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
   private MethodChannel channel;
   private boolean didSetRequiresPrivacyConsent = false;
   private boolean waitingForUserPrivacyConsent = false;
+  private OSNotificationOpenResult coldStartNotificationResult;
+  private boolean setNotificationOpenedHandler = false;
 
   public static void registerWith(Registrar registrar) {
 
@@ -87,6 +89,10 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
       this.setEmail(call, result);
     } else if (call.method.contentEquals("OneSignal#logoutEmail")) {
       this.logoutEmail(call, result);
+    } else if (call.method.contentEquals("OneSignal#promptPermission")) {
+      Log.e("onesignal", "promptPermission() is not applicable in Android.");
+    } else if (call.method.contentEquals("OneSignal#didSetNotificationOpenedHandler")) {
+      this.didSetNotificationOpenedHandler();
     } else {
       result.notImplemented();
     }
@@ -111,7 +117,6 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
   }
 
   public void addObservers() {
-    Log.d("onesignal", "adding observers");
     OneSignal.addSubscriptionObserver(this);
     OneSignal.addEmailSubscriptionObserver(this);
     OneSignal.addPermissionObserver(this);
@@ -131,6 +136,12 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     OneSignal.provideUserConsent((Boolean)args.get("granted"));
 
     result.success(null);
+
+    if (this.waitingForUserPrivacyConsent) {
+      this.waitingForUserPrivacyConsent = false;
+
+      this.addObservers();
+    }
   }
 
   public void setRequiresUserPrivacyConsent(MethodCall call, Result result) {
@@ -173,7 +184,11 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
 
       @Override
       public void onSuccess(JSONObject response) {
-        reply.success(response);
+        try {
+          reply.success(OneSignalSerializer.convertJSONObjectToHashMap(response));
+        } catch (JSONException exception) {
+          Log.e("onesignal", "Encountered an error attempting to deserialize server response: " + exception.getMessage());
+        }
       }
     });
   }
@@ -229,6 +244,14 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     return 1;
   }
 
+  public void didSetNotificationOpenedHandler() {
+    this.setNotificationOpenedHandler = true;
+    if (this.coldStartNotificationResult != null) {
+      this.notificationOpened(this.coldStartNotificationResult);
+      this.coldStartNotificationResult = null;
+    }
+  }
+
   @Override
   public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
     Log.d("onesignal", "Subscription changed calling observer");
@@ -256,6 +279,12 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
 
   @Override
   public void notificationOpened(OSNotificationOpenResult result) {
+    if (!this.setNotificationOpenedHandler) {
+      this.coldStartNotificationResult = result;
+      return;
+    }
+
+    Log.d("onesignal", "OS Notification Opened");
     try {
       this.channel.invokeMethod("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationOpenResultToMap(result));
     } catch (JSONException exception) {

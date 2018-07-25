@@ -111,13 +111,15 @@ public class OneSignalSerializer {
 
         ArrayList<HashMap> buttons = new ArrayList<HashMap>();
 
-        for (int i = 0; i < payload.actionButtons.size(); i++) {
-            OSNotificationPayload.ActionButton button = payload.actionButtons.get(i);
+        if (payload.actionButtons != null) {
+            for (int i = 0; i < payload.actionButtons.size(); i++) {
+                OSNotificationPayload.ActionButton button = payload.actionButtons.get(i);
 
-            HashMap buttonHash = new HashMap();
-            buttonHash.put("id", button.id);
-            buttonHash.put("text", button.text);
-            buttonHash.put("icon", button.icon);
+                HashMap buttonHash = new HashMap();
+                buttonHash.put("id", button.id);
+                buttonHash.put("text", button.text);
+                buttonHash.put("icon", button.icon);
+            }
         }
 
         if (buttons.size() > 0)

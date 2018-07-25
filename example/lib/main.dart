@@ -163,10 +163,14 @@ class _MyAppState extends State<MyApp> {
 
     var playerId = status.subscriptionStatus.userId;
 
+    var imgUrlString = "http://cdn1-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-2.jpg";
+
     var notification = OSCreateNotification(
       playerIds: [playerId],
       content: "this is a test from OneSignal's Flutter SDK",
       heading: "Test Notification",
+      iosAttachments: {"id1" : imgUrlString},
+      bigPicture: imgUrlString,
       buttons: [
         OSActionButton(text: "test1", id: "id1"),
         OSActionButton(text: "test2", id: "id2")

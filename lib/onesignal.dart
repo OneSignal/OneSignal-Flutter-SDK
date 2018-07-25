@@ -77,6 +77,7 @@ class OneSignal {
   /// OneSignal push notification, or taps an action button on a notification.
   void setNotificationOpenedHandler(OpenedNotificationHandler handler) {
     _onOpenedNotification = handler;
+    _channel.invokeMethod("OneSignal#didSetNotificationOpenedHandler");
   }
 
   /// The subscription handler will be called whenever the user's OneSignal
