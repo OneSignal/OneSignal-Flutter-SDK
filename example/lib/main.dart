@@ -17,7 +17,7 @@ class _MyAppState extends State<MyApp> {
   bool _enableConsentButton = false;
 
   // CHANGE THIS parameter to true if you want to test GDPR privacy consent
-  bool requireConsent = false;
+  bool _requireConsent = true;
 
   @override
   void initState() {
@@ -31,7 +31,7 @@ class _MyAppState extends State<MyApp> {
 
     OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
-    OneSignal.shared.setRequiresUserPrivacyConsent(requireConsent);
+    OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
     var settings = { 
       OSiOSSettings.autoPrompt : false,
@@ -62,7 +62,7 @@ class _MyAppState extends State<MyApp> {
       print("EMAIL SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
     });
 
-    await OneSignal.shared.init("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
+    await OneSignal.shared.init("78e8aff3-7ce2-401f-9da0-2d41f287ebaf", iOSSettings: settings);
 
     OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
 
@@ -213,22 +213,22 @@ class _MyAppState extends State<MyApp> {
               children: [
                 new TableRow(
                   children: [
-                    new OneSignalButton("Get Tags", _handleGetTags, true)
+                    new OneSignalButton("Get Tags", _handleGetTags, !_enableConsentButton)
                   ]
                 ),
                 new TableRow(
                   children: [
-                    new OneSignalButton("Send Tags", _handleSendTags, true)
+                    new OneSignalButton("Send Tags", _handleSendTags, !_enableConsentButton)
                   ]
                 ),
                 new TableRow(
                   children: [
-                    new OneSignalButton("Prompt for Push Permission", _handlePromptForPushPermission, true)
+                    new OneSignalButton("Prompt for Push Permission", _handlePromptForPushPermission, !_enableConsentButton)
                   ]
                 ),
                 new TableRow(
                   children: [
-                    new OneSignalButton("Print Permission Subscription State", _handleGetPermissionSubscriptionState, true)
+                    new OneSignalButton("Print Permission Subscription State", _handleGetPermissionSubscriptionState, !_enableConsentButton)
                   ]
                 ),
                 new TableRow(
@@ -258,12 +258,12 @@ class _MyAppState extends State<MyApp> {
                 ),
                 new TableRow(
                   children: [
-                    new OneSignalButton("Set Email", _handleSetEmail, true)
+                    new OneSignalButton("Set Email", _handleSetEmail, !_enableConsentButton)
                   ]
                 ),
                 new TableRow(
                   children: [
-                    new OneSignalButton("Logout Email", _handleLogoutEmail, true)
+                    new OneSignalButton("Logout Email", _handleLogoutEmail, !_enableConsentButton)
                   ]
                 ),
                 new TableRow(
@@ -273,22 +273,22 @@ class _MyAppState extends State<MyApp> {
                 ),
                 new TableRow(
                   children: [
-                    new OneSignalButton("Set Location Shared", _handleSetLocationShared, true)
+                    new OneSignalButton("Set Location Shared", _handleSetLocationShared, !_enableConsentButton)
                   ]
                 ),
                 new TableRow(
                   children: [
-                    new OneSignalButton("Delete Tag", _handleDeleteTag, true)
+                    new OneSignalButton("Delete Tag", _handleDeleteTag, !_enableConsentButton)
                   ]
                 ),
                 new TableRow(
                   children: [
-                    new OneSignalButton("Post Notification", _handleSendNotification, true)
+                    new OneSignalButton("Post Notification", _handleSendNotification, !_enableConsentButton)
                   ]
                 ),
                 new TableRow(
                   children: [
-                    new OneSignalButton("Post Silent Notification", _handleSendSilentNotification, true)
+                    new OneSignalButton("Post Silent Notification", _handleSendSilentNotification, !_enableConsentButton)
                   ]
                 ),
                 new TableRow(
