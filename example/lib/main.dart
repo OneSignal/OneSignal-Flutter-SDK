@@ -62,7 +62,8 @@ class _MyAppState extends State<MyApp> {
       print("EMAIL SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
     });
 
-    await OneSignal.shared.init("78e8aff3-7ce2-401f-9da0-2d41f287ebaf", iOSSettings: settings);
+    // NOTE: Replace with your own app ID from https://www.onesignal.com
+    await OneSignal.shared.init("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
 
     OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
 
