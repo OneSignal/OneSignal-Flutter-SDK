@@ -71,11 +71,14 @@
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     
+    // Wrapper SDK's call init with no app ID early on in the
+    // app lifecycle. The developer will call init() later on
+    // from the Flutter plugin channel.
     [OneSignal initWithLaunchOptions:nil appId:nil handleNotificationAction:^(OSNotificationOpenedResult *result) {
         @synchronized (OneSignalPlugin.sharedInstance.coldStartOpenResult) {
             OneSignalPlugin.sharedInstance.coldStartOpenResult = result;
         }
-    }];
+    } settings:@{kOSSettingsKeyAutoPrompt : @false, @"kOSSettingsKeyInOmitNoAppIdLogging" : @true}];
     
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
                                      methodChannelWithName:@"OneSignal"
@@ -141,11 +144,18 @@
         [self addObservers];
     }
     
-    @synchronized(self.coldStartOpenResult) {
-        if (self.coldStartOpenResult) {
-            [self handleNotificationOpened:self.coldStartOpenResult];
+    //since the developer may add the NotificationOpened handler
+    //after they call OneSignal.init(), we delay this check to
+    //make sure the app has had enough time to reasonably add
+    //the NotificationOpened handler.
+    
+    dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(0.1 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+        @synchronized(self.coldStartOpenResult) {
+            if (self.coldStartOpenResult) {
+                [self handleNotificationOpened:self.coldStartOpenResult];
+            }
         }
-    }
+    });
     
     result(@[]);
 }
