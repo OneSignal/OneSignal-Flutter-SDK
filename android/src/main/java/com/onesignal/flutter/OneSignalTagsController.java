@@ -16,13 +16,19 @@ import org.json.JSONException;
 
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by bradhesse on 7/17/18.
  */
 
-class OSFlutterChangeTagsHandler implements ChangeTagsUpdateHandler {
+class OSFlutterChangeTagsHandler implements ChangeTagsUpdateHandler, GetTagsHandler {
     private Result result;
+
+    // the tags callbacks can in some instances be called more than once
+    // ie. cached vs. server response.
+    // this property guarantees the callback will never be called more than once.
+    private AtomicBoolean replySubmitted = new AtomicBoolean(false);
 
     OSFlutterChangeTagsHandler(Result res) {
         this.result = res;
@@ -30,6 +36,9 @@ class OSFlutterChangeTagsHandler implements ChangeTagsUpdateHandler {
 
     @Override
     public void onSuccess(JSONObject tags) {
+        if (this.replySubmitted.getAndSet(true))
+            return;
+
         try {
             this.result.success(OneSignalSerializer.convertJSONObjectToHashMap(tags));
         } catch (JSONException exception) {
@@ -39,7 +48,22 @@ class OSFlutterChangeTagsHandler implements ChangeTagsUpdateHandler {
 
     @Override
     public void onFailure(SendTagsError error) {
+        if (this.replySubmitted.getAndSet(true))
+            return;
+
         this.result.error("onesignal", "Encountered an error updating tags (" + String.valueOf(error.getCode()) + "): " + error.getMessage(), null);
+    }
+
+    @Override
+    public void tagsAvailable(JSONObject jsonObject) {
+        if (this.replySubmitted.getAndSet(true))
+            return;
+
+        try {
+            this.result.success(OneSignalSerializer.convertJSONObjectToHashMap(jsonObject));
+        } catch (JSONException exception) {
+            this.result.error("onesignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
+        }
     }
 }
 
@@ -55,17 +79,7 @@ public class OneSignalTagsController implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, Result result) {
         if (call.method.contentEquals("OneSignal#getTags")) {
-            final Result res = result;
-            OneSignal.getTags(new GetTagsHandler() {
-                @Override
-                public void tagsAvailable(JSONObject tags) {
-                    try {
-                        res.success(OneSignalSerializer.convertJSONObjectToHashMap(tags));
-                    } catch (JSONException exception) {
-                        res.error("onesignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
-                    }
-                }
-            });
+            OneSignal.getTags(new OSFlutterChangeTagsHandler(result));
         } else if (call.method.contentEquals("OneSignal#sendTags")) {
             OneSignal.sendTags(new JSONObject((Map<String, Object>) call.arguments), new OSFlutterChangeTagsHandler(result));
         } else if (call.method.contentEquals("OneSignal#deleteTags")
