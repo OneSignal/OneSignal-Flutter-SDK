@@ -36,8 +36,8 @@ class OSNotification extends JSONStringRepresentable {
   int androidNotificationId;
 
   //converts JSON map to OSNotification instance
-  OSNotification(Map<dynamic, dynamic> json) {
-    this.payload = OSNotificationPayload(json['payload'] as Map<dynamic, dynamic>);
+  OSNotification(Map<String, dynamic> json) {
+    this.payload = OSNotificationPayload(json['payload'].cast<String, dynamic>());
     this.shown = json['shown'] as bool;
     this.appInFocus = json['appInFocus'] as bool;
     this.silent = json['silent'] as bool;
@@ -121,11 +121,11 @@ class OSNotificationPayload extends JSONStringRepresentable {
 
   /// Any additional custom data you want to send along
   /// with this notification.
-  Map<dynamic, dynamic> additionalData;
+  Map<String, dynamic> additionalData;
 
   /// Any attachments (images, sounds, videos) you want
   /// to display with this notification.
-  Map<dynamic, dynamic> attachments;
+  Map<String, dynamic> attachments;
 
   /// Any buttons you want to add to the notification.
   /// The notificationOpened handler will provide an
@@ -135,7 +135,7 @@ class OSNotificationPayload extends JSONStringRepresentable {
 
   /// A hashmap object representing the raw key/value 
   /// properties of the push notification
-  dynamic rawPayload;
+  Map<String, dynamic> rawPayload;
 
   /// (Android Only)
   /// The filename of the image to use as the small
@@ -211,7 +211,7 @@ class OSNotificationPayload extends JSONStringRepresentable {
   /// notification (if set)
   OSAndroidBackgroundImageLayout backgroundImageLayout;
 
-  OSNotificationPayload(Map<dynamic, dynamic> json) {
+  OSNotificationPayload(Map<String, dynamic> json) {
     this.notificationId = json['notificationId'] as String;
 
     // iOS Specific Parameters
@@ -221,7 +221,7 @@ class OSNotificationPayload extends JSONStringRepresentable {
     if (json.containsKey('badge')) this.badge = json['badge'] as int;
     if (json.containsKey('badgeIncrement')) this.badgeIncrement = json['badgeIncrement'] as int;
     if (json.containsKey('subtitle')) this.subtitle = json['subtitle'] as String;
-    if (json.containsKey('attachments')) this.attachments = json['attachments'] as Map<dynamic, dynamic>;
+    if (json.containsKey('attachments')) this.attachments = json['attachments'].cast<String, dynamic>();
 
     // Android Specific Parameters
     if (json.containsKey("smallIcon")) this.smallIcon = json['smallIcon'] as String;
@@ -242,10 +242,10 @@ class OSNotificationPayload extends JSONStringRepresentable {
     if (json.containsKey('title')) this.title = json['title'] as String;
     if (json.containsKey('body')) this.body = json['body'] as String;
     if (json.containsKey('launchUrl')) this.launchUrl = json['launchUrl'] as String;
-    if (json.containsKey('additionalData')) this.additionalData = json['additionalData'] as Map<dynamic, dynamic>;
+    if (json.containsKey('additionalData')) this.additionalData = json['additionalData'].cast<String, dynamic>();
     
     if (json.containsKey('backgroundImageLayout')) {
-      this.backgroundImageLayout = OSAndroidBackgroundImageLayout(json['backgroundImageLayout'] as Map<dynamic, dynamic>);
+      this.backgroundImageLayout = OSAndroidBackgroundImageLayout(json['backgroundImageLayout'].cast<String, dynamic>());
     }
 
     // raw payload comes as a JSON string
@@ -259,7 +259,7 @@ class OSNotificationPayload extends JSONStringRepresentable {
       this.buttons = List<OSActionButton>();
       var btns = json['buttons'] as List<dynamic>;
       for (var btn in btns) {
-        var serialized = btn as Map<dynamic, dynamic>;
+        var serialized = btn.cast<String, dynamic>();
         this.buttons.add(OSActionButton.fromJson(serialized));
       }
     }
@@ -279,11 +279,11 @@ class OSNotificationOpenedResult {
   OSNotificationAction action;
 
   //constructor
-  OSNotificationOpenedResult(Map<dynamic, dynamic> json) {
-    this.notification = OSNotification(json['notification'] as Map<dynamic, dynamic>);
+  OSNotificationOpenedResult(Map<String, dynamic> json) {
+    this.notification = OSNotification(json['notification'].cast<String, dynamic>());
 
     if (json.containsKey('action')) { 
-      this.action = OSNotificationAction(json['action'] as Map<dynamic, dynamic>); 
+      this.action = OSNotificationAction(json['action'].cast<String, dynamic>()); 
     }
   }
 }
@@ -305,7 +305,7 @@ class OSNotificationAction {
   /// that the user tapped
   String actionId;
 
-  OSNotificationAction(Map<dynamic, dynamic> json) {
+  OSNotificationAction(Map<String, dynamic> json) {
     this.type = OSNotificationActionType.opened;
     this.actionId = json['id'] as String;
 
@@ -330,7 +330,7 @@ class OSActionButton extends JSONStringRepresentable {
 
   OSActionButton({@required this.id, @required this.text, this.icon});
 
-  OSActionButton.fromJson(Map<dynamic, dynamic> json) {
+  OSActionButton.fromJson(Map<String, dynamic> json) {
     this.id = json['id'] as String;
     this.text = json['text'] as String;
 
@@ -366,7 +366,7 @@ class OSAndroidBackgroundImageLayout extends JSONStringRepresentable {
   /// The color of the body text
   String bodyTextColor;
 
-  OSAndroidBackgroundImageLayout(Map<dynamic, dynamic> json) {
+  OSAndroidBackgroundImageLayout(Map<String, dynamic> json) {
     if (json.containsKey('image')) this.image = json['image'] as String;
     if (json.containsKey('titleTextColor')) this.titleTextColor = json['titleTextColor'] as String;
     if (json.containsKey('bodyTextColor')) this.bodyTextColor = json['bodyTextColor'] as String;

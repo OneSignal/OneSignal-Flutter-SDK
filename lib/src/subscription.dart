@@ -19,7 +19,7 @@ class OSSubscriptionState extends JSONStringRepresentable {
   /// The APNS (iOS), GCM/FCM (Android) push token
   String pushToken;
   
-  OSSubscriptionState(Map<dynamic, dynamic> json) {
+  OSSubscriptionState(Map<String, dynamic> json) {
     this.subscribed = json['subscribed'] as bool;
     this.userSubscriptionSetting = json['userSubscriptionSetting'] as bool;
 
@@ -44,9 +44,9 @@ class OSSubscriptionStateChanges extends JSONStringRepresentable {
   OSSubscriptionState from;
   OSSubscriptionState to;
 
-  OSSubscriptionStateChanges(Map<dynamic, dynamic> json) {
-    if (json.containsKey('from')) this.from = OSSubscriptionState(json['from'] as Map<dynamic, dynamic>);
-    if (json.containsKey('to')) this.to = OSSubscriptionState(json['to'] as Map<dynamic, dynamic>);
+  OSSubscriptionStateChanges(Map<String, dynamic> json) {
+    if (json.containsKey('from')) this.from = OSSubscriptionState(json['from'].cast<String, dynamic>());
+    if (json.containsKey('to')) this.to = OSSubscriptionState(json['to'].cast<String, dynamic>());
   }
 
   String jsonRepresentation() {
@@ -63,7 +63,7 @@ class OSEmailSubscriptionState extends JSONStringRepresentable {
   String emailUserId;
   String emailAddress;
 
-  OSEmailSubscriptionState(Map<dynamic, dynamic> json) {
+  OSEmailSubscriptionState(Map<String, dynamic> json) {
     this.subscribed = false;
 
     if (json.containsKey('emailAddress') && json['emailAddress'] != null) 
@@ -90,7 +90,7 @@ class OSEmailSubscriptionStateChanges extends JSONStringRepresentable {
   OSEmailSubscriptionState from;
   OSEmailSubscriptionState to;
 
-  OSEmailSubscriptionStateChanges(Map<dynamic, dynamic> json) {
+  OSEmailSubscriptionStateChanges(Map<String, dynamic> json) {
     if (json.containsKey('from')) this.from = OSEmailSubscriptionState(json['from']);
     if (json.containsKey('to')) this.to = OSEmailSubscriptionState(json['to']);
   }

@@ -5,7 +5,7 @@ import 'test_data.dart';
 void main() {
   // Subscription State Tests
   // Tests both OSSubscriptionStateChanges and OSSubscriptionState model parsing
-  final subscriptionStateChanges = TestData.jsonForTest('subscription_changed_test') as Map<dynamic, dynamic>;
+  final subscriptionStateChanges = TestData.jsonForTest('subscription_changed_test') as Map<String, dynamic>;
   final subscriptionChanges = OSSubscriptionStateChanges(subscriptionStateChanges);
 
   test('expect subscription correctly parses user ID', () {
@@ -28,7 +28,7 @@ void main() {
 
   // Email Subscription State Tests
   // Tests both OSEmailSubscriptionStateChanges and OSEmailSubscriptionState model parsing
-  final emailStateChanges = TestData.jsonForTest('email_changed_test') as Map<dynamic, dynamic>;
+  final emailStateChanges = TestData.jsonForTest('email_changed_test') as Map<String, dynamic>;
   final emailChanges = OSEmailSubscriptionStateChanges(emailStateChanges);
 
   test ('expect subscription correctly parses email address', () {

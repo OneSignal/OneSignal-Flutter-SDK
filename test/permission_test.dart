@@ -6,7 +6,7 @@ import 'test_data.dart';
 
 void main() {
   // Permission State tests
-  final permissionStateChangesJson = TestData.jsonForTest("permission_parsing_test") as Map<dynamic, dynamic>;
+  final permissionStateChangesJson = TestData.jsonForTest("permission_parsing_test") as Map<String, dynamic>;
   final permissionStateChanges = OSPermissionStateChanges(permissionStateChangesJson);
 
   test('expect permission to parse hasPrompted correctly', () {

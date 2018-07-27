@@ -50,7 +50,7 @@ class OneSignalMockChannelController {
         break;
       case "OneSignal#postNotification":
         this.state.postNotificationJson = call.arguments as Map<dynamic, dynamic>;
-        break;
+        return {"success" : true};
       case "OneSignal#setLocationShared":
         this.state.locationShared = call.arguments as bool;
         break;
