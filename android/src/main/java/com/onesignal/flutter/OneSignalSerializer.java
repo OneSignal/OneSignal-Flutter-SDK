@@ -12,8 +12,8 @@ import java.util.Iterator;
 import java.util.List;
 
 public class OneSignalSerializer {
-    static public HashMap<Object, Object> convertSubscriptionStateToMap(OSSubscriptionState state) {
-        HashMap<Object, Object> hash = new HashMap();
+    static private HashMap<String, Object> convertSubscriptionStateToMap(OSSubscriptionState state) {
+        HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("subscribed", state.getSubscribed());
         hash.put("userSubscriptionSetting", state.getUserSubscriptionSetting());
@@ -23,16 +23,16 @@ public class OneSignalSerializer {
         return hash;
     }
 
-    static public HashMap<Object, Object> convertPermissionStateToMap(OSPermissionState state) {
-        HashMap<Object, Object> permission = new HashMap<Object, Object>();
+    static private HashMap<String, Object> convertPermissionStateToMap(OSPermissionState state) {
+        HashMap<String, Object> permission = new HashMap<>();
 
         permission.put("enabled", state.getEnabled());
 
         return permission;
     }
 
-    static public HashMap<Object, Object> convertEmailSubscriptionStateToMap(OSEmailSubscriptionState state) {
-        HashMap<Object, Object> hash = new HashMap();
+    static private HashMap<String, Object> convertEmailSubscriptionStateToMap(OSEmailSubscriptionState state) {
+        HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("emailUserId", state.getEmailUserId());
         hash.put("emailAddress", state.getEmailAddress());
@@ -41,8 +41,8 @@ public class OneSignalSerializer {
         return hash;
     }
 
-    static public HashMap<Object, Object> convertPermissionSubscriptionStateToMap(OSPermissionSubscriptionState state) {
-        HashMap<Object, Object> hash = new HashMap();
+    static public HashMap<String, Object> convertPermissionSubscriptionStateToMap(OSPermissionSubscriptionState state) {
+        HashMap<String, Object> hash = new HashMap<>();
 
         OSSubscriptionState subState = state.getSubscriptionStatus();
         OSPermissionState permState = state.getPermissionStatus();
@@ -60,8 +60,8 @@ public class OneSignalSerializer {
         return hash;
     }
 
-    static public HashMap<Object, Object> convertSubscriptionStateChangesToMap(OSSubscriptionStateChanges changes) {
-        HashMap<Object, Object> hash = new HashMap();
+    static public HashMap<String, Object> convertSubscriptionStateChangesToMap(OSSubscriptionStateChanges changes) {
+        HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("to", convertSubscriptionStateToMap(changes.getTo()));
         hash.put("from", convertSubscriptionStateToMap(changes.getFrom()));
@@ -69,8 +69,8 @@ public class OneSignalSerializer {
         return hash;
     }
 
-    static public HashMap<Object, Object> convertEmailSubscriptionStateChangesToMap(OSEmailSubscriptionStateChanges changes) {
-        HashMap hash = new HashMap();
+    static public HashMap<String, Object> convertEmailSubscriptionStateChangesToMap(OSEmailSubscriptionStateChanges changes) {
+       HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("to", convertEmailSubscriptionStateToMap(changes.getTo()));
         hash.put("from", convertEmailSubscriptionStateToMap(changes.getFrom()));
@@ -79,7 +79,7 @@ public class OneSignalSerializer {
     }
 
     static public HashMap convertPermissionStateChangesToMap(OSPermissionStateChanges changes) {
-        HashMap hash = new HashMap();
+       HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("to", convertPermissionStateToMap(changes.getTo()));
         hash.put("from", convertPermissionStateToMap(changes.getFrom()));
@@ -87,8 +87,8 @@ public class OneSignalSerializer {
         return hash;
     }
 
-    static public HashMap<Object, Object> convertNotificationPayloadToMap(OSNotificationPayload payload) throws JSONException {
-        HashMap hash = new HashMap();
+    static private HashMap<String, Object> convertNotificationPayloadToMap(OSNotificationPayload payload) throws JSONException {
+       HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("notificationId", payload.notificationID);
         hash.put("templateName", payload.templateName);
@@ -109,16 +109,17 @@ public class OneSignalSerializer {
         hash.put("collapseId", payload.collapseId);
         hash.put("priority", payload.priority);
 
-        ArrayList<HashMap> buttons = new ArrayList<HashMap>();
+        ArrayList<HashMap> buttons = new ArrayList<>();
 
         if (payload.actionButtons != null) {
             for (int i = 0; i < payload.actionButtons.size(); i++) {
                 OSNotificationPayload.ActionButton button = payload.actionButtons.get(i);
 
-                HashMap buttonHash = new HashMap();
+               HashMap<String, Object> buttonHash = new HashMap<>();
                 buttonHash.put("id", button.id);
                 buttonHash.put("text", button.text);
                 buttonHash.put("icon", button.icon);
+                buttons.add(buttonHash);
             }
         }
 
@@ -139,8 +140,8 @@ public class OneSignalSerializer {
         return hash;
     }
 
-    static public HashMap<Object, Object> convertNotificationToMap(OSNotification notification) throws JSONException {
-        HashMap<Object, Object> hash = new HashMap();
+    static public HashMap<String, Object> convertNotificationToMap(OSNotification notification) throws JSONException {
+        HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("payload", convertNotificationPayloadToMap(notification.payload));
         hash.put("shown", notification.shown);
@@ -160,8 +161,8 @@ public class OneSignalSerializer {
         return hash;
     }
 
-    static public HashMap<Object, Object> convertNotificationOpenResultToMap(OSNotificationOpenResult openResult) throws JSONException {
-        HashMap<Object, Object> hash = new HashMap();
+    static public HashMap<String, Object> convertNotificationOpenResultToMap(OSNotificationOpenResult openResult) throws JSONException {
+        HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("notification", convertNotificationToMap(openResult.notification));
         hash.put("action", convertNotificationActionToMap(openResult.action));
@@ -169,8 +170,8 @@ public class OneSignalSerializer {
         return hash;
     }
 
-    static public HashMap<Object, Object> convertNotificationActionToMap(OSNotificationAction action) throws JSONException {
-        HashMap<Object, Object> hash = new HashMap();
+    static private HashMap<String, Object> convertNotificationActionToMap(OSNotificationAction action) {
+        HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("id", action.actionID);
 
@@ -180,14 +181,13 @@ public class OneSignalSerializer {
                 break;
             case ActionTaken:
                 hash.put("type", 1);
-
         }
 
         return hash;
     }
 
-    static public HashMap<Object, Object> convertAndroidBackgroundImageLayoutToMap(BackgroundImageLayout layout) {
-        HashMap<Object, Object> hash = new HashMap();
+    static private HashMap<String, Object> convertAndroidBackgroundImageLayoutToMap(BackgroundImageLayout layout) {
+        HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("image", layout.image);
         hash.put("bodyTextColor", layout.bodyTextColor);
@@ -196,8 +196,8 @@ public class OneSignalSerializer {
         return hash;
     }
 
-    static public HashMap<Object, Object> convertJSONObjectToHashMap(JSONObject object) throws JSONException {
-        HashMap<Object, Object> hash = new HashMap();
+    static public HashMap<String, Object> convertJSONObjectToHashMap(JSONObject object) throws JSONException {
+        HashMap<String, Object> hash = new HashMap<>();
 
         Iterator<String> keys = object.keys();
 
@@ -216,17 +216,16 @@ public class OneSignalSerializer {
         return hash;
     }
 
-    static public List<Object> convertJSONArrayToList(JSONArray array) throws JSONException {
-        List<Object> list = new ArrayList<Object>();
+    static private List<Object> convertJSONArrayToList(JSONArray array) throws JSONException {
+        List<Object> list = new ArrayList<>();
 
         for (int i = 0; i < array.length(); i++) {
             Object val = array.get(i);
 
-            if (val instanceof JSONArray) {
+            if (val instanceof JSONArray)
                 val = OneSignalSerializer.convertJSONArrayToList((JSONArray)val);
-            } else if (val instanceof JSONObject) {
+            else if (val instanceof JSONObject)
                 val = convertJSONObjectToHashMap((JSONObject)val);
-            }
 
             list.add(val);
         }
