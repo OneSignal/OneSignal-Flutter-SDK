@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:OneSignalFlutter/onesignal.dart';
+import 'package:onesignal/onesignal.dart';
 
 /*
   This class mocks an iOS or Android host device

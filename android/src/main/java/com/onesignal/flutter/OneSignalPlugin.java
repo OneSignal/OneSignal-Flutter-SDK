@@ -254,7 +254,6 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
 
   @Override
   public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
-    Log.d("onesignal", "Subscription changed calling observer");
     this.channel.invokeMethod("OneSignal#subscriptionChanged", OneSignalSerializer.convertSubscriptionStateChangesToMap(stateChanges));
   }
 
@@ -283,8 +282,7 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
       this.coldStartNotificationResult = result;
       return;
     }
-
-    Log.d("onesignal", "OS Notification Opened");
+    
     try {
       this.channel.invokeMethod("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationOpenResultToMap(result));
     } catch (JSONException exception) {

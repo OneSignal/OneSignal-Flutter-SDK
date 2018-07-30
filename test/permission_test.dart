@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:OneSignalFlutter/onesignal.dart';
+import 'package:onesignal/onesignal.dart';
 import 'test_data.dart';
 
 
