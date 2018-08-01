@@ -3,11 +3,10 @@ import 'package:flutter/foundation.dart';
 import 'package:onesignal/src/notification.dart';
 import 'package:onesignal/onesignal.dart';
 
-/// The parameters & format to create push notifications is 
+/// The parameters & format to create push notifications is
 /// so different from receiving notifications that we represent
 /// a Create Notification object as an entirely different class
 class OSCreateNotification extends JSONStringRepresentable {
-
   /// An array of user ID's that should receive this notification
   List<String> playerIds;
 
@@ -49,7 +48,7 @@ class OSCreateNotification extends JSONStringRepresentable {
   List<OSActionButton> buttons;
 
   /// The category identifier for iOS (controls various aspects
-  /// of the notification, for example, whether to launch a 
+  /// of the notification, for example, whether to launch a
   /// Notification Content Extension) (iOS only)
   String iosCategory;
 
@@ -89,78 +88,87 @@ class OSCreateNotification extends JSONStringRepresentable {
   /// in each timezone with the 'timezone' delayedOption
   OSCreateNotificationDelayOption delayedOption;
 
-  /// Used with delayedOption == timezone, lets you specify what time of day 
+  /// Used with delayedOption == timezone, lets you specify what time of day
   /// each user should receive the notification, ie. "9:00 AM"
   String deliveryTimeOfDay;
 
-  OSCreateNotification({
-    @required this.playerIds,
-    @required this.content,
-    this.languageCode,
-    this.heading,
-    this.subtitle,
-    this.contentAvailable,
-    this.mutableContent,
-    this.additionalData,
-    this.url,
-    this.iosAttachments,
-    this.bigPicture,
-    this.buttons,
-    this.iosCategory,
-    this.iosSound,
-    this.androidSound,
-    this.androidSmallIcon,
-    this.androidLargeIcon,
-    this.androidChannelId,
-    this.iosBadgeCount,
-    this.iosBadgeType,
-    this.collapseId,
-    this.sendAfter,
-    this.delayedOption,
-    this.deliveryTimeOfDay
-  });
+  OSCreateNotification(
+      {@required this.playerIds,
+      @required this.content,
+      this.languageCode,
+      this.heading,
+      this.subtitle,
+      this.contentAvailable,
+      this.mutableContent,
+      this.additionalData,
+      this.url,
+      this.iosAttachments,
+      this.bigPicture,
+      this.buttons,
+      this.iosCategory,
+      this.iosSound,
+      this.androidSound,
+      this.androidSmallIcon,
+      this.androidLargeIcon,
+      this.androidChannelId,
+      this.iosBadgeCount,
+      this.iosBadgeType,
+      this.collapseId,
+      this.sendAfter,
+      this.delayedOption,
+      this.deliveryTimeOfDay});
 
-  OSCreateNotification.silentNotification({
-    @required this.playerIds, 
-    this.additionalData, 
-    this.sendAfter, 
-    this.delayedOption, 
-    this.deliveryTimeOfDay
-  }) {
+  OSCreateNotification.silentNotification(
+      {@required this.playerIds,
+      this.additionalData,
+      this.sendAfter,
+      this.delayedOption,
+      this.deliveryTimeOfDay}) {
     this.contentAvailable = true;
   }
 
   Map<String, dynamic> mapRepresentation() {
     if (this.languageCode == null) this.languageCode = "en";
 
-    var json = <String, dynamic> {
-      "include_player_ids" : this.playerIds
-    };
+    var json = <String, dynamic>{"include_player_ids": this.playerIds};
 
     // add optional parameters to payload if present
-    if (this.content != null) json['contents'] = { this.languageCode : this.content };
-    if (this.heading != null) json['headings'] = { this.languageCode : this.heading };
-    if (this.subtitle != null) json['subtitle'] = { this.languageCode : this.subtitle };
-    if (this.contentAvailable != null) json['content_available'] = this.contentAvailable;
-    if (this.mutableContent != null) json['mutable_content'] = this.mutableContent;
+    if (this.content != null)
+      json['contents'] = {this.languageCode: this.content};
+    if (this.heading != null)
+      json['headings'] = {this.languageCode: this.heading};
+    if (this.subtitle != null)
+      json['subtitle'] = {this.languageCode: this.subtitle};
+    if (this.contentAvailable != null)
+      json['content_available'] = this.contentAvailable;
+    if (this.mutableContent != null)
+      json['mutable_content'] = this.mutableContent;
     if (this.additionalData != null) json['data'] = this.additionalData;
     if (this.url != null) json['url'] = this.url;
-    if (this.iosAttachments != null) json['ios_attachments'] = this.iosAttachments;
+    if (this.iosAttachments != null)
+      json['ios_attachments'] = this.iosAttachments;
     if (this.bigPicture != null) json['big_picture'] = this.bigPicture;
     if (this.iosCategory != null) json['ios_category'] = this.iosCategory;
     if (this.iosSound != null) json['ios_sound'] = this.iosSound;
     if (this.androidSound != null) json['android_sound'] = this.androidSound;
-    if (this.androidSmallIcon != null) json['small_icon'] = this.androidSmallIcon;
-    if (this.androidLargeIcon != null) json['large_icon'] = this.androidLargeIcon;
-    if (this.androidChannelId != null) json['android_channel_id'] = this.androidChannelId;
+    if (this.androidSmallIcon != null)
+      json['small_icon'] = this.androidSmallIcon;
+    if (this.androidLargeIcon != null)
+      json['large_icon'] = this.androidLargeIcon;
+    if (this.androidChannelId != null)
+      json['android_channel_id'] = this.androidChannelId;
     if (this.iosBadgeCount != null) json['ios_badgeCount'] = this.iosBadgeCount;
     if (this.collapseId != null) json['collapse_id'] = this.collapseId;
-    if (this.deliveryTimeOfDay != null) json['delivery_time_of_day'] = this.deliveryTimeOfDay;
+    if (this.deliveryTimeOfDay != null)
+      json['delivery_time_of_day'] = this.deliveryTimeOfDay;
 
     // adds optional parameters that require transformations
-    if (this.sendAfter != null) json['send_after'] = dateToStringWithOffset(this.sendAfter);
-    if (this.iosBadgeType != null) json['ios_badgeType'] = convertEnumCaseToValue(this.iosBadgeType);
-    if (this.delayedOption != null) json['delay_option'] = convertEnumCaseToValue(this.delayedOption);
+    if (this.sendAfter != null)
+      json['send_after'] = dateToStringWithOffset(this.sendAfter);
+    if (this.iosBadgeType != null)
+      json['ios_badgeType'] = convertEnumCaseToValue(this.iosBadgeType);
+    if (this.delayedOption != null)
+      json['delay_option'] = convertEnumCaseToValue(this.delayedOption);
 
     // adds buttons
     if (this.buttons != null) {

@@ -9,7 +9,6 @@ import 'package:onesignal/onesignal.dart';
 */
 
 class OneSignalMockChannelController {
-  
   MethodChannel _channel = const MethodChannel('OneSignal');
   MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
 
@@ -34,7 +33,8 @@ class OneSignalMockChannelController {
         this.state.setLogLevel(call.arguments);
         break;
       case "OneSignal#consentGranted":
-        this.state.consentGranted = (call.arguments as Map<dynamic, dynamic>)['granted'] as bool;
+        this.state.consentGranted =
+            (call.arguments as Map<dynamic, dynamic>)['granted'] as bool;
         break;
       case "OneSignal#promptPermission":
         this.state.calledPromptPermission = true;
@@ -49,8 +49,9 @@ class OneSignalMockChannelController {
         this.state.subscriptionState = call.arguments as bool;
         break;
       case "OneSignal#postNotification":
-        this.state.postNotificationJson = call.arguments as Map<dynamic, dynamic>;
-        return {"success" : true};
+        this.state.postNotificationJson =
+            call.arguments as Map<dynamic, dynamic>;
+        return {"success": true};
       case "OneSignal#setLocationShared":
         this.state.locationShared = call.arguments as bool;
         break;
@@ -59,16 +60,15 @@ class OneSignalMockChannelController {
         break;
       case "OneSignal#sendTags":
         this.state.tags = call.arguments;
-        return {"success" : true};
+        return {"success": true};
       case "OneSignal#deleteTags":
         this.state.deleteTags = call.arguments;
-        return {"success" : true};
+        return {"success": true};
     }
   }
 }
 
 class OneSignalState {
-
   //initialization
   String appId;
   Map<dynamic, dynamic> iosSettings;
@@ -122,14 +122,15 @@ class OneSignalState {
 
   void log(Map<dynamic, dynamic> params) {
     var level = params['logLevel'] as int;
-    
+
     if (level != null) this.latestLogLevel = OSLogLevel.values[level];
     this.latestLogStatement = params['message'];
   }
 
   void setDisplayType(Map<dynamic, dynamic> params) {
-    var type = params['displayType'] as int; 
-    if (type != null) this.inFocusDisplayType = OSNotificationDisplayType.values[type];
+    var type = params['displayType'] as int;
+    if (type != null)
+      this.inFocusDisplayType = OSNotificationDisplayType.values[type];
   }
 
   void setEmail(Map<dynamic, dynamic> params) {

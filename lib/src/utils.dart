@@ -7,15 +7,19 @@ String dateToStringWithOffset(DateTime date) {
   var offsetMinutes = date.timeZoneOffset.inMinutes % 60;
   var dateString = "${date.toIso8601String()} ";
 
-  dateString += "UTC" + ((offsetHours > 10 || offsetHours < 0) ? "$offsetHours" : "0$offsetHours");
-  dateString += ":" + ((offsetMinutes.abs() > 10) ? "$offsetMinutes" : "0$offsetMinutes:00");
+  dateString += "UTC" +
+      ((offsetHours > 10 || offsetHours < 0)
+          ? "$offsetHours"
+          : "0$offsetHours");
+  dateString += ":" +
+      ((offsetMinutes.abs() > 10) ? "$offsetMinutes" : "0$offsetMinutes:00");
 
   return dateString;
 }
 
 // in some places, we want to send an enum value to
-// ObjC. Before we can do this, we must convert it 
-// to a string/int/etc. 
+// ObjC. Before we can do this, we must convert it
+// to a string/int/etc.
 // However, in some places such as iOS init settings,
 // there could be multiple different types of enum,
 // so we've combined it into this one function.
@@ -25,7 +29,7 @@ dynamic convertEnumCaseToValue(dynamic key) {
       return "kOSSettingsKeyAutoPrompt";
     case OSiOSSettings.inAppAlerts:
       return "kOSSettingsKeyInAppAlerts";
-    case OSiOSSettings.inAppLaunchUrl: 
+    case OSiOSSettings.inAppLaunchUrl:
       return "kOSSettingsKeyInAppLaunchURL";
     case OSiOSSettings.inFocusDisplayOption:
       return "kOSSettingsKeyInFocusDisplayOption";
@@ -48,9 +52,9 @@ dynamic convertEnumCaseToValue(dynamic key) {
   }
 
   switch (key) {
-    case OSNotificationDisplayType.none: 
+    case OSNotificationDisplayType.none:
       return 0;
-    case OSNotificationDisplayType.alert: 
+    case OSNotificationDisplayType.alert:
       return 1;
     case OSNotificationDisplayType.notification:
       return 2;
@@ -63,8 +67,9 @@ dynamic convertEnumCaseToValue(dynamic key) {
 abstract class JSONStringRepresentable {
   String jsonRepresentation();
 
-  String convertToJsonString(Map<String, dynamic> object) => JsonEncoder.withIndent('  ')
-    .convert(object)
-    .replaceAll("\\n", "\n")
-    .replaceAll("\\", "");
+  String convertToJsonString(Map<String, dynamic> object) => JsonEncoder
+      .withIndent('  ')
+      .convert(object)
+      .replaceAll("\\n", "\n")
+      .replaceAll("\\", "");
 }

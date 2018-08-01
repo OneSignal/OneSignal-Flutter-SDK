@@ -33,24 +33,28 @@ class _MyAppState extends State<MyApp> {
 
     OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
-    var settings = { 
-      OSiOSSettings.autoPrompt : false,
-      OSiOSSettings.promptBeforeOpeningPushUrl : true 
+    var settings = {
+      OSiOSSettings.autoPrompt: false,
+      OSiOSSettings.promptBeforeOpeningPushUrl: true
     };
 
     OneSignal.shared.setNotificationReceivedHandler((notification) {
       this.setState(() {
-        _debugLabelString = "Received notification: \n${notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-      });
-    });
-    
-    OneSignal.shared.setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      this.setState(() {
-        _debugLabelString = "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+        _debugLabelString =
+            "Received notification: \n${notification.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
     });
 
-    OneSignal.shared.setSubscriptionObserver((OSSubscriptionStateChanges changes) {
+    OneSignal.shared
+        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+      this.setState(() {
+        _debugLabelString =
+            "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });
+
+    OneSignal.shared
+        .setSubscriptionObserver((OSSubscriptionStateChanges changes) {
       print("SUBSCRIPTION STATE CHANGED: ${changes.jsonRepresentation()}");
     });
 
@@ -58,14 +62,17 @@ class _MyAppState extends State<MyApp> {
       print("PERMISSION STATE CHANGED: ${changes.jsonRepresentation()}");
     });
 
-    OneSignal.shared.setEmailSubscriptionObserver((OSEmailSubscriptionStateChanges changes) {
+    OneSignal.shared.setEmailSubscriptionObserver(
+        (OSEmailSubscriptionStateChanges changes) {
       print("EMAIL SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
     });
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
-    await OneSignal.shared.init("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
+    await OneSignal.shared
+        .init("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
 
-    OneSignal.shared.setInFocusDisplayType(OSNotificationDisplayType.notification);
+    OneSignal.shared
+        .setInFocusDisplayType(OSNotificationDisplayType.notification);
 
     bool requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
 
@@ -77,7 +84,7 @@ class _MyAppState extends State<MyApp> {
   void _handleGetTags() {
     OneSignal.shared.getTags().then((tags) {
       if (tags == null) return;
-      
+
       setState((() {
         _debugLabelString = "$tags";
       }));
@@ -163,20 +170,20 @@ class _MyAppState extends State<MyApp> {
 
     var playerId = status.subscriptionStatus.userId;
 
-    var imgUrlString = "http://cdn1-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-2.jpg";
+    var imgUrlString =
+        "http://cdn1-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-2.jpg";
 
     var notification = OSCreateNotification(
-      playerIds: [playerId],
-      content: "this is a test from OneSignal's Flutter SDK",
-      heading: "Test Notification",
-      iosAttachments: {"id1" : imgUrlString},
-      bigPicture: imgUrlString,
-      buttons: [
-        OSActionButton(text: "test1", id: "id1"),
-        OSActionButton(text: "test2", id: "id2")
-      ]
-    );
-    
+        playerIds: [playerId],
+        content: "this is a test from OneSignal's Flutter SDK",
+        heading: "Test Notification",
+        iosAttachments: {"id1": imgUrlString},
+        bigPicture: imgUrlString,
+        buttons: [
+          OSActionButton(text: "test1", id: "id1"),
+          OSActionButton(text: "test2", id: "id2")
+        ]);
+
     var response = await OneSignal.shared.postNotification(notification);
 
     this.setState(() {
@@ -190,12 +197,8 @@ class _MyAppState extends State<MyApp> {
     var playerId = status.subscriptionStatus.userId;
 
     var notification = OSCreateNotification.silentNotification(
-      playerIds: [playerId],
-      additionalData: {
-        'test' : 'value'
-      }
-    );
-    
+        playerIds: [playerId], additionalData: {'test': 'value'});
+
     var response = await OneSignal.shared.postNotification(notification);
 
     this.setState(() {
@@ -207,108 +210,91 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return new MaterialApp(
       home: new Scaffold(
-        appBar: new AppBar(
-          title: const Text('OneSignal Flutter Demo'),
-          backgroundColor: Color.fromARGB(255, 212, 86, 83),
-        ),
-        body: Container(
-          padding: EdgeInsets.all(10.0),
-          child: SingleChildScrollView(
-            child: new Table(
-              children: [
-                new TableRow(
-                  children: [
-                    new OneSignalButton("Get Tags", _handleGetTags, !_enableConsentButton)
-                  ]
-                ),
-                new TableRow(
-                  children: [
-                    new OneSignalButton("Send Tags", _handleSendTags, !_enableConsentButton)
-                  ]
-                ),
-                new TableRow(
-                  children: [
-                    new OneSignalButton("Prompt for Push Permission", _handlePromptForPushPermission, !_enableConsentButton)
-                  ]
-                ),
-                new TableRow(
-                  children: [
-                    new OneSignalButton("Print Permission Subscription State", _handleGetPermissionSubscriptionState, !_enableConsentButton)
-                  ]
-                ),
-                new TableRow(
-                  children: [
+          appBar: new AppBar(
+            title: const Text('OneSignal Flutter Demo'),
+            backgroundColor: Color.fromARGB(255, 212, 86, 83),
+          ),
+          body: Container(
+            padding: EdgeInsets.all(10.0),
+            child: SingleChildScrollView(
+              child: new Table(
+                children: [
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Get Tags", _handleGetTags, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Send Tags", _handleSendTags, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Prompt for Push Permission",
+                        _handlePromptForPushPermission, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Print Permission Subscription State",
+                        _handleGetPermissionSubscriptionState,
+                        !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
                     new TextField(
                       textAlign: TextAlign.center,
                       decoration: InputDecoration(
-                        hintText: "Email Address",
-                        labelStyle: TextStyle(
-                          color: Color.fromARGB(255, 212, 86, 83),
-                        )
-                      ),
+                          hintText: "Email Address",
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 212, 86, 83),
+                          )),
                       onChanged: (text) {
                         this.setState(() {
                           _emailAddress = text == "" ? null : text;
                         });
                       },
                     )
-                  ]
-                ),
-                new TableRow(
-                  children: [
+                  ]),
+                  new TableRow(children: [
                     Container(
                       height: 8.0,
                     )
-                  ]
-                ),
-                new TableRow(
-                  children: [
-                    new OneSignalButton("Set Email", _handleSetEmail, !_enableConsentButton)
-                  ]
-                ),
-                new TableRow(
-                  children: [
-                    new OneSignalButton("Logout Email", _handleLogoutEmail, !_enableConsentButton)
-                  ]
-                ),
-                new TableRow(
-                  children: [
-                    new OneSignalButton("Provide GDPR Consent", _handleConsent, _enableConsentButton)
-                  ]
-                ),
-                new TableRow(
-                  children: [
-                    new OneSignalButton("Set Location Shared", _handleSetLocationShared, !_enableConsentButton)
-                  ]
-                ),
-                new TableRow(
-                  children: [
-                    new OneSignalButton("Delete Tag", _handleDeleteTag, !_enableConsentButton)
-                  ]
-                ),
-                new TableRow(
-                  children: [
-                    new OneSignalButton("Post Notification", _handleSendNotification, !_enableConsentButton)
-                  ]
-                ),
-                new TableRow(
-                  children: [
-                    new OneSignalButton("Post Silent Notification", _handleSendSilentNotification, !_enableConsentButton)
-                  ]
-                ),
-                new TableRow(
-                  children: [
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Set Email", _handleSetEmail, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Logout Email", _handleLogoutEmail,
+                        !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Provide GDPR Consent", _handleConsent,
+                        _enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Set Location Shared",
+                        _handleSetLocationShared, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Delete Tag", _handleDeleteTag, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Post Notification",
+                        _handleSendNotification, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Post Silent Notification",
+                        _handleSendSilentNotification, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
                     new Container(
                       child: new Text(_debugLabelString),
                       alignment: Alignment.center,
                     )
-                  ]
-                )
-              ],
+                  ])
+                ],
+              ),
             ),
-          ),
-        )
-      ),
+          )),
     );
   }
 }
@@ -327,31 +313,27 @@ class OneSignalButton extends StatefulWidget {
 
 class OneSignalButtonState extends State<OneSignalButton> {
   @override
-    Widget build(BuildContext context) {
-      // TODO: implement build
-      return new Table(
-        children: [
-          new TableRow(
-            children: [
-              new FlatButton(
-                disabledColor: Color.fromARGB(180, 212, 86, 83),
-                disabledTextColor: Colors.white,
-                color: Color.fromARGB(255, 212, 86, 83),
-                textColor: Colors.white,
-                padding: EdgeInsets.all(8.0),
-                child: new Text(widget.title),
-                onPressed: widget.enabled ? widget.onPressed : null,
-              )
-            ]
-          ),
-          new TableRow(
-            children: [
-              Container(
-                height: 8.0,
-              )
-            ]
-          ),
-        ],
-      );
-    }
+  Widget build(BuildContext context) {
+    // TODO: implement build
+    return new Table(
+      children: [
+        new TableRow(children: [
+          new FlatButton(
+            disabledColor: Color.fromARGB(180, 212, 86, 83),
+            disabledTextColor: Colors.white,
+            color: Color.fromARGB(255, 212, 86, 83),
+            textColor: Colors.white,
+            padding: EdgeInsets.all(8.0),
+            child: new Text(widget.title),
+            onPressed: widget.enabled ? widget.onPressed : null,
+          )
+        ]),
+        new TableRow(children: [
+          Container(
+            height: 8.0,
+          )
+        ]),
+      ],
+    );
+  }
 }

@@ -5,10 +5,9 @@ import 'dart:convert';
 
 /// A class representing the notification, including the
 /// payload of the notification as well as additional
-/// parameters (such as whether the notification was `shown` 
+/// parameters (such as whether the notification was `shown`
 /// to the user, whether it's `silent`, etc.)
 class OSNotification extends JSONStringRepresentable {
-
   /// Represents the payload, the data received from the
   /// server for this push notification
   OSNotificationPayload payload;
@@ -26,7 +25,7 @@ class OSNotification extends JSONStringRepresentable {
 
   /// (iOS Only)
   /// Indicates if it was a silent (non user-interactive/background)
-  /// push notification. You must use the NotificationExtenderService 
+  /// push notification. You must use the NotificationExtenderService
   /// to implement silent notifications in Android.
   bool silent;
 
@@ -37,40 +36,41 @@ class OSNotification extends JSONStringRepresentable {
 
   //converts JSON map to OSNotification instance
   OSNotification(Map<String, dynamic> json) {
-    this.payload = OSNotificationPayload(json['payload'].cast<String, dynamic>());
+    this.payload =
+        OSNotificationPayload(json['payload'].cast<String, dynamic>());
     this.shown = json['shown'] as bool;
     this.appInFocus = json['appInFocus'] as bool;
     this.silent = json['silent'] as bool;
-    
-    if (json.containsKey("androidNotificationId")) this.androidNotificationId = json['androidNotificationId'] as int;
-    if (json.containsKey('displayType')) this.displayType = OSNotificationDisplayType.values[json['displayType'] as int];
+
+    if (json.containsKey("androidNotificationId"))
+      this.androidNotificationId = json['androidNotificationId'] as int;
+    if (json.containsKey('displayType'))
+      this.displayType =
+          OSNotificationDisplayType.values[json['displayType'] as int];
   }
-  
+
   String jsonRepresentation() {
     return convertToJsonString({
-      'payload' : this.payload.jsonRepresentation(),
-      'displayType' : this.displayType.index,
-      'shown' : this.shown,
-      'appInFocus' : this.appInFocus,
-      'silent' : this.silent
+      'payload': this.payload.jsonRepresentation(),
+      'displayType': this.displayType.index,
+      'shown': this.shown,
+      'appInFocus': this.appInFocus,
+      'silent': this.silent
     });
   }
 }
 
-
-
 /// This class represents the actual payload of the notification,
 /// the data that impacts the content of the notification itself.
 class OSNotificationPayload extends JSONStringRepresentable {
-
   /// The OneSignal notification ID for this notification
   String notificationId;
 
-  /// If this notification was created from a Template on the 
+  /// If this notification was created from a Template on the
   /// OneSignal dashboard, this will be the ID of that template
   String templateId;
 
-  /// The name of the template (if any) that was used to 
+  /// The name of the template (if any) that was used to
   /// create this push notification
   String templateName;
 
@@ -85,12 +85,12 @@ class OSNotificationPayload extends JSONStringRepresentable {
 
   /// (iOS Only)
   /// The category for this notification. This can trigger custom
-  /// behavior (ie. if this notification should display a 
+  /// behavior (ie. if this notification should display a
   /// custom Content Extension for custom UI)
   String category;
 
   /// (iOS Only)
-  /// If you set the badge to a specific value, this integer 
+  /// If you set the badge to a specific value, this integer
   /// property will be that value
   int badge;
 
@@ -113,7 +113,7 @@ class OSNotificationPayload extends JSONStringRepresentable {
   /// The body (should contain most of the text)
   String body;
 
-  /// If set, he launch URL will be opened when the user 
+  /// If set, he launch URL will be opened when the user
   /// taps on your push notification. You can control
   /// whether or not it opens in an in-app webview or
   /// in Safari (with iOS).
@@ -133,7 +133,7 @@ class OSNotificationPayload extends JSONStringRepresentable {
   /// the ID of the Action the user tapped.
   List<OSActionButton> buttons;
 
-  /// A hashmap object representing the raw key/value 
+  /// A hashmap object representing the raw key/value
   /// properties of the push notification
   Map<String, dynamic> rawPayload;
 
@@ -155,7 +155,7 @@ class OSNotificationPayload extends JSONStringRepresentable {
   /// (Android Only)
   /// The accent color to use on the notification
   /// Hex value in ARGB format (it's a normal
-  /// hex color value, but it includes the alpha 
+  /// hex color value, but it includes the alpha
   /// channel in addition to red, green, blue)
   String smallIconAccentColor;
 
@@ -168,7 +168,7 @@ class OSNotificationPayload extends JSONStringRepresentable {
   /// (Android only) API level 21+
   /// Sets the visibility of the notification
   ///  1 = Public (default)
-  ///  0 = Private (hidden from lock screen 
+  ///  0 = Private (hidden from lock screen
   ///    if user set 'Hide Sensitive content')
   ///  -1 = Secret (doesn't appear at all)
   int lockScreenVisibility;
@@ -179,10 +179,10 @@ class OSNotificationPayload extends JSONStringRepresentable {
   String groupKey;
 
   /// (Android only) Android 6 and earlier only
-  /// The message to display when multiple 
+  /// The message to display when multiple
   /// notifications have been stacked together.
   /// Note: Android 7 allows groups (stacks)
-  /// to be expanded, so group message is no 
+  /// to be expanded, so group message is no
   /// longer necessary
   String groupMessage;
 
@@ -205,9 +205,9 @@ class OSNotificationPayload extends JSONStringRepresentable {
   /// means the notification will be delivered faster.
   /// Default = 10.
   int priority;
-  
+
   /// (Android Only)
-  /// Describes the background image layout of the 
+  /// Describes the background image layout of the
   /// notification (if set)
   OSAndroidBackgroundImageLayout backgroundImageLayout;
 
@@ -215,41 +215,61 @@ class OSNotificationPayload extends JSONStringRepresentable {
     this.notificationId = json['notificationId'] as String;
 
     // iOS Specific Parameters
-    if (json.containsKey('contentAvailable')) this.contentAvailable = json['contentAvailable'] as bool;
-    if (json.containsKey('mutableContent')) this.mutableContent = json['mutableContent'] as bool;
-    if (json.containsKey('category')) this.category = json['category'] as String;
+    if (json.containsKey('contentAvailable'))
+      this.contentAvailable = json['contentAvailable'] as bool;
+    if (json.containsKey('mutableContent'))
+      this.mutableContent = json['mutableContent'] as bool;
+    if (json.containsKey('category'))
+      this.category = json['category'] as String;
     if (json.containsKey('badge')) this.badge = json['badge'] as int;
-    if (json.containsKey('badgeIncrement')) this.badgeIncrement = json['badgeIncrement'] as int;
-    if (json.containsKey('subtitle')) this.subtitle = json['subtitle'] as String;
-    if (json.containsKey('attachments')) this.attachments = json['attachments'].cast<String, dynamic>();
+    if (json.containsKey('badgeIncrement'))
+      this.badgeIncrement = json['badgeIncrement'] as int;
+    if (json.containsKey('subtitle'))
+      this.subtitle = json['subtitle'] as String;
+    if (json.containsKey('attachments'))
+      this.attachments = json['attachments'].cast<String, dynamic>();
 
     // Android Specific Parameters
-    if (json.containsKey("smallIcon")) this.smallIcon = json['smallIcon'] as String;
-    if (json.containsKey("largeIcon")) this.largeIcon = json['largeIcon'] as String;
-    if (json.containsKey("bigPicture")) this.bigPicture = json['bigPicture'] as String;
-    if (json.containsKey("smallIconAccentColor")) this.smallIconAccentColor = json['smallIconAccentColor'] as String;
-    if (json.containsKey("ledColor")) this.ledColor = json['ledColor'] as String;
-    if (json.containsKey("lockScreenVisibility")) this.lockScreenVisibility = json['lockScreenVisibility'] as int;
-    if (json.containsKey("groupMessage")) this.groupMessage = json['groupMessage'] as String;
-    if (json.containsKey("fromProjectNumber")) this.fromProjectNumber = json['fromProjectNumber'] as String;
-    if (json.containsKey("collapseId")) this.collapseId = json['collapseId'] as String;
+    if (json.containsKey("smallIcon"))
+      this.smallIcon = json['smallIcon'] as String;
+    if (json.containsKey("largeIcon"))
+      this.largeIcon = json['largeIcon'] as String;
+    if (json.containsKey("bigPicture"))
+      this.bigPicture = json['bigPicture'] as String;
+    if (json.containsKey("smallIconAccentColor"))
+      this.smallIconAccentColor = json['smallIconAccentColor'] as String;
+    if (json.containsKey("ledColor"))
+      this.ledColor = json['ledColor'] as String;
+    if (json.containsKey("lockScreenVisibility"))
+      this.lockScreenVisibility = json['lockScreenVisibility'] as int;
+    if (json.containsKey("groupMessage"))
+      this.groupMessage = json['groupMessage'] as String;
+    if (json.containsKey("fromProjectNumber"))
+      this.fromProjectNumber = json['fromProjectNumber'] as String;
+    if (json.containsKey("collapseId"))
+      this.collapseId = json['collapseId'] as String;
     if (json.containsKey("priority")) this.priority = json['priority'] as int;
 
     // shared parameters
-    if (json.containsKey('templateName')) this.templateName = json['templateName'] as String;
-    if (json.containsKey('templateId')) this.templateId = json['templateId'] as String;
+    if (json.containsKey('templateName'))
+      this.templateName = json['templateName'] as String;
+    if (json.containsKey('templateId'))
+      this.templateId = json['templateId'] as String;
     if (json.containsKey('sound')) this.sound = json['sound'] as String;
     if (json.containsKey('title')) this.title = json['title'] as String;
     if (json.containsKey('body')) this.body = json['body'] as String;
-    if (json.containsKey('launchUrl')) this.launchUrl = json['launchUrl'] as String;
-    if (json.containsKey('additionalData')) this.additionalData = json['additionalData'].cast<String, dynamic>();
-    
+    if (json.containsKey('launchUrl'))
+      this.launchUrl = json['launchUrl'] as String;
+    if (json.containsKey('additionalData'))
+      this.additionalData = json['additionalData'].cast<String, dynamic>();
+
     if (json.containsKey('backgroundImageLayout')) {
-      this.backgroundImageLayout = OSAndroidBackgroundImageLayout(json['backgroundImageLayout'].cast<String, dynamic>());
+      this.backgroundImageLayout = OSAndroidBackgroundImageLayout(
+          json['backgroundImageLayout'].cast<String, dynamic>());
     }
 
     // raw payload comes as a JSON string
-    if (json.containsKey('rawPayload')) { 
+    if (json.containsKey('rawPayload')) {
       var raw = json['rawPayload'] as String;
       JsonDecoder decoder = JsonDecoder();
       this.rawPayload = decoder.convert(raw);
@@ -268,40 +288,36 @@ class OSNotificationPayload extends JSONStringRepresentable {
   String jsonRepresentation() => convertToJsonString(this.rawPayload);
 }
 
-
-
 /// An instance of this class represents a user interaction with
 /// your push notification, ie. if they tap a button
 class OSNotificationOpenedResult {
-  
   //instance properties
   OSNotification notification;
   OSNotificationAction action;
 
   //constructor
   OSNotificationOpenedResult(Map<String, dynamic> json) {
-    this.notification = OSNotification(json['notification'].cast<String, dynamic>());
+    this.notification =
+        OSNotification(json['notification'].cast<String, dynamic>());
 
-    if (json.containsKey('action')) { 
-      this.action = OSNotificationAction(json['action'].cast<String, dynamic>()); 
+    if (json.containsKey('action')) {
+      this.action =
+          OSNotificationAction(json['action'].cast<String, dynamic>());
     }
   }
 }
 
-
-
 /// Represents an action taken on a push notification, such as
 /// tapping the notification (or a button on the notification),
-/// or if your `inFocusDisplayType` is set to true - if they 
+/// or if your `inFocusDisplayType` is set to true - if they
 /// tapped 'close'.
 class OSNotificationAction {
-
-  /// An enum that represents whether the user `opened` or 
+  /// An enum that represents whether the user `opened` or
   /// took a more specific `action` (such as tapping a button
   /// on the notification)
   OSNotificationActionType type;
 
-  /// The ID of the button on your notification 
+  /// The ID of the button on your notification
   /// that the user tapped
   String actionId;
 
@@ -309,11 +325,10 @@ class OSNotificationAction {
     this.type = OSNotificationActionType.opened;
     this.actionId = json['id'] as String;
 
-    if (json.containsKey('type')) this.type = OSNotificationActionType.values[json['type'] as int];
+    if (json.containsKey('type'))
+      this.type = OSNotificationActionType.values[json['type'] as int];
   }
 }
-
-
 
 /// Represents a button sent as part of a push notification
 class OSActionButton extends JSONStringRepresentable {
@@ -324,7 +339,7 @@ class OSActionButton extends JSONStringRepresentable {
   String text;
 
   /// (Android only)
-  /// The URL/filename to show as the 
+  /// The URL/filename to show as the
   /// button's icon
   String icon;
 
@@ -338,11 +353,7 @@ class OSActionButton extends JSONStringRepresentable {
   }
 
   Map<String, dynamic> mapRepresentation() {
-    return {
-      'id' : this.id,
-      'text' : this.text,
-      'icon' : this.icon
-    };
+    return {'id': this.id, 'text': this.text, 'icon': this.icon};
   }
 
   String jsonRepresentation() {
@@ -368,15 +379,17 @@ class OSAndroidBackgroundImageLayout extends JSONStringRepresentable {
 
   OSAndroidBackgroundImageLayout(Map<String, dynamic> json) {
     if (json.containsKey('image')) this.image = json['image'] as String;
-    if (json.containsKey('titleTextColor')) this.titleTextColor = json['titleTextColor'] as String;
-    if (json.containsKey('bodyTextColor')) this.bodyTextColor = json['bodyTextColor'] as String;
+    if (json.containsKey('titleTextColor'))
+      this.titleTextColor = json['titleTextColor'] as String;
+    if (json.containsKey('bodyTextColor'))
+      this.bodyTextColor = json['bodyTextColor'] as String;
   }
 
   String jsonRepresentation() {
     return convertToJsonString({
-      'image' : this.image,
-      'titleTextColor' : this.titleTextColor,
-      'bodyTextColor' : this.bodyTextColor
+      'image': this.image,
+      'titleTextColor': this.titleTextColor,
+      'bodyTextColor': this.bodyTextColor
     });
   }
 }

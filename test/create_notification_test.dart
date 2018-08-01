@@ -2,18 +2,17 @@ import 'package:test/test.dart';
 import 'test_data.dart';
 
 void main() {
-
   //silent notification tests
-  test ('expect silent notifications contentAvailable param to be true wihtout explicitly passing it into the constructor', () {
+  test('expect silent notifications contentAvailable param to be true', () {
     expect(silentNotification.contentAvailable, true);
   });
 
-  test ('expect notification to parse player IDs correctly', () {
+  test('expect notification to parse player IDs correctly', () {
     expect(silentNotification.playerIds.first, testPlayerId);
   });
 
-  test ('expect notification to parse additional data correctly', () {
-    expect(silentNotification.additionalData['test'], 'value' );
+  test('expect notification to parse additional data correctly', () {
+    expect(silentNotification.additionalData['test'], 'value');
   });
 
   //normal notification tests
@@ -26,7 +25,7 @@ void main() {
   });
 
   test('expect subtitle to be correct', () {
-    expect(notificationJson['subtitle']['es'], 'test subtitle' );
+    expect(notificationJson['subtitle']['es'], 'test subtitle');
   });
 
   test('expect contentAvailable to be parsed correctly', () {
@@ -82,7 +81,8 @@ void main() {
   });
 
   test('expect sendAfter to be parsed correctly', () {
-    expect(notificationJson['send_after'], "2018-07-24T20:38:24.571Z UTC00:00:00");
+    expect(
+        notificationJson['send_after'], "2018-07-24T20:38:24.571Z UTC00:00:00");
   });
 
   test('expect delayed option to be parsed correctly', () {
