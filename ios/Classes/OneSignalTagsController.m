@@ -31,8 +31,6 @@
 
 @implementation OneSignalTagsController
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    NSLog(@"Registering tags controller");
-    
     OneSignalTagsController *instance = [OneSignalTagsController new];
     
     instance.channel = [FlutterMethodChannel

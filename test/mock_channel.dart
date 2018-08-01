@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:OneSignalFlutter/onesignal.dart';
+import 'package:onesignal/onesignal.dart';
 
 /*
   This class mocks an iOS or Android host device
@@ -50,7 +50,7 @@ class OneSignalMockChannelController {
         break;
       case "OneSignal#postNotification":
         this.state.postNotificationJson = call.arguments as Map<dynamic, dynamic>;
-        break;
+        return {"success" : true};
       case "OneSignal#setLocationShared":
         this.state.locationShared = call.arguments as bool;
         break;

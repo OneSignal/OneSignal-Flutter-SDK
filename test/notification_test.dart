@@ -1,6 +1,6 @@
 import 'package:test/test.dart';
-import 'package:OneSignalFlutter/src/notification.dart';
-import 'package:OneSignalFlutter/src/defines.dart';
+import 'package:onesignal/src/notification.dart';
+import 'package:onesignal/src/defines.dart';
 import 'test_data.dart';
 
 void main() {

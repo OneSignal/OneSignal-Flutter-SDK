@@ -1,13 +1,13 @@
-import 'package:OneSignalFlutter/src/subscription.dart';
-import 'package:OneSignalFlutter/src/defines.dart';
-import 'package:OneSignalFlutter/src/utils.dart';
+import 'package:onesignal/src/subscription.dart';
+import 'package:onesignal/src/defines.dart';
+import 'package:onesignal/src/utils.dart';
 
 class OSPermissionState extends JSONStringRepresentable {
   bool hasPrompted; // iOS only
   bool provisional; //iOS only
   OSNotificationPermission status;
   
-  OSPermissionState(Map<dynamic, dynamic> json) {
+  OSPermissionState(Map<String, dynamic> json) {
     
     if (json.containsKey('status')) {
       //ios
@@ -44,10 +44,10 @@ class OSPermissionSubscriptionState extends JSONStringRepresentable {
   OSSubscriptionState subscriptionStatus;
   OSEmailSubscriptionState emailSubscriptionStatus;
 
-  OSPermissionSubscriptionState(Map<dynamic, dynamic> json) {
-    this.permissionStatus = OSPermissionState(json['permissionStatus']);
-    this.subscriptionStatus = OSSubscriptionState(json['subscriptionStatus']);
-    this.emailSubscriptionStatus = OSEmailSubscriptionState(json['emailSubscriptionStatus']);
+  OSPermissionSubscriptionState(Map<String, dynamic> json) {
+    this.permissionStatus = OSPermissionState(json['permissionStatus'].cast<String, dynamic>());
+    this.subscriptionStatus = OSSubscriptionState(json['subscriptionStatus'].cast<String, dynamic>());
+    this.emailSubscriptionStatus = OSEmailSubscriptionState(json['emailSubscriptionStatus'].cast<String, dynamic>());
   }
 
   String jsonRepresentation() {
@@ -63,7 +63,7 @@ class OSPermissionStateChanges extends JSONStringRepresentable {
   OSPermissionState from;
   OSPermissionState to;
 
-  OSPermissionStateChanges(Map<dynamic, dynamic> json) {
+  OSPermissionStateChanges(Map<String, dynamic> json) {
     this.from = OSPermissionState(json['from']);
     this.to = OSPermissionState(json['to']);
   }

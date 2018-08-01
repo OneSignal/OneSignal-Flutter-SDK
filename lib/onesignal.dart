@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:OneSignalFlutter/src/permission.dart';
-import 'package:OneSignalFlutter/src/subscription.dart';
-import 'package:OneSignalFlutter/src/defines.dart';
-import 'package:OneSignalFlutter/src/utils.dart';
-import 'package:OneSignalFlutter/src/notification.dart';
-import 'package:OneSignalFlutter/src/create_notification.dart';
+import 'package:onesignal/src/permission.dart';
+import 'package:onesignal/src/subscription.dart';
+import 'package:onesignal/src/defines.dart';
+import 'package:onesignal/src/utils.dart';
+import 'package:onesignal/src/notification.dart';
+import 'package:onesignal/src/create_notification.dart';
 
 export 'src/notification.dart';
 export 'src/subscription.dart';
@@ -160,7 +160,7 @@ class OneSignal {
   /// This method can often take more than five seconds to complete,
   /// so please do NOT block any user-interactive content while
   /// waiting for this request to complete.
-  Future<Map<String, dynamic>> sendTag(dynamic key, dynamic value) async {
+  Future<Map<String, dynamic>> sendTag(String key, dynamic value) async {
     Map<dynamic, dynamic> response = await this.sendTags({ key : value });
     return response.cast<String, dynamic>();
   }
@@ -169,7 +169,7 @@ class OneSignal {
   /// This method can often take more than five seconds to complete,
   /// so please do NOT block any user-interactive content while
   /// waiting for this request to complete.
-  Future<Map<String, dynamic>> sendTags(Map<dynamic, dynamic> tags) async {
+  Future<Map<String, dynamic>> sendTags(Map<String, dynamic> tags) async {
     Map<dynamic, dynamic> response = await _tagsChannel.invokeMethod("OneSignal#sendTags", tags);
     return response.cast<String, dynamic>();
   }
@@ -207,7 +207,7 @@ class OneSignal {
   Future<OSPermissionSubscriptionState> getPermissionSubscriptionState() async {
     var json = await _channel.invokeMethod("OneSignal#getPermissionSubscriptionState");
 
-    return OSPermissionSubscriptionState(json);
+    return OSPermissionSubscriptionState(json.cast<String, dynamic>());
   }
 
   /// Allows you to manually disable or enable push notifications for this user.
@@ -215,17 +215,19 @@ class OneSignal {
   /// permission status. If the user disabled (or never allowed) your application
   /// to send push notifications, calling setSubscription(true) will not change that.
   Future<void> setSubscription(bool enable) async {
-    await _channel.invokeMethod("OneSignal#setSubscription", enable);
+    return await _channel.invokeMethod("OneSignal#setSubscription", enable);
   }
 
   /// Allows you to post a notification to the current user (or a different user 
   /// if you specify their OneSignal user ID).
-  Future<Map<dynamic, dynamic>> postNotificationWithJson(Map<dynamic, dynamic> json) async {
-    return await _channel.invokeMethod("OneSignal#postNotification", json);
+  Future<Map<String, dynamic>> postNotificationWithJson(Map<String, dynamic> json) async {
+    Map<dynamic, dynamic> response = await _channel.invokeMethod("OneSignal#postNotification", json);
+    return response.cast<String, dynamic>();
   }
 
-  Future<Map<dynamic, dynamic>> postNotification(OSCreateNotification notification) async {
-    return await _channel.invokeMethod("OneSignal#postNotification", notification.mapRepresentation());
+  Future<Map<String, dynamic>> postNotification(OSCreateNotification notification) async {
+    Map<dynamic, dynamic> response = await _channel.invokeMethod("OneSignal#postNotification", notification.mapRepresentation());
+    return response.cast<String, dynamic>();
   }
 
   /// Allows you to prompt the user for permission to use location services
@@ -260,15 +262,15 @@ class OneSignal {
   // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#handleReceivedNotification' && this._onReceivedNotification != null) {
-      return this._onReceivedNotification(OSNotification(call.arguments as Map<dynamic, dynamic>));
+      return this._onReceivedNotification(OSNotification(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#handleOpenedNotification' && this._onOpenedNotification != null) {
-      return this._onOpenedNotification(OSNotificationOpenedResult(call.arguments as Map<dynamic, dynamic>));
+      return this._onOpenedNotification(OSNotificationOpenedResult(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#subscriptionChanged' && this._onSubscriptionChangedHandler != null) {
-      return this._onSubscriptionChangedHandler(OSSubscriptionStateChanges(call.arguments as Map<dynamic, dynamic>));
+      return this._onSubscriptionChangedHandler(OSSubscriptionStateChanges(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#permissionChanged' && this._onPermissionChangedHandler != null) {
-      return this._onPermissionChangedHandler(OSPermissionStateChanges(call.arguments as Map<dynamic, dynamic>));
+      return this._onPermissionChangedHandler(OSPermissionStateChanges(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#emailSubscriptionChanged' && this._onEmailSubscriptionChangedHandler != null) {
-      return this._onEmailSubscriptionChangedHandler(OSEmailSubscriptionStateChanges(call.arguments as Map<dynamic, dynamic>));
+      return this._onEmailSubscriptionChangedHandler(OSEmailSubscriptionStateChanges(call.arguments.cast<String, dynamic>()));
     }
 
     return null;
