@@ -2,12 +2,12 @@ import 'package:test/test.dart';
 import 'package:onesignal/onesignal.dart';
 import 'test_data.dart';
 
-
-
 void main() {
   // Permission State tests
-  final permissionStateChangesJson = TestData.jsonForTest("permission_parsing_test") as Map<String, dynamic>;
-  final permissionStateChanges = OSPermissionStateChanges(permissionStateChangesJson);
+  final permissionStateChangesJson =
+      TestData.jsonForTest("permission_parsing_test") as Map<String, dynamic>;
+  final permissionStateChanges =
+      OSPermissionStateChanges(permissionStateChangesJson);
 
   test('expect permission to parse hasPrompted correctly', () {
     expect(permissionStateChanges.from.hasPrompted, false);
@@ -20,7 +20,9 @@ void main() {
   });
 
   test('expect permission to parse status correctly', () {
-    expect(permissionStateChanges.from.status, OSNotificationPermission.notDetermined);
-    expect(permissionStateChanges.to.status, OSNotificationPermission.authorized);
+    expect(permissionStateChanges.from.status,
+        OSNotificationPermission.notDetermined);
+    expect(
+        permissionStateChanges.to.status, OSNotificationPermission.authorized);
   });
 }
