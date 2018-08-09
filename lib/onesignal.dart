@@ -266,25 +266,24 @@ class OneSignal {
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#handleReceivedNotification' &&
         this._onReceivedNotification != null) {
-      return this._onReceivedNotification(
-          OSNotification(call.arguments.cast<String, dynamic>()));
+      var notification = OSNotification(call.arguments.cast<String, dynamic>());
+      this._onReceivedNotification(notification);
     } else if (call.method == 'OneSignal#handleOpenedNotification' &&
         this._onOpenedNotification != null) {
-      return this._onOpenedNotification(
-          OSNotificationOpenedResult(call.arguments.cast<String, dynamic>()));
+      var result = OSNotificationOpenedResult(call.arguments.cast<String, dynamic>());
+      this._onOpenedNotification(result);
     } else if (call.method == 'OneSignal#subscriptionChanged' &&
         this._onSubscriptionChangedHandler != null) {
-      return this._onSubscriptionChangedHandler(
-          OSSubscriptionStateChanges(call.arguments.cast<String, dynamic>()));
+      var changes = OSSubscriptionStateChanges(call.arguments.cast<String, dynamic>());
+      this._onSubscriptionChangedHandler(changes);
     } else if (call.method == 'OneSignal#permissionChanged' &&
         this._onPermissionChangedHandler != null) {
-      return this._onPermissionChangedHandler(
-          OSPermissionStateChanges(call.arguments.cast<String, dynamic>()));
+      var changes = OSPermissionStateChanges(call.arguments.cast<String, dynamic>());
+      this._onPermissionChangedHandler(changes);
     } else if (call.method == 'OneSignal#emailSubscriptionChanged' &&
         this._onEmailSubscriptionChangedHandler != null) {
-      return this._onEmailSubscriptionChangedHandler(
-          OSEmailSubscriptionStateChanges(
-              call.arguments.cast<String, dynamic>()));
+      var changes = OSEmailSubscriptionStateChanges(call.arguments.cast<String, dynamic>());
+      this._onEmailSubscriptionChangedHandler(changes);
     }
 
     return null;
