@@ -297,19 +297,26 @@ class OneSignal {
   }
 
   Map<String, dynamic> _processSettings(Map<OSiOSSettings, dynamic> settings) {
-    var finalSettings = Map<String, dynamic>();
+    var finalSettings = new Map<String, dynamic>();
 
-    for (OSiOSSettings key in settings.keys) {
-      var settingsKey = convertEnumCaseToValue(key);
-      var settingsValue = convertEnumCaseToValue(settings[key]);
+    if (settings.containsKey(OSiOSSettings.autoPrompt)) {
+      finalSettings["kOSSettingsKeyAutoPrompt"] = settings[OSiOSSettings.autoPrompt];
+    }
 
-      if (settingsKey == null) continue;
+    if (settings.containsKey(OSiOSSettings.inAppAlerts)) {
+      finalSettings["kOSSettingsKeyInAppAlerts"] = settings[OSiOSSettings.inAppAlerts];
+    }
 
-      //we check if the value is also an enum case
-      //ie. if they pass OSNotificationDisplayType,
-      //we want to convert it to an integer before
-      //passing the parameter to the ObjC bridge.
-      finalSettings[settingsKey] = settingsValue ?? settings[key];
+    if (settings.containsKey(OSiOSSettings.inAppLaunchUrl)) {
+      finalSettings["kOSSettingsKeyInAppLaunchURL"] = settings[OSiOSSettings.inAppLaunchUrl];
+    }
+
+    if (settings.containsKey(OSiOSSettings.inFocusDisplayOption)) {
+      finalSettings["kOSSettingsKeyInFocusDisplayOption"] = notificationDisplayTypeToInt(settings[OSiOSSettings.inFocusDisplayOption]);
+    }
+
+    if (settings.containsKey(OSiOSSettings.promptBeforeOpeningPushUrl)) {
+      finalSettings["kOSSSettingsKeyPromptBeforeOpeningPushURL"] = settings[OSiOSSettings.promptBeforeOpeningPushUrl];
     }
 
     return finalSettings;

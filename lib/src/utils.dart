@@ -17,50 +17,31 @@ String dateToStringWithOffset(DateTime date) {
   return dateString;
 }
 
-// in some places, we want to send an enum value to
-// ObjC. Before we can do this, we must convert it
-// to a string/int/etc.
-// However, in some places such as iOS init settings,
-// there could be multiple different types of enum,
-// so we've combined it into this one function.
-dynamic convertEnumCaseToValue(dynamic key) {
-  switch (key) {
-    case OSiOSSettings.autoPrompt:
-      return "kOSSettingsKeyAutoPrompt";
-    case OSiOSSettings.inAppAlerts:
-      return "kOSSettingsKeyInAppAlerts";
-    case OSiOSSettings.inAppLaunchUrl:
-      return "kOSSettingsKeyInAppLaunchURL";
-    case OSiOSSettings.inFocusDisplayOption:
-      return "kOSSettingsKeyInFocusDisplayOption";
-    case OSiOSSettings.promptBeforeOpeningPushUrl:
-      return "kOSSSettingsKeyPromptBeforeOpeningPushURL";
+String createNotificationDelayOptionToString(OSCreateNotificationDelayOption option) {
+  if (option == OSCreateNotificationDelayOption.lastActive) {
+    return "last_active";
+  } else {
+    return "timezone";
   }
+}
 
-  switch (key) {
-    case OSCreateNotificationBadgeType.increase:
-      return "Increase";
-    case OSCreateNotificationBadgeType.setTo:
-      return "SetTo";
+String createNotificationBadgeTypeToString(OSCreateNotificationBadgeType type) {
+  if (type == OSCreateNotificationBadgeType.increase) {
+    return "Increase";
+  } else {
+    return "SetTo";
   }
+}
 
-  switch (key) {
-    case OSCreateNotificationDelayOption.lastActive:
-      return "last_active";
-    case OSCreateNotificationDelayOption.timezone:
-      return "timezone";
-  }
-
-  switch (key) {
+int notificationDisplayTypeToInt(OSNotificationDisplayType type) {
+  switch (type) {
     case OSNotificationDisplayType.none:
       return 0;
     case OSNotificationDisplayType.alert:
       return 1;
-    case OSNotificationDisplayType.notification:
+    default:
       return 2;
   }
-
-  return key;
 }
 
 /// An abstract class to provide JSON decoding
