@@ -98,7 +98,7 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
 
   private void initOneSignal(MethodCall call, Result result) {
     String appId = call.argument("appId");
-    Context context = flutterRegistrar.context();
+    Context context = flutterRegistrar.activeContext();
 
     OneSignal.Builder builder = OneSignal.getCurrentOrNewInitBuilder();
     builder.unsubscribeWhenNotificationsAreDisabled(true);
@@ -164,8 +164,8 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
   }
 
   private void setInFocusDisplayType(MethodCall call, Result result) {
-    int deplayType = call.argument("displayType");
-    OneSignal.setInFocusDisplaying(deplayType);
+    int displayType = call.argument("displayType");
+    OneSignal.setInFocusDisplaying(displayType);
     result.success(null);
   }
 
