@@ -298,18 +298,19 @@ class OneSignal {
 
   Map<String, dynamic> _processSettings(Map<OSiOSSettings, dynamic> settings) {
     var finalSettings = Map<String, dynamic>();
+    if (settings != null) {
+      for (OSiOSSettings key in settings.keys) {
+        var settingsKey = convertEnumCaseToValue(key);
+        var settingsValue = convertEnumCaseToValue(settings[key]);
 
-    for (OSiOSSettings key in settings.keys) {
-      var settingsKey = convertEnumCaseToValue(key);
-      var settingsValue = convertEnumCaseToValue(settings[key]);
+        if (settingsKey == null) continue;
 
-      if (settingsKey == null) continue;
-
-      //we check if the value is also an enum case
-      //ie. if they pass OSNotificationDisplayType,
-      //we want to convert it to an integer before
-      //passing the parameter to the ObjC bridge.
-      finalSettings[settingsKey] = settingsValue ?? settings[key];
+        //we check if the value is also an enum case
+        //ie. if they pass OSNotificationDisplayType,
+        //we want to convert it to an integer before
+        //passing the parameter to the ObjC bridge.
+        finalSettings[settingsKey] = settingsValue ?? settings[key];
+      }
     }
 
     return finalSettings;
