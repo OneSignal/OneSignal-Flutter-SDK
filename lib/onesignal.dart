@@ -263,7 +263,7 @@ class OneSignal {
   }
 
   // Private function that gets called by ObjC/Java
-  Future<Null> _handleMethod(MethodCall call) async {
+  Future<void> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#handleReceivedNotification' &&
         this._onReceivedNotification != null) {
       return this._onReceivedNotification(
