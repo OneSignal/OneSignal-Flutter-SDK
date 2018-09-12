@@ -266,23 +266,23 @@ class OneSignal {
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#handleReceivedNotification' &&
         this._onReceivedNotification != null) {
-      return this._onReceivedNotification(
+      this._onReceivedNotification(
           OSNotification(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#handleOpenedNotification' &&
         this._onOpenedNotification != null) {
-      return this._onOpenedNotification(
+      this._onOpenedNotification(
           OSNotificationOpenedResult(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#subscriptionChanged' &&
         this._onSubscriptionChangedHandler != null) {
-      return this._onSubscriptionChangedHandler(
+      this._onSubscriptionChangedHandler(
           OSSubscriptionStateChanges(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#permissionChanged' &&
         this._onPermissionChangedHandler != null) {
-      return this._onPermissionChangedHandler(
+      this._onPermissionChangedHandler(
           OSPermissionStateChanges(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#emailSubscriptionChanged' &&
         this._onEmailSubscriptionChangedHandler != null) {
-      return this._onEmailSubscriptionChangedHandler(
+      this._onEmailSubscriptionChangedHandler(
           OSEmailSubscriptionStateChanges(
               call.arguments.cast<String, dynamic>()));
     }
