@@ -299,6 +299,8 @@ class OneSignal {
   Map<String, dynamic> _processSettings(Map<OSiOSSettings, dynamic> settings) {
     var finalSettings = Map<String, dynamic>();
 
+    if (settings == null) return finalSettings;
+
     for (OSiOSSettings key in settings.keys) {
       var settingsKey = convertEnumCaseToValue(key);
       var settingsValue = convertEnumCaseToValue(settings[key]);
