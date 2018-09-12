@@ -199,6 +199,9 @@ public class OneSignalSerializer {
     static public HashMap<String, Object> convertJSONObjectToHashMap(JSONObject object) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
+        if (object == null)
+           return hash;
+
         Iterator<String> keys = object.keys();
 
         while (keys.hasNext()) {
