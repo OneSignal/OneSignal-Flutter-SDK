@@ -21,6 +21,11 @@ void main() {
     }));
   });
 
+  test('verify initialization without iOS Settings', () {
+    onesignal.init(testAppId);
+    expect(channelController.state.appId, testAppId);
+  });
+
   test('set set log level', () {
     onesignal
         .setLogLevel(OSLogLevel.info, OSLogLevel.warn)
