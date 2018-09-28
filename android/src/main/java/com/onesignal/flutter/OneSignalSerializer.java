@@ -199,14 +199,19 @@ public class OneSignalSerializer {
     static public HashMap<String, Object> convertJSONObjectToHashMap(JSONObject object) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
-        if (object == null)
+        if (object == null || object == JSONObject.NULL)
            return hash;
 
         Iterator<String> keys = object.keys();
 
         while (keys.hasNext()) {
             String key = keys.next();
+
+            if (object.isNull(key))
+                continue;
+
             Object val = object.get(key);
+
             if (val instanceof JSONArray) {
                 val = convertJSONArrayToList((JSONArray)val);
             } else if (val instanceof JSONObject) {
