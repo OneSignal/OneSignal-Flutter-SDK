@@ -5,7 +5,7 @@ import 'package:onesignal/src/notification.dart';
 import 'package:onesignal/src/defines.dart';
 
 class TestData {
-  static final file = new File(Directory.current.path + '/test/test.json');
+  static final file = new File(Directory.current.path + '/test.json');
   static final json =
       JsonDecoder().convert(file.readAsStringSync()) as Map<dynamic, dynamic>;
 
