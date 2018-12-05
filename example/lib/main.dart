@@ -14,6 +14,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _debugLabelString = "";
   String _emailAddress;
+  String _externalUserId;
   bool _enableConsentButton = false;
 
   // CHANGE THIS parameter to true if you want to test GDPR privacy consent
@@ -138,6 +139,21 @@ class _MyAppState extends State<MyApp> {
       print("Successfully logged out of email");
     }).catchError((error) {
       print("Failed to log out of email: $error");
+    });
+  }
+
+  void _handleSetExternalUserId() {
+    print("Setting external user ID");
+    OneSignal.shared.setExternalUserId(_externalUserId);
+    this.setState(() {
+      _debugLabelString = "Set External User ID";
+    });
+  }
+
+  void _handleRemoveExternalUserId() {
+    OneSignal.shared.removeExternalUserId();
+    this.setState(() {
+      _debugLabelString = "Removed external user ID";
     });
   }
 
@@ -286,11 +302,39 @@ class _MyAppState extends State<MyApp> {
                         _handleSendSilentNotification, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
+                    new TextField(
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                          hintText: "External User ID",
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 212, 86, 83),
+                          )),
+                      onChanged: (text) {
+                        this.setState(() {
+                          _externalUserId = text == "" ? null : text;
+                        });
+                      },
+                    )
+                  ]),
+                  new TableRow(children: [
+                    Container(
+                      height: 8.0,
+                    )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Set External User ID", _handleSetExternalUserId, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Remove External User ID", _handleRemoveExternalUserId, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
                     new Container(
                       child: new Text(_debugLabelString),
                       alignment: Alignment.center,
                     )
-                  ])
+                  ]),
                 ],
               ),
             ),

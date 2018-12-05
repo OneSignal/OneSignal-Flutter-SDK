@@ -262,6 +262,18 @@ class OneSignal {
     return await _channel.invokeMethod("OneSignal#logoutEmail");
   }
 
+  /// OneSignal allows you to set a custom ID for your users. This makes it so that
+  /// if your app has its own user ID's, you can use your own custom user ID's with
+  /// our API instead of having to save their OneSignal user ID's.
+  Future<void> setExternalUserId(String externalId) async {
+    return await _channel.invokeMethod("OneSignal#setExternalUserId", {'externalUserId' : externalId});
+  }
+
+  /// Removes the external user ID that was set for the current user.
+  Future<void> removeExternalUserId() async {
+    return await _channel.invokeMethod("OneSignal#removeExternalUserId");
+  }
+
   // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#handleReceivedNotification' &&
