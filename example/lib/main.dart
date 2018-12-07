@@ -142,21 +142,6 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void _handleSetExternalUserId() {
-    print("Setting external user ID");
-    OneSignal.shared.setExternalUserId(_externalUserId);
-    this.setState(() {
-      _debugLabelString = "Set External User ID";
-    });
-  }
-
-  void _handleRemoveExternalUserId() {
-    OneSignal.shared.removeExternalUserId();
-    this.setState(() {
-      _debugLabelString = "Removed external user ID";
-    });
-  }
-
   void _handleConsent() {
     print("Setting consent to true");
     OneSignal.shared.consentGranted(true);
@@ -178,6 +163,21 @@ class _MyAppState extends State<MyApp> {
       print("Successfully deleted tags with response $response");
     }).catchError((error) {
       print("Encountered error deleting tag: $error");
+    });
+  }
+
+  void _handleSetExternalUserId() {
+    print("Setting external user ID");
+    OneSignal.shared.setExternalUserId(_externalUserId);
+    this.setState(() {
+      _debugLabelString = "Set External User ID";
+    });
+  }
+
+  void _handleRemoveExternalUserId() {
+    OneSignal.shared.removeExternalUserId();
+    this.setState(() {
+      _debugLabelString = "Removed external user ID";
     });
   }
 

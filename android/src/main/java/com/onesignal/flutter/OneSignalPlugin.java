@@ -92,6 +92,10 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
       Log.e("onesignal", "promptPermission() is not applicable in Android.");
     else if (call.method.contentEquals("OneSignal#didSetNotificationOpenedHandler"))
       this.didSetNotificationOpenedHandler();
+    else if (call.method.contentEquals("OneSignal#setExternalUserId"))
+      this.setExternalUserId(call, result);
+    else if (call.method.contentEquals("OneSignal#removeExternalUserId")) 
+      this.removeExternalUserId(result);
     else
       result.notImplemented();
   }
@@ -248,6 +252,18 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
       this.notificationOpened(this.coldStartNotificationResult);
       this.coldStartNotificationResult = null;
     }
+  }
+
+  private void setExternalUserId(MethodCall call, Result result) {
+     OneSignal.setExternalUserId((String)call.argument("externalUserId"));
+
+     result.success(null);
+  }
+
+  private void removeExternalUserId(Result result) {
+     OneSignal.removeExternalUserId();
+
+     result.success(null);
   }
 
   @Override
