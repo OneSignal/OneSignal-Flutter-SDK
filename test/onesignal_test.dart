@@ -111,4 +111,16 @@ void main() {
       expect(channelController.state.deleteTags, ['test1']);
     }));
   });
+
+  test('setting external user ID', () {
+    onesignal.setExternalUserId('test_ext_id').then(expectAsync1((v) {
+      expect(channelController.state.externalId, 'test_ext_id');
+    }));
+  });
+
+  test('removing external user ID', () {
+    onesignal.removeExternalUserId().then(expectAsync1((v) {
+      expect(channelController.state.externalId, null);
+    }));
+  });
 }

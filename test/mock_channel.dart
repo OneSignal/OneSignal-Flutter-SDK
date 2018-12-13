@@ -64,6 +64,12 @@ class OneSignalMockChannelController {
       case "OneSignal#deleteTags":
         this.state.deleteTags = call.arguments;
         return {"success": true};
+      case "OneSignal#setExternalUserId":
+        this.state.externalId = (call.arguments as Map<dynamic, dynamic>)['externalUserId'] as String;
+        return {"success" : true};
+      case "OneSignal#removeExternalUserId":
+        this.state.externalId = null;
+        return {"success" : true};
     }
   }
 }
@@ -90,6 +96,7 @@ class OneSignalState {
   bool locationShared;
   OSNotificationDisplayType inFocusDisplayType;
   bool subscriptionState;
+  String externalId;
 
   // tags
   Map<dynamic, dynamic> tags;

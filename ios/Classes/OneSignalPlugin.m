@@ -126,6 +126,10 @@
         [self logoutEmail:call withResult:result];
     } else if ([@"OneSignal#didSetNotificationOpenedHandler" isEqualToString:call.method]) {
         [self didSetNotificationOpenedHandler];
+    } else if ([@"OneSignal#setExternalUserId" isEqualToString:call.method]) {
+        [OneSignal setExternalUserId:call.arguments[@"externalUserId"]];
+    } else if ([@"OneSignal#removeExternalUserId" isEqualToString:call.method]) {
+        [OneSignal removeExternalUserId];
     } else {
         result(FlutterMethodNotImplemented);
     }
