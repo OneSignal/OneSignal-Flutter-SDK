@@ -2,7 +2,7 @@
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
 #
 Pod::Spec.new do |s|
-  s.name             = 'onesignal'
+  s.name             = 'onesignalflutter'
   s.version          = '1.0.5'
   s.summary          = 'The OneSignal Flutter SDK'
   s.description      = 'Allows you to easily add OneSignal to your flutter projects, to make sending and handling push notifications easy'
@@ -17,4 +17,3 @@ Pod::Spec.new do |s|
   s.ios.deployment_target = '8.0'
   s.static_framework = true
 end
-
