@@ -1,11 +1,11 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:onesignal/src/permission.dart';
-import 'package:onesignal/src/subscription.dart';
-import 'package:onesignal/src/defines.dart';
-import 'package:onesignal/src/utils.dart';
-import 'package:onesignal/src/notification.dart';
-import 'package:onesignal/src/create_notification.dart';
+import 'package:onesignalflutter/src/permission.dart';
+import 'package:onesignalflutter/src/subscription.dart';
+import 'package:onesignalflutter/src/defines.dart';
+import 'package:onesignalflutter/src/utils.dart';
+import 'package:onesignalflutter/src/notification.dart';
+import 'package:onesignalflutter/src/create_notification.dart';
 
 export 'src/notification.dart';
 export 'src/subscription.dart';
