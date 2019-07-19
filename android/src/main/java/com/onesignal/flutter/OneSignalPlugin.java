@@ -1,13 +1,11 @@
 package com.onesignal.flutter;
 
-import io.flutter.plugin.common.MethodCall;
-import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
-import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
+import android.app.Activity;
+import android.content.Context;
 
 import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSEmailSubscriptionStateChanges;
+import com.onesignal.OSInAppMessageAction;
 import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationOpenResult;
 import com.onesignal.OSPermissionObserver;
@@ -16,29 +14,39 @@ import com.onesignal.OSPermissionSubscriptionState;
 import com.onesignal.OSSubscriptionObserver;
 import com.onesignal.OSSubscriptionStateChanges;
 import com.onesignal.OneSignal;
-import com.onesignal.OneSignal.OSInFocusDisplayOption;
+import com.onesignal.OneSignal.EmailUpdateError;
+import com.onesignal.OneSignal.EmailUpdateHandler;
+import com.onesignal.OneSignal.InAppMessageClickHandler;
 import com.onesignal.OneSignal.NotificationOpenedHandler;
 import com.onesignal.OneSignal.NotificationReceivedHandler;
-import com.onesignal.OneSignal.EmailUpdateHandler;
-import com.onesignal.OneSignal.EmailUpdateError;
+import com.onesignal.OneSignal.OSInFocusDisplayOption;
 
-import org.json.JSONObject;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
-import android.content.Context;
-import android.util.Log;
+
+import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
+import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /** OnesignalPlugin */
-public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedHandler, NotificationOpenedHandler, OSSubscriptionObserver, OSEmailSubscriptionObserver, OSPermissionObserver {
+public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedHandler, NotificationOpenedHandler,
+        InAppMessageClickHandler, OSSubscriptionObserver, OSEmailSubscriptionObserver, OSPermissionObserver {
 
   /** Plugin registration. */
   private Registrar flutterRegistrar;
   private MethodChannel channel;
-  private boolean didSetRequiresPrivacyConsent = false;
-  private boolean waitingForUserPrivacyConsent = false;
   private OSNotificationOpenResult coldStartNotificationResult;
-  private boolean setNotificationOpenedHandler = false;
+  private OSInAppMessageAction inAppMessageClickedResult;
+  private boolean hasSetNotificationOpenedHandler = false;
+  private boolean hasSetInAppMessageClickedHandler = false;
+  private boolean hasSetRequiresPrivacyConsent = false;
+  private boolean waitingForUserPrivacyConsent = false;
 
   public static void registerWith(Registrar registrar) {
     OneSignal.sdkType = "flutter";
@@ -63,7 +71,7 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     else if (call.method.contentEquals("OneSignal#setLogLevel"))
       this.setLogLevel(call, result);
     else if (call.method.contentEquals("OneSignal#requiresUserPrivacyConsent"))
-      result.success(OneSignal.requiresUserPrivacyConsent());
+      replySuccess(result, OneSignal.requiresUserPrivacyConsent());
     else if (call.method.contentEquals("OneSignal#consentGranted"))
       this.consentGranted(call, result);
     else if (call.method.contentEquals("OneSignal#setRequiresUserPrivacyConsent"))
@@ -71,50 +79,91 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     else if (call.method.contentEquals("OneSignal#log"))
       this.oneSignalLog(call);
     else if (call.method.contentEquals("OneSignal#inFocusDisplayType"))
-      result.success(inFocusDisplayOptionToInt(OneSignal.currentInFocusDisplayOption()));
+      replySuccess(result, inFocusDisplayOptionToInt(OneSignal.currentInFocusDisplayOption()));
     else if (call.method.contentEquals("OneSignal#getPermissionSubscriptionState"))
       this.getPermissionSubscriptionState(result);
     else if (call.method.contentEquals("OneSignal#setInFocusDisplayType"))
       this.setInFocusDisplayType(call, result);
     else if (call.method.contentEquals("OneSignal#setSubscription"))
-      OneSignal.setSubscription((boolean)call.arguments);
+      OneSignal.setSubscription((boolean) call.arguments);
     else if (call.method.contentEquals("OneSignal#postNotification"))
       this.postNotification(call, result);
     else if (call.method.contentEquals("OneSignal#promptLocation"))
       this.promptLocation(result);
     else if (call.method.contentEquals("OneSignal#setLocationShared"))
-      OneSignal.setLocationShared((boolean)call.arguments);
+      OneSignal.setLocationShared((boolean) call.arguments);
     else if (call.method.contentEquals("OneSignal#setEmail"))
       this.setEmail(call, result);
     else if (call.method.contentEquals("OneSignal#logoutEmail"))
       this.logoutEmail(result);
     else if (call.method.contentEquals("OneSignal#promptPermission"))
-      Log.e("onesignal", "promptPermission() is not applicable in Android.");
-    else if (call.method.contentEquals("OneSignal#didSetNotificationOpenedHandler"))
-      this.didSetNotificationOpenedHandler();
+      OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "promptPermission() is not applicable in Android");
+    else if (call.method.contentEquals("OneSignal#initNotificationOpenedHandlerParams"))
+      this.initNotificationOpenedHandlerParams();
     else if (call.method.contentEquals("OneSignal#setExternalUserId"))
       this.setExternalUserId(call, result);
-    else if (call.method.contentEquals("OneSignal#removeExternalUserId")) 
+    else if (call.method.contentEquals("OneSignal#removeExternalUserId"))
       this.removeExternalUserId(result);
+    else if (call.method.contentEquals("OneSignal#addTrigger")) {
+      // call.arguments is being casted to a Map<String, Object> so a try-catch with
+      //  a ClassCastException will be thrown
+      try {
+        OneSignal.addTriggers((Map<String, Object>) call.arguments);
+      } catch (ClassCastException e) {
+        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Add trigger failed with error: " + e.getMessage());
+        e.printStackTrace();
+      }
+    } else if (call.method.contentEquals("OneSignal#addTriggers")) {
+      // call.arguments is being casted to a Map<String, Object> so a try-catch with
+      //  a ClassCastException will be thrown
+      try {
+        OneSignal.addTriggers((Map<String, Object>) call.arguments);
+      } catch (ClassCastException e) {
+        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Add triggers failed with error: " + e.getMessage());
+        e.printStackTrace();
+      }
+    } else if (call.method.contentEquals("OneSignal#removeTriggerForKey"))
+      OneSignal.removeTriggerForKey((String) call.arguments);
+    else if (call.method.contentEquals("OneSignal#removeTriggerForKeys")) {
+      // call.arguments is being casted to a Collection<String> a try-catch with
+      //  a ClassCastException will be thrown
+      try {
+        OneSignal.removeTriggersForKeys((Collection<String>) call.arguments);
+      } catch (ClassCastException e) {
+        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Remove trigger for keys failed with error: " + e.getMessage());
+        e.printStackTrace();
+      }
+    } else if (call.method.contentEquals("OneSignal#getTriggerValueForKey"))
+      getTriggerValueForKey(result, (String) call.arguments);
+    else if (call.method.contentEquals("OneSignal#pauseInAppMessages"))
+      OneSignal.pauseInAppMessages((boolean) call.arguments);
+    else if (call.method.contentEquals("OneSignal#initInAppMessageClickedHandlerParams"))
+      this.initInAppMessageClickedHandlerParams();
     else
-      result.notImplemented();
+      replyNotImplemented(result);
   }
 
-  private void initOneSignal(MethodCall call, Result result) {
+  private void getTriggerValueForKey(Result reply, String key) {
+    Object triggerValue = OneSignal.getTriggerValueForKey(key);
+    replySuccess(reply, triggerValue);
+  }
+
+  private void initOneSignal(MethodCall call, Result reply) {
     String appId = call.argument("appId");
     Context context = flutterRegistrar.activeContext();
 
     OneSignal.Builder builder = OneSignal.getCurrentOrNewInitBuilder();
     builder.unsubscribeWhenNotificationsAreDisabled(true);
     builder.filterOtherGCMReceivers(true);
+    builder.setInAppMessageClickHandler(this);
     OneSignal.init(context, null, appId, this, this);
 
-    if (didSetRequiresPrivacyConsent)
+    if (hasSetRequiresPrivacyConsent)
       this.waitingForUserPrivacyConsent = true;
     else
       this.addObservers();
 
-    result.success(null);
+    replySuccess(reply, null);
   }
 
   private void addObservers() {
@@ -123,20 +172,20 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     OneSignal.addPermissionObserver(this);
   }
 
-  private void setLogLevel(MethodCall call, Result result) {
+  private void setLogLevel(MethodCall call, Result reply) {
     int console = call.argument("console");
     int visual = call.argument("visual");
 
     OneSignal.setLogLevel(console, visual);
 
-    result.success(null);
+    replySuccess(reply, null);
   }
 
-  private void consentGranted(MethodCall call, Result result) {
+  private void consentGranted(MethodCall call, Result reply) {
     boolean granted = call.argument("granted");
     OneSignal.provideUserConsent(granted);
 
-    result.success(null);
+    replySuccess(reply, null);
 
     if (this.waitingForUserPrivacyConsent) {
       this.waitingForUserPrivacyConsent = false;
@@ -145,13 +194,13 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     }
   }
 
-  private void setRequiresUserPrivacyConsent(MethodCall call, Result result) {
+  private void setRequiresUserPrivacyConsent(MethodCall call, Result reply) {
     boolean required = call.argument("required");
-    didSetRequiresPrivacyConsent = required;
+    hasSetRequiresPrivacyConsent = required;
 
     OneSignal.setRequiresUserPrivacyConsent(required);
 
-    result.success(null);
+    replySuccess(reply, null);
   }
 
   private void oneSignalLog(MethodCall call) {
@@ -161,74 +210,83 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     OneSignal.onesignalLog(OneSignal.LOG_LEVEL.values()[logLevel], message);
   }
 
-  private void getPermissionSubscriptionState(Result result) {
+  private void getPermissionSubscriptionState(Result reply) {
     OSPermissionSubscriptionState state = OneSignal.getPermissionSubscriptionState();
 
-    result.success(OneSignalSerializer.convertPermissionSubscriptionStateToMap(state));
+    replySuccess(reply, OneSignalSerializer.convertPermissionSubscriptionStateToMap(state));
   }
 
-  private void setInFocusDisplayType(MethodCall call, Result result) {
+  private void setInFocusDisplayType(MethodCall call, Result reply) {
     int displayType = call.argument("displayType");
     OneSignal.setInFocusDisplaying(displayType);
-    result.success(null);
+
+    replySuccess(reply, null);
   }
 
-  private void postNotification(MethodCall call, Result result) {
-    JSONObject json = new JSONObject((Map<String, Object>)call.arguments);
-    final Result reply = result;
+  private void postNotification(MethodCall call, final Result reply) {
+    JSONObject json = new JSONObject((Map<String, Object>) call.arguments);
     OneSignal.postNotification(json, new OneSignal.PostNotificationResponseHandler() {
-      @Override
-      public void onFailure(JSONObject response) {
-        reply.error("onesignal", "Encountered an error attempting to post notification: " + response.toString(), response);
-      }
-
       @Override
       public void onSuccess(JSONObject response) {
         try {
-          reply.success(OneSignalSerializer.convertJSONObjectToHashMap(response));
-        } catch (JSONException exception) {
-          Log.e("onesignal", "Encountered an error attempting to deserialize server response: " + exception.getMessage());
+          replySuccess(reply, OneSignalSerializer.convertJSONObjectToHashMap(response));
+        } catch (JSONException e) {
+          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
+                  "Encountered an error attempting to deserialize server response: " + e.getMessage());
+        }
+      }
+
+      @Override
+      public void onFailure(final JSONObject response) {
+        try {
+          replyError(reply, "OneSignal",
+                  "Encountered an error attempting to post notification: " + response.toString(),
+                  OneSignalSerializer.convertJSONObjectToHashMap(response));
+        } catch (JSONException e) {
+          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
+                  "Encountered an error attempting to deserialize server response: " + e.getMessage());
         }
       }
     });
   }
 
-  private void promptLocation(Result result) {
+  private void promptLocation(Result reply) {
     OneSignal.promptLocation();
-    result.success(null);
+
+    replySuccess(reply, null);
   }
 
-  private void setEmail(MethodCall call, Result result) {
+  private void setEmail(MethodCall call, final Result reply) {
     String email = call.argument("email");
     String emailAuthHashToken = call.argument("emailAuthHashToken");
-
-    final Result reply = result;
 
     OneSignal.setEmail(email, emailAuthHashToken, new EmailUpdateHandler() {
       @Override
       public void onSuccess() {
-        reply.success(null);
+        replySuccess(reply, null);
       }
 
       @Override
       public void onFailure(EmailUpdateError error) {
-        reply.error("onesignal", "Encountered an error setting email: " + error.getMessage(), null);
+        replyError(reply, "OneSignal",
+                "Encountered an error setting email: " + error.getMessage(),
+                null);
       }
     });
   }
 
-  private void logoutEmail(Result result) {
-    final Result reply = result;
-
+  private void logoutEmail(final Result reply) {
     OneSignal.logoutEmail(new EmailUpdateHandler() {
       @Override
       public void onSuccess() {
-        reply.success(null);
+        replySuccess(reply, null);
       }
 
       @Override
       public void onFailure(EmailUpdateError error) {
-        reply.error("onesignal", "Encountered an error loggoing out of email: " + error.getMessage(), null);
+        replyError(reply, "OneSignal",
+                "Encountered an error loggoing out of email: " + error.getMessage(),
+                null);
       }
     });
   }
@@ -246,24 +304,32 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     return 1;
   }
 
-  private void didSetNotificationOpenedHandler() {
-    this.setNotificationOpenedHandler = true;
+  private void initNotificationOpenedHandlerParams() {
+    this.hasSetNotificationOpenedHandler = true;
     if (this.coldStartNotificationResult != null) {
       this.notificationOpened(this.coldStartNotificationResult);
       this.coldStartNotificationResult = null;
     }
   }
 
-  private void setExternalUserId(MethodCall call, Result result) {
-     OneSignal.setExternalUserId((String)call.argument("externalUserId"));
+  private void initInAppMessageClickedHandlerParams() {
+    this.hasSetInAppMessageClickedHandler = true;
+    if (this.inAppMessageClickedResult != null) {
+      this.inAppMessageClicked(this.inAppMessageClickedResult);
+      this.inAppMessageClickedResult = null;
+    }
+  }
 
-     result.success(null);
+  private void setExternalUserId(MethodCall call, Result result) {
+    OneSignal.setExternalUserId((String)call.argument("externalUserId"));
+
+    replySuccess(result, null);
   }
 
   private void removeExternalUserId(Result result) {
      OneSignal.removeExternalUserId();
 
-     result.success(null);
+     replySuccess(result, null);
   }
 
   @Override
@@ -285,22 +351,79 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
   public void notificationReceived(OSNotification notification) {
     try {
       this.channel.invokeMethod("OneSignal#handleReceivedNotification", OneSignalSerializer.convertNotificationToMap(notification));
-    } catch (JSONException exception) {
-      Log.e("onesignal", "Encountered an error attempting to convert OSNotification object to hash map: " + exception.getMessage() + "\n" + exception.getStackTrace());
+    } catch (JSONException e) {
+      e.printStackTrace();
+      OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
+              "Encountered an error attempting to convert OSNotification object to hash map: " + e.getMessage());
     }
   }
 
   @Override
   public void notificationOpened(OSNotificationOpenResult result) {
-    if (!this.setNotificationOpenedHandler) {
+    if (!this.hasSetNotificationOpenedHandler) {
       this.coldStartNotificationResult = result;
       return;
     }
     
     try {
       this.channel.invokeMethod("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationOpenResultToMap(result));
-    } catch (JSONException exception) {
-      Log.e("onesignal", "Encountered an error attempting to convert OSNotificationOpenResult object to hash map: " + exception.getMessage() + "\n" + exception.getStackTrace());
+    } catch (JSONException e) {
+      e.getStackTrace();
+      OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
+              "Encountered an error attempting to convert OSNotificationOpenResult object to hash map: " + e.getMessage());
     }
   }
+
+  @Override
+  public void inAppMessageClicked(OSInAppMessageAction action) {
+    if (!this.hasSetInAppMessageClickedHandler) {
+      this.inAppMessageClickedResult = action;
+      return;
+    }
+
+    this.channel.invokeMethod("OneSignal#handleClickedInAppMessage", OneSignalSerializer.convertInAppMessageClickedActionToMap(action));
+  }
+
+  /**
+   * MethodChannel class is home to success() method used by Result class
+   * It has the @UiThread annotation and must be run on UI thread, otherwise a RuntimeException will be thrown
+   * This will communicate success back to Dart
+   */
+  private void replySuccess(final Result reply, final Object response) {
+    ((Activity) flutterRegistrar.activeContext()).runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        reply.success(response);
+      }
+    });
+  }
+
+  /**
+   * MethodChannel class is home to error() method used by Result class
+   * It has the @UiThread annotation and must be run on UI thread, otherwise a RuntimeException will be thrown
+   * This will communicate error back to Dart
+   */
+  private void replyError(final Result reply, final String tag, final String message, final Object response) {
+    ((Activity) flutterRegistrar.activeContext()).runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        reply.error(tag, message, response);
+      }
+    });
+  }
+
+  /**
+   * MethodChannel class is home to notImplemented() method used by Result class
+   * It has the @UiThread annotation and must be run on UI thread, otherwise a RuntimeException will be thrown
+   * This will communicate not implemented back to Dart
+   */
+  private void replyNotImplemented(final Result reply) {
+    ((Activity) flutterRegistrar.activeContext()).runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        reply.notImplemented();
+      }
+    });
+  }
+
 }
