@@ -124,8 +124,8 @@
         [self setEmail:call withResult:result];
     } else if ([@"OneSignal#logoutEmail" isEqualToString:call.method]) {
         [self logoutEmail:call withResult:result];
-    } else if ([@"OneSignal#didSetNotificationOpenedHandler" isEqualToString:call.method]) {
-        [self didSetNotificationOpenedHandler];
+    } else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method]) {
+        [self initNotificationOpenedHandlerParams];
     } else if ([@"OneSignal#setExternalUserId" isEqualToString:call.method]) {
         [OneSignal setExternalUserId:call.arguments[@"externalUserId"]];
     } else if ([@"OneSignal#removeExternalUserId" isEqualToString:call.method]) {
@@ -229,7 +229,7 @@
     [OneSignal onesignal_Log:(ONE_S_LOG_LEVEL)[call.arguments[@"logLevel"] integerValue] message:(NSString *)call.arguments[@"message"]];
 }
 
-- (void)didSetNotificationOpenedHandler {
+- (void)initNotificationOpenedHandlerParams {
     if (self.coldStartOpenResult) {
         [self handleNotificationOpened:self.coldStartOpenResult];
         self.coldStartOpenResult = nil;
