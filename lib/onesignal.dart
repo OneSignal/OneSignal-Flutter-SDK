@@ -6,20 +6,23 @@ import 'package:onesignal/src/defines.dart';
 import 'package:onesignal/src/utils.dart';
 import 'package:onesignal/src/notification.dart';
 import 'package:onesignal/src/create_notification.dart';
+import 'package:onesignal/src/in_app_message.dart';
 
 export 'src/notification.dart';
 export 'src/subscription.dart';
 export 'src/permission.dart';
 export 'src/defines.dart';
 export 'src/create_notification.dart';
+export 'src/in_app_message.dart';
 
 // Handlers for various events
 typedef void ReceivedNotificationHandler(OSNotification notification);
 typedef void OpenedNotificationHandler(OSNotificationOpenedResult openedResult);
 typedef void SubscriptionChangedHandler(OSSubscriptionStateChanges changes);
 typedef void EmailSubscriptionChangeHandler(
-    OSEmailSubscriptionStateChanges changes);
+  OSEmailSubscriptionStateChanges changes);
 typedef void PermissionChangeHandler(OSPermissionStateChanges changes);
+typedef void InAppMessageClickedHandler(OSInAppMessageAction action);
 
 class OneSignal {
   /// A singleton representing the OneSignal SDK.
@@ -38,6 +41,7 @@ class OneSignal {
   SubscriptionChangedHandler _onSubscriptionChangedHandler;
   EmailSubscriptionChangeHandler _onEmailSubscriptionChangedHandler;
   PermissionChangeHandler _onPermissionChangedHandler;
+  InAppMessageClickedHandler _onInAppMessageClickedHandler;
 
   // constructor method
   OneSignal() {
@@ -75,7 +79,7 @@ class OneSignal {
   /// OneSignal push notification, or taps an action button on a notification.
   void setNotificationOpenedHandler(OpenedNotificationHandler handler) {
     _onOpenedNotification = handler;
-    _channel.invokeMethod("OneSignal#didSetNotificationOpenedHandler");
+    _channel.invokeMethod("OneSignal#initNotificationOpenedHandlerParams");
   }
 
   /// The subscription handler will be called whenever the user's OneSignal
@@ -97,6 +101,13 @@ class OneSignal {
   /// notifications). For example, if you call setEmail() or logoutEmail().
   void setEmailSubscriptionObserver(EmailSubscriptionChangeHandler handler) {
     _onEmailSubscriptionChangedHandler = handler;
+  }
+
+  /// The in app message clicked handler is called whenever the user clicks a
+  /// OneSignal IAM button or image with an action event attacthed to it
+  void setInAppMessageClickedHandler(InAppMessageClickedHandler handler) {
+    _onInAppMessageClickedHandler = handler;
+    _channel.invokeMethod("OneSignal#initInAppMessageClickedHandlerParams");
   }
 
   /// Allows you to completely disable the SDK until your app calls the
@@ -274,6 +285,40 @@ class OneSignal {
     return await _channel.invokeMethod("OneSignal#removeExternalUserId");
   }
 
+  /// Adds a single key, value trigger, which will trigger an in app message
+  /// if one exists matching the specific trigger added
+  Future<void> addTrigger(String key, Object value) async {
+    return await _channel.invokeMethod("OneSignal#addTrigger", {key : value});
+  }
+
+  /// Adds one or more key, value triggers, which will trigger in app messages
+  /// (one at a time) if any exist matching the specific triggers added
+  Future<void> addTriggers(Map<String, Object> triggers) async {
+    return await _channel.invokeMethod("OneSignal#addTriggers", triggers);
+  }
+
+  /// Remove a single key, value trigger to prevent an in app message from
+  /// showing with that trigger
+  Future<void> removeTriggerForKey(String key) async {
+    return await _channel.invokeMethod("OneSignal#removeTriggerForKey", key);
+  }
+
+  /// Remove one or more key, value triggers to prevent any in app messages
+  /// from showing with those triggers
+  Future<void> removeTriggerForKeys(List<String> keys) async {
+    return await _channel.invokeMethod("OneSignal#removeTriggerForKeys", keys);
+  }
+
+  /// Get the trigger value associated with the key provided
+  Future<Object> getTriggerValueForKey(String key) async {
+    return await _channel.invokeMethod("OneSignal#getTriggerValueForKey", key);
+  }
+
+  /// Toggles the showing of all in app messages
+  Future<void> pauseInAppMessages(bool pause) async {
+    return await _channel.invokeMethod("OneSignal#pauseInAppMessages", pause);
+  }
+
   // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#handleReceivedNotification' &&
@@ -297,8 +342,11 @@ class OneSignal {
       this._onEmailSubscriptionChangedHandler(
           OSEmailSubscriptionStateChanges(
               call.arguments.cast<String, dynamic>()));
+    } else if (call.method == 'OneSignal#handleClickedInAppMessage' &&
+        this._onInAppMessageClickedHandler != null) {
+      this._onInAppMessageClickedHandler(
+          OSInAppMessageAction(call.arguments.cast<String, dynamic>()));
     }
-
     return null;
   }
 

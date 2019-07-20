@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp> {
       OSiOSSettings.promptBeforeOpeningPushUrl: true
     };
 
-    OneSignal.shared.setNotificationReceivedHandler((notification) {
+    OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
       this.setState(() {
         _debugLabelString =
             "Received notification: \n${notification.jsonRepresentation().replaceAll("\\n", "\n")}";
@@ -51,6 +51,14 @@ class _MyAppState extends State<MyApp> {
       this.setState(() {
         _debugLabelString =
             "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });
+
+    OneSignal.shared
+    .setInAppMessageClickedHandler((OSInAppMessageAction action) {
+      this.setState(() {
+        _debugLabelString =
+            "In App Message Clicked: \n${action.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
     });
 
@@ -80,6 +88,9 @@ class _MyAppState extends State<MyApp> {
     this.setState(() {
       _enableConsentButton = requiresConsent;
     });
+
+    // Some examples of how to use In App Messaging public methods with OneSignal SDK
+    oneSignalInAppMessagingTriggerExamples();
   }
 
   void _handleGetTags() {
@@ -220,6 +231,38 @@ class _MyAppState extends State<MyApp> {
     this.setState(() {
       _debugLabelString = "Sent notification with response: $response";
     });
+  }
+
+  oneSignalInAppMessagingTriggerExamples() async {
+    /// Example addTrigger call for IAM
+    /// This will add 1 trigger so if there are any IAM satisfying it, it
+    /// will be shown to the user
+    OneSignal.shared.addTrigger("trigger_1", "value_1");
+
+    /// Example addTriggers call for IAM
+    /// This will add 2 triggers so if there are any IAM satisfying these, they
+    /// will be shown to the user
+    Map<String, Object> triggers = new Map<String, Object>();
+    triggers["trigger_2"] = "value_2";
+    triggers["trigger_3"] = "value_3";
+    OneSignal.shared.addTriggers(triggers);
+
+    // Removes a trigger by its key so if any future IAM are pulled with
+    // these triggers they will not be shown until the trigger is added back
+    OneSignal.shared.removeTriggerForKey("trigger_2");
+
+    // Get the value for a trigger by its key
+    Object triggerValue = await OneSignal.shared.getTriggerValueForKey("trigger_3");
+    print("'trigger_3' key trigger value: " + triggerValue);
+
+    // Create a list and bulk remove triggers based on keys supplied
+    List<String> keys = new List<String>();
+    keys.add("trigger_1");
+    keys.add("trigger_3");
+    OneSignal.shared.removeTriggerForKeys(keys);
+
+    // Toggle pausing (displaying or not) of IAMs
+    OneSignal.shared.pauseInAppMessages(true);
   }
 
   @override
