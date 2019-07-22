@@ -1,7 +1,7 @@
-import 'package:onesignalflutter/src/utils.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 import 'package:flutter/foundation.dart';
-import 'package:onesignalflutter/src/notification.dart';
-import 'package:onesignalflutter/onesignalflutter.dart';
+import 'package:onesignal_flutter/src/notification.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 /// The parameters & format to create push notifications is
 /// so different from receiving notifications that we represent

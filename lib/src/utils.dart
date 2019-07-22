@@ -1,4 +1,4 @@
-import 'package:onesignalflutter/src/defines.dart';
+import 'package:onesignal_flutter/src/defines.dart';
 import 'dart:convert';
 
 // produces a string like this: 2018-07-23T17:56:30.951030 UTC-7:00

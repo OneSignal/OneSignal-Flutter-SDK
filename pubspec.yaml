@@ -1,6 +1,6 @@
-name: onesignalflutter
+name: onesignal_flutter
 description: OneSignal is a free push notification service for mobile apps. This plugin makes it easy to integrate your flutter app with OneSignal
-version: 1.1.0
+version: 2.0.0
 author: Brad Hesse <brad@onesignal.com>, Josh Kasten <josh@onesignal.com>
 homepage: https://github.com/OneSignal/OneSignal-Flutter-SDK
 

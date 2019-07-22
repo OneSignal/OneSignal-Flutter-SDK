@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
-import 'package:onesignal/src/create_notification.dart';
-import 'package:onesignal/src/notification.dart';
-import 'package:onesignal/src/defines.dart';
+import 'package:onesignal_flutter/src/create_notification.dart';
+import 'package:onesignal_flutter/src/notification.dart';
+import 'package:onesignal_flutter/src/defines.dart';
 
 class TestData {
   static final file = new File(Directory.current.path + '/test.json');

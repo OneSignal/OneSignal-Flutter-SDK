@@ -1,4 +1,4 @@
-import 'package:onesignal/src/utils.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 
 /// When a click action is defined on an In App Message form the dashboard,
 /// the handler returns an OSInAppMessageAction object so the Dart code can act accordingly

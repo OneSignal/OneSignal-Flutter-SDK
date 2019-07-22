@@ -1,5 +1,5 @@
-import 'package:onesignalflutter/src/defines.dart';
-import 'package:onesignalflutter/src/utils.dart';
+import 'package:onesignal_flutter/src/defines.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
 

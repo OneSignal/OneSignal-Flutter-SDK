@@ -1,4 +1,4 @@
-import 'package:onesignalflutter/src/utils.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 
 /// Represents the current user's subscription state with OneSignal
 class OSSubscriptionState extends JSONStringRepresentable {

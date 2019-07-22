@@ -1,6 +1,6 @@
-import 'package:onesignalflutter/src/subscription.dart';
-import 'package:onesignalflutter/src/defines.dart';
-import 'package:onesignalflutter/src/utils.dart';
+import 'package:onesignal_flutter/src/subscription.dart';
+import 'package:onesignal_flutter/src/defines.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 
 class OSPermissionState extends JSONStringRepresentable {
   bool hasPrompted; // iOS only
