@@ -1,5 +1,5 @@
 import 'package:test/test.dart';
-import 'package:onesignal/src/subscription.dart';
+import 'package:onesignal_flutter/src/subscription.dart';
 import 'test_data.dart';
 
 void main() {

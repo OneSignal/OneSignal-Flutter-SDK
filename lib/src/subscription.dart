@@ -1,4 +1,4 @@
-import 'package:onesignal/src/utils.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 
 /// Represents the current user's subscription state with OneSignal
 class OSSubscriptionState extends JSONStringRepresentable {
@@ -6,7 +6,7 @@ class OSSubscriptionState extends JSONStringRepresentable {
   /// programmatically disable notifications for this user
   bool userSubscriptionSetting;
 
-  /// A boolean paramerer that indicates if the  user
+  /// A boolean parameter that indicates if the  user
   /// is subscribed to your app with OneSignal
   /// This is only true if the `userId`, `pushToken`, and
   /// `userSubscriptionSetting` parameters are defined/true.
