@@ -127,7 +127,10 @@
     } else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method]) {
         [self initNotificationOpenedHandlerParams];
     } else if ([@"OneSignal#setExternalUserId" isEqualToString:call.method]) {
-        [OneSignal setExternalUserId:call.arguments[@"externalUserId"]];
+        id externalId = call.arguments[@"externalUserId"];
+        if (externalId == [NSNull null])
+            externalId = nil;
+        [OneSignal setExternalUserId:externalId];
     } else if ([@"OneSignal#removeExternalUserId" isEqualToString:call.method]) {
         [OneSignal removeExternalUserId];
     } else {
