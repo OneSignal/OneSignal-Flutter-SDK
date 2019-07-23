@@ -1,7 +1,7 @@
 package com.onesignal.flutter;
 
-import android.app.Activity;
 import android.content.Context;
+import android.support.annotation.NonNull;
 
 import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSEmailSubscriptionStateChanges;
@@ -25,7 +25,6 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
@@ -35,12 +34,17 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 /** OnesignalPlugin */
-public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedHandler, NotificationOpenedHandler,
-        InAppMessageClickHandler, OSSubscriptionObserver, OSEmailSubscriptionObserver, OSPermissionObserver {
+public class OneSignalPlugin
+   extends FlutterRegistrarResponder
+   implements MethodCallHandler,
+   NotificationReceivedHandler,
+   NotificationOpenedHandler,
+   InAppMessageClickHandler,
+   OSSubscriptionObserver,
+   OSEmailSubscriptionObserver,
+   OSPermissionObserver {
 
   /** Plugin registration. */
-  private Registrar flutterRegistrar;
-  private MethodChannel channel;
   private OSNotificationOpenResult coldStartNotificationResult;
   private OSInAppMessageAction inAppMessageClickedResult;
   private boolean hasSetNotificationOpenedHandler = false;
@@ -54,18 +58,15 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     OneSignalPlugin plugin = new OneSignalPlugin();
 
     plugin.waitingForUserPrivacyConsent = false;
-
     plugin.channel = new MethodChannel(registrar.messenger(), "OneSignal");
-
     plugin.channel.setMethodCallHandler(plugin);
-
     plugin.flutterRegistrar = registrar;
 
     OneSignalTagsController.registerWith(registrar);
   }
 
   @Override
-  public void onMethodCall(MethodCall call, Result result) {
+  public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
     if (call.method.contentEquals("OneSignal#init"))
       initOneSignal(call, result);
     else if (call.method.contentEquals("OneSignal#setLogLevel"))
@@ -105,34 +106,13 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     else if (call.method.contentEquals("OneSignal#removeExternalUserId"))
       this.removeExternalUserId(result);
     else if (call.method.contentEquals("OneSignal#addTrigger")) {
-      // call.arguments is being casted to a Map<String, Object> so a try-catch with
-      //  a ClassCastException will be thrown
-      try {
-        OneSignal.addTriggers((Map<String, Object>) call.arguments);
-      } catch (ClassCastException e) {
-        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Add trigger failed with error: " + e.getMessage());
-        e.printStackTrace();
-      }
+      addTriggers(call.arguments);
     } else if (call.method.contentEquals("OneSignal#addTriggers")) {
-      // call.arguments is being casted to a Map<String, Object> so a try-catch with
-      //  a ClassCastException will be thrown
-      try {
-        OneSignal.addTriggers((Map<String, Object>) call.arguments);
-      } catch (ClassCastException e) {
-        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Add triggers failed with error: " + e.getMessage());
-        e.printStackTrace();
-      }
+      addTriggers(call.arguments);
     } else if (call.method.contentEquals("OneSignal#removeTriggerForKey"))
       OneSignal.removeTriggerForKey((String) call.arguments);
     else if (call.method.contentEquals("OneSignal#removeTriggerForKeys")) {
-      // call.arguments is being casted to a Collection<String> a try-catch with
-      //  a ClassCastException will be thrown
-      try {
-        OneSignal.removeTriggersForKeys((Collection<String>) call.arguments);
-      } catch (ClassCastException e) {
-        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Remove trigger for keys failed with error: " + e.getMessage());
-        e.printStackTrace();
-      }
+      removeTriggersForKeys(call.arguments);
     } else if (call.method.contentEquals("OneSignal#getTriggerValueForKey"))
       getTriggerValueForKey(result, (String) call.arguments);
     else if (call.method.contentEquals("OneSignal#pauseInAppMessages"))
@@ -141,6 +121,28 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
       this.initInAppMessageClickedHandlerParams();
     else
       replyNotImplemented(result);
+  }
+
+  private void addTriggers(Object arguments) {
+    // call.arguments is being casted to a Map<String, Object> so a try-catch with
+    //  a ClassCastException will be thrown
+    try {
+      OneSignal.addTriggers((Map<String, Object>) arguments);
+    } catch (ClassCastException e) {
+      OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Add triggers failed with error: " + e.getMessage());
+      e.printStackTrace();
+    }
+  }
+
+  private void removeTriggersForKeys(Object arguments) {
+    // call.arguments is being casted to a Collection<String> a try-catch with
+    //  a ClassCastException will be thrown
+    try {
+      OneSignal.removeTriggersForKeys((Collection<String>) arguments);
+    } catch (ClassCastException e) {
+      OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Remove trigger for keys failed with error: " + e.getMessage());
+      e.printStackTrace();
+    }
   }
 
   private void getTriggerValueForKey(Result reply, String key) {
@@ -334,27 +336,27 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
 
   @Override
   public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
-    this.channel.invokeMethod("OneSignal#subscriptionChanged", OneSignalSerializer.convertSubscriptionStateChangesToMap(stateChanges));
+    invokeMethodOnUiThread("OneSignal#subscriptionChanged", OneSignalSerializer.convertSubscriptionStateChangesToMap(stateChanges));
   }
 
   @Override
   public void onOSEmailSubscriptionChanged(OSEmailSubscriptionStateChanges stateChanges) {
-    this.channel.invokeMethod("OneSignal#emailSubscriptionChanged", OneSignalSerializer.convertEmailSubscriptionStateChangesToMap(stateChanges));
+    invokeMethodOnUiThread("OneSignal#emailSubscriptionChanged", OneSignalSerializer.convertEmailSubscriptionStateChangesToMap(stateChanges));
   }
 
   @Override
   public void onOSPermissionChanged(OSPermissionStateChanges stateChanges) {
-    this.channel.invokeMethod("OneSignal#permissionChanged", OneSignalSerializer.convertPermissionStateChangesToMap(stateChanges));
+    invokeMethodOnUiThread("OneSignal#permissionChanged", OneSignalSerializer.convertPermissionStateChangesToMap(stateChanges));
   }
 
   @Override
   public void notificationReceived(OSNotification notification) {
     try {
-      this.channel.invokeMethod("OneSignal#handleReceivedNotification", OneSignalSerializer.convertNotificationToMap(notification));
+      invokeMethodOnUiThread("OneSignal#handleReceivedNotification", OneSignalSerializer.convertNotificationToMap(notification));
     } catch (JSONException e) {
       e.printStackTrace();
       OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
-              "Encountered an error attempting to convert OSNotification object to hash map: " + e.getMessage());
+         "Encountered an error attempting to convert OSNotification object to hash map: " + e.getMessage());
     }
   }
 
@@ -366,7 +368,7 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
     }
     
     try {
-      this.channel.invokeMethod("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationOpenResultToMap(result));
+      invokeMethodOnUiThread("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationOpenResultToMap(result));
     } catch (JSONException e) {
       e.getStackTrace();
       OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
@@ -381,49 +383,6 @@ public class OneSignalPlugin implements MethodCallHandler, NotificationReceivedH
       return;
     }
 
-    this.channel.invokeMethod("OneSignal#handleClickedInAppMessage", OneSignalSerializer.convertInAppMessageClickedActionToMap(action));
+    invokeMethodOnUiThread("OneSignal#handleClickedInAppMessage", OneSignalSerializer.convertInAppMessageClickedActionToMap(action));
   }
-
-  /**
-   * MethodChannel class is home to success() method used by Result class
-   * It has the @UiThread annotation and must be run on UI thread, otherwise a RuntimeException will be thrown
-   * This will communicate success back to Dart
-   */
-  private void replySuccess(final Result reply, final Object response) {
-    ((Activity) flutterRegistrar.activeContext()).runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        reply.success(response);
-      }
-    });
-  }
-
-  /**
-   * MethodChannel class is home to error() method used by Result class
-   * It has the @UiThread annotation and must be run on UI thread, otherwise a RuntimeException will be thrown
-   * This will communicate error back to Dart
-   */
-  private void replyError(final Result reply, final String tag, final String message, final Object response) {
-    ((Activity) flutterRegistrar.activeContext()).runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        reply.error(tag, message, response);
-      }
-    });
-  }
-
-  /**
-   * MethodChannel class is home to notImplemented() method used by Result class
-   * It has the @UiThread annotation and must be run on UI thread, otherwise a RuntimeException will be thrown
-   * This will communicate not implemented back to Dart
-   */
-  private void replyNotImplemented(final Result reply) {
-    ((Activity) flutterRegistrar.activeContext()).runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
-        reply.notImplemented();
-      }
-    });
-  }
-
 }

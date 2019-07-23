@@ -237,14 +237,14 @@ class _MyAppState extends State<MyApp> {
     /// Example addTrigger call for IAM
     /// This will add 1 trigger so if there are any IAM satisfying it, it
     /// will be shown to the user
-    OneSignal.shared.addTrigger("trigger_1", "value_1");
+    OneSignal.shared.addTrigger("trigger_1", "one");
 
     /// Example addTriggers call for IAM
     /// This will add 2 triggers so if there are any IAM satisfying these, they
     /// will be shown to the user
     Map<String, Object> triggers = new Map<String, Object>();
-    triggers["trigger_2"] = "value_2";
-    triggers["trigger_3"] = "value_3";
+    triggers["trigger_2"] = "two";
+    triggers["trigger_3"] = "three";
     OneSignal.shared.addTriggers(triggers);
 
     // Removes a trigger by its key so if any future IAM are pulled with
@@ -262,7 +262,7 @@ class _MyAppState extends State<MyApp> {
     OneSignal.shared.removeTriggerForKeys(keys);
 
     // Toggle pausing (displaying or not) of IAMs
-    OneSignal.shared.pauseInAppMessages(true);
+    OneSignal.shared.pauseInAppMessages(false);
   }
 
   @override
