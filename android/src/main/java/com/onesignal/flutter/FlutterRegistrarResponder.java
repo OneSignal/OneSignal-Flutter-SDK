@@ -1,7 +1,6 @@
 package com.onesignal.flutter;
 
 import android.app.Activity;
-import android.support.annotation.NonNull;
 
 import java.util.HashMap;
 
@@ -54,11 +53,11 @@ abstract class FlutterRegistrarResponder {
       });
    }
 
-   protected void runOnMainThread(@NonNull final Runnable runnable) {
+   protected void runOnMainThread(final Runnable runnable) {
       ((Activity)flutterRegistrar.activeContext()).runOnUiThread(runnable);
    }
 
-   protected void invokeMethodOnUiThread(@NonNull final String methodName, @NonNull final HashMap map) {
+   protected void invokeMethodOnUiThread(final String methodName, final HashMap map) {
       final MethodChannel channel = this.channel;
       runOnMainThread(new Runnable() {
          @Override
