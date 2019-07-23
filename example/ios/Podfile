@@ -65,3 +65,6 @@ post_install do |installer|
     end
   end
 end
+
+# Fixes Flutter.framework in shell script build phase '[CP] Embed Pods Frameworks' error
+install! 'cocoapods', :disable_input_output_paths => true
