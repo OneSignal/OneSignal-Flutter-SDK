@@ -11,7 +11,7 @@
 ![alt text](https://onesignal.com/images/android_and_ios_notification_image.gif)
 
 #### Installation
-See the [Setup Guide](https://documentation.onesignal.com/v5.0/docs/flutter-sdk-setup) for setup instructions.
+See the [Setup Guide](https://documentation.onesignal.com/docs/flutter-sdk-setup) for setup instructions.
 
 #### Change Log
 See this repository's [release tags](https://github.com/onesignal/onesignal-flutter-sdk/releases) for a complete change log of every released version.
@@ -24,5 +24,5 @@ For account issues and support please contact OneSignal support from the [OneSig
 To make things easier, we have published a demo project in the `/example` folder of this repository.
 
 #### Supports: 
-* Tested from iOS 8 to iOS 11.3
-* Tested from Android 4.0.3 (API level 15) to Android 8.1 (27)
+* Tested from iOS 8 to iOS 12.3
+* Tested from Android 4.0.3 (API level 15) to Android 9.0 (28)
