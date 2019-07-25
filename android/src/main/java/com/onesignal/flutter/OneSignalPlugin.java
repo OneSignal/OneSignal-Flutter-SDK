@@ -1,7 +1,6 @@
 package com.onesignal.flutter;
 
 import android.content.Context;
-import android.support.annotation.NonNull;
 
 import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSEmailSubscriptionStateChanges;
@@ -66,7 +65,7 @@ public class OneSignalPlugin
   }
 
   @Override
-  public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+  public void onMethodCall(MethodCall call, Result result) {
     if (call.method.contentEquals("OneSignal#init"))
       initOneSignal(call, result);
     else if (call.method.contentEquals("OneSignal#setLogLevel"))

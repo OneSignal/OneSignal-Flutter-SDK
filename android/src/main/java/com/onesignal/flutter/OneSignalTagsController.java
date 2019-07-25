@@ -1,7 +1,5 @@
 package com.onesignal.flutter;
 
-import android.support.annotation.NonNull;
-
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -31,7 +29,7 @@ class OSFlutterChangeTagsHandler extends FlutterRegistrarResponder implements Ch
     // the tags callbacks can in some instances be called more than once
     // ie. cached vs. server response.
     // this property guarantees the callback will never be called more than once.
-    @NonNull private AtomicBoolean replySubmitted = new AtomicBoolean(false);
+    private AtomicBoolean replySubmitted = new AtomicBoolean(false);
 
     OSFlutterChangeTagsHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res) {
         this.flutterRegistrar = flutterRegistrar;
@@ -84,7 +82,7 @@ public class OneSignalTagsController implements MethodCallHandler {
     }
 
     @Override
-    public void onMethodCall(@NonNull MethodCall call, @NonNull Result result) {
+    public void onMethodCall(MethodCall call, Result result) {
         if (call.method.contentEquals("OneSignal#getTags"))
             OneSignal.getTags(new OSFlutterChangeTagsHandler(registrar, channel, result));
         else if (call.method.contentEquals("OneSignal#sendTags"))
