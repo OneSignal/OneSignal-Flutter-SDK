@@ -31,7 +31,9 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
+import io.flutter.view.FlutterNativeView;
 
 /** OnesignalPlugin */
 public class OneSignalPlugin
@@ -61,6 +63,18 @@ public class OneSignalPlugin
     plugin.channel = new MethodChannel(registrar.messenger(), "OneSignal");
     plugin.channel.setMethodCallHandler(plugin);
     plugin.flutterRegistrar = registrar;
+
+    // Create a callback for the flutterRegistrar to connect the applications onDestroy
+    plugin.flutterRegistrar.addViewDestroyListener(new PluginRegistry.ViewDestroyListener() {
+      @Override
+      public boolean onViewDestroy(FlutterNativeView flutterNativeView) {
+        // Remove all handlers so they aren't triggered with wrong context
+        OneSignal.removeNotificationReceivedHandler();
+        OneSignal.removeNotificationOpenedHandler();
+        OneSignal.removeInAppMessageClickHandler();
+        return false;
+      }
+    });
 
     OneSignalTagsController.registerWith(registrar);
   }
