@@ -1,5 +1,5 @@
 group 'com.onesignal.flutter'
-version '2.0.0'
+version '2.0.2'
 
 buildscript {
     repositories {
@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    compile('com.onesignal:OneSignal:3.11.1')
+    compile('com.onesignal:OneSignal:3.11.2')
 }
 
 // Adds required manifestPlaceholders keys to allow mainifest merge gradle step to complete
@@ -49,12 +49,13 @@ class DefaultManifestPlaceHolders {
     static void addManifestToAppProject(Project proj) {
         def androidApp = proj.android
         MANIFEST_PLACEHOLDERS_DEFAULTS.each { defKey, defValue ->
-            if (!androidApp.defaultConfig.manifestPlaceholders.containsKey(defKey))
+            if (!androidApp.defaultConfig.manifestPlaceholders.containsKey(defKey)) {
                 androidApp.defaultConfig.manifestPlaceholders[defKey] = defValue
 
-            androidApp.buildTypes.each { buildType ->
-                if (!buildType.manifestPlaceholders.containsKey(defKey))
-                    buildType.manifestPlaceholders[defKey] = defValue
+                androidApp.buildTypes.each { buildType ->
+                    if (!buildType.manifestPlaceholders.containsKey(defKey))
+                        buildType.manifestPlaceholders[defKey] = defValue
+                }
             }
         }
     }
