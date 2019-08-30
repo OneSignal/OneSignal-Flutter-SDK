@@ -146,11 +146,6 @@ class OneSignal {
     return result as bool;
   }
 
-  /// in iOS, takes the user to the iOS Settings page for this app.
-  Future<void> presentApplicationSettings() async {
-    await _channel.invokeMethod("OneSignal#presentSettings");
-  }
-
   /// The current setting that controls how notifications are displayed.
   Future<OSNotificationDisplayType> inFocusDisplayType() async {
     int type = await _channel.invokeMethod("OneSignal#inFocusDisplayType");
