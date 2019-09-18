@@ -28,6 +28,7 @@
 #import "OneSignalPlugin.h"
 #import "OneSignalCategories.h"
 #import "OneSignalTagsController.h"
+#import "OneSignalInAppMessagesController.h"
 
 @interface OneSignalPlugin ()
 
@@ -43,13 +44,19 @@
 @property (atomic) BOOL waitingForUserConsent;
 
 /*
-    holds reference to any notifications received before the
+    Holds reference to any notifications received before the
     flutter runtime channel has been opened
     Thus, if a user taps a notification while the app is
     terminated, the SDK will still notify the app once the
     channel is open
 */
 @property (strong, nonatomic) OSNotificationOpenedResult *coldStartOpenResult;
+
+/*
+    Holds reference to any in app messages received before any click action
+    occurs on the body, button or image elements of the in app message 
+*/
+@property (strong, nonatomic) OSInAppMessageAction *inAppMessageClickedResult;
 
 @end
 
@@ -70,25 +77,27 @@
 
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    
+
     [OneSignal setMSDKType:@"flutter"];
-    
+
     // Wrapper SDK's call init with no app ID early on in the
     // app lifecycle. The developer will call init() later on
     // from the Flutter plugin channel.
+
     [OneSignal initWithLaunchOptions:nil appId:nil handleNotificationAction:^(OSNotificationOpenedResult *result) {
         @synchronized (OneSignalPlugin.sharedInstance.coldStartOpenResult) {
             OneSignalPlugin.sharedInstance.coldStartOpenResult = result;
         }
     } settings:@{kOSSettingsKeyAutoPrompt : @false, @"kOSSettingsKeyInOmitNoAppIdLogging" : @true}];
-    
+
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
                                      methodChannelWithName:@"OneSignal"
                                      binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:OneSignalPlugin.sharedInstance channel:OneSignalPlugin.sharedInstance.channel];
-    
+
     [OneSignalTagsController registerWithRegistrar:registrar];
+    [OneSignalInAppMessagesController registerWithRegistrar:registrar];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -133,28 +142,34 @@
         [OneSignal setExternalUserId:externalId];
     } else if ([@"OneSignal#removeExternalUserId" isEqualToString:call.method]) {
         [OneSignal removeExternalUserId];
+    } else if ([@"OneSignal#initInAppMessageClickedHandlerParams" isEqualToString:call.method]) {
+        [self initInAppMessageClickedHandlerParams];
     } else {
         result(FlutterMethodNotImplemented);
     }
 }
 
 - (void)initOneSignal:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+     [OneSignal setInAppMessageClickHandler:^(OSInAppMessageAction *action) {
+         [self handleInAppMessageClicked:action];
+     }];
+
     [OneSignal initWithLaunchOptions:nil appId:call.arguments[@"appId"] handleNotificationReceived:^(OSNotification *notification) {
         [self handleReceivedNotification:notification];
     } handleNotificationAction:^(OSNotificationOpenedResult *result) {
         [self handleNotificationOpened:result];
     } settings:call.arguments[@"settings"]];
-    
+
     // If the user has required privacy consent, the SDK will not
     // add these observers. So we should delay adding the observers
     // until consent has been provided.
-    
+
     if (OneSignal.requiresUserPrivacyConsent) {
         self.waitingForUserConsent = true;
     } else {
         [self addObservers];
     }
-    
+
     result(@[]);
 }
 
@@ -171,13 +186,13 @@
 
 -(void)changeConsentStatus:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     BOOL granted = [call.arguments[@"granted"] boolValue];
-    
+
     [OneSignal consentGranted:granted];
-    
+
     if (self.waitingForUserConsent && granted) {
         [self addObservers];
     }
-    
+
     result(@[]);
 }
 
@@ -206,13 +221,13 @@
 }
 
 - (void)setEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    
+
     NSString *email = call.arguments[@"email"];
     NSString *emailAuthHashToken = call.arguments[@"emailAuthHashToken"];
-    
+
     if ([emailAuthHashToken isKindOfClass:[NSNull class]])
         emailAuthHashToken = nil;
-    
+
     [OneSignal setEmail:email withEmailAuthHashToken:emailAuthHashToken withSuccess:^{
         result(@[]);
     } withFailure:^(NSError *error) {
@@ -239,6 +254,13 @@
     }
 }
 
+- (void)initInAppMessageClickedHandlerParams {
+    if (self.inAppMessageClickedResult) {
+        [self handleInAppMessageClicked:self.inAppMessageClickedResult];
+        self.inAppMessageClickedResult = nil;
+    }
+}
+
 #pragma mark Received & Opened Notification Handlers
 - (void)handleReceivedNotification:(OSNotification *)notification {
     [self.channel invokeMethod:@"OneSignal#handleReceivedNotification" arguments:notification.toJson ? notification.toJson : @[]];
@@ -246,6 +268,11 @@
 
 - (void)handleNotificationOpened:(OSNotificationOpenedResult *)result {
     [self.channel invokeMethod:@"OneSignal#handleOpenedNotification" arguments:result.toJson];
+}
+
+#pragma mark In App Message Click Handler
+- (void)handleInAppMessageClicked:(OSInAppMessageAction *)action {
+    [self.channel invokeMethod:@"OneSignal#handleClickedInAppMessage" arguments:action.toJson];
 }
 
 #pragma mark OSSubscriptionObserver

@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  *
- * Copyright 2017 OneSignal
+ * Copyright 2019 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,40 +25,34 @@
  * THE SOFTWARE.
  */
 
-#import "OneSignalTagsController.h"
+#import "OneSignalInAppMessagesController.h"
 #import <OneSignal/OneSignal.h>
 #import "OneSignalCategories.h"
 
-@implementation OneSignalTagsController
+@implementation OneSignalInAppMessagesController
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    OneSignalTagsController *instance = [OneSignalTagsController new];
+    OneSignalInAppMessagesController *instance = [OneSignalInAppMessagesController new];
 
     instance.channel = [FlutterMethodChannel
-                        methodChannelWithName:@"OneSignal#tags"
+                        methodChannelWithName:@"OneSignal#inAppMessages"
                         binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:instance channel:instance.channel];
 }
 
 -(void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([@"OneSignal#sendTags" isEqualToString:call.method]) {
-        [OneSignal sendTags:(NSDictionary *)call.arguments onSuccess:^(NSDictionary *tags) {
-            result(tags);
-        } onFailure:^(NSError *error) {
-            result(error.flutterError);
-        }];
-    } else if ([@"OneSignal#getTags" isEqualToString:call.method]) {
-        [OneSignal getTags:^(NSDictionary *tags) {
-            result(tags);
-        } onFailure:^(NSError *error) {
-            result(error.flutterError);
-        }];
-    } else if ([@"OneSignal#deleteTags" isEqualToString:call.method]) {
-        [OneSignal deleteTags:(NSArray *)call.arguments onSuccess:^(NSDictionary *response) {
-            result(response);
-        } onFailure:^(NSError *error) {
-            result(error.flutterError);
-        }];
+    if ([@"OneSignal#addTrigger" isEqualToString:call.method]) {
+        [OneSignal addTriggers:call.arguments];
+    } else if ([@"OneSignal#addTriggers" isEqualToString:call.method]) {
+        [OneSignal addTriggers:call.arguments];
+    } else if ([@"OneSignal#removeTriggerForKey" isEqualToString:call.method]) {
+        [OneSignal removeTriggerForKey:call.arguments];
+    } else if ([@"OneSignal#removeTriggersForKeys" isEqualToString:call.method]) {
+        [OneSignal removeTriggersForKeys:call.arguments];
+    } else if ([@"OneSignal#getTriggerValueForKey" isEqualToString:call.method]) {
+        result([OneSignal getTriggerValueForKey:call.arguments]);
+    } else if ([@"OneSignal#pauseInAppMessages" isEqualToString:call.method]) {
+        [OneSignal pauseInAppMessages:[call.arguments boolValue]];
     }
 }
 @end
