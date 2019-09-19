@@ -104,50 +104,48 @@
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-    if ([@"OneSignal#init" isEqualToString:call.method]) {
+    if ([@"OneSignal#init" isEqualToString:call.method])
         [self initOneSignal:call withResult:result];
-    } else if ([@"OneSignal#setLogLevel" isEqualToString:call.method]) {
+    else if ([@"OneSignal#setLogLevel" isEqualToString:call.method])
         [self setOneSignalLogLevel:call withResult:result];
-    } else if ([@"OneSignal#log" isEqualToString:call.method]) {
+    else if ([@"OneSignal#log" isEqualToString:call.method])
         [self oneSignalLog:call withResult:result];
-    } else if ([@"OneSignal#requiresUserPrivacyConsent" isEqualToString:call.method]) {
+    else if ([@"OneSignal#requiresUserPrivacyConsent" isEqualToString:call.method])
         result(@(OneSignal.requiresUserPrivacyConsent));
-    } else if ([@"OneSignal#setRequiresUserPrivacyConsent" isEqualToString:call.method]) {
+    else if ([@"OneSignal#setRequiresUserPrivacyConsent" isEqualToString:call.method])
         [self setRequiresUserPrivacyConsent:call withResult:result];
-    } else if ([@"OneSignal#consentGranted" isEqualToString:call.method]) {
+    else if ([@"OneSignal#consentGranted" isEqualToString:call.method])
         [self setConsentStatus:call withResult:result];
-    } else if ([@"OneSignal#inFocusDisplayType" isEqualToString:call.method]) {
+    else if ([@"OneSignal#inFocusDisplayType" isEqualToString:call.method])
         result(@(OneSignal.inFocusDisplayType));
-    } else if ([@"OneSignal#setInFocusDisplayType" isEqualToString:call.method]) {
+    else if ([@"OneSignal#setInFocusDisplayType" isEqualToString:call.method])
         [self setInFocusDisplayType:call withResult:result];
-    } else if ([@"OneSignal#promptPermission" isEqualToString:call.method]) {
+    else if ([@"OneSignal#promptPermission" isEqualToString:call.method])
         [self promptPermission:call withResult:result];
-    } else if ([@"OneSignal#getPermissionSubscriptionState" isEqualToString:call.method]) {
+    else if ([@"OneSignal#getPermissionSubscriptionState" isEqualToString:call.method])
         result(OneSignal.getPermissionSubscriptionState.toDictionary);
-    } else if ([@"OneSignal#setSubscription" isEqualToString:call.method]) {
+    else if ([@"OneSignal#setSubscription" isEqualToString:call.method])
         [self setSubscription:call withResult:result];
-    } else if ([@"OneSignal#postNotification" isEqualToString:call.method]) {
+    else if ([@"OneSignal#postNotification" isEqualToString:call.method])
         [self postNotification:call withResult:result];
-    } else if ([@"OneSignal#promptLocation" isEqualToString:call.method]) {
+    else if ([@"OneSignal#promptLocation" isEqualToString:call.method])
         [self promptLocation:call withResult:result];
-    } else if ([@"OneSignal#setLocationShared" isEqualToString:call.method]) {
+    else if ([@"OneSignal#setLocationShared" isEqualToString:call.method])
         [self setLocationShared:call withResult:result];
-    } else if ([@"OneSignal#setEmail" isEqualToString:call.method]) {
+    else if ([@"OneSignal#setEmail" isEqualToString:call.method])
         [self setEmail:call withResult:result];
-    } else if ([@"OneSignal#logoutEmail" isEqualToString:call.method]) {
+    else if ([@"OneSignal#logoutEmail" isEqualToString:call.method])
         [self logoutEmail:call withResult:result];
-    } else if ([@"OneSignal#setExternalUserId" isEqualToString:call.method]) {
+    else if ([@"OneSignal#setExternalUserId" isEqualToString:call.method])
         [self setExternalUserId:call withResult:result];
-    } else if ([@"OneSignal#removeExternalUserId" isEqualToString:call.method]) {
+    else if ([@"OneSignal#removeExternalUserId" isEqualToString:call.method])
         [self removeExternalUserId:call withResult:result];
-    } else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method]) {
+    else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method])
         [self initNotificationOpenedHandlerParams];
-    } else if ([@"OneSignal#initInAppMessageClickedHandlerParams" isEqualToString:call.method]) {
+    else if ([@"OneSignal#initInAppMessageClickedHandlerParams" isEqualToString:call.method])
         [self initInAppMessageClickedHandlerParams];
-    
-    } else {
+    else
         result(FlutterMethodNotImplemented);
-    }
 }
 
 - (void)initOneSignal:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -181,6 +179,7 @@
 
 - (void)oneSignalLog:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal onesignal_Log:(ONE_S_LOG_LEVEL)[call.arguments[@"logLevel"] integerValue] message:(NSString *)call.arguments[@"message"]];
+    result(@[]);
 }
 
 - (void)setRequiresUserPrivacyConsent:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -192,9 +191,8 @@
     BOOL granted = [call.arguments[@"granted"] boolValue];
     [OneSignal consentGranted:granted];
 
-    if (self.waitingForUserConsent && granted) {
+    if (self.waitingForUserConsent && granted)
         [self addObservers];
-    }
     
     result(@[]);
 }

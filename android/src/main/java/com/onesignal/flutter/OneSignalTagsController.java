@@ -45,7 +45,7 @@ class OSFlutterChangeTagsHandler extends FlutterRegistrarResponder implements Ch
         try {
             replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(tags));
         } catch (JSONException exception) {
-            replyError(result, "onesignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
+            replyError(result, "OneSignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
         }
     }
 
@@ -54,7 +54,7 @@ class OSFlutterChangeTagsHandler extends FlutterRegistrarResponder implements Ch
         if (this.replySubmitted.getAndSet(true))
             return;
 
-        replyError(result,"onesignal","Encountered an error updating tags (" + error.getCode() + "): " + error.getMessage(), null);
+        replyError(result,"OneSignal", "Encountered an error updating tags (" + error.getCode() + "): " + error.getMessage(), null);
     }
 
     @Override
@@ -65,12 +65,12 @@ class OSFlutterChangeTagsHandler extends FlutterRegistrarResponder implements Ch
         try {
             replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(jsonObject));
         } catch (JSONException exception) {
-            replyError(result, "onesignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
+            replyError(result, "OneSignal", "Encountered an error serializing tags into hashmap: " + exception.getMessage() + "\n" + exception.getStackTrace(), null);
         }
     }
 }
 
-public class OneSignalTagsController implements MethodCallHandler {
+public class OneSignalTagsController extends FlutterRegistrarResponder implements MethodCallHandler {
     private MethodChannel channel;
     private Registrar registrar;
 
@@ -84,10 +84,36 @@ public class OneSignalTagsController implements MethodCallHandler {
     @Override
     public void onMethodCall(MethodCall call, Result result) {
         if (call.method.contentEquals("OneSignal#getTags"))
-            OneSignal.getTags(new OSFlutterChangeTagsHandler(registrar, channel, result));
+            this.getTags(call, result);
         else if (call.method.contentEquals("OneSignal#sendTags"))
-            OneSignal.sendTags(new JSONObject((Map<String, Object>) call.arguments), new OSFlutterChangeTagsHandler(registrar, channel, result));
+            this.sendTags(call, result);
         else if (call.method.contentEquals("OneSignal#deleteTags"))
-            OneSignal.deleteTags((List<String>)call.arguments, new OSFlutterChangeTagsHandler(registrar, channel, result));
+            this.deleteTags(call, result);
+        else
+            replyNotImplemented(result);
+    }
+
+    private void getTags(MethodCall call, Result result) {
+        OneSignal.getTags(new OSFlutterChangeTagsHandler(registrar, channel, result));
+    }
+
+    private void sendTags(MethodCall call, Result result) {
+        // call.arguments is being casted to a Map<String, Object> so a try-catch with
+        //  a ClassCastException will be thrown
+        try {
+            OneSignal.sendTags(new JSONObject((Map<String, Object>) call.arguments), new OSFlutterChangeTagsHandler(registrar, channel, result));
+        } catch(ClassCastException e) {
+            replyError(result, "OneSignal", "sendTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
+        }
+    }
+
+    private void deleteTags(MethodCall call, Result result) {
+        // call.arguments is being casted to a List<String> so a try-catch with
+        //  a ClassCastException will be thrown
+        try {
+            OneSignal.deleteTags((List<String>) call.arguments, new OSFlutterChangeTagsHandler(registrar, channel, result));
+        } catch(ClassCastException e) {
+            replyError(result, "OneSignal", "deleteTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
+        }
     }
 }

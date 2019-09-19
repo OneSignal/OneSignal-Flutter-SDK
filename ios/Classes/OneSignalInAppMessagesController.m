@@ -40,19 +40,47 @@
     [registrar addMethodCallDelegate:instance channel:instance.channel];
 }
 
--(void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
+- (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     if ([@"OneSignal#addTrigger" isEqualToString:call.method]) {
-        [OneSignal addTriggers:call.arguments];
+        [self addTriggers:call withResult:result];
     } else if ([@"OneSignal#addTriggers" isEqualToString:call.method]) {
-        [OneSignal addTriggers:call.arguments];
+        [self addTriggers:call withResult:result];
     } else if ([@"OneSignal#removeTriggerForKey" isEqualToString:call.method]) {
-        [OneSignal removeTriggerForKey:call.arguments];
+        [self removeTriggerForKey:call withResult:result];
     } else if ([@"OneSignal#removeTriggersForKeys" isEqualToString:call.method]) {
-        [OneSignal removeTriggersForKeys:call.arguments];
+        [self removeTriggersForKeys:call withResult:result];
     } else if ([@"OneSignal#getTriggerValueForKey" isEqualToString:call.method]) {
         result([OneSignal getTriggerValueForKey:call.arguments]);
     } else if ([@"OneSignal#pauseInAppMessages" isEqualToString:call.method]) {
-        [OneSignal pauseInAppMessages:[call.arguments boolValue]];
+        [self pauseInAppMessages:call withResult:result];
+    } else {
+        result(FlutterMethodNotImplemented);
     }
 }
+
+- (void)addTriggers:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSDictionary *triggers = call.arguments;
+    [OneSignal addTriggers:triggers];
+    result(@[]);
+}
+
+- (void)removeTriggerForKey:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *key = call.arguments;
+    [OneSignal removeTriggerForKey:key];
+    result(@[]);
+    
+}
+
+- (void)removeTriggersForKeys:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSArray *keys = call.arguments;
+    [OneSignal removeTriggersForKeys:keys];
+    result(@[]);
+}
+
+- (void)pauseInAppMessages:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    BOOL pause = [call.arguments boolValue];
+    [OneSignal pauseInAppMessages:pause];
+    result(@[]);
+}
+
 @end
