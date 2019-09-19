@@ -173,8 +173,9 @@
 }
 
 - (void)setOneSignalLogLevel:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal setLogLevel:(ONE_S_LOG_LEVEL)[call.arguments[@"console"] intValue]
-               visualLevel:(ONE_S_LOG_LEVEL)[call.arguments[@"visual"] intValue]];
+    ONE_S_LOG_LEVEL consoleLogLevel = (ONE_S_LOG_LEVEL)[call.arguments[@"console"] intValue];
+    ONE_S_LOG_LEVEL visualLogLevel = (ONE_S_LOG_LEVEL)[call.arguments[@"visual"] intValue];
+    [OneSignal setLogLevel:consoleLogLevel visualLevel:visualLogLevel];
     result(@[]);
 }
 
