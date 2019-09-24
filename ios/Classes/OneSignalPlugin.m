@@ -28,6 +28,7 @@
 #import "OneSignalPlugin.h"
 #import "OneSignalCategories.h"
 #import "OneSignalTagsController.h"
+#import "OneSignalInAppMessagesController.h"
 
 @interface OneSignalPlugin ()
 
@@ -43,7 +44,7 @@
 @property (atomic) BOOL waitingForUserConsent;
 
 /*
-    holds reference to any notifications received before the
+    Holds reference to any notifications received before the
     flutter runtime channel has been opened
     Thus, if a user taps a notification while the app is
     terminated, the SDK will still notify the app once the
@@ -51,14 +52,17 @@
 */
 @property (strong, nonatomic) OSNotificationOpenedResult *coldStartOpenResult;
 
+/*
+    Holds reference to any in app messages received before any click action
+    occurs on the body, button or image elements of the in app message
+*/
+@property (strong, nonatomic) OSInAppMessageAction *inAppMessageClickedResult;
+
 @end
-
-
 
 @implementation OneSignalPlugin
 
-+ (instancetype)sharedInstance
-{
++ (instancetype)sharedInstance {
     static OneSignalPlugin *sharedInstance = nil;
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
@@ -70,92 +74,27 @@
 
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    
+
     [OneSignal setMSDKType:@"flutter"];
-    
+
     // Wrapper SDK's call init with no app ID early on in the
     // app lifecycle. The developer will call init() later on
     // from the Flutter plugin channel.
+
     [OneSignal initWithLaunchOptions:nil appId:nil handleNotificationAction:^(OSNotificationOpenedResult *result) {
         @synchronized (OneSignalPlugin.sharedInstance.coldStartOpenResult) {
             OneSignalPlugin.sharedInstance.coldStartOpenResult = result;
         }
     } settings:@{kOSSettingsKeyAutoPrompt : @false, @"kOSSettingsKeyInOmitNoAppIdLogging" : @true}];
-    
+
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
                                      methodChannelWithName:@"OneSignal"
                                      binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:OneSignalPlugin.sharedInstance channel:OneSignalPlugin.sharedInstance.channel];
-    
+
     [OneSignalTagsController registerWithRegistrar:registrar];
-}
-
-- (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-    if ([@"OneSignal#init" isEqualToString:call.method]) {
-        [self initOneSignal:call withResult:result];
-    } else if ([@"OneSignal#setLogLevel" isEqualToString:call.method]) {
-        [self setOneSignalLogLevel:call withResult:result];
-    } else if ([@"OneSignal#requiresUserPrivacyConsent" isEqualToString:call.method]) {
-        result(@(OneSignal.requiresUserPrivacyConsent));
-    } else if ([@"OneSignal#consentGranted" isEqualToString:call.method]) {
-        [self changeConsentStatus:call withResult:result];
-    } else if ([@"OneSignal#setRequiresUserPrivacyConsent" isEqualToString:call.method]) {
-        [self setRequiresUserPrivacyConsent:call withResult:result];
-    } else if ([@"OneSignal#promptPermission" isEqualToString:call.method]) {
-        [self promptPermission:call withResult:result];
-    } else if ([@"OneSignal#log" isEqualToString:call.method]) {
-        [self oneSignalLog:call withResult:result];
-    } else if ([@"OneSignal#inFocusDisplayType" isEqualToString:call.method]) {
-        result(@(OneSignal.inFocusDisplayType));
-    } else if ([@"OneSignal#getPermissionSubscriptionState" isEqualToString:call.method]) {
-        result(OneSignal.getPermissionSubscriptionState.toDictionary);
-    } else if ([@"OneSignal#setInFocusDisplayType" isEqualToString:call.method]) {
-        [OneSignal setInFocusDisplayType:(OSNotificationDisplayType)[call.arguments[@"displayType"] intValue]];
-    } else if ([@"OneSignal#setSubscription" isEqualToString:call.method]) {
-        [OneSignal setSubscription:[call.arguments boolValue]];
-    } else if ([@"OneSignal#postNotification" isEqualToString:call.method]) {
-        [self postNotification:call withResult:result];
-    } else if ([@"OneSignal#promptLocation" isEqualToString:call.method]) {
-        [self promptLocation:call withResult:result];
-    } else if ([@"OneSignal#setLocationShared" isEqualToString:call.method]) {
-        [OneSignal setLocationShared:[call.arguments boolValue]];
-    } else if ([@"OneSignal#setEmail" isEqualToString:call.method]) {
-        [self setEmail:call withResult:result];
-    } else if ([@"OneSignal#logoutEmail" isEqualToString:call.method]) {
-        [self logoutEmail:call withResult:result];
-    } else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method]) {
-        [self initNotificationOpenedHandlerParams];
-    } else if ([@"OneSignal#setExternalUserId" isEqualToString:call.method]) {
-        id externalId = call.arguments[@"externalUserId"];
-        if (externalId == [NSNull null])
-            externalId = nil;
-        [OneSignal setExternalUserId:externalId];
-    } else if ([@"OneSignal#removeExternalUserId" isEqualToString:call.method]) {
-        [OneSignal removeExternalUserId];
-    } else {
-        result(FlutterMethodNotImplemented);
-    }
-}
-
-- (void)initOneSignal:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal initWithLaunchOptions:nil appId:call.arguments[@"appId"] handleNotificationReceived:^(OSNotification *notification) {
-        [self handleReceivedNotification:notification];
-    } handleNotificationAction:^(OSNotificationOpenedResult *result) {
-        [self handleNotificationOpened:result];
-    } settings:call.arguments[@"settings"]];
-    
-    // If the user has required privacy consent, the SDK will not
-    // add these observers. So we should delay adding the observers
-    // until consent has been provided.
-    
-    if (OneSignal.requiresUserPrivacyConsent) {
-        self.waitingForUserConsent = true;
-    } else {
-        [self addObservers];
-    }
-    
-    result(@[]);
+    [OneSignalInAppMessagesController registerWithRegistrar:registrar];
 }
 
 - (void)addObservers {
@@ -164,32 +103,116 @@
     [OneSignal addEmailSubscriptionObserver:self];
 }
 
-- (void)setOneSignalLogLevel:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal setLogLevel:(ONE_S_LOG_LEVEL)[call.arguments[@"console"] intValue] visualLevel:(ONE_S_LOG_LEVEL)[call.arguments[@"visual"] intValue]];
-    result([NSNull null]);
+- (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
+    if ([@"OneSignal#init" isEqualToString:call.method])
+        [self initOneSignal:call withResult:result];
+    else if ([@"OneSignal#setLogLevel" isEqualToString:call.method])
+        [self setOneSignalLogLevel:call withResult:result];
+    else if ([@"OneSignal#log" isEqualToString:call.method])
+        [self oneSignalLog:call withResult:result];
+    else if ([@"OneSignal#requiresUserPrivacyConsent" isEqualToString:call.method])
+        result(@(OneSignal.requiresUserPrivacyConsent));
+    else if ([@"OneSignal#setRequiresUserPrivacyConsent" isEqualToString:call.method])
+        [self setRequiresUserPrivacyConsent:call withResult:result];
+    else if ([@"OneSignal#consentGranted" isEqualToString:call.method])
+        [self setConsentStatus:call withResult:result];
+    else if ([@"OneSignal#inFocusDisplayType" isEqualToString:call.method])
+        result(@(OneSignal.inFocusDisplayType));
+    else if ([@"OneSignal#setInFocusDisplayType" isEqualToString:call.method])
+        [self setInFocusDisplayType:call withResult:result];
+    else if ([@"OneSignal#promptPermission" isEqualToString:call.method])
+        [self promptPermission:call withResult:result];
+    else if ([@"OneSignal#getPermissionSubscriptionState" isEqualToString:call.method])
+        result(OneSignal.getPermissionSubscriptionState.toDictionary);
+    else if ([@"OneSignal#setSubscription" isEqualToString:call.method])
+        [self setSubscription:call withResult:result];
+    else if ([@"OneSignal#postNotification" isEqualToString:call.method])
+        [self postNotification:call withResult:result];
+    else if ([@"OneSignal#promptLocation" isEqualToString:call.method])
+        [self promptLocation:call withResult:result];
+    else if ([@"OneSignal#setLocationShared" isEqualToString:call.method])
+        [self setLocationShared:call withResult:result];
+    else if ([@"OneSignal#setEmail" isEqualToString:call.method])
+        [self setEmail:call withResult:result];
+    else if ([@"OneSignal#logoutEmail" isEqualToString:call.method])
+        [self logoutEmail:call withResult:result];
+    else if ([@"OneSignal#setExternalUserId" isEqualToString:call.method])
+        [self setExternalUserId:call withResult:result];
+    else if ([@"OneSignal#removeExternalUserId" isEqualToString:call.method])
+        [self removeExternalUserId:call withResult:result];
+    else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method])
+        [self initNotificationOpenedHandlerParams];
+    else if ([@"OneSignal#initInAppMessageClickedHandlerParams" isEqualToString:call.method])
+        [self initInAppMessageClickedHandlerParams];
+    else
+        result(FlutterMethodNotImplemented);
 }
 
--(void)changeConsentStatus:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    BOOL granted = [call.arguments[@"granted"] boolValue];
-    
-    [OneSignal consentGranted:granted];
-    
-    if (self.waitingForUserConsent && granted) {
+- (void)initOneSignal:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+     [OneSignal setInAppMessageClickHandler:^(OSInAppMessageAction *action) {
+         [self handleInAppMessageClicked:action];
+     }];
+
+    [OneSignal initWithLaunchOptions:nil appId:call.arguments[@"appId"] handleNotificationReceived:^(OSNotification *notification) {
+        [self handleReceivedNotification:notification];
+    } handleNotificationAction:^(OSNotificationOpenedResult *result) {
+        [self handleNotificationOpened:result];
+    } settings:call.arguments[@"settings"]];
+
+    // If the user has required privacy consent, the SDK will not
+    // add these observers. So we should delay adding the observers
+    // until consent has been provided.
+    if (OneSignal.requiresUserPrivacyConsent) {
+        self.waitingForUserConsent = true;
+    } else {
         [self addObservers];
     }
+    result(@[]);
+}
+
+- (void)setOneSignalLogLevel:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    ONE_S_LOG_LEVEL consoleLogLevel = (ONE_S_LOG_LEVEL)[call.arguments[@"console"] intValue];
+    ONE_S_LOG_LEVEL visualLogLevel = (ONE_S_LOG_LEVEL)[call.arguments[@"visual"] intValue];
+    [OneSignal setLogLevel:consoleLogLevel visualLevel:visualLogLevel];
+    result(@[]);
+}
+
+- (void)oneSignalLog:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal onesignal_Log:(ONE_S_LOG_LEVEL)[call.arguments[@"logLevel"] integerValue] message:(NSString *)call.arguments[@"message"]];
+    result(@[]);
+}
+
+- (void)setRequiresUserPrivacyConsent:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal setRequiresUserPrivacyConsent:[call.arguments[@"required"] boolValue]];
+    result(@[]);
+}
+
+- (void)setConsentStatus:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    BOOL granted = [call.arguments[@"granted"] boolValue];
+    [OneSignal consentGranted:granted];
+
+    if (self.waitingForUserConsent && granted)
+        [self addObservers];
     
     result(@[]);
 }
 
--(void)setRequiresUserPrivacyConsent:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal setRequiresUserPrivacyConsent:[call.arguments[@"required"] boolValue]];
+- (void)setInFocusDisplayType:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    OSNotificationDisplayType displayType = (OSNotificationDisplayType)[call.arguments[@"displayType"] intValue];
+    [OneSignal setInFocusDisplayType:displayType];
     result(@[]);
 }
 
 - (void)promptPermission:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal promptForPushNotificationsWithUserResponse:^(BOOL accepted) {
-        [self.channel invokeMethod:@"OneSignal#userAnsweredPrompt" arguments:@(accepted)];
+        result(@(accepted));
     }];
+}
+
+- (void)setSubscription:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    BOOL subscribe = [call.arguments boolValue];
+    [OneSignal setSubscription:subscribe];
+    result(@[]);
 }
 
 - (void)postNotification:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -205,14 +228,20 @@
     result(@[]);
 }
 
+- (void)setLocationShared:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    BOOL locationShared = [call.arguments boolValue];
+    [OneSignal setLocationShared:locationShared];
+    result(@[]);
+}
+
 - (void)setEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    
+
     NSString *email = call.arguments[@"email"];
     NSString *emailAuthHashToken = call.arguments[@"emailAuthHashToken"];
-    
+
     if ([emailAuthHashToken isKindOfClass:[NSNull class]])
         emailAuthHashToken = nil;
-    
+
     [OneSignal setEmail:email withEmailAuthHashToken:emailAuthHashToken withSuccess:^{
         result(@[]);
     } withFailure:^(NSError *error) {
@@ -228,14 +257,30 @@
     }];
 }
 
-- (void)oneSignalLog:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal onesignal_Log:(ONE_S_LOG_LEVEL)[call.arguments[@"logLevel"] integerValue] message:(NSString *)call.arguments[@"message"]];
+- (void)setExternalUserId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    id externalId = call.arguments[@"externalUserId"];
+    if (externalId == [NSNull null])
+        externalId = nil;
+    [OneSignal setExternalUserId:externalId];
+    result(@[]);
+}
+
+- (void)removeExternalUserId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal removeExternalUserId];
+    result(@[]);
 }
 
 - (void)initNotificationOpenedHandlerParams {
     if (self.coldStartOpenResult) {
         [self handleNotificationOpened:self.coldStartOpenResult];
         self.coldStartOpenResult = nil;
+    }
+}
+
+- (void)initInAppMessageClickedHandlerParams {
+    if (self.inAppMessageClickedResult) {
+        [self handleInAppMessageClicked:self.inAppMessageClickedResult];
+        self.inAppMessageClickedResult = nil;
     }
 }
 
@@ -248,18 +293,23 @@
     [self.channel invokeMethod:@"OneSignal#handleOpenedNotification" arguments:result.toJson];
 }
 
+#pragma mark In App Message Click Handler
+- (void)handleInAppMessageClicked:(OSInAppMessageAction *)action {
+    [self.channel invokeMethod:@"OneSignal#handleClickedInAppMessage" arguments:action.toJson];
+}
+
 #pragma mark OSSubscriptionObserver
 - (void)onOSSubscriptionChanged:(OSSubscriptionStateChanges*)stateChanges {
    [self.channel invokeMethod:@"OneSignal#subscriptionChanged" arguments: stateChanges.toDictionary];
 }
 
 #pragma mark OSPermissionObserver
--(void)onOSPermissionChanged:(OSPermissionStateChanges *)stateChanges {
+- (void)onOSPermissionChanged:(OSPermissionStateChanges *)stateChanges {
     [self.channel invokeMethod:@"OneSignal#permissionChanged" arguments:stateChanges.toDictionary];
 }
 
 #pragma mark OSEmailSubscriptionObserver
--(void)onOSEmailSubscriptionChanged:(OSEmailSubscriptionStateChanges *)stateChanges {
+- (void)onOSEmailSubscriptionChanged:(OSEmailSubscriptionStateChanges *)stateChanges {
     [self.channel invokeMethod:@"OneSignal#emailSubscriptionChanged" arguments:stateChanges.toDictionary];
 }
 
