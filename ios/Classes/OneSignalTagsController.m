@@ -40,25 +40,42 @@
     [registrar addMethodCallDelegate:instance channel:instance.channel];
 }
 
--(void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
+- (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
     if ([@"OneSignal#sendTags" isEqualToString:call.method]) {
-        [OneSignal sendTags:(NSDictionary *)call.arguments onSuccess:^(NSDictionary *tags) {
-            result(tags);
-        } onFailure:^(NSError *error) {
-            result(error.flutterError);
-        }];
+        [self sendTags:call withResult:result];
     } else if ([@"OneSignal#getTags" isEqualToString:call.method]) {
-        [OneSignal getTags:^(NSDictionary *tags) {
-            result(tags);
-        } onFailure:^(NSError *error) {
-            result(error.flutterError);
-        }];
+        [self getTags:call withResult:result];
     } else if ([@"OneSignal#deleteTags" isEqualToString:call.method]) {
-        [OneSignal deleteTags:(NSArray *)call.arguments onSuccess:^(NSDictionary *response) {
-            result(response);
-        } onFailure:^(NSError *error) {
-            result(error.flutterError);
-        }];
+        [self deleteTags:call withResult:result];
+    } else {
+        result(FlutterMethodNotImplemented);
     }
 }
+
+- (void)sendTags:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSDictionary *tags = call.arguments;
+    [OneSignal sendTags:tags onSuccess:^(NSDictionary *tags) {
+        result(tags);
+    } onFailure:^(NSError *error) {
+        result(error.flutterError);
+    }];
+}
+
+- (void)getTags:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal getTags:^(NSDictionary *tags) {
+        result(tags);
+    } onFailure:^(NSError *error) {
+        result(error.flutterError);
+    }];
+}
+
+- (void)deleteTags:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSArray *tags = call.arguments;
+    [OneSignal deleteTags:tags onSuccess:^(NSDictionary *response) {
+        result(response);
+    } onFailure:^(NSError *error) {
+        result(error.flutterError);
+    }];
+}
+
 @end

@@ -82,47 +82,52 @@ public class OneSignalPlugin
   @Override
   public void onMethodCall(MethodCall call, Result result) {
     if (call.method.contentEquals("OneSignal#init"))
-      initOneSignal(call, result);
+      this.initOneSignal(call, result);
     else if (call.method.contentEquals("OneSignal#setLogLevel"))
       this.setLogLevel(call, result);
+    else if (call.method.contentEquals("OneSignal#log"))
+      this.oneSignalLog(call, result);
     else if (call.method.contentEquals("OneSignal#requiresUserPrivacyConsent"))
       replySuccess(result, OneSignal.requiresUserPrivacyConsent());
-    else if (call.method.contentEquals("OneSignal#consentGranted"))
-      this.consentGranted(call, result);
     else if (call.method.contentEquals("OneSignal#setRequiresUserPrivacyConsent"))
       this.setRequiresUserPrivacyConsent(call, result);
-    else if (call.method.contentEquals("OneSignal#log"))
-      this.oneSignalLog(call);
+    else if (call.method.contentEquals("OneSignal#consentGranted"))
+      this.consentGranted(call, result);
     else if (call.method.contentEquals("OneSignal#inFocusDisplayType"))
       replySuccess(result, inFocusDisplayOptionToInt(OneSignal.currentInFocusDisplayOption()));
-    else if (call.method.contentEquals("OneSignal#getPermissionSubscriptionState"))
-      this.getPermissionSubscriptionState(result);
     else if (call.method.contentEquals("OneSignal#setInFocusDisplayType"))
       this.setInFocusDisplayType(call, result);
+    else if (call.method.contentEquals("OneSignal#promptPermission"))
+      this.promptPermission(call, result);
+    else if (call.method.contentEquals("OneSignal#getPermissionSubscriptionState"))
+      this.getPermissionSubscriptionState(result);
     else if (call.method.contentEquals("OneSignal#setSubscription"))
-      OneSignal.setSubscription((boolean) call.arguments);
+      this.setSubscription(call, result);
     else if (call.method.contentEquals("OneSignal#postNotification"))
       this.postNotification(call, result);
     else if (call.method.contentEquals("OneSignal#promptLocation"))
       this.promptLocation(result);
     else if (call.method.contentEquals("OneSignal#setLocationShared"))
-      OneSignal.setLocationShared((boolean) call.arguments);
+      this.setLocationShared(call, result);
     else if (call.method.contentEquals("OneSignal#setEmail"))
       this.setEmail(call, result);
     else if (call.method.contentEquals("OneSignal#logoutEmail"))
       this.logoutEmail(result);
-    else if (call.method.contentEquals("OneSignal#promptPermission"))
-      OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "promptPermission() is not applicable in Android");
-    else if (call.method.contentEquals("OneSignal#initNotificationOpenedHandlerParams"))
-      this.initNotificationOpenedHandlerParams();
     else if (call.method.contentEquals("OneSignal#setExternalUserId"))
       this.setExternalUserId(call, result);
     else if (call.method.contentEquals("OneSignal#removeExternalUserId"))
       this.removeExternalUserId(result);
+    else if (call.method.contentEquals("OneSignal#initNotificationOpenedHandlerParams"))
+      this.initNotificationOpenedHandlerParams();
     else if (call.method.contentEquals("OneSignal#initInAppMessageClickedHandlerParams"))
       this.initInAppMessageClickedHandlerParams();
     else
       replyNotImplemented(result);
+  }
+
+  private void setSubscription(MethodCall call, Result result) {
+    OneSignal.setSubscription((boolean) call.arguments);
+    replySuccess(result, null);
   }
 
   private void initOneSignal(MethodCall call, Result reply) {
@@ -158,17 +163,13 @@ public class OneSignalPlugin
     replySuccess(reply, null);
   }
 
-  private void consentGranted(MethodCall call, Result reply) {
-    boolean granted = call.argument("granted");
-    OneSignal.provideUserConsent(granted);
+  private void oneSignalLog(MethodCall call, Result reply) {
+    int logLevel = call.argument("logLevel");
+    String message = call.argument("message");
+
+    OneSignal.onesignalLog(OneSignal.LOG_LEVEL.values()[logLevel], message);
 
     replySuccess(reply, null);
-
-    if (this.waitingForUserPrivacyConsent) {
-      this.waitingForUserPrivacyConsent = false;
-
-      this.addObservers();
-    }
   }
 
   private void setRequiresUserPrivacyConsent(MethodCall call, Result reply) {
@@ -180,24 +181,46 @@ public class OneSignalPlugin
     replySuccess(reply, null);
   }
 
-  private void oneSignalLog(MethodCall call) {
-    int logLevel = call.argument("logLevel");
-    String message = call.argument("message");
+  private void consentGranted(MethodCall call, Result reply) {
+    boolean granted = call.argument("granted");
+    OneSignal.provideUserConsent(granted);
 
-    OneSignal.onesignalLog(OneSignal.LOG_LEVEL.values()[logLevel], message);
+    if (this.waitingForUserPrivacyConsent) {
+      this.waitingForUserPrivacyConsent = false;
+
+      this.addObservers();
+    }
+
+    replySuccess(reply, null);
   }
 
-  private void getPermissionSubscriptionState(Result reply) {
-    OSPermissionSubscriptionState state = OneSignal.getPermissionSubscriptionState();
+  private int inFocusDisplayOptionToInt(OSInFocusDisplayOption option) {
+    switch (option) {
+      case None:
+        return 0;
+      case InAppAlert:
+        return 1;
+      case Notification:
+        return 2;
+    }
 
-    replySuccess(reply, OneSignalSerializer.convertPermissionSubscriptionStateToMap(state));
+    return 1;
   }
 
   private void setInFocusDisplayType(MethodCall call, Result reply) {
     int displayType = call.argument("displayType");
     OneSignal.setInFocusDisplaying(displayType);
-
     replySuccess(reply, null);
+  }
+
+  private void promptPermission(MethodCall call, Result result) {
+    OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "promptPermission() is not applicable in Android");
+    replySuccess(result, null);
+  }
+
+  private void getPermissionSubscriptionState(Result reply) {
+    OSPermissionSubscriptionState state = OneSignal.getPermissionSubscriptionState();
+    replySuccess(reply, OneSignalSerializer.convertPermissionSubscriptionStateToMap(state));
   }
 
   private void postNotification(MethodCall call, final Result reply) {
@@ -208,8 +231,7 @@ public class OneSignalPlugin
         try {
           replySuccess(reply, OneSignalSerializer.convertJSONObjectToHashMap(response));
         } catch (JSONException e) {
-          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
-                  "Encountered an error attempting to deserialize server response: " + e.getMessage());
+          replyError(reply, "OneSignal", "Encountered an error attempting to deserialize server response: " + e.getMessage(), null);
         }
       }
 
@@ -229,13 +251,20 @@ public class OneSignalPlugin
 
   private void promptLocation(Result reply) {
     OneSignal.promptLocation();
-
     replySuccess(reply, null);
+  }
+
+  private void setLocationShared(MethodCall call, Result result) {
+    OneSignal.setLocationShared((boolean) call.arguments);
+    replySuccess(result, null);
   }
 
   private void setEmail(MethodCall call, final Result reply) {
     String email = call.argument("email");
     String emailAuthHashToken = call.argument("emailAuthHashToken");
+
+    if (email == null || emailAuthHashToken == null)
+      return;
 
     OneSignal.setEmail(email, emailAuthHashToken, new EmailUpdateHandler() {
       @Override
@@ -268,17 +297,14 @@ public class OneSignalPlugin
     });
   }
 
-  private int inFocusDisplayOptionToInt(OSInFocusDisplayOption option) {
-    switch (option) {
-      case None:
-        return 0;
-      case InAppAlert:
-        return 1;
-      case Notification:
-        return 2;
-    }
+  private void setExternalUserId(MethodCall call, Result result) {
+    OneSignal.setExternalUserId((String)call.argument("externalUserId"));
+    replySuccess(result, null);
+  }
 
-    return 1;
+  private void removeExternalUserId(Result result) {
+    OneSignal.removeExternalUserId();
+    replySuccess(result, null);
   }
 
   private void initNotificationOpenedHandlerParams() {
@@ -295,18 +321,6 @@ public class OneSignalPlugin
       this.inAppMessageClicked(this.inAppMessageClickedResult);
       this.inAppMessageClickedResult = null;
     }
-  }
-
-  private void setExternalUserId(MethodCall call, Result result) {
-    OneSignal.setExternalUserId((String)call.argument("externalUserId"));
-
-    replySuccess(result, null);
-  }
-
-  private void removeExternalUserId(Result result) {
-     OneSignal.removeExternalUserId();
-
-     replySuccess(result, null);
   }
 
   @Override
