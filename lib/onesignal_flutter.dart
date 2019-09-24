@@ -34,6 +34,7 @@ class OneSignal {
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal');
   MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
+  MethodChannel _inAppMessagesChannel = const MethodChannel('OneSignal#inAppMessages');
 
   // event handlers
   ReceivedNotificationHandler _onReceivedNotification;
@@ -144,11 +145,6 @@ class OneSignal {
         "OneSignal#promptPermission", {'fallback': fallbackToSettings});
 
     return result as bool;
-  }
-
-  /// in iOS, takes the user to the iOS Settings page for this app.
-  Future<void> presentApplicationSettings() async {
-    await _channel.invokeMethod("OneSignal#presentSettings");
   }
 
   /// The current setting that controls how notifications are displayed.
@@ -288,35 +284,35 @@ class OneSignal {
   /// Adds a single key, value trigger, which will trigger an in app message
   /// if one exists matching the specific trigger added
   Future<void> addTrigger(String key, Object value) async {
-    return await _channel.invokeMethod("OneSignal#addTrigger", {key : value});
+    return await _inAppMessagesChannel.invokeMethod("OneSignal#addTrigger", {key : value});
   }
 
   /// Adds one or more key, value triggers, which will trigger in app messages
   /// (one at a time) if any exist matching the specific triggers added
   Future<void> addTriggers(Map<String, Object> triggers) async {
-    return await _channel.invokeMethod("OneSignal#addTriggers", triggers);
+    return await _inAppMessagesChannel.invokeMethod("OneSignal#addTriggers", triggers);
   }
 
   /// Remove a single key, value trigger to prevent an in app message from
   /// showing with that trigger
   Future<void> removeTriggerForKey(String key) async {
-    return await _channel.invokeMethod("OneSignal#removeTriggerForKey", key);
+    return await _inAppMessagesChannel.invokeMethod("OneSignal#removeTriggerForKey", key);
   }
 
   /// Remove one or more key, value triggers to prevent any in app messages
   /// from showing with those triggers
-  Future<void> removeTriggerForKeys(List<String> keys) async {
-    return await _channel.invokeMethod("OneSignal#removeTriggerForKeys", keys);
+  Future<void> removeTriggersForKeys(List<String> keys) async {
+    return await _inAppMessagesChannel.invokeMethod("OneSignal#removeTriggersForKeys", keys);
   }
 
   /// Get the trigger value associated with the key provided
   Future<Object> getTriggerValueForKey(String key) async {
-    return await _channel.invokeMethod("OneSignal#getTriggerValueForKey", key);
+    return await _inAppMessagesChannel.invokeMethod("OneSignal#getTriggerValueForKey", key);
   }
 
   /// Toggles the showing of all in app messages
   Future<void> pauseInAppMessages(bool pause) async {
-    return await _channel.invokeMethod("OneSignal#pauseInAppMessages", pause);
+    return await _inAppMessagesChannel.invokeMethod("OneSignal#pauseInAppMessages", pause);
   }
 
   // Private function that gets called by ObjC/Java
