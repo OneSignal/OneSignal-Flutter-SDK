@@ -259,7 +259,7 @@ class _MyAppState extends State<MyApp> {
     List<String> keys = new List<String>();
     keys.add("trigger_1");
     keys.add("trigger_3");
-    OneSignal.shared.removeTriggerForKeys(keys);
+    OneSignal.shared.removeTriggersForKeys(keys);
 
     // Toggle pausing (displaying or not) of IAMs
     OneSignal.shared.pauseInAppMessages(false);
