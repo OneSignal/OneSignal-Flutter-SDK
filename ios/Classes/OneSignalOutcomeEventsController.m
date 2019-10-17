@@ -25,61 +25,47 @@
  * THE SOFTWARE.
  */
 
-#import "OneSignalInAppMessagesController.h"
+#import "OneSignalOutcomeEventsController.h"
 #import <OneSignal/OneSignal.h>
 #import "OneSignalCategories.h"
 
-@implementation OneSignalInAppMessagesController
+@implementation OneSignalOutcomeEventsController
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     OneSignalInAppMessagesController *instance = [OneSignalInAppMessagesController new];
 
     instance.channel = [FlutterMethodChannel
-                        methodChannelWithName:@"OneSignal#inAppMessages"
+                        methodChannelWithName:@"OneSignal#outcomes"
                         binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:instance channel:instance.channel];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([@"OneSignal#addTrigger" isEqualToString:call.method]) {
-        [self addTriggers:call withResult:result];
-    } else if ([@"OneSignal#addTriggers" isEqualToString:call.method]) {
-        [self addTriggers:call withResult:result];
-    } else if ([@"OneSignal#removeTriggerForKey" isEqualToString:call.method]) {
-        [self removeTriggerForKey:call withResult:result];
-    } else if ([@"OneSignal#removeTriggersForKeys" isEqualToString:call.method]) {
-        [self removeTriggersForKeys:call withResult:result];
-    } else if ([@"OneSignal#getTriggerValueForKey" isEqualToString:call.method]) {
-        result([OneSignal getTriggerValueForKey:call.arguments]);
-    } else if ([@"OneSignal#pauseInAppMessages" isEqualToString:call.method]) {
-        [self pauseInAppMessages:call withResult:result];
+    if ([@"OneSignal#sendOutcome" isEqualToString:call.method]) {
+        [self sendOutcome:call withResult:result];
+    } else if ([@"OneSignal#sendUniqueOutcome" isEqualToString:call.method]) {
+        [self sendUniqueOutcome:call withResult:result];
+    } else if ([@"OneSignal#sendOutcomeWithValue" isEqualToString:call.method]) {
+        [self sendOutcomeWithValue:call withResult:result];
     } else {
         result(FlutterMethodNotImplemented);
     }
 }
 
-- (void)addTriggers:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSDictionary *triggers = call.arguments;
-    [OneSignal addTriggers:triggers];
-    result(@[]);
+- (void)sendOutcome:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSString *name = call.arguments;
+    result(FlutterMethodNotImplemented);
 }
 
-- (void)removeTriggerForKey:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSString *key = call.arguments;
-    [OneSignal removeTriggerForKey:key];
-    result(@[]);
+- (void)sendUniqueOutcome:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSString *name = call.arguments;
+    result(FlutterMethodNotImplemented);
 }
 
-- (void)removeTriggersForKeys:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSArray *keys = call.arguments;
-    [OneSignal removeTriggersForKeys:keys];
-    result(@[]);
-}
-
-- (void)pauseInAppMessages:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    BOOL pause = [call.arguments boolValue];
-    [OneSignal pauseInAppMessages:pause];
-    result(@[]);
+- (void)sendOutcomeWithValue:(FlutterMethodCall *)call result:(FlutterResult)result {
+    NSString *name = call.arguments[@"outcome_name"];
+    NSNumber *value = call.arguments[@"outcome_value"];
+    result(FlutterMethodNotImplemented);
 }
 
 @end

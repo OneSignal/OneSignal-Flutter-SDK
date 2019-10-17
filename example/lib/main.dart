@@ -91,6 +91,9 @@ class _MyAppState extends State<MyApp> {
 
     // Some examples of how to use In App Messaging public methods with OneSignal SDK
     oneSignalInAppMessagingTriggerExamples();
+
+    // Some examples of how to use Outcome Events public methods with OneSignal SDK
+    oneSignalOutcomeEventsExamples();
   }
 
   void _handleGetTags() {
@@ -263,6 +266,20 @@ class _MyAppState extends State<MyApp> {
 
     // Toggle pausing (displaying or not) of IAMs
     OneSignal.shared.pauseInAppMessages(false);
+  }
+
+  oneSignalOutcomeEventsExamples() async {
+      // Send a normal outcome and get a reply with the name of the outcome
+      String normalOutcome = await OneSignal.shared.sendOutcome("normal");
+      print(normalOutcome);
+
+      // Send a unique outcome and get a reply with the name of the outcome
+      String uniqueOutcome = await OneSignal.shared.sendUniqueOutcome("unique");
+      print(uniqueOutcome);
+
+      // Send an outcome with a value and get a reply with the name of the outcome
+      String valueOutcome = await OneSignal.shared.sendOutcomeWithValue("value", 3.2);
+      print(valueOutcome);
   }
 
   @override

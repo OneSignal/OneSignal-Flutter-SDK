@@ -1,5 +1,5 @@
 group 'com.onesignal.flutter'
-version '2.1.0'
+version '2.2.0'
 
 buildscript {
     repositories {
@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.1'
+        classpath 'com.android.tools.build:gradle:3.5.0'
     }
 }
 
@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    compile('com.onesignal:OneSignal:3.11.4')
+    api 'com.onesignal:OneSignal:3.12.0'
 }
 
 // Adds required manifestPlaceholders keys to allow mainifest merge gradle step to complete
@@ -42,8 +42,8 @@ dependencies {
 // Google project number / FCM Sender ID will be pulled in from the OneSignal dashbaord
 class DefaultManifestPlaceHolders {
     static final MANIFEST_PLACEHOLDERS_DEFAULTS = [
-        onesignal_app_id: '',
-        onesignal_google_project_number: 'REMOTE'
+        onesignal_app_id: '${onesignal_app_id}',
+        onesignal_google_project_number: '${onesignal_google_project_number}'
     ]
 
     static void addManifestToAppProject(Project proj) {
@@ -62,7 +62,7 @@ class DefaultManifestPlaceHolders {
 }
 
 rootProject.childProjects.each { projName, proj ->
-    if (projName != 'app')
+    if (projName != 'app' && projName != 'onesignal_flutter')
         return
 
     if (proj.hasProperty('android')) {

@@ -35,6 +35,7 @@ class OneSignal {
   MethodChannel _channel = const MethodChannel('OneSignal');
   MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
   MethodChannel _inAppMessagesChannel = const MethodChannel('OneSignal#inAppMessages');
+  MethodChannel _outcomesChannel = const MethodChannel('OneSignal#outcomes');
 
   // event handlers
   ReceivedNotificationHandler _onReceivedNotification;
@@ -313,6 +314,24 @@ class OneSignal {
   /// Toggles the showing of all in app messages
   Future<void> pauseInAppMessages(bool pause) async {
     return await _inAppMessagesChannel.invokeMethod("OneSignal#pauseInAppMessages", pause);
+  }
+
+  /// Send a normal outcome event for the current session and notifications with the attribution window
+  /// Counted each time sent successfully, failed ones will be cached and reattempted in future
+  Future<String> sendOutcome(String name) async {
+      return await _outcomesChannel.invokeMethod("OneSignal#sendOutcome", name);
+  }
+
+  /// Send a unique outcome event for the current session and notifications with the attribution window
+  /// Counted once per notification when sent successfully, failed ones will be cached and reattempted in future
+  Future<String> sendUniqueOutcome(String name) async {
+      return await _outcomesChannel.invokeMethod("OneSignal#sendUniqueOutcome", name);
+  }
+
+  /// Send an outcome event with a value for the current session and notifications with the attribution window
+  /// Counted each time sent successfully, failed ones will be cached and reattempted in future
+  Future<String> sendOutcomeWithValue(String name, double value) async {
+      return await _outcomesChannel.invokeMethod("OneSignal#sendOutcomeWithValue", {"outcome_name" : name, "outcome_value" : value});
   }
 
   // Private function that gets called by ObjC/Java

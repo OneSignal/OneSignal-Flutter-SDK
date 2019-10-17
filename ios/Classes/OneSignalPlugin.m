@@ -29,6 +29,7 @@
 #import "OneSignalCategories.h"
 #import "OneSignalTagsController.h"
 #import "OneSignalInAppMessagesController.h"
+#import "OneSignalOutcomeEventsController.h"
 
 @interface OneSignalPlugin ()
 
@@ -95,6 +96,7 @@
 
     [OneSignalTagsController registerWithRegistrar:registrar];
     [OneSignalInAppMessagesController registerWithRegistrar:registrar];
+    [OneSignalOutcomeEventsController registerWithRegistrar:registrar];
 }
 
 - (void)addObservers {
