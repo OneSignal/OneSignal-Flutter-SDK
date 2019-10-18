@@ -269,17 +269,26 @@ class _MyAppState extends State<MyApp> {
   }
 
   oneSignalOutcomeEventsExamples() async {
-      // Send a normal outcome and get a reply with the name of the outcome
-      String normalOutcome = await OneSignal.shared.sendOutcome("normal");
-      print(normalOutcome);
+    // Send a normal outcome and get a reply with the name of the outcome
+    OneSignal.shared.sendOutcome("normal").then((name) {
+      print("Successfully sent outcome with name: $name");
+    }).catchError((error) {
+      print("Failed to send outcome with error: $error");
+    });
 
-      // Send a unique outcome and get a reply with the name of the outcome
-      String uniqueOutcome = await OneSignal.shared.sendUniqueOutcome("unique");
-      print(uniqueOutcome);
+    // Send a unique outcome and get a reply with the name of the outcome
+    OneSignal.shared.sendUniqueOutcome("unique").then((name) {
+      print("Successfully sent outcome with name: $name");
+    }).catchError((error) {
+      print("Failed to send outcome with error: $error");
+    });
 
-      // Send an outcome with a value and get a reply with the name of the outcome
-      String valueOutcome = await OneSignal.shared.sendOutcomeWithValue("value", 3.2);
-      print(valueOutcome);
+    // Send an outcome with a value and get a reply with the name of the outcome
+    OneSignal.shared.sendOutcomeWithValue("value", 3.2).then((name) {
+      print("Successfully sent outcome with name: $name");
+    }).catchError((error) {
+      print("Failed to send outcome with error: $error");
+    });
   }
 
   @override
