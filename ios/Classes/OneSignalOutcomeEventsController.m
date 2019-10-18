@@ -31,7 +31,7 @@
 
 @implementation OneSignalOutcomeEventsController
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    OneSignalInAppMessagesController *instance = [OneSignalInAppMessagesController new];
+    OneSignalOutcomeEventsController *instance = [OneSignalOutcomeEventsController new];
 
     instance.channel = [FlutterMethodChannel
                         methodChannelWithName:@"OneSignal#outcomes"
@@ -52,20 +52,23 @@
     }
 }
 
-- (void)sendOutcome:(FlutterMethodCall *)call result:(FlutterResult)result {
-    NSString *name = call.arguments;
-    result(FlutterMethodNotImplemented);
+- (void)sendOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+//    NSString *name = call.arguments;
+    [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:@"Method sendOutcome() not implemented for iOS yet!"];
+    result(nil);
 }
 
-- (void)sendUniqueOutcome:(FlutterMethodCall *)call result:(FlutterResult)result {
-    NSString *name = call.arguments;
-    result(FlutterMethodNotImplemented);
+- (void)sendUniqueOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+//    NSString *name = call.arguments;
+    [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:@"Method sendUniqueOutcome() not implemented for iOS yet!"];
+    result(nil);
 }
 
-- (void)sendOutcomeWithValue:(FlutterMethodCall *)call result:(FlutterResult)result {
-    NSString *name = call.arguments[@"outcome_name"];
-    NSNumber *value = call.arguments[@"outcome_value"];
-    result(FlutterMethodNotImplemented);
+- (void)sendOutcomeWithValue:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+//    NSString *name = call.arguments[@"outcome_name"];
+//    NSNumber *value = call.arguments[@"outcome_value"];
+    [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:@"Method sendOutcomeWithValue() not implemented for iOS yet!"];
+    result(nil);
 }
 
 @end
