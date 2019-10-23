@@ -7,6 +7,7 @@ import 'package:onesignal_flutter/src/utils.dart';
 import 'package:onesignal_flutter/src/notification.dart';
 import 'package:onesignal_flutter/src/create_notification.dart';
 import 'package:onesignal_flutter/src/in_app_message.dart';
+import 'package:onesignal_flutter/src/outcome_event.dart';
 
 export 'src/notification.dart';
 export 'src/subscription.dart';
@@ -14,6 +15,7 @@ export 'src/permission.dart';
 export 'src/defines.dart';
 export 'src/create_notification.dart';
 export 'src/in_app_message.dart';
+export 'src/outcome_event.dart';
 
 // Handlers for various events
 typedef void ReceivedNotificationHandler(OSNotification notification);
@@ -318,20 +320,23 @@ class OneSignal {
 
   /// Send a normal outcome event for the current session and notifications with the attribution window
   /// Counted each time sent successfully, failed ones will be cached and reattempted in future
-  Future<String> sendOutcome(String name) async {
-      return await _outcomesChannel.invokeMethod("OneSignal#sendOutcome", name);
+  Future<OSOutcomeEvent> sendOutcome(String name) async {
+      Map<dynamic, dynamic> json = await _outcomesChannel.invokeMethod("OneSignal#sendOutcome", name);
+      return new OSOutcomeEvent(json.cast<String, dynamic>());
   }
 
   /// Send a unique outcome event for the current session and notifications with the attribution window
   /// Counted once per notification when sent successfully, failed ones will be cached and reattempted in future
-  Future<String> sendUniqueOutcome(String name) async {
-      return await _outcomesChannel.invokeMethod("OneSignal#sendUniqueOutcome", name);
+  Future<OSOutcomeEvent> sendUniqueOutcome(String name) async {
+      Map<dynamic, dynamic> json = await _outcomesChannel.invokeMethod("OneSignal#sendUniqueOutcome", name);
+      return new OSOutcomeEvent(json.cast<String, dynamic>());
   }
 
   /// Send an outcome event with a value for the current session and notifications with the attribution window
   /// Counted each time sent successfully, failed ones will be cached and reattempted in future
-  Future<String> sendOutcomeWithValue(String name, double value) async {
-      return await _outcomesChannel.invokeMethod("OneSignal#sendOutcomeWithValue", {"outcome_name" : name, "outcome_value" : value});
+  Future<OSOutcomeEvent> sendOutcomeWithValue(String name, double value) async {
+      Map<dynamic, dynamic> json = await _outcomesChannel.invokeMethod("OneSignal#sendOutcomeWithValue", {"outcome_name" : name, "outcome_value" : value});
+      return new OSOutcomeEvent(json.cast<String, dynamic>());
   }
 
   // Private function that gets called by ObjC/Java

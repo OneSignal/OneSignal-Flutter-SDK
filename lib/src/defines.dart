@@ -24,6 +24,13 @@ enum OSiOSSettings {
   inFocusDisplayOption
 }
 
+enum OSSession {
+    DIRECT,
+    INDIRECT,
+    UNATTRIBUTED,
+    DISABLED
+}
+
 /// Applies to iOS notifications only
 /// Determines if the badgeCount is used to increment
 /// the existing badge count, or sets the badge count directly

@@ -78,7 +78,7 @@ class _MyAppState extends State<MyApp> {
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     await OneSignal.shared
-        .init("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
+        .init("77e32082-ea27-42e3-a898-c72e141824ef", iOSSettings: settings);
 
     OneSignal.shared
         .setInFocusDisplayType(OSNotificationDisplayType.notification);
@@ -270,24 +270,24 @@ class _MyAppState extends State<MyApp> {
 
   oneSignalOutcomeEventsExamples() async {
     // Send a normal outcome and get a reply with the name of the outcome
-    OneSignal.shared.sendOutcome("normal").then((name) {
-      print("Successfully sent outcome with name: $name");
-    }).catchError((error) {
-      print("Failed to send outcome with error: $error");
-    });
+    OneSignal.shared.sendOutcome("normal_1");
+    OneSignal.shared.sendOutcome("normal_2").then((outcomeEvent) {
+        var json = outcomeEvent.jsonRepresentation();
+        print("Successfully sent outcome event: $json");
+  });
 
     // Send a unique outcome and get a reply with the name of the outcome
-    OneSignal.shared.sendUniqueOutcome("unique").then((name) {
-      print("Successfully sent outcome with name: $name");
-    }).catchError((error) {
-      print("Failed to send outcome with error: $error");
-    });
+    await OneSignal.shared.sendUniqueOutcome("unique_1");
+    OneSignal.shared.sendUniqueOutcome("unique_2").then((outcomeEvent) {
+        var json = outcomeEvent.jsonRepresentation();
+        print("Successfully sent unique outcome event: $json");
+  });
 
     // Send an outcome with a value and get a reply with the name of the outcome
-    OneSignal.shared.sendOutcomeWithValue("value", 3.2).then((name) {
-      print("Successfully sent outcome with name: $name");
-    }).catchError((error) {
-      print("Failed to send outcome with error: $error");
+    OneSignal.shared.sendOutcomeWithValue("value_1", 3.2);
+    OneSignal.shared.sendOutcomeWithValue("value_2", 3.9).then((outcomeEvent) {
+        var json = outcomeEvent.jsonRepresentation();
+        print("Successfully sent outcome event with value: $json");
     });
   }
 

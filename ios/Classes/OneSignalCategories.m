@@ -112,6 +112,21 @@
 }
 @end
 
+// TODO: Will reference the OSOutcomeEvent in OneSignal.h
+//@implementation OSOutcomeEvent (Flutter)
+//- (NSDictionary *)toJson {
+//    NSMutableDictionary *json = [NSMutableDictionary new];
+//
+//    json[@"session"] = self.session;
+//    json[@"notification_ids"] = self.notificationIds;
+//    json[@"name"] = self.name;
+//    json[@"timestamp"] = self.timestamp;
+//    json[@"weight"] = self.weight;
+//
+//    return json;
+//}
+//@end
+
 @implementation NSError (Flutter)
 - (FlutterError *)flutterError {
     return [FlutterError errorWithCode:[NSString stringWithFormat:@"%i", (int)self.code] message:self.localizedDescription details:nil];

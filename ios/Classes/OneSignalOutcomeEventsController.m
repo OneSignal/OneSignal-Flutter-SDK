@@ -55,20 +55,20 @@
 - (void)sendOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
 //    NSString *name = call.arguments;
     [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:@"Method sendOutcome() not implemented for iOS yet!"];
-    result(nil);
+    result(@{});
 }
 
 - (void)sendUniqueOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
 //    NSString *name = call.arguments;
     [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:@"Method sendUniqueOutcome() not implemented for iOS yet!"];
-    result(nil);
+    result(@{});
 }
 
 - (void)sendOutcomeWithValue:(FlutterMethodCall *)call withResult:(FlutterResult)result {
 //    NSString *name = call.arguments[@"outcome_name"];
 //    NSNumber *value = call.arguments[@"outcome_value"];
     [OneSignal onesignal_Log:ONE_S_LL_VERBOSE message:@"Method sendOutcomeWithValue() not implemented for iOS yet!"];
-    result(nil);
+    result(@{});
 }
 
 @end

@@ -1,6 +1,7 @@
 package com.onesignal.flutter;
 
 import com.onesignal.OneSignal;
+import com.onesignal.OutcomeEvent;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -26,21 +27,12 @@ class OSFlutterOutcomeEventsHandler extends FlutterRegistrarResponder implements
     }
 
     @Override
-    public void onOutcomeSuccess(String name) {
+    public void onSuccess(OutcomeEvent outcomeEvent) {
         if (this.replySubmitted.getAndSet(true))
             return;
 
-        replySuccess(result, name);
+        replySuccess(result, OneSignalSerializer.convertOutcomeEventToMap(outcomeEvent));
     }
-
-    @Override
-    public void onOutcomeFail(int statusCode, String response) {
-        if (this.replySubmitted.getAndSet(true))
-            return;
-
-        replyError(result,"OneSignal", "Encountered an error sending outcome with code: " + statusCode, response);
-    }
-
 }
 
 public class OneSignalOutcomeEventsController extends FlutterRegistrarResponder implements MethodCallHandler {
