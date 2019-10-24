@@ -15,7 +15,7 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 class OSFlutterOutcomeEventsHandler extends FlutterRegistrarResponder implements OneSignal.OutcomeCallback {
     private Result result;
 
-    // the tags callbacks can in some instances be called more than once
+    // the outcome events callbacks can in some instances be called more than once
     // ie. cached vs. server response.
     // this property guarantees the callback will never be called more than once.
     private AtomicBoolean replySubmitted = new AtomicBoolean(false);
