@@ -202,7 +202,7 @@ class OneSignalSerializer {
 
         hash.put("session", outcomeEvent.getSession().toString());
         hash.put("notification_ids", outcomeEvent.getNotificationIds().toString());
-        hash.put("name", outcomeEvent.getName());
+        hash.put("id", outcomeEvent.getName());
         hash.put("timestamp", outcomeEvent.getTimestamp());
         hash.put("weight", String.valueOf(outcomeEvent.getWeight()));
 

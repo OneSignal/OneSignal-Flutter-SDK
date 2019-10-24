@@ -47,9 +47,9 @@ class OSOutcomeEvent extends JSONStringRepresentable {
                              new List<String>.from(json.decode(outcome["notification_ids"]));
 
       // Make sure name exists
-      this.name = outcome["name"] == null ?
+      this.name = outcome["id"] == null ?
                   "" :
-                  outcome["name"] as String;
+                  outcome["id"] as String;
 
       // Make sure timestamp exists
       this.timestamp = outcome["timestamp"] == null ?
@@ -66,7 +66,7 @@ class OSOutcomeEvent extends JSONStringRepresentable {
     return convertToJsonString({
       'session': convertEnumCaseToValue(this.session),
       'notification_ids': this.notificationIds,
-      'name': this.name,
+      'id': this.name,
       'timestamp': this.timestamp,
       'weight': this.weight,
     });

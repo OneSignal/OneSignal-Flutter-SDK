@@ -274,14 +274,14 @@ class _MyAppState extends State<MyApp> {
     OneSignal.shared.sendOutcome("normal_2").then((outcomeEvent) {
         var json = outcomeEvent.jsonRepresentation();
         print("Successfully sent outcome event: $json");
-  });
+    });
 
     // Send a unique outcome and get a reply with the name of the outcome
-    await OneSignal.shared.sendUniqueOutcome("unique_1");
+    OneSignal.shared.sendUniqueOutcome("unique_1");
     OneSignal.shared.sendUniqueOutcome("unique_2").then((outcomeEvent) {
         var json = outcomeEvent.jsonRepresentation();
         print("Successfully sent unique outcome event: $json");
-  });
+    });
 
     // Send an outcome with a value and get a reply with the name of the outcome
     OneSignal.shared.sendOutcomeWithValue("value_1", 3.2);

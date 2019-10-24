@@ -63,8 +63,7 @@ public class OneSignalOutcomeEventsController extends FlutterRegistrarResponder 
         String name = (String) call.arguments;
 
         if (name == null || name.isEmpty()) {
-            OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Outcome name must not be null or empty");
-            replySuccess(result, null);
+            replyError(result, "OneSignal", "sendOutcome() name must not be null or empty", null);
             return;
         }
 
@@ -75,8 +74,7 @@ public class OneSignalOutcomeEventsController extends FlutterRegistrarResponder 
         String name = (String) call.arguments;
 
         if (name == null || name.isEmpty()) {
-            OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Outcome name must not be null or empty");
-            replySuccess(result, null);
+            replyError(result, "OneSignal", "sendUniqueOutcome() name must not be null or empty", null);
             return;
         }
 
@@ -88,14 +86,12 @@ public class OneSignalOutcomeEventsController extends FlutterRegistrarResponder 
         Double value = call.argument("outcome_value");
 
         if (name == null || name.isEmpty()) {
-            OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Outcome name must not be null or empty");
-            replySuccess(result, null);
+            replyError(result, "OneSignal", "sendOutcomeWithValue() name must not be null or empty", null);
             return;
         }
 
         if (value == null) {
-            OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Outcome value must not be null");
-            replySuccess(result, null);
+            replyError(result, "OneSignal", "sendOutcomeWithValue() value must not be null", null);
             return;
         }
 
