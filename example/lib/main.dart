@@ -269,6 +269,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   oneSignalOutcomeEventsExamples() async {
+    // Await example for sending outcomes
+    outcomeAwaitExample();
+
     // Send a normal outcome and get a reply with the name of the outcome
     OneSignal.shared.sendOutcome("normal_1");
     OneSignal.shared.sendOutcome("normal_2").then((outcomeEvent) {
@@ -289,6 +292,11 @@ class _MyAppState extends State<MyApp> {
         var json = outcomeEvent.jsonRepresentation();
         print("Successfully sent outcome event with value: $json");
     });
+  }
+
+  Future<void> outcomeAwaitExample() async {
+      var outcomeEvent = await OneSignal.shared.sendOutcome("await_normal_1");
+      print(outcomeEvent.jsonRepresentation());
   }
 
   @override

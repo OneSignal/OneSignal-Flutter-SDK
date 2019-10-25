@@ -1,8 +1,11 @@
 package com.onesignal.flutter;
 
+import androidx.annotation.Nullable;
+
 import com.onesignal.OneSignal;
 import com.onesignal.OutcomeEvent;
 
+import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.flutter.plugin.common.MethodCall;
@@ -27,12 +30,16 @@ class OSFlutterOutcomeEventsHandler extends FlutterRegistrarResponder implements
     }
 
     @Override
-    public void onSuccess(OutcomeEvent outcomeEvent) {
+    public void onSuccess(@Nullable OutcomeEvent outcomeEvent) {
         if (this.replySubmitted.getAndSet(true))
             return;
 
-        replySuccess(result, OneSignalSerializer.convertOutcomeEventToMap(outcomeEvent));
+        if (outcomeEvent == null)
+            replySuccess(result, new HashMap<>());
+        else
+            replySuccess(result, OneSignalSerializer.convertOutcomeEventToMap(outcomeEvent));
     }
+
 }
 
 public class OneSignalOutcomeEventsController extends FlutterRegistrarResponder implements MethodCallHandler {
