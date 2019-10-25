@@ -1,7 +1,5 @@
 package com.onesignal.flutter;
 
-import androidx.annotation.Nullable;
-
 import com.onesignal.OneSignal;
 import com.onesignal.OutcomeEvent;
 
@@ -30,7 +28,7 @@ class OSFlutterOutcomeEventsHandler extends FlutterRegistrarResponder implements
     }
 
     @Override
-    public void onSuccess(@Nullable OutcomeEvent outcomeEvent) {
+    public void onSuccess(OutcomeEvent outcomeEvent) {
         if (this.replySubmitted.getAndSet(true))
             return;
 
