@@ -11,8 +11,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
-    
-  onesignal_flutter: ^2.0.1
+
+  onesignal_flutter: ^2.2.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

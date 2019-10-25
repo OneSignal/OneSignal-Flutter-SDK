@@ -1,4 +1,4 @@
-String sdkVersion = "2.0.0";
+String sdkVersion = "2.2.0";
 
 /// Determines how notifications should be displayed
 enum OSNotificationDisplayType { none, alert, notification }
@@ -22,6 +22,13 @@ enum OSiOSSettings {
   inAppLaunchUrl,
   promptBeforeOpeningPushUrl,
   inFocusDisplayOption
+}
+
+enum OSSession {
+    DIRECT,
+    INDIRECT,
+    UNATTRIBUTED,
+    DISABLED
 }
 
 /// Applies to iOS notifications only

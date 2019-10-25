@@ -61,26 +61,25 @@
 - (void)addTriggers:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSDictionary *triggers = call.arguments;
     [OneSignal addTriggers:triggers];
-    result(@[]);
+    result(nil);
 }
 
 - (void)removeTriggerForKey:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString *key = call.arguments;
     [OneSignal removeTriggerForKey:key];
-    result(@[]);
-    
+    result(nil);
 }
 
 - (void)removeTriggersForKeys:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSArray *keys = call.arguments;
     [OneSignal removeTriggersForKeys:keys];
-    result(@[]);
+    result(nil);
 }
 
 - (void)pauseInAppMessages:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     BOOL pause = [call.arguments boolValue];
     [OneSignal pauseInAppMessages:pause];
-    result(@[]);
+    result(nil);
 }
 
 @end

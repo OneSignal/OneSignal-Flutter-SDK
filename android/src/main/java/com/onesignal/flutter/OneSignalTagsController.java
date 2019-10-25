@@ -79,6 +79,7 @@ public class OneSignalTagsController extends FlutterRegistrarResponder implement
         controller.registrar = registrar;
         controller.channel = new MethodChannel(registrar.messenger(), "OneSignal#tags");
         controller.channel.setMethodCallHandler(controller);
+        controller.flutterRegistrar = registrar;
     }
 
     @Override

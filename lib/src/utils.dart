@@ -60,6 +60,17 @@ dynamic convertEnumCaseToValue(dynamic key) {
       return 2;
   }
 
+  switch (key) {
+      case OSSession.DIRECT:
+        return "DIRECT";
+      case OSSession.INDIRECT:
+        return "INDIRECT";
+      case OSSession.UNATTRIBUTED:
+        return "UNATTRIBUTED";
+      case OSSession.DISABLED:
+        return "DISABLED";
+  }
+
   return key;
 }
 

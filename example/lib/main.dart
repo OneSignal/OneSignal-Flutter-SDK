@@ -91,6 +91,9 @@ class _MyAppState extends State<MyApp> {
 
     // Some examples of how to use In App Messaging public methods with OneSignal SDK
     oneSignalInAppMessagingTriggerExamples();
+
+    // Some examples of how to use Outcome Events public methods with OneSignal SDK
+    oneSignalOutcomeEventsExamples();
   }
 
   void _handleGetTags() {
@@ -263,6 +266,37 @@ class _MyAppState extends State<MyApp> {
 
     // Toggle pausing (displaying or not) of IAMs
     OneSignal.shared.pauseInAppMessages(false);
+  }
+
+  oneSignalOutcomeEventsExamples() async {
+    // Await example for sending outcomes
+    outcomeAwaitExample();
+
+    // Send a normal outcome and get a reply with the name of the outcome
+    OneSignal.shared.sendOutcome("normal_1");
+    OneSignal.shared.sendOutcome("normal_2").then((outcomeEvent) {
+        var json = outcomeEvent.jsonRepresentation();
+        print("Successfully sent outcome event: $json");
+    });
+
+    // Send a unique outcome and get a reply with the name of the outcome
+    OneSignal.shared.sendUniqueOutcome("unique_1");
+    OneSignal.shared.sendUniqueOutcome("unique_2").then((outcomeEvent) {
+        var json = outcomeEvent.jsonRepresentation();
+        print("Successfully sent unique outcome event: $json");
+    });
+
+    // Send an outcome with a value and get a reply with the name of the outcome
+    OneSignal.shared.sendOutcomeWithValue("value_1", 3.2);
+    OneSignal.shared.sendOutcomeWithValue("value_2", 3.9).then((outcomeEvent) {
+        var json = outcomeEvent.jsonRepresentation();
+        print("Successfully sent outcome event with value: $json");
+    });
+  }
+
+  Future<void> outcomeAwaitExample() async {
+      var outcomeEvent = await OneSignal.shared.sendOutcome("await_normal_1");
+      print(outcomeEvent.jsonRepresentation());
   }
 
   @override

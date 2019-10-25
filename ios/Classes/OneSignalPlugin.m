@@ -29,6 +29,7 @@
 #import "OneSignalCategories.h"
 #import "OneSignalTagsController.h"
 #import "OneSignalInAppMessagesController.h"
+#import "OneSignalOutcomeEventsController.h"
 
 @interface OneSignalPlugin ()
 
@@ -95,6 +96,7 @@
 
     [OneSignalTagsController registerWithRegistrar:registrar];
     [OneSignalInAppMessagesController registerWithRegistrar:registrar];
+    [OneSignalOutcomeEventsController registerWithRegistrar:registrar];
 }
 
 - (void)addObservers {
@@ -167,24 +169,24 @@
     } else {
         [self addObservers];
     }
-    result(@[]);
+    result(nil);
 }
 
 - (void)setOneSignalLogLevel:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     ONE_S_LOG_LEVEL consoleLogLevel = (ONE_S_LOG_LEVEL)[call.arguments[@"console"] intValue];
     ONE_S_LOG_LEVEL visualLogLevel = (ONE_S_LOG_LEVEL)[call.arguments[@"visual"] intValue];
     [OneSignal setLogLevel:consoleLogLevel visualLevel:visualLogLevel];
-    result(@[]);
+    result(nil);
 }
 
 - (void)oneSignalLog:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal onesignal_Log:(ONE_S_LOG_LEVEL)[call.arguments[@"logLevel"] integerValue] message:(NSString *)call.arguments[@"message"]];
-    result(@[]);
+    result(nil);
 }
 
 - (void)setRequiresUserPrivacyConsent:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal setRequiresUserPrivacyConsent:[call.arguments[@"required"] boolValue]];
-    result(@[]);
+    result(nil);
 }
 
 - (void)setConsentStatus:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -194,13 +196,13 @@
     if (self.waitingForUserConsent && granted)
         [self addObservers];
     
-    result(@[]);
+    result(nil);
 }
 
 - (void)setInFocusDisplayType:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     OSNotificationDisplayType displayType = (OSNotificationDisplayType)[call.arguments[@"displayType"] intValue];
     [OneSignal setInFocusDisplayType:displayType];
-    result(@[]);
+    result(nil);
 }
 
 - (void)promptPermission:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -212,7 +214,7 @@
 - (void)setSubscription:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     BOOL subscribe = [call.arguments boolValue];
     [OneSignal setSubscription:subscribe];
-    result(@[]);
+    result(nil);
 }
 
 - (void)postNotification:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -225,13 +227,13 @@
 
 - (void)promptLocation:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal promptLocation];
-    result(@[]);
+    result(nil);
 }
 
 - (void)setLocationShared:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     BOOL locationShared = [call.arguments boolValue];
     [OneSignal setLocationShared:locationShared];
-    result(@[]);
+    result(nil);
 }
 
 - (void)setEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -243,7 +245,7 @@
         emailAuthHashToken = nil;
 
     [OneSignal setEmail:email withEmailAuthHashToken:emailAuthHashToken withSuccess:^{
-        result(@[]);
+        result(nil);
     } withFailure:^(NSError *error) {
         result(error.flutterError);
     }];
@@ -251,7 +253,7 @@
 
 - (void)logoutEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal logoutEmailWithSuccess:^{
-        result(@[]);
+        result(nil);
     } withFailure:^(NSError *error) {
         result(error.flutterError);
     }];
@@ -262,12 +264,12 @@
     if (externalId == [NSNull null])
         externalId = nil;
     [OneSignal setExternalUserId:externalId];
-    result(@[]);
+    result(nil);
 }
 
 - (void)removeExternalUserId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal removeExternalUserId];
-    result(@[]);
+    result(nil);
 }
 
 - (void)initNotificationOpenedHandlerParams {

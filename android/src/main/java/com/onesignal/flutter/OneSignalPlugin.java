@@ -77,6 +77,7 @@ public class OneSignalPlugin
 
     OneSignalTagsController.registerWith(registrar);
     OneSignalInAppMessagingController.registerWith(registrar);
+    OneSignalOutcomeEventsController.registerWith(registrar);
   }
 
   @Override

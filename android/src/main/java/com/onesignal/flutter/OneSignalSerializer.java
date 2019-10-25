@@ -197,6 +197,23 @@ class OneSignalSerializer {
         return hash;
     }
 
+    static HashMap<String, Object> convertOutcomeEventToMap(OutcomeEvent outcomeEvent) {
+        HashMap<String, Object> hash = new HashMap<>();
+
+        hash.put("session", outcomeEvent.getSession().toString());
+
+        if (outcomeEvent.getNotificationIds() == null)
+            hash.put("notification_ids", new JSONArray().toString());
+        else
+            hash.put("notification_ids", outcomeEvent.getNotificationIds().toString());
+
+        hash.put("id", outcomeEvent.getName());
+        hash.put("timestamp", outcomeEvent.getTimestamp());
+        hash.put("weight", String.valueOf(outcomeEvent.getWeight()));
+
+        return hash;
+    }
+
     private static HashMap<String, Object> convertAndroidBackgroundImageLayoutToMap(BackgroundImageLayout layout) {
         HashMap<String, Object> hash = new HashMap<>();
 

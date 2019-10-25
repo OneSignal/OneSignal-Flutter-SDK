@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  *
- * Copyright 2017 OneSignal
+ * Copyright 2019 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,35 +25,11 @@
  * THE SOFTWARE.
  */
 
-#import <OneSignal/OneSignal.h>
+#import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
 
-#ifndef OneSignalCategories_h
-#define OneSignalCategories_h
+@interface OneSignalOutcomeEventsController : NSObject<FlutterPlugin>
 
-@interface OSNotificationPayload (Flutter)
-- (NSDictionary *)toJson;
+@property (strong, nonatomic) FlutterMethodChannel *channel;
+
 @end
-
-@interface OSNotification (Flutter)
-- (NSDictionary *)toJson;
-@end
-
-@interface OSNotificationOpenedResult (Flutter)
-- (NSDictionary *)toJson;
-@end
-
-@interface OSInAppMessageAction (Flutter)
-- (NSDictionary *)toJson;
-@end
-
-// TODO: Will reference the OSOutcomeEvent in OneSignal.h
-//@interface OSOutcomeEvent (Flutter)
-//- (NSDictionary *)toJson;
-//@end
-
-@interface NSError (Flutter)
-- (FlutterError *)flutterError;
-@end
-
-#endif
