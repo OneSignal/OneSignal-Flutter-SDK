@@ -28,7 +28,7 @@
 #import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
 
-@interface OneSignalOutcomeEventsController : NSObject<FlutterPlugin>
+@interface OSFlutterOutcomeEventsController : NSObject<FlutterPlugin>
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 
