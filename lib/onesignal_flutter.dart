@@ -321,22 +321,34 @@ class OneSignal {
   /// Send a normal outcome event for the current session and notifications with the attribution window
   /// Counted each time sent successfully, failed ones will be cached and reattempted in future
   Future<OSOutcomeEvent> sendOutcome(String name) async {
-      Map<dynamic, dynamic> json = await _outcomesChannel.invokeMethod("OneSignal#sendOutcome", name);
-      return new OSOutcomeEvent(json.cast<String, dynamic>());
+    var json = await _outcomesChannel.invokeMethod("OneSignal#sendOutcome", name);
+
+    if (json == null)
+      return new OSOutcomeEvent();
+
+    return new OSOutcomeEvent.fromMap(json.cast<String, dynamic>());
   }
 
   /// Send a unique outcome event for the current session and notifications with the attribution window
   /// Counted once per notification when sent successfully, failed ones will be cached and reattempted in future
   Future<OSOutcomeEvent> sendUniqueOutcome(String name) async {
-      Map<dynamic, dynamic> json = await _outcomesChannel.invokeMethod("OneSignal#sendUniqueOutcome", name);
-      return new OSOutcomeEvent(json.cast<String, dynamic>());
+    var json = await _outcomesChannel.invokeMethod("OneSignal#sendUniqueOutcome", name);
+
+    if (json == null)
+      return new OSOutcomeEvent();
+
+    return new OSOutcomeEvent.fromMap(json.cast<String, dynamic>());
   }
 
   /// Send an outcome event with a value for the current session and notifications with the attribution window
   /// Counted each time sent successfully, failed ones will be cached and reattempted in future
   Future<OSOutcomeEvent> sendOutcomeWithValue(String name, double value) async {
-      Map<dynamic, dynamic> json = await _outcomesChannel.invokeMethod("OneSignal#sendOutcomeWithValue", {"outcome_name" : name, "outcome_value" : value});
-      return new OSOutcomeEvent(json.cast<String, dynamic>());
+    var json = await _outcomesChannel.invokeMethod("OneSignal#sendOutcomeWithValue", {"outcome_name" : name, "outcome_value" : value});
+
+    if (json == null)
+      return new OSOutcomeEvent();
+
+    return new OSOutcomeEvent.fromMap(json.cast<String, dynamic>());
   }
 
   // Private function that gets called by ObjC/Java

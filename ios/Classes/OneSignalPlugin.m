@@ -26,10 +26,10 @@
  */
 
 #import "OneSignalPlugin.h"
-#import "OneSignalCategories.h"
-#import "OneSignalTagsController.h"
-#import "OneSignalInAppMessagesController.h"
-#import "OneSignalOutcomeEventsController.h"
+#import "OSFlutterCategories.h"
+#import "OSFlutterTagsController.h"
+#import "OSFlutterInAppMessagesController.h"
+#import "OSFlutterOutcomeEventsController.h"
 
 @interface OneSignalPlugin ()
 
@@ -94,9 +94,9 @@
 
     [registrar addMethodCallDelegate:OneSignalPlugin.sharedInstance channel:OneSignalPlugin.sharedInstance.channel];
 
-    [OneSignalTagsController registerWithRegistrar:registrar];
-    [OneSignalInAppMessagesController registerWithRegistrar:registrar];
-    [OneSignalOutcomeEventsController registerWithRegistrar:registrar];
+    [OSFlutterTagsController registerWithRegistrar:registrar];
+    [OSFlutterInAppMessagesController registerWithRegistrar:registrar];
+    [OSFlutterOutcomeEventsController registerWithRegistrar:registrar];
 }
 
 - (void)addObservers {
