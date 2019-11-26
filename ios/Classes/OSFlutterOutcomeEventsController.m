@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  *
- * Copyright 2017 OneSignal
+ * Copyright 2019 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,56 +25,52 @@
  * THE SOFTWARE.
  */
 
-#import "OneSignalTagsController.h"
+#import "OSFlutterOutcomeEventsController.h"
 #import <OneSignal/OneSignal.h>
-#import "OneSignalCategories.h"
+#import "OSFlutterCategories.h"
 
-@implementation OneSignalTagsController
+@implementation OSFlutterOutcomeEventsController
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    OneSignalTagsController *instance = [OneSignalTagsController new];
+    OSFlutterOutcomeEventsController *instance = [OSFlutterOutcomeEventsController new];
 
     instance.channel = [FlutterMethodChannel
-                        methodChannelWithName:@"OneSignal#tags"
+                        methodChannelWithName:@"OneSignal#outcomes"
                         binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:instance channel:instance.channel];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([@"OneSignal#sendTags" isEqualToString:call.method]) {
-        [self sendTags:call withResult:result];
-    } else if ([@"OneSignal#getTags" isEqualToString:call.method]) {
-        [self getTags:call withResult:result];
-    } else if ([@"OneSignal#deleteTags" isEqualToString:call.method]) {
-        [self deleteTags:call withResult:result];
+    if ([@"OneSignal#sendOutcome" isEqualToString:call.method]) {
+        [self sendOutcome:call withResult:result];
+    } else if ([@"OneSignal#sendUniqueOutcome" isEqualToString:call.method]) {
+        [self sendUniqueOutcome:call withResult:result];
+    } else if ([@"OneSignal#sendOutcomeWithValue" isEqualToString:call.method]) {
+        [self sendOutcomeWithValue:call withResult:result];
     } else {
         result(FlutterMethodNotImplemented);
     }
 }
 
-- (void)sendTags:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSDictionary *tags = call.arguments;
-    [OneSignal sendTags:tags onSuccess:^(NSDictionary *tags) {
-        result(tags);
-    } onFailure:^(NSError *error) {
-        result(error.flutterError);
+- (void)sendOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *name = call.arguments;
+    [OneSignal sendOutcome:name onSuccess:^(OSOutcomeEvent *outcome) {
+        result(outcome.jsonRepresentation);
     }];
 }
 
-- (void)getTags:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal getTags:^(NSDictionary *tags) {
-        result(tags);
-    } onFailure:^(NSError *error) {
-        result(error.flutterError);
+- (void)sendUniqueOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *name = call.arguments;
+    [OneSignal sendUniqueOutcome:name onSuccess:^(OSOutcomeEvent *outcome) {
+        result(outcome.jsonRepresentation);
     }];
 }
 
-- (void)deleteTags:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSArray *tags = call.arguments;
-    [OneSignal deleteTags:tags onSuccess:^(NSDictionary *response) {
-        result(response);
-    } onFailure:^(NSError *error) {
-        result(error.flutterError);
+- (void)sendOutcomeWithValue:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *name = call.arguments[@"outcome_name"];
+    NSNumber *value = call.arguments[@"outcome_value"];
+    [OneSignal sendOutcomeWithValue:name value:value onSuccess:^(OSOutcomeEvent *outcome) {
+        result(outcome.jsonRepresentation);
     }];
 }
 

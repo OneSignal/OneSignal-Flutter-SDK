@@ -25,13 +25,13 @@
  * THE SOFTWARE.
  */
 
-#import "OneSignalInAppMessagesController.h"
+#import "OSFlutterInAppMessagesController.h"
 #import <OneSignal/OneSignal.h>
-#import "OneSignalCategories.h"
+#import "OSFlutterCategories.h"
 
-@implementation OneSignalInAppMessagesController
+@implementation OSFlutterInAppMessagesController
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    OneSignalInAppMessagesController *instance = [OneSignalInAppMessagesController new];
+    OSFlutterInAppMessagesController *instance = [OSFlutterInAppMessagesController new];
 
     instance.channel = [FlutterMethodChannel
                         methodChannelWithName:@"OneSignal#inAppMessages"
