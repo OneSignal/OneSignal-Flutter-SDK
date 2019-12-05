@@ -47,11 +47,6 @@
 - (NSDictionary *)toJson;
 @end
 
-// TODO: Will reference the OSOutcomeEvent in OneSignal.h
-//@interface OSOutcomeEvent (Flutter)
-//- (NSDictionary *)toJson;
-//@end
-
 @interface NSError (Flutter)
 - (FlutterError *)flutterError;
 @end
