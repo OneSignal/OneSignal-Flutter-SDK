@@ -46,9 +46,16 @@ class OSOutcomeEvent extends JSONStringRepresentable {
                      OSSession.DISABLED;
 
       // Make sure notification_ids exists
-      this.notificationIds = outcome.containsKey("notification_ids") && outcome["notification_ids"] != null ?
-                             new List<String>.from(json.decode(outcome["notification_ids"])) :
-                             [];
+      if (outcome.containsKey("notification_ids") && outcome["notification_ids"] != null) {
+        if (outcome["notification_ids"] is List) {
+          // Handle if type comes in as a List
+          this.notificationIds = (outcome["notification_ids"] as List).map<String>((s) => s).toList();
+        }
+        else if (outcome["notification_ids"] is String) {
+          // Handle if type comes in as a String
+          this.notificationIds = new List<String>.from(json.decode(outcome["notification_ids"]));
+        }
+      }
 
       // Make sure name exists
       this.name = outcome.containsKey("id") && outcome["id"] != null ?
