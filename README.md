@@ -8,7 +8,7 @@
 
 [OneSignal](https://onesignal.com/) is a free push notification service for mobile apps. This SDK makes it easy to integrate your Flutter iOS and/or Android apps with OneSignal.
 
-![alt text](https://onesignal.com/images/android_and_ios_notification_image.gif)
+<p align="center"><img src="https://app.onesignal.com/images/android_and_ios_notification_image.gif" width="400" alt="Flutter Notification"></p>
 
 #### Installation
 See the [Setup Guide](https://documentation.onesignal.com/docs/flutter-sdk-setup) for setup instructions.
