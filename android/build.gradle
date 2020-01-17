@@ -1,5 +1,5 @@
 group 'com.onesignal.flutter'
-version '2.3.2'
+version '2.3.3'
 
 buildscript {
     repositories {
@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    api 'com.onesignal:OneSignal:3.12.4'
+    api 'com.onesignal:OneSignal:3.12.5'
 }
 
 // Adds required manifestPlaceholders keys to allow mainifest merge gradle step to complete
