@@ -264,9 +264,6 @@ public class OneSignalPlugin
     String email = call.argument("email");
     String emailAuthHashToken = call.argument("emailAuthHashToken");
 
-    if (email == null || emailAuthHashToken == null)
-      return;
-
     OneSignal.setEmail(email, emailAuthHashToken, new EmailUpdateHandler() {
       @Override
       public void onSuccess() {
