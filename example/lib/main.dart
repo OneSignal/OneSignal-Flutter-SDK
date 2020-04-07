@@ -182,16 +182,22 @@ class _MyAppState extends State<MyApp> {
 
   void _handleSetExternalUserId() {
     print("Setting external user ID");
-    OneSignal.shared.setExternalUserId(_externalUserId);
-    this.setState(() {
-      _debugLabelString = "Set External User ID";
+    OneSignal.shared.setExternalUserId(_externalUserId).then((results) {
+        if (results == null) return;
+
+        this.setState(() {
+            _debugLabelString = "External user id set: $results";
+        });
     });
   }
 
   void _handleRemoveExternalUserId() {
-    OneSignal.shared.removeExternalUserId();
-    this.setState(() {
-      _debugLabelString = "Removed external user ID";
+    OneSignal.shared.removeExternalUserId().then((results) {
+        if (results == null) return;
+
+        this.setState(() {
+           _debugLabelString = "External user id removed: $results";
+        });
     });
   }
 

@@ -298,14 +298,33 @@ public class OneSignalPlugin
     });
   }
 
-  private void setExternalUserId(MethodCall call, Result result) {
-    OneSignal.setExternalUserId((String)call.argument("externalUserId"));
-    replySuccess(result, null);
+  private void setExternalUserId(MethodCall call, final Result result) {
+    String externalUserId = call.argument("externalUserId");
+    OneSignal.setExternalUserId(externalUserId, new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
+      @Override
+      public void onComplete(JSONObject results) {
+        try {
+          replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
+        } catch (JSONException e) {
+          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
+                  "Encountered an error attempting to deserialize server response for setExternalUserId: " + e.getMessage());
+        }
+      }
+    });
   }
 
-  private void removeExternalUserId(Result result) {
-    OneSignal.removeExternalUserId();
-    replySuccess(result, null);
+  private void removeExternalUserId(final Result result) {
+    OneSignal.removeExternalUserId(new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
+      @Override
+      public void onComplete(JSONObject results) {
+        try {
+          replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
+        } catch (JSONException e) {
+          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
+                  "Encountered an error attempting to deserialize server response for removeExternalUserId: " + e.getMessage());
+        }
+      }
+    });
   }
 
   private void initNotificationOpenedHandlerParams() {

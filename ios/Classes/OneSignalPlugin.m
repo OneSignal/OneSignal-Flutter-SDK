@@ -263,13 +263,16 @@
     id externalId = call.arguments[@"externalUserId"];
     if (externalId == [NSNull null])
         externalId = nil;
-    [OneSignal setExternalUserId:externalId];
-    result(nil);
+
+    [OneSignal setExternalUserId:externalId withCompletion:^(NSDictionary *results) {
+       result(results);
+    }];
 }
 
 - (void)removeExternalUserId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal removeExternalUserId];
-    result(nil);
+    [OneSignal removeExternalUserId:^(NSDictionary *results) {
+        result(results);
+    }];
 }
 
 - (void)initNotificationOpenedHandlerParams {
