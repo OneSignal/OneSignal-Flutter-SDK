@@ -275,13 +275,17 @@ class OneSignal {
   /// OneSignal allows you to set a custom ID for your users. This makes it so that
   /// if your app has its own user ID's, you can use your own custom user ID's with
   /// our API instead of having to save their OneSignal user ID's.
-  Future<void> setExternalUserId(String externalId) async {
-    return await _channel.invokeMethod("OneSignal#setExternalUserId", {'externalUserId' : externalId});
+  Future<Map<String, dynamic>> setExternalUserId(String externalId) async {
+    Map<dynamic, dynamic> results =
+        await _channel.invokeMethod("OneSignal#setExternalUserId", {'externalUserId' : externalId});;
+    return results.cast<String, dynamic>();
   }
 
   /// Removes the external user ID that was set for the current user.
-  Future<void> removeExternalUserId() async {
-    return await _channel.invokeMethod("OneSignal#removeExternalUserId");
+  Future<Map<String, dynamic>> removeExternalUserId() async {
+    Map<dynamic, dynamic> results =
+        await _channel.invokeMethod("OneSignal#removeExternalUserId");
+    return results.cast<String, dynamic>();
   }
 
   /// Adds a single key, value trigger, which will trigger an in app message
