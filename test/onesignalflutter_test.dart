@@ -1,9 +1,12 @@
-import 'package:test/test.dart';
+import 'package:flutter_test/flutter_test.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'mock_channel.dart';
 import 'test_data.dart';
 
+
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized();
+
   OneSignalMockChannelController channelController =
       OneSignalMockChannelController();
   OneSignal onesignal = OneSignal();
