@@ -168,7 +168,7 @@ class OSCreateNotification extends JSONStringRepresentable {
     if (this.iosBadgeType != null)
       json['ios_badgeType'] = convertEnumCaseToValue(this.iosBadgeType);
     if (this.delayedOption != null)
-      json['delay_option'] = convertEnumCaseToValue(this.delayedOption);
+      json['delayed_option'] = convertEnumCaseToValue(this.delayedOption);
 
     // adds buttons
     if (this.buttons != null) {
