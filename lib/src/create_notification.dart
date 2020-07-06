@@ -83,6 +83,10 @@ class OSCreateNotification extends JSONStringRepresentable {
   /// Allows you to send a notification at a specific date
   DateTime sendAfter;
 
+  /// Time to Live. The default time is 259,200 seconds (3 days) but can be any value from 0 to 2,419,200 seconds.
+  /// The notification will expire if the device remains offline for these number of seconds.
+  int ttl;
+
   /// You can use several options to send notifications at specific times
   /// ie. you can send notifications to different user's at the same time
   /// in each timezone with the 'timezone' delayedOption
@@ -92,38 +96,41 @@ class OSCreateNotification extends JSONStringRepresentable {
   /// each user should receive the notification, ie. "9:00 AM"
   String deliveryTimeOfDay;
 
-  OSCreateNotification(
-      {@required this.playerIds,
-      @required this.content,
-      this.languageCode,
-      this.heading,
-      this.subtitle,
-      this.contentAvailable,
-      this.mutableContent,
-      this.additionalData,
-      this.url,
-      this.iosAttachments,
-      this.bigPicture,
-      this.buttons,
-      this.iosCategory,
-      this.iosSound,
-      this.androidSound,
-      this.androidSmallIcon,
-      this.androidLargeIcon,
-      this.androidChannelId,
-      this.iosBadgeCount,
-      this.iosBadgeType,
-      this.collapseId,
-      this.sendAfter,
-      this.delayedOption,
-      this.deliveryTimeOfDay});
+  OSCreateNotification({
+    @required this.playerIds,
+    @required this.content,
+    this.languageCode,
+    this.heading,
+    this.subtitle,
+    this.contentAvailable,
+    this.mutableContent,
+    this.additionalData,
+    this.url,
+    this.iosAttachments,
+    this.bigPicture,
+    this.buttons,
+    this.iosCategory,
+    this.iosSound,
+    this.androidSound,
+    this.androidSmallIcon,
+    this.androidLargeIcon,
+    this.androidChannelId,
+    this.iosBadgeCount,
+    this.iosBadgeType,
+    this.collapseId,
+    this.sendAfter,
+    this.ttl,
+    this.delayedOption,
+    this.deliveryTimeOfDay,
+  });
 
-  OSCreateNotification.silentNotification(
-      {@required this.playerIds,
-      this.additionalData,
-      this.sendAfter,
-      this.delayedOption,
-      this.deliveryTimeOfDay}) {
+  OSCreateNotification.silentNotification({
+    @required this.playerIds,
+    this.additionalData,
+    this.sendAfter,
+    this.delayedOption,
+    this.deliveryTimeOfDay,
+  }) {
     this.contentAvailable = true;
   }
 
@@ -161,6 +168,7 @@ class OSCreateNotification extends JSONStringRepresentable {
     if (this.collapseId != null) json['collapse_id'] = this.collapseId;
     if (this.deliveryTimeOfDay != null)
       json['delivery_time_of_day'] = this.deliveryTimeOfDay;
+    if (this.ttl != null) json['ttl'] = this.ttl;
 
     // adds optional parameters that require transformations
     if (this.sendAfter != null)
