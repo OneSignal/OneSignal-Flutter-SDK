@@ -86,7 +86,7 @@ void main() {
   });
 
   test('expect delayed option to be parsed correctly', () {
-    expect(notificationJson['delay_option'], 'last_active');
+    expect(notificationJson['delayed_option'], 'last_active');
   });
 
   test('expect delivery time of day to be parsed correctly', () {
