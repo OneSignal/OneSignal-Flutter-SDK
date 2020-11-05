@@ -1,11 +1,24 @@
 package com.onesignal.flutter;
 
 import android.util.Log;
-import com.onesignal.OSNotificationPayload.BackgroundImageLayout;
-import com.onesignal.*;
+
+import com.onesignal.OSDeviceState;
+import com.onesignal.OSEmailSubscriptionState;
+import com.onesignal.OSEmailSubscriptionStateChanges;
+import com.onesignal.OSInAppMessageAction;
+import com.onesignal.OSNotification;
+import com.onesignal.OSNotificationAction;
+import com.onesignal.OSNotificationOpenedResult;
+import com.onesignal.OSPermissionState;
+import com.onesignal.OSPermissionStateChanges;
+import com.onesignal.OSSubscriptionState;
+import com.onesignal.OSSubscriptionStateChanges;
+import com.onesignal.OutcomeEvent;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -15,8 +28,8 @@ class OneSignalSerializer {
     private static HashMap<String, Object> convertSubscriptionStateToMap(OSSubscriptionState state) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("subscribed", state.getSubscribed());
-        hash.put("userSubscriptionSetting", state.getUserSubscriptionSetting());
+        hash.put("isSubscribed", state.isSubscribed());
+        hash.put("isPushDisabled", state.isPushDisabled());
         hash.put("pushToken", state.getPushToken());
         hash.put("userId", state.getUserId());
 
@@ -26,7 +39,7 @@ class OneSignalSerializer {
     private static HashMap<String, Object> convertPermissionStateToMap(OSPermissionState state) {
         HashMap<String, Object> permission = new HashMap<>();
 
-        permission.put("enabled", state.getEnabled());
+        permission.put("areNotificationsEnabled", state.areNotificationsEnabled());
 
         return permission;
     }
@@ -41,21 +54,17 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertPermissionSubscriptionStateToMap(OSPermissionSubscriptionState state) {
+    static HashMap<String, Object> convertDeviceStateToMap(OSDeviceState state) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        OSSubscriptionState subState = state.getSubscriptionStatus();
-        OSPermissionState permState = state.getPermissionStatus();
-        OSEmailSubscriptionState emailState = state.getEmailSubscriptionStatus();
-
-        if (subState != null)
-            hash.put("subscriptionStatus", convertSubscriptionStateToMap(subState));
-
-        if (permState != null)
-            hash.put("permissionStatus", convertPermissionStateToMap(state.getPermissionStatus()));
-
-        if (emailState != null)
-            hash.put("emailSubscriptionStatus", convertEmailSubscriptionStateToMap(state.getEmailSubscriptionStatus()));
+        hash.put("areNotificationsEnabled", state.areNotificationsEnabled());
+        hash.put("pushDisabled", state.isPushDisabled());
+        hash.put("subscribed", state.isSubscribed());
+        hash.put("emailSubscribed", state.isEmailSubscribed());
+        hash.put("userId", state.getUserId());
+        hash.put("pushToken", state.getPushToken());
+        hash.put("emailUserId", state.getEmailUserId());
+        hash.put("emailAddress", state.getEmailAddress());
 
         return hash;
     }
@@ -79,7 +88,7 @@ class OneSignalSerializer {
     }
 
     static HashMap convertPermissionStateChangesToMap(OSPermissionStateChanges changes) {
-       HashMap<String, Object> hash = new HashMap<>();
+        HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("to", convertPermissionStateToMap(changes.getTo()));
         hash.put("from", convertPermissionStateToMap(changes.getFrom()));
@@ -87,85 +96,69 @@ class OneSignalSerializer {
         return hash;
     }
 
-    private static HashMap<String, Object> convertNotificationPayloadToMap(OSNotificationPayload payload) throws JSONException {
-       HashMap<String, Object> hash = new HashMap<>();
+    static HashMap<String, Object> convertNotificationToMap(OSNotification notification) throws JSONException {
+        HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("notificationId", payload.notificationID);
-        hash.put("templateName", payload.templateName);
-        hash.put("templateId", payload.templateId);
-        hash.put("sound", payload.sound);
-        hash.put("title", payload.title);
-        hash.put("body", payload.body);
-        hash.put("launchUrl", payload.launchURL);
-        hash.put("smallIcon", payload.smallIcon);
-        hash.put("largeIcon", payload.largeIcon);
-        hash.put("bigPicture", payload.bigPicture);
-        hash.put("smallIconAccentColor", payload.smallIconAccentColor);
-        hash.put("ledColor", payload.ledColor);
-        hash.put("lockScreenVisibility", payload.lockScreenVisibility);
-        hash.put("groupKey", payload.groupKey);
-        hash.put("groupMessage", payload.groupMessage);
-        hash.put("fromProjectNumber", payload.fromProjectNumber);
-        hash.put("collapseId", payload.collapseId);
-        hash.put("priority", payload.priority);
+        hash.put("androidNotificationId", notification.getAndroidNotificationId());
+
+        JSONArray payloadJsonArray = new JSONArray();
+        if (notification.getGroupedNotifications() != null) {
+            for (OSNotification groupedNotification : notification.getGroupedNotifications())
+                payloadJsonArray.put(groupedNotification.toJSONObject());
+        }
+
+        hash.put("groupedNotifications", payloadJsonArray);
+
+        hash.put("notificationId", notification.getNotificationId());
+        hash.put("title", notification.getTitle());
+        hash.put("body", notification.getBody());
+        hash.put("smallIcon", notification.getSmallIcon());
+        hash.put("largeIcon", notification.getLargeIcon());
+        hash.put("bigPicture", notification.getBigPicture());
+        hash.put("smallIconAccentColor", notification.getSmallIconAccentColor());
+        hash.put("launchURL", notification.getLaunchURL());
+        hash.put("sound", notification.getSound());
+        hash.put("ledColor", notification.getLedColor());
+        hash.put("lockScreenVisibility", notification.getLockScreenVisibility());
+        hash.put("groupKey", notification.getGroupKey());
+        hash.put("groupMessage", notification.getGroupMessage());
+        hash.put("fromProjectNumber", notification.getFromProjectNumber());
+        hash.put("collapseId", notification.getCollapseId());
+        hash.put("priority", notification.getPriority());
+        hash.put("additionalData", notification.getAdditionalData());
 
         ArrayList<HashMap> buttons = new ArrayList<>();
 
-        if (payload.actionButtons != null) {
-            for (int i = 0; i < payload.actionButtons.size(); i++) {
-                OSNotificationPayload.ActionButton button = payload.actionButtons.get(i);
+        if (notification.getActionButtons() != null) {
+            List<OSNotification.ActionButton> actionButtons = notification.getActionButtons();
+            for (int i = 0; i < actionButtons.size(); i++) {
+                OSNotification.ActionButton button = actionButtons.get(i);
 
-               HashMap<String, Object> buttonHash = new HashMap<>();
-                buttonHash.put("id", button.id);
-                buttonHash.put("text", button.text);
-                buttonHash.put("icon", button.icon);
+                HashMap<String, Object> buttonHash = new HashMap<>();
+                buttonHash.put("id", button.getId());
+                buttonHash.put("text", button.getText());
+                buttonHash.put("icon", button.getIcon());
                 buttons.add(buttonHash);
             }
         }
 
-        if (buttons.size() > 0)
-            hash.put("buttons", buttons);
+        hash.put("actionButtons", buttons);
 
-        if (payload.backgroundImageLayout != null)
-            hash.put("backgroundImageLayout", convertAndroidBackgroundImageLayoutToMap(payload.backgroundImageLayout));
+        if (notification.getBackgroundImageLayout() != null)
+            hash.put("backgroundImageLayout", convertAndroidBackgroundImageLayoutToMap(notification.getBackgroundImageLayout()));
 
-        if (payload.rawPayload != null)
-            hash.put("rawPayload", payload.rawPayload);
+        hash.put("rawPayload", notification.getRawPayload());
 
-        Log.d("onesignal", "Created json raw payload: " + convertJSONObjectToHashMap(new JSONObject(payload.rawPayload)).toString());
-
-        if (payload.additionalData != null)
-            hash.put("additionalData", convertJSONObjectToHashMap(payload.additionalData));
+        Log.d("onesignal", "Created json raw payload: " + convertJSONObjectToHashMap(new JSONObject(notification.getRawPayload())).toString());
 
         return hash;
     }
 
-    static HashMap<String, Object> convertNotificationToMap(OSNotification notification) throws JSONException {
+    static HashMap<String, Object> convertNotificationOpenResultToMap(OSNotificationOpenedResult openResult) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("payload", convertNotificationPayloadToMap(notification.payload));
-        hash.put("shown", notification.shown);
-        hash.put("appInFocus", notification.isAppInFocus);
-        hash.put("androidNotificationId", notification.androidNotificationId);
-
-        switch (notification.displayType) {
-            case None:
-                hash.put("displayType", 0);
-            case InAppAlert:
-                hash.put("displayType", 1);
-                break;
-            case Notification:
-                hash.put("displayType", 2);
-        }
-
-        return hash;
-    }
-
-    static HashMap<String, Object> convertNotificationOpenResultToMap(OSNotificationOpenResult openResult) throws JSONException {
-        HashMap<String, Object> hash = new HashMap<>();
-
-        hash.put("notification", convertNotificationToMap(openResult.notification));
-        hash.put("action", convertNotificationActionToMap(openResult.action));
+        hash.put("notification", convertNotificationToMap(openResult.getNotification()));
+        hash.put("action", convertNotificationActionToMap(openResult.getAction()));
 
         return hash;
     }
@@ -173,9 +166,9 @@ class OneSignalSerializer {
     private static HashMap<String, Object> convertNotificationActionToMap(OSNotificationAction action) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("id", action.actionID);
+        hash.put("id", action.getActionId());
 
-        switch (action.type) {
+        switch (action.getType()) {
             case Opened:
                 hash.put("type", 0);
                 break;
@@ -189,10 +182,10 @@ class OneSignalSerializer {
     static HashMap<String, Object> convertInAppMessageClickedActionToMap(OSInAppMessageAction action) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("click_name", action.clickName);
-        hash.put("click_url", action.clickUrl);
-        hash.put("first_click", action.firstClick);
-        hash.put("closes_message", action.closesMessage);
+        hash.put("click_name", action.getClickName());
+        hash.put("click_url", action.getClickUrl());
+        hash.put("first_click", action.isFirstClick());
+        hash.put("closes_message", action.doesCloseMessage());
 
         return hash;
     }
@@ -214,12 +207,12 @@ class OneSignalSerializer {
         return hash;
     }
 
-    private static HashMap<String, Object> convertAndroidBackgroundImageLayoutToMap(BackgroundImageLayout layout) {
+    private static HashMap<String, Object> convertAndroidBackgroundImageLayoutToMap(OSNotification.BackgroundImageLayout layout) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("image", layout.image);
-        hash.put("bodyTextColor", layout.bodyTextColor);
-        hash.put("titleTextColor", layout.titleTextColor);
+        hash.put("image", layout.getImage());
+        hash.put("bodyTextColor", layout.getBodyTextColor());
+        hash.put("titleTextColor", layout.getBodyTextColor());
 
         return hash;
     }
