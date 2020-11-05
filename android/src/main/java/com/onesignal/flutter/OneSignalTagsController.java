@@ -1,5 +1,16 @@
 package com.onesignal.flutter;
 
+import com.onesignal.OneSignal;
+import com.onesignal.OneSignal.ChangeTagsUpdateHandler;
+import com.onesignal.OneSignal.SendTagsError;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -7,23 +18,11 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-import com.onesignal.OneSignal;
-import com.onesignal.OneSignal.GetTagsHandler;
-import com.onesignal.OneSignal.ChangeTagsUpdateHandler;
-import com.onesignal.OneSignal.SendTagsError;
-
-import org.json.JSONObject;
-import org.json.JSONException;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 /**
  * Created by bradhesse on 7/17/18.
  */
 
-class OSFlutterChangeTagsHandler extends FlutterRegistrarResponder implements ChangeTagsUpdateHandler, GetTagsHandler {
+class OSFlutterChangeTagsHandler extends FlutterRegistrarResponder implements ChangeTagsUpdateHandler, OneSignal.OSGetTagsHandler {
     private Result result;
 
     // the tags callbacks can in some instances be called more than once
