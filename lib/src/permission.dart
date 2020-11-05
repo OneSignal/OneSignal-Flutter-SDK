@@ -80,3 +80,44 @@ class OSPermissionStateChanges extends JSONStringRepresentable {
     });
   }
 }
+
+class OSDeviceState extends JSONStringRepresentable {
+
+  bool areNotificationsEnabled;
+  bool pushDisabled;
+  bool subscribed;
+  bool emailSubscribed;
+  String userId;
+  String pushToken;
+  String emailUserId;
+  String emailAddress;
+
+  OSDeviceState(Map<String, dynamic> json) {
+    if (json.containsKey('areNotificationsEnabled')) {
+      this.areNotificationsEnabled = json['areNotificationsEnabled'] as bool;
+    } else if (json.containsKey('iOS_Param')) {
+      this.areNotificationsEnabled = json['iOS_Param'] as bool;
+    }
+
+    this.pushDisabled = json['pushDisabled'] as bool;
+    this.subscribed = json['subscribed'] as bool;
+    this.emailSubscribed = json['emailSubscribed'] as bool;
+    this.userId = json['userId'] as String;
+    this.pushToken = json['pushToken'] as String;
+    this.emailUserId = json['emailUserId'] as String;
+    this.emailAddress = json['emailAddress'] as String;
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString({
+      'areNotificationsEnabled': this.areNotificationsEnabled,
+      'isPushDisabled': this.pushDisabled,
+      'isSubscribed': this.subscribed,
+      'userId': this.userId,
+      'pushToken': this.pushToken,
+      'isEmailSubscribed': this.emailSubscribed,
+      'emailUserId': this.emailUserId,
+      'emailAddress': this.emailAddress
+    });
+  }
+}
