@@ -78,10 +78,7 @@ class _MyAppState extends State<MyApp> {
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     await OneSignal.shared
-        .init("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
-
-    OneSignal.shared
-        .setInFocusDisplayType(OSNotificationDisplayType.notification);
+        .setAppId("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
 
     bool requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
 
@@ -93,7 +90,7 @@ class _MyAppState extends State<MyApp> {
     oneSignalInAppMessagingTriggerExamples();
 
     // Some examples of how to use Outcome Events public methods with OneSignal SDK
-    oneSignalOutcomeEventsExamples();
+    // oneSignalOutcomeEventsExamples();
   }
 
   void _handleGetTags() {
@@ -126,11 +123,11 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void _handleGetPermissionSubscriptionState() {
-    print("Getting permissionSubscriptionState");
-    OneSignal.shared.getPermissionSubscriptionState().then((status) {
+  void _handleGetDeviceState() {
+    print("Getting DeviceState");
+    OneSignal.shared.getDeviceState().then((deviceState) {
       this.setState(() {
-        _debugLabelString = status.jsonRepresentation();
+        _debugLabelString = deviceState.jsonRepresentation();
       });
     });
   }
@@ -202,9 +199,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _handleSendNotification() async {
-    var status = await OneSignal.shared.getPermissionSubscriptionState();
+    var deviceState = await OneSignal.shared.getDeviceState();
 
-    var playerId = status.subscriptionStatus.userId;
+    var playerId = deviceState.userId;
 
     var imgUrlString =
         "http://cdn1-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-2.jpg";
@@ -228,9 +225,9 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _handleSendSilentNotification() async {
-    var status = await OneSignal.shared.getPermissionSubscriptionState();
+    var deviceState = await OneSignal.shared.getDeviceState();
 
-    var playerId = status.subscriptionStatus.userId;
+    var playerId = deviceState.userId;
 
     var notification = OSCreateNotification.silentNotification(
         playerIds: [playerId], additionalData: {'test': 'value'});
@@ -327,8 +324,8 @@ class _MyAppState extends State<MyApp> {
                   ]),
                   new TableRow(children: [
                     new OneSignalButton(
-                        "Print Permission Subscription State",
-                        _handleGetPermissionSubscriptionState,
+                        "Print Device State",
+                        _handleGetDeviceState,
                         !_enableConsentButton)
                   ]),
                   new TableRow(children: [

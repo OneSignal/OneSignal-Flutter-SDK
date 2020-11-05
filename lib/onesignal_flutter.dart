@@ -54,7 +54,7 @@ class OneSignal {
 
   /// The initializer for OneSignal. Note that this initializer
   /// accepts an iOSSettings object, in Android you can pass null.
-  Future<void> init(String appId,
+  Future<void> setAppId(String appId,
       {Map<OSiOSSettings, dynamic> iOSSettings}) async {
     _onesignalLog(OSLogLevel.verbose,
         "Initializing the OneSignal Flutter SDK ($sdkVersion)");
@@ -62,7 +62,7 @@ class OneSignal {
     var finalSettings = _processSettings(iOSSettings);
 
     await _channel.invokeMethod(
-        'OneSignal#init', {'appId': appId, 'settings': finalSettings});
+        'OneSignal#setAppId', {'appId': appId, 'settings': finalSettings});
   }
 
   /// Sets the log level for the SDK. The first parameter (logLevel) controls
@@ -150,18 +150,6 @@ class OneSignal {
     return result as bool;
   }
 
-  /// The current setting that controls how notifications are displayed.
-  Future<OSNotificationDisplayType> inFocusDisplayType() async {
-    int type = await _channel.invokeMethod("OneSignal#inFocusDisplayType");
-    return OSNotificationDisplayType.values[type];
-  }
-
-  Future<void> setInFocusDisplayType(
-      OSNotificationDisplayType displayType) async {
-    await _channel.invokeMethod(
-        "OneSignal#setInFocusDisplayType", {"displayType": displayType.index});
-  }
-
   /// Sends a single key/value pair to tags to OneSignal.
   /// Please do not send hashmaps/arrays as values as this will fail.
   /// This method can often take more than five seconds to complete,
@@ -210,23 +198,20 @@ class OneSignal {
     return response.cast<String, dynamic>();
   }
 
-  /// Returns an `OSPermissionSubscriptionState` object, which contains three properties:
-  ///   1. `subscriptionStatus` : Describes the current user's OneSignal Push notification subscription
-  ///   2. `emailSubscriptionStatus` : The current user's email subscription state
-  ///   3. `permissionStatus` : The current user's permission, ie. have they answered the iOS permission prompt
-  Future<OSPermissionSubscriptionState> getPermissionSubscriptionState() async {
+  /// Returns an `OSDeviceState` object, which contains the current device state
+  Future<OSDeviceState> getDeviceState() async {
     var json =
-        await _channel.invokeMethod("OneSignal#getPermissionSubscriptionState");
+        await _channel.invokeMethod("OneSignal#getDeviceState");
 
-    return OSPermissionSubscriptionState(json.cast<String, dynamic>());
+    return OSDeviceState(json.cast<String, dynamic>());
   }
 
   /// Allows you to manually disable or enable push notifications for this user.
   /// Note: This method does not change the user's system (iOS) push notification
   /// permission status. If the user disabled (or never allowed) your application
-  /// to send push notifications, calling setSubscription(true) will not change that.
-  Future<void> setSubscription(bool enable) async {
-    return await _channel.invokeMethod("OneSignal#setSubscription", enable);
+  /// to send push notifications, calling disablePush(false) will not change that.
+  Future<void> disablePush(bool disable) async {
+    return await _channel.invokeMethod("OneSignal#disablePush", disable);
   }
 
   /// Allows you to post a notification to the current user (or a different user
@@ -357,11 +342,7 @@ class OneSignal {
 
   // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
-    if (call.method == 'OneSignal#handleReceivedNotification' &&
-        this._onReceivedNotification != null) {
-      this._onReceivedNotification(
-          OSNotification(call.arguments.cast<String, dynamic>()));
-    } else if (call.method == 'OneSignal#handleOpenedNotification' &&
+    if (call.method == 'OneSignal#handleOpenedNotification' &&
         this._onOpenedNotification != null) {
       this._onOpenedNotification(
           OSNotificationOpenedResult(call.arguments.cast<String, dynamic>()));
