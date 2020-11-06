@@ -9,6 +9,7 @@ import com.onesignal.OSInAppMessageAction;
 import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationAction;
 import com.onesignal.OSNotificationOpenedResult;
+import com.onesignal.OSNotificationReceivedEvent;
 import com.onesignal.OSPermissionState;
 import com.onesignal.OSPermissionStateChanges;
 import com.onesignal.OSSubscriptionState;
@@ -142,7 +143,7 @@ class OneSignalSerializer {
             }
         }
 
-        hash.put("actionButtons", buttons);
+        hash.put("buttons", buttons);
 
         if (notification.getBackgroundImageLayout() != null)
             hash.put("backgroundImageLayout", convertAndroidBackgroundImageLayoutToMap(notification.getBackgroundImageLayout()));
@@ -188,6 +189,10 @@ class OneSignalSerializer {
         hash.put("closes_message", action.doesCloseMessage());
 
         return hash;
+    }
+
+    static HashMap<String, Object> convertNotificationReceivedEventToMap(OSNotificationReceivedEvent notificationReceivedEvent) throws JSONException {
+        return convertNotificationToMap(notificationReceivedEvent.getNotification());
     }
 
     static HashMap<String, Object> convertOutcomeEventToMap(OutcomeEvent outcomeEvent) {

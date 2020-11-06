@@ -41,37 +41,22 @@
 - (NSDictionary *)toJson {
     NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"payload"] = [self.payload toJson];
-    json[@"displayType"] = @((int)self.displayType);
-    json[@"shown"] = @(self.shown);
-    json[@"appInFocus"] = @(self.isAppInFocus);
-    json[@"silent"] = @(self.silentNotification);
-
-    return json;
-}
-@end
-
-@implementation OSNotificationPayload (Flutter)
--(NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
-
     json[@"contentAvailable"] = @(self.contentAvailable);
     json[@"mutableContent"] = @(self.mutableContent);
 
-    NSError *jsonError;
     if (self.rawPayload) {
+        NSError *jsonError;
         NSData *data = [NSJSONSerialization dataWithJSONObject:self.rawPayload options:NSJSONWritingPrettyPrinted error:&jsonError];
 
         if (!jsonError) {
             NSString *rawPayloadString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-
-            if (self.rawPayload) json[@"rawPayload"] = rawPayloadString;
+            json[@"rawPayload"] = rawPayloadString;
         }
     }
 
-    if (self.notificationID) json[@"notificationId"] = self.notificationID;
+    if (self.notificationId) json[@"notificationId"] = self.notificationId;
     if (self.templateName) json[@"templateName"] = self.templateName;
-    if (self.templateID) json[@"templateId"] = self.templateID;
+    if (self.templateId) json[@"templateId"] = self.templateId;
     if (self.badge) json[@"badge"] = @(self.badge);
     if (self.badgeIncrement) json[@"badgeIncrement"] = @(self.badgeIncrement);
     if (self.sound) json[@"sound"] = self.sound;
@@ -93,7 +78,7 @@
     NSMutableDictionary *json = [NSMutableDictionary new];
 
     if (self.notification) json[@"notification"] = self.notification.toJson;
-    if (self.action.actionID) json[@"action"] = @{@"type" : @((int)self.action.type), @"id" : self.action.actionID};
+    if (self.action.actionId) json[@"action"] = @{@"type" : @((int)self.action.type), @"id" : self.action.actionId};
 
     return json;
 }

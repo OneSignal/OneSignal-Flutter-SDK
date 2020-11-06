@@ -34,11 +34,6 @@ class _MyAppState extends State<MyApp> {
 
     OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
-    var settings = {
-      OSiOSSettings.autoPrompt: false,
-      OSiOSSettings.promptBeforeOpeningPushUrl: true
-    };
-
     OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
       this.setState(() {
         _debugLabelString =
@@ -78,7 +73,7 @@ class _MyAppState extends State<MyApp> {
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     await OneSignal.shared
-        .setAppId("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
+        .setAppId("b2f7f966-d8cc-11e4-bed1-df8f05be55ba");
 
     bool requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
 
