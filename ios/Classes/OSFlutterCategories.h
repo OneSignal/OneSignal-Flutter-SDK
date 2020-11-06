@@ -31,10 +31,6 @@
 #ifndef OneSignalCategories_h
 #define OneSignalCategories_h
 
-@interface OSNotificationPayload (Flutter)
-- (NSDictionary *)toJson;
-@end
-
 @interface OSNotification (Flutter)
 - (NSDictionary *)toJson;
 @end
