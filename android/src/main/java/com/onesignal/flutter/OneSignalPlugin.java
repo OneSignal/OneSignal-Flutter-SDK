@@ -7,6 +7,7 @@ import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSEmailSubscriptionStateChanges;
 import com.onesignal.OSInAppMessageAction;
 import com.onesignal.OSNotificationOpenedResult;
+import com.onesignal.OSNotificationReceivedEvent;
 import com.onesignal.OSPermissionObserver;
 import com.onesignal.OSPermissionStateChanges;
 import com.onesignal.OSSubscriptionObserver;
@@ -36,13 +37,16 @@ public class OneSignalPlugin
         OneSignal.OSInAppMessageClickHandler,
         OSSubscriptionObserver,
         OSEmailSubscriptionObserver,
-        OSPermissionObserver {
+        OSPermissionObserver,
+        OneSignal.OSNotificationWillShowInForegroundHandler {
 
   /** Plugin registration. */
   private OSNotificationOpenedResult coldStartNotificationResult;
   private OSInAppMessageAction inAppMessageClickedResult;
+  private OSNotificationReceivedEvent notificationReceivedEvent;
   private boolean hasSetNotificationOpenedHandler = false;
   private boolean hasSetInAppMessageClickedHandler = false;
+  private boolean hasSetNotificationWillShowInForegroundHandler = false;
   private boolean hasSetRequiresPrivacyConsent = false;
   private boolean waitingForUserPrivacyConsent = false;
 
@@ -110,6 +114,8 @@ public class OneSignalPlugin
       this.initNotificationOpenedHandlerParams();
     else if (call.method.contentEquals("OneSignal#initInAppMessageClickedHandlerParams"))
       this.initInAppMessageClickedHandlerParams();
+    else if (call.method.contentEquals("OneSignal#initNotificationWillShowInForegroundHandlerParams"))
+      this.initNotificationWillShowInForegroundHandlerParams();
     else
       replyNotImplemented(result);
   }
@@ -138,6 +144,7 @@ public class OneSignalPlugin
     OneSignal.addSubscriptionObserver(this);
     OneSignal.addEmailSubscriptionObserver(this);
     OneSignal.addPermissionObserver(this);
+    OneSignal.setNotificationWillShowInForegroundHandler(this);
   }
 
   private void setLogLevel(MethodCall call, Result reply) {
@@ -306,6 +313,14 @@ public class OneSignalPlugin
     }
   }
 
+  private void initNotificationWillShowInForegroundHandlerParams() {
+    this.hasSetNotificationWillShowInForegroundHandler = true;
+    if (this.notificationReceivedEvent != null) {
+      this.notificationWillShowInForeground(this.notificationReceivedEvent);
+      this.notificationReceivedEvent = null;
+    }
+  }
+
   @Override
   public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
     invokeMethodOnUiThread("OneSignal#subscriptionChanged", OneSignalSerializer.convertSubscriptionStateChangesToMap(stateChanges));
@@ -345,5 +360,21 @@ public class OneSignalPlugin
     }
 
     invokeMethodOnUiThread("OneSignal#handleClickedInAppMessage", OneSignalSerializer.convertInAppMessageClickedActionToMap(action));
+  }
+
+  @Override
+  public void notificationWillShowInForeground(OSNotificationReceivedEvent notificationReceivedEvent) {
+    if (!this.hasSetNotificationWillShowInForegroundHandler) {
+      this.notificationReceivedEvent = notificationReceivedEvent;
+      return;
+    }
+
+    try {
+      invokeMethodOnUiThread("OneSignal#handleNotificationWillShowInForeground", OneSignalSerializer.convertNotificationReceivedEventToMap(notificationReceivedEvent));
+    } catch (JSONException e) {
+      e.getStackTrace();
+      OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
+              "Encountered an error attempting to convert OSNotificationReceivedEvent object to hash map: " + e.getMessage());
+    }
   }
 }

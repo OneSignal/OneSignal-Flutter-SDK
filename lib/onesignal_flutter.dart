@@ -25,6 +25,7 @@ typedef void EmailSubscriptionChangeHandler(
   OSEmailSubscriptionStateChanges changes);
 typedef void PermissionChangeHandler(OSPermissionStateChanges changes);
 typedef void InAppMessageClickedHandler(OSInAppMessageAction action);
+typedef void NotificationWillShowInForegroundHandler(OSNotificationReceivedEvent event);
 
 class OneSignal {
   /// A singleton representing the OneSignal SDK.
@@ -46,6 +47,7 @@ class OneSignal {
   EmailSubscriptionChangeHandler _onEmailSubscriptionChangedHandler;
   PermissionChangeHandler _onPermissionChangedHandler;
   InAppMessageClickedHandler _onInAppMessageClickedHandler;
+  NotificationWillShowInForegroundHandler _onNotificationWillShowInForegroundHandler;
 
   // constructor method
   OneSignal() {
@@ -54,15 +56,12 @@ class OneSignal {
 
   /// The initializer for OneSignal. Note that this initializer
   /// accepts an iOSSettings object, in Android you can pass null.
-  Future<void> setAppId(String appId,
-      {Map<OSiOSSettings, dynamic> iOSSettings}) async {
+  Future<void> setAppId(String appId) async {
     _onesignalLog(OSLogLevel.verbose,
         "Initializing the OneSignal Flutter SDK ($sdkVersion)");
 
-    var finalSettings = _processSettings(iOSSettings);
-
     await _channel.invokeMethod(
-        'OneSignal#setAppId', {'appId': appId, 'settings': finalSettings});
+        'OneSignal#setAppId', {'appId': appId});
   }
 
   /// Sets the log level for the SDK. The first parameter (logLevel) controls
@@ -112,6 +111,13 @@ class OneSignal {
   void setInAppMessageClickedHandler(InAppMessageClickedHandler handler) {
     _onInAppMessageClickedHandler = handler;
     _channel.invokeMethod("OneSignal#initInAppMessageClickedHandlerParams");
+  }
+
+    /// The in app message clicked handler is called whenever the user clicks a
+  /// OneSignal IAM button or image with an action event attacthed to it
+  void setNotificationWillShowInForegroundHandler(NotificationWillShowInForegroundHandler handler) {
+    _onNotificationWillShowInForegroundHandler = handler;
+    _channel.invokeMethod("OneSignal#initNotificationWillShowInForegroundHandlerParams");
   }
 
   /// Allows you to completely disable the SDK until your app calls the
@@ -357,12 +363,15 @@ class OneSignal {
     } else if (call.method == 'OneSignal#emailSubscriptionChanged' &&
         this._onEmailSubscriptionChangedHandler != null) {
       this._onEmailSubscriptionChangedHandler(
-          OSEmailSubscriptionStateChanges(
-              call.arguments.cast<String, dynamic>()));
+          OSEmailSubscriptionStateChanges(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#handleClickedInAppMessage' &&
         this._onInAppMessageClickedHandler != null) {
       this._onInAppMessageClickedHandler(
           OSInAppMessageAction(call.arguments.cast<String, dynamic>()));
+    } else if (call.method == 'OneSignal#handleNotificationWillShowInForeground' &&
+        this._onNotificationWillShowInForegroundHandler != null) {
+      this._onNotificationWillShowInForegroundHandler(
+          OSNotificationReceivedEvent(call.arguments.cast<String, dynamic>()));
     }
     return null;
   }

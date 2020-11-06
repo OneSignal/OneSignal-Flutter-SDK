@@ -13,8 +13,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _debugLabelString = "";
-  String _emailAddress;
-  String _externalUserId;
+  String? _emailAddress;
+  String? _externalUserId;
   bool _enableConsentButton = false;
 
   // CHANGE THIS parameter to true if you want to test GDPR privacy consent
@@ -33,11 +33,6 @@ class _MyAppState extends State<MyApp> {
     OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
     OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
-
-    var settings = {
-      OSiOSSettings.autoPrompt: false,
-      OSiOSSettings.promptBeforeOpeningPushUrl: true
-    };
 
     OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
       this.setState(() {
@@ -78,7 +73,7 @@ class _MyAppState extends State<MyApp> {
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     await OneSignal.shared
-        .setAppId("b2f7f966-d8cc-11e4-bed1-df8f05be55ba", iOSSettings: settings);
+        .setAppId("b2f7f966-d8cc-11e4-bed1-df8f05be55ba");
 
     bool requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
 
@@ -259,12 +254,10 @@ class _MyAppState extends State<MyApp> {
 
     // Get the value for a trigger by its key
     Object triggerValue = await OneSignal.shared.getTriggerValueForKey("trigger_3");
-    print("'trigger_3' key trigger value: " + triggerValue);
+    print("'trigger_3' key trigger value: " + triggerValue.toString());
 
     // Create a list and bulk remove triggers based on keys supplied
-    List<String> keys = new List<String>();
-    keys.add("trigger_1");
-    keys.add("trigger_3");
+    List<String> keys = ["trigger_1", "trigger_3"];
     OneSignal.shared.removeTriggersForKeys(keys);
 
     // Toggle pausing (displaying or not) of IAMs
