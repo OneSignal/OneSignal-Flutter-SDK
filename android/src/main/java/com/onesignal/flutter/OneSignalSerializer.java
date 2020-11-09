@@ -102,35 +102,49 @@ class OneSignalSerializer {
 
         hash.put("androidNotificationId", notification.getAndroidNotificationId());
 
-        JSONArray payloadJsonArray = new JSONArray();
         if (notification.getGroupedNotifications() != null) {
+            JSONArray payloadJsonArray = new JSONArray();
             for (OSNotification groupedNotification : notification.getGroupedNotifications())
                 payloadJsonArray.put(groupedNotification.toJSONObject());
-        }
 
-        hash.put("groupedNotifications", payloadJsonArray);
+            hash.put("groupedNotifications", payloadJsonArray);
+        }
 
         hash.put("notificationId", notification.getNotificationId());
         hash.put("title", notification.getTitle());
-        hash.put("body", notification.getBody());
-        hash.put("smallIcon", notification.getSmallIcon());
-        hash.put("largeIcon", notification.getLargeIcon());
-        hash.put("bigPicture", notification.getBigPicture());
-        hash.put("smallIconAccentColor", notification.getSmallIconAccentColor());
-        hash.put("launchURL", notification.getLaunchURL());
-        hash.put("sound", notification.getSound());
-        hash.put("ledColor", notification.getLedColor());
-        hash.put("lockScreenVisibility", notification.getLockScreenVisibility());
-        hash.put("groupKey", notification.getGroupKey());
-        hash.put("groupMessage", notification.getGroupMessage());
-        hash.put("fromProjectNumber", notification.getFromProjectNumber());
-        hash.put("collapseId", notification.getCollapseId());
-        hash.put("priority", notification.getPriority());
-        hash.put("additionalData", notification.getAdditionalData());
 
-        ArrayList<HashMap> buttons = new ArrayList<>();
+        if (notification.getBody() != null)
+            hash.put("body", notification.getBody());
+        if (notification.getSmallIcon() != null)
+            hash.put("smallIcon", notification.getSmallIcon());
+        if (notification.getLargeIcon() != null)
+            hash.put("largeIcon", notification.getLargeIcon());
+        if (notification.getBigPicture() != null)
+            hash.put("bigPicture", notification.getBigPicture());
+        if (notification.getSmallIconAccentColor() != null)
+            hash.put("smallIconAccentColor", notification.getSmallIconAccentColor());
+        if (notification.getLaunchURL() != null)
+            hash.put("launchURL", notification.getLaunchURL());
+        if (notification.getSound() != null)
+            hash.put("sound", notification.getSound());
+        if (notification.getLedColor() != null)
+            hash.put("ledColor", notification.getLedColor());
+        hash.put("lockScreenVisibility", notification.getLockScreenVisibility());
+        if (notification.getGroupKey() != null)
+            hash.put("groupKey", notification.getGroupKey());
+        if (notification.getGroupMessage() != null)
+            hash.put("groupMessage", notification.getGroupMessage());
+        if (notification.getFromProjectNumber() != null)
+            hash.put("fromProjectNumber", notification.getFromProjectNumber());
+        if (notification.getCollapseId() != null)
+            hash.put("collapseId", notification.getCollapseId());
+        hash.put("priority", notification.getPriority());
+        if (notification.getAdditionalData() != null)
+            hash.put("additionalData", notification.getAdditionalData());
 
         if (notification.getActionButtons() != null) {
+            ArrayList<HashMap> buttons = new ArrayList<>();
+
             List<OSNotification.ActionButton> actionButtons = notification.getActionButtons();
             for (int i = 0; i < actionButtons.size(); i++) {
                 OSNotification.ActionButton button = actionButtons.get(i);
@@ -141,9 +155,9 @@ class OneSignalSerializer {
                 buttonHash.put("icon", button.getIcon());
                 buttons.add(buttonHash);
             }
-        }
 
-        hash.put("buttons", buttons);
+            hash.put("buttons", buttons);
+        }
 
         if (notification.getBackgroundImageLayout() != null)
             hash.put("backgroundImageLayout", convertAndroidBackgroundImageLayoutToMap(notification.getBackgroundImageLayout()));

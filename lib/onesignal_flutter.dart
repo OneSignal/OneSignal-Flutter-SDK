@@ -41,7 +41,6 @@ class OneSignal {
   MethodChannel _outcomesChannel = const MethodChannel('OneSignal#outcomes');
 
   // event handlers
-  ReceivedNotificationHandler _onReceivedNotification;
   OpenedNotificationHandler _onOpenedNotification;
   SubscriptionChangedHandler _onSubscriptionChangedHandler;
   EmailSubscriptionChangeHandler _onEmailSubscriptionChangedHandler;
@@ -70,12 +69,6 @@ class OneSignal {
   Future<void> setLogLevel(OSLogLevel logLevel, OSLogLevel visualLevel) async {
     await _channel.invokeMethod("OneSignal#setLogLevel",
         {'console': logLevel.index, 'visual': visualLevel.index});
-  }
-
-  /// The notification received handler will be called whenever a notification
-  /// is received by the SDK (only applies to OneSignal push notifications)
-  void setNotificationReceivedHandler(ReceivedNotificationHandler handler) {
-    _onReceivedNotification = handler;
   }
 
   /// The notification opened handler is called whenever the user opens a
@@ -113,11 +106,18 @@ class OneSignal {
     _channel.invokeMethod("OneSignal#initInAppMessageClickedHandlerParams");
   }
 
-    /// The in app message clicked handler is called whenever the user clicks a
-  /// OneSignal IAM button or image with an action event attacthed to it
+  /// The notification foreground handler is called whenever a notification arrives
+  /// and the application is in foreground
   void setNotificationWillShowInForegroundHandler(NotificationWillShowInForegroundHandler handler) {
     _onNotificationWillShowInForegroundHandler = handler;
     _channel.invokeMethod("OneSignal#initNotificationWillShowInForegroundHandlerParams");
+  }
+
+  /// The notification foreground handler is called whenever a notification arrives
+  /// and the application is in foreground
+  Future<void> completeNotification(String notificationId, bool shouldDisplay) async {
+    await _channel.invokeMethod("OneSignal#completeNotification",
+        {'notificationId': notificationId, 'shouldDisplay': shouldDisplay});
   }
 
   /// Allows you to completely disable the SDK until your app calls the
