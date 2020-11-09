@@ -34,24 +34,29 @@ class _MyAppState extends State<MyApp> {
 
     OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
-    OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
-      this.setState(() {
-        _debugLabelString =
-            "Received notification: \n${notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-      });
-    });
-
     OneSignal.shared
         .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      this.setState(() {
+        this.setState(() {
         _debugLabelString =
             "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
     });
 
     OneSignal.shared
-    .setInAppMessageClickedHandler((OSInAppMessageAction action) {
-      this.setState(() {
+        .setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
+           print('FOREGROUND HANDLER CALLED WITH: ${event}');
+           /// Display Notification, send null to not display
+           event.complete(event.notification);
+          
+           this.setState(() {
+           _debugLabelString =
+              "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });  
+
+    OneSignal.shared
+        .setInAppMessageClickedHandler((OSInAppMessageAction action) {
+        this.setState(() {
         _debugLabelString =
             "In App Message Clicked: \n${action.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
@@ -73,7 +78,7 @@ class _MyAppState extends State<MyApp> {
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     await OneSignal.shared
-        .setAppId("b2f7f966-d8cc-11e4-bed1-df8f05be55ba");
+        .setAppId("380dc082-5231-4cc2-ab51-a03da5a0e4c2");
 
     bool requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
 

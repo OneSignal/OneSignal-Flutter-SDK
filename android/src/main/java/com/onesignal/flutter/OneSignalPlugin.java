@@ -1,11 +1,13 @@
 package com.onesignal.flutter;
 
+import android.app.Notification;
 import android.content.Context;
 
 import com.onesignal.OSDeviceState;
 import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSEmailSubscriptionStateChanges;
 import com.onesignal.OSInAppMessageAction;
+import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationOpenedResult;
 import com.onesignal.OSNotificationReceivedEvent;
 import com.onesignal.OSPermissionObserver;
@@ -19,6 +21,7 @@ import com.onesignal.OneSignal.EmailUpdateHandler;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
@@ -49,6 +52,8 @@ public class OneSignalPlugin
   private boolean hasSetNotificationWillShowInForegroundHandler = false;
   private boolean hasSetRequiresPrivacyConsent = false;
   private boolean waitingForUserPrivacyConsent = false;
+
+  private HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
   public static void registerWith(Registrar registrar) {
     OneSignal.sdkType = "flutter";
@@ -116,6 +121,8 @@ public class OneSignalPlugin
       this.initInAppMessageClickedHandlerParams();
     else if (call.method.contentEquals("OneSignal#initNotificationWillShowInForegroundHandlerParams"))
       this.initNotificationWillShowInForegroundHandlerParams();
+    else if (call.method.contentEquals("OneSignal#completeNotification"))
+      this.completeNotification(call, result);
     else
       replyNotImplemented(result);
   }
@@ -321,6 +328,26 @@ public class OneSignalPlugin
     }
   }
 
+  private void completeNotification(MethodCall call, final Result reply) {
+    String notificationId = call.argument("notificationId");
+    boolean shouldDisplay = call.argument("shouldDisplay");
+    OSNotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
+
+    if (notificationReceivedEvent == null) {
+      OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Could not find notification completion block with id: " + notificationId);
+      replyError(reply, "OneSignal", "Could not find notification completion block with id: " + notificationId, null);
+      return;
+    }
+
+    if (shouldDisplay) {
+      notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
+    } else {
+      notificationReceivedEvent.complete(null);
+    }
+
+    replySuccess(reply, null);
+  }
+
   @Override
   public void onOSSubscriptionChanged(OSSubscriptionStateChanges stateChanges) {
     invokeMethodOnUiThread("OneSignal#subscriptionChanged", OneSignalSerializer.convertSubscriptionStateChangesToMap(stateChanges));
@@ -369,8 +396,12 @@ public class OneSignalPlugin
       return;
     }
 
+    OSNotification notification = notificationReceivedEvent.getNotification();
+    notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
+
     try {
-      invokeMethodOnUiThread("OneSignal#handleNotificationWillShowInForeground", OneSignalSerializer.convertNotificationReceivedEventToMap(notificationReceivedEvent));
+      HashMap<String, Object>  receivedMap = OneSignalSerializer.convertNotificationReceivedEventToMap(notificationReceivedEvent);
+      invokeMethodOnUiThread("OneSignal#handleNotificationWillShowInForeground", receivedMap);
     } catch (JSONException e) {
       e.getStackTrace();
       OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
