@@ -1,5 +1,6 @@
 import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/utils.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:flutter/foundation.dart';
 import 'dart:convert';
 
@@ -371,7 +372,18 @@ class OSNotificationReceivedEvent extends JSONStringRepresentable {
   OSNotification notification;
 
   OSNotificationReceivedEvent(Map<String, dynamic> json) {
+    print('OSNotificationReceivedEvent called');
     notification = OSNotification(json);
+
+    print('OSNotificationReceivedEvent notification: $notification');
+  }
+
+  void complete(OSNotification notification) {
+    if (notification != null) {
+        OneSignal.shared.completeNotification(notification.notificationId, true);
+    } else {
+        OneSignal.shared.completeNotification(notification.notificationId, true);
+    }
   }
 
   String jsonRepresentation() {

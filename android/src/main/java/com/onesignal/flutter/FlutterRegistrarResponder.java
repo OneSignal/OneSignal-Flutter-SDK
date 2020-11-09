@@ -3,7 +3,7 @@ package com.onesignal.flutter;
 import android.os.Handler;
 import android.os.Looper;
 
-import android.app.Activity;
+import com.onesignal.OneSignal;
 
 import java.util.HashMap;
 
