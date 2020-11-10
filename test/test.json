@@ -27,26 +27,24 @@
     },
     "notification_parsing_test" : {
       "shown" : true,
-      "payload" : {
-        "rawPayload" : "{ \"test\" : \"raw payload\" }",
-        "additionalData" : {
-           "additional" : "data"
-        },
-        "notificationId" : "8e0eeec2-aa42-4ff7-a74b-bce9ca9e588b",
-        "buttons" : [
-          {
-            "id" : "test1",
-            "text" : "BTN1"
-          }
-        ],
-        "contentAvailable" : true,
-        "sound" : "default",
-        "attachments" : {
-          "id" : "https://www.onesignal.com"
-        },
-        "body" : "Welcome to OneSignal!",
-        "mutableContent" : true
+      "rawPayload" : "{ \"test\" : \"raw payload\" }",
+      "additionalData" : {
+         "additional" : "data"
       },
+      "notificationId" : "8e0eeec2-aa42-4ff7-a74b-bce9ca9e588b",
+      "buttons" : [
+         {
+         "id" : "test1",
+         "text" : "BTN1"
+         }
+      ],
+      "contentAvailable" : true,
+      "sound" : "default",
+      "attachments" : {
+         "id" : "https://www.onesignal.com"
+      },
+      "body" : "Welcome to OneSignal!",
+      "mutableContent" : true,
       "displayType" : 1,
       "appInFocus" : true,
       "silent" : true
