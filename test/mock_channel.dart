@@ -26,7 +26,7 @@ class OneSignalMockChannelController {
   Future<dynamic> _handleMethod(MethodCall call) async {
     print("Mock method called: ${call.method}");
     switch (call.method) {
-      case "OneSignal#init":
+      case "OneSignal#setAppId":
         this.state.initialize(call.arguments);
         break;
       case "OneSignal#setLogLevel":
@@ -42,11 +42,8 @@ class OneSignalMockChannelController {
       case "OneSignal#log":
         this.state.log(call.arguments);
         break;
-      case "OneSignal#setInFocusDisplayType":
-        this.state.setDisplayType(call.arguments);
-        break;
-      case "OneSignal#setSubscription":
-        this.state.subscriptionState = call.arguments as bool;
+      case "OneSignal#disablePush":
+        this.state.disablePush = call.arguments as bool;
         break;
       case "OneSignal#postNotification":
         this.state.postNotificationJson =
@@ -77,7 +74,6 @@ class OneSignalMockChannelController {
 class OneSignalState {
   //initialization
   String appId;
-  Map<dynamic, dynamic> iosSettings;
 
   //email
   String email;
@@ -95,7 +91,7 @@ class OneSignalState {
   bool calledPromptPermission;
   bool locationShared;
   OSNotificationDisplayType inFocusDisplayType;
-  bool subscriptionState;
+  bool disablePush;
   String externalId;
 
   // tags
@@ -111,7 +107,6 @@ class OneSignalState {
   */
 
   void initialize(Map<dynamic, dynamic> params) {
-    this.iosSettings = params['settings'];
     this.appId = params['appId'];
   }
 
