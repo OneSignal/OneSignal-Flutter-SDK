@@ -1,6 +1,5 @@
 package com.onesignal.flutter;
 
-import android.app.Notification;
 import android.content.Context;
 
 import com.onesignal.OSDeviceState;
@@ -46,7 +45,6 @@ public class OneSignalPlugin
   /** Plugin registration. */
   private OSNotificationOpenedResult coldStartNotificationResult;
   private OSInAppMessageAction inAppMessageClickedResult;
-  private OSNotificationReceivedEvent notificationReceivedEvent;
   private boolean hasSetNotificationOpenedHandler = false;
   private boolean hasSetInAppMessageClickedHandler = false;
   private boolean hasSetNotificationWillShowInForegroundHandler = false;
@@ -322,10 +320,6 @@ public class OneSignalPlugin
 
   private void initNotificationWillShowInForegroundHandlerParams() {
     this.hasSetNotificationWillShowInForegroundHandler = true;
-    if (this.notificationReceivedEvent != null) {
-      this.notificationWillShowInForeground(this.notificationReceivedEvent);
-      this.notificationReceivedEvent = null;
-    }
   }
 
   private void completeNotification(MethodCall call, final Result reply) {
@@ -335,7 +329,6 @@ public class OneSignalPlugin
 
     if (notificationReceivedEvent == null) {
       OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Could not find notification completion block with id: " + notificationId);
-      replyError(reply, "OneSignal", "Could not find notification completion block with id: " + notificationId, null);
       return;
     }
 
@@ -344,8 +337,6 @@ public class OneSignalPlugin
     } else {
       notificationReceivedEvent.complete(null);
     }
-
-    replySuccess(reply, null);
   }
 
   @Override
@@ -392,7 +383,7 @@ public class OneSignalPlugin
   @Override
   public void notificationWillShowInForeground(OSNotificationReceivedEvent notificationReceivedEvent) {
     if (!this.hasSetNotificationWillShowInForegroundHandler) {
-      this.notificationReceivedEvent = notificationReceivedEvent;
+      notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
       return;
     }
 

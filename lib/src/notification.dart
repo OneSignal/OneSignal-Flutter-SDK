@@ -372,17 +372,15 @@ class OSNotificationReceivedEvent extends JSONStringRepresentable {
   OSNotification notification;
 
   OSNotificationReceivedEvent(Map<String, dynamic> json) {
-    print('OSNotificationReceivedEvent called');
     notification = OSNotification(json);
-
-    print('OSNotificationReceivedEvent notification: $notification');
   }
 
   void complete(OSNotification notification) {
+    print('OSNotificationReceivedEvent complete with notification: $notification');
     if (notification != null) {
         OneSignal.shared.completeNotification(notification.notificationId, true);
     } else {
-        OneSignal.shared.completeNotification(notification.notificationId, true);
+        OneSignal.shared.completeNotification(this.notification.notificationId, false);
     }
   }
 
