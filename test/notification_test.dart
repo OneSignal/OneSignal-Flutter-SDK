@@ -8,51 +8,35 @@ void main() {
   final notification = OSNotification(notificationJson);
 
   test('expect notification ID to be set', () {
-    expect(notification.payload.notificationId,
+    expect(notification.notificationId,
         "8e0eeec2-aa42-4ff7-a74b-bce9ca9e588b");
   });
 
   test('expect buttons to be parsed correctly', () {
-    expect(notification.payload.buttons.first.id, "test1");
+    expect(notification.buttons.first.id, "test1");
   });
 
   test('expect content available to be parsed correctly', () {
-    expect(notification.payload.contentAvailable, true);
+    expect(notification.contentAvailable, true);
   });
 
   test('expect sound to be parsed correctly', () {
-    expect(notification.payload.sound, "default");
+    expect(notification.sound, "default");
   });
 
   test('expect raw payload to be parsed correctly', () {
-    expect(notification.payload.rawPayload['test'], "raw payload");
+    expect(notification.rawPayload['test'], "raw payload");
   });
 
   test('expect attachments to be parsed correctly', () {
-    expect(notification.payload.attachments['id'], "https://www.onesignal.com");
+    expect(notification.attachments['id'], "https://www.onesignal.com");
   });
 
   test('expect body to be parsed correctly', () {
-    expect(notification.payload.body, 'Welcome to OneSignal!');
+    expect(notification.body, 'Welcome to OneSignal!');
   });
 
   test('expect mutable content to be parsed correctly', () {
-    expect(notification.payload.mutableContent, true);
-  });
-
-  test('expect display type to be parsed correctly', () {
-    expect(notification.displayType, OSNotificationDisplayType.alert);
-  });
-
-  test('expect body to be parsed correctly', () {
-    expect(notification.appInFocus, true);
-  });
-
-  test('expect silent to be parsed correctly', () {
-    expect(notification.silent, true);
-  });
-
-  test('expect shown to be parsed correctly', () {
-    expect(notification.shown, true);
+    expect(notification.mutableContent, true);
   });
 }

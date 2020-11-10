@@ -15,18 +15,10 @@ void main() {
     channelController.resetState();
   });
 
-  test('verify initialization', () {
-    onesignal.init(testAppId,
-        iOSSettings: {OSiOSSettings.autoPrompt: true}).then(expectAsync1((v) {
-      expect(channelController.state.appId, testAppId);
-      expect(channelController.state.iosSettings['kOSSettingsKeyAutoPrompt'],
-          true);
-    }));
-  });
-
   test('verify initialization without iOS Settings', () {
-    onesignal.init(testAppId);
-    expect(channelController.state.appId, testAppId);
+    onesignal.setAppId(testAppId).then(expectAsync1((v) {
+      expect(channelController.state.appId, testAppId);
+    }));
   });
 
   test('set set log level', () {
@@ -50,18 +42,9 @@ void main() {
     }));
   });
 
-  test('set display type', () {
-    onesignal
-        .setInFocusDisplayType(OSNotificationDisplayType.notification)
-        .then(expectAsync1((v) {
-      expect(channelController.state.inFocusDisplayType.index,
-          OSNotificationDisplayType.notification.index);
-    }));
-  });
-
-  test('set subscription', () {
-    onesignal.setSubscription(true).then(expectAsync1((v) {
-      expect(channelController.state.subscriptionState, true);
+  test('disable push', () {
+    onesignal.disablePush(true).then(expectAsync1((v) {
+      expect(channelController.state.disablePush, true);
     }));
   });
 
