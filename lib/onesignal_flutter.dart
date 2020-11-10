@@ -115,8 +115,8 @@ class OneSignal {
 
   /// The notification foreground handler is called whenever a notification arrives
   /// and the application is in foreground
-  Future<void> completeNotification(String notificationId, bool shouldDisplay) async {
-    await _channel.invokeMethod("OneSignal#completeNotification",
+  void completeNotification(String notificationId, bool shouldDisplay) {
+    _channel.invokeMethod("OneSignal#completeNotification",
         {'notificationId': notificationId, 'shouldDisplay': shouldDisplay});
   }
 

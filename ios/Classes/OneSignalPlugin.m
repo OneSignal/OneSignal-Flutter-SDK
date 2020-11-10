@@ -44,6 +44,8 @@
 */
 @property (atomic) BOOL waitingForUserConsent;
 
+@property (atomic) BOOL hasSetNotificationWillShowInForegroundHandler;
+
 /*
     Holds reference to any notifications received before the
     flutter runtime channel has been opened
@@ -59,6 +61,9 @@
 */
 @property (strong, nonatomic) OSInAppMessageAction *inAppMessageClickedResult;
 
+@property (strong, nonatomic) NSMutableDictionary* notificationCompletionCache;
+@property (strong, nonatomic) NSMutableDictionary* receivedNotificationCache;
+
 @end
 
 @implementation OneSignalPlugin
@@ -69,6 +74,8 @@
     dispatch_once(&onceToken, ^{
         sharedInstance = [OneSignalPlugin new];
         sharedInstance.waitingForUserConsent = false;
+        sharedInstance.receivedNotificationCache = [NSMutableDictionary new];;
+        sharedInstance.notificationCompletionCache = [NSMutableDictionary new];;
     });
     return sharedInstance;
 }
@@ -97,6 +104,9 @@
     [OneSignal addSubscriptionObserver:self];
     [OneSignal addPermissionObserver:self];
     [OneSignal addEmailSubscriptionObserver:self];
+    [OneSignal setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
+        [OneSignalPlugin.sharedInstance handleNotificationWillShowInForeground:notification completion:completion];
+    }];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
@@ -114,7 +124,7 @@
         [self setConsentStatus:call withResult:result];
     else if ([@"OneSignal#promptPermission" isEqualToString:call.method])
         [self promptPermission:call withResult:result];
-    else if ([@"OneSignal#getPermissionSubscriptionState" isEqualToString:call.method])
+    else if ([@"OneSignal#getDeviceState" isEqualToString:call.method])
         [self getDeviceState:call withResult:result];
     else if ([@"OneSignal#disablePush" isEqualToString:call.method])
         [self disablePush:call withResult:result];
@@ -136,6 +146,10 @@
         [self initNotificationOpenedHandlerParams];
     else if ([@"OneSignal#initInAppMessageClickedHandlerParams" isEqualToString:call.method])
         [self initInAppMessageClickedHandlerParams];
+    else if ([@"OneSignal#initNotificationWillShowInForegroundHandlerParams" isEqualToString:call.method])
+        [self initNotificationWillShowInForegroundHandlerParams];
+    else if ([@"OneSignal#completeNotification" isEqualToString:call.method])
+        [self completeNotification:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -204,7 +218,7 @@
     json[@"pushToken"] = deviceState.pushToken;
     json[@"emailUserId"] = deviceState.emailUserId;
     json[@"emailAddress"] = deviceState.emailAddress;
-//    json[@"emailSubscribed"] = @(deviceState.isEmailSubscribed);
+    json[@"emailSubscribed"] = @(deviceState.isEmailSubscribed);
     json[@"notificationPermissionStatus"] = @(deviceState.notificationPermissionStatus);
 
     return json;
@@ -294,14 +308,48 @@
     }
 }
 
-#pragma mark Received & Opened Notification Handlers
-- (void)handleReceivedNotification:(OSNotification *)notification {
-    [self.channel invokeMethod:@"OneSignal#handleReceivedNotification" arguments:notification.toJson ? notification.toJson : @[]];
+- (void)initNotificationWillShowInForegroundHandlerParams {
+    self.hasSetNotificationWillShowInForegroundHandler = YES;
 }
 
+#pragma mark Opened Notification Handlers
 - (void)handleNotificationOpened:(OSNotificationOpenedResult *)result {
     [self.channel invokeMethod:@"OneSignal#handleOpenedNotification" arguments:result.toJson];
 }
+
+#pragma mark Received in Foreground Notification Handlers
+- (void)handleNotificationWillShowInForeground:(OSNotification *)notification completion:(OSNotificationDisplayResponse)completion {
+    if (!self.hasSetNotificationWillShowInForegroundHandler) {
+        completion(notification);
+        return;
+    }
+
+    self.receivedNotificationCache[notification.notificationId] = notification;
+    self.notificationCompletionCache[notification.notificationId] = completion;
+    [self.channel invokeMethod:@"OneSignal#handleNotificationWillShowInForeground" arguments:notification.toJson];
+}
+
+- (void)completeNotification:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *notificationId = call.arguments[@"notificationId"];
+    BOOL shouldDisplay = [call.arguments[@"shouldDisplay"] boolValue];
+    OSNotificationDisplayResponse completion = self.notificationCompletionCache[notificationId];
+    
+    if (!completion) {
+        [OneSignal onesignal_Log:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
+        return;
+    }
+
+    if (shouldDisplay) {
+        OSNotification *notification = self.receivedNotificationCache[notificationId];
+        completion(notification);
+    } else {
+        completion(nil);
+    }
+
+    [self.notificationCompletionCache removeObjectForKey:notificationId];
+    [self.receivedNotificationCache removeObjectForKey:notificationId];
+}
+
 
 #pragma mark In App Message Click Handler
 - (void)handleInAppMessageClicked:(OSInAppMessageAction *)action {
