@@ -46,7 +46,7 @@ class _MyAppState extends State<MyApp> {
         .setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
            print('FOREGROUND HANDLER CALLED WITH: ${event}');
            /// Display Notification, send null to not display
-           event.complete(event.notification);
+           event.complete(null);
           
            this.setState(() {
            _debugLabelString =
