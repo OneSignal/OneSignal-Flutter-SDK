@@ -281,6 +281,12 @@ class OneSignal {
     return results.cast<String, dynamic>();
   }
 
+  Future<Map<String, dynamic>> setExternalUserIdWithAuthToken(String externalId, String authHashToken) async {
+    Map<dynamic, dynamic> results =
+        await _channel.invokeMethod("OneSignal#setExternalUserId", {'externalUserId' : externalId, 'authHashToken' : authHashToken});
+    return results.cast<String, dynamic>();
+  }
+
   /// Removes the external user ID that was set for the current user.
   Future<Map<String, dynamic>> removeExternalUserId() async {
     Map<dynamic, dynamic> results =
