@@ -10,11 +10,12 @@ import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationAction;
 import com.onesignal.OSNotificationOpenedResult;
 import com.onesignal.OSNotificationReceivedEvent;
+import com.onesignal.OSOutcomeEvent;
 import com.onesignal.OSPermissionState;
 import com.onesignal.OSPermissionStateChanges;
 import com.onesignal.OSSubscriptionState;
 import com.onesignal.OSSubscriptionStateChanges;
-import com.onesignal.OutcomeEvent;
+import com.onesignal.OSOutcomeEvent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -50,7 +51,7 @@ class OneSignalSerializer {
 
         hash.put("emailUserId", state.getEmailUserId());
         hash.put("emailAddress", state.getEmailAddress());
-        hash.put("subscribed", state.getSubscribed());
+        hash.put("subscribed", state.isSubscribed());
 
         return hash;
     }
@@ -209,7 +210,7 @@ class OneSignalSerializer {
         return convertNotificationToMap(notificationReceivedEvent.getNotification());
     }
 
-    static HashMap<String, Object> convertOutcomeEventToMap(OutcomeEvent outcomeEvent) {
+    static HashMap<String, Object> convertOutcomeEventToMap(OSOutcomeEvent outcomeEvent) {
         HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("session", outcomeEvent.getSession().toString());

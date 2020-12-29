@@ -283,7 +283,7 @@ public class OneSignalPlugin
 
     OneSignal.setExternalUserId(externalUserId, authHashToken, new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
       @Override
-      public void onComplete(JSONObject results) {
+      public void onSuccess(JSONObject results) {
         try {
           replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
         } catch (JSONException e) {
@@ -291,19 +291,33 @@ public class OneSignalPlugin
                   "Encountered an error attempting to deserialize server response for setExternalUserId: " + e.getMessage());
         }
       }
+
+      @Override
+      public void onFailure(OneSignal.ExternalIdError error) {
+        replyError(result, "OneSignal",
+                "Encountered an error setting external id: " + error.getMessage(),
+                null);
+      }
     });
   }
 
   private void removeExternalUserId(final Result result) {
     OneSignal.removeExternalUserId(new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
       @Override
-      public void onComplete(JSONObject results) {
+      public void onSuccess(JSONObject results) {
         try {
           replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
         } catch (JSONException e) {
           OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
                   "Encountered an error attempting to deserialize server response for removeExternalUserId: " + e.getMessage());
         }
+      }
+
+      @Override
+      public void onFailure(OneSignal.ExternalIdError error) {
+        replyError(result, "OneSignal",
+                "Encountered an error removing external id: " + error.getMessage(),
+                null);
       }
     });
   }
