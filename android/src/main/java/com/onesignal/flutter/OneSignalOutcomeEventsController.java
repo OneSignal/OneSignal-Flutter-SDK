@@ -1,7 +1,7 @@
 package com.onesignal.flutter;
 
 import com.onesignal.OneSignal;
-import com.onesignal.OutcomeEvent;
+import com.onesignal.OSOutcomeEvent;
 
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -28,7 +28,7 @@ class OSFlutterOutcomeEventsHandler extends FlutterRegistrarResponder implements
     }
 
     @Override
-    public void onSuccess(OutcomeEvent outcomeEvent) {
+    public void onSuccess(OSOutcomeEvent outcomeEvent) {
         if (this.replySubmitted.getAndSet(true))
             return;
 
