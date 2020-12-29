@@ -266,9 +266,9 @@ class OneSignal {
   /// OneSignal allows you to set a custom ID for your users. This makes it so that
   /// if your app has its own user ID's, you can use your own custom user ID's with
   /// our API instead of having to save their OneSignal user ID's.
-  Future<Map<String, dynamic>> setExternalUserId(String externalId) async {
+  Future<Map<String, dynamic>> setExternalUserId(String externalId, [String authHashToken]) async {
     Map<dynamic, dynamic> results =
-        await _channel.invokeMethod("OneSignal#setExternalUserId", {'externalUserId' : externalId});;
+        await _channel.invokeMethod("OneSignal#setExternalUserId", {'externalUserId' : externalId, 'authHashToken' : authHashToken});
     return results.cast<String, dynamic>();
   }
 
