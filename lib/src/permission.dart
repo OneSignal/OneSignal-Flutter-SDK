@@ -93,12 +93,7 @@ class OSDeviceState extends JSONStringRepresentable {
   String emailAddress;
 
   OSDeviceState(Map<String, dynamic> json) {
-    if (json.containsKey('areNotificationsEnabled')) {
-      this.hasNotificationPermission = json['areNotificationsEnabled'] as bool;
-    } else if (json.containsKey('hasNotificationPermission')) {
-      this.hasNotificationPermission = json['hasNotificationPermission'] as bool;
-    }
-
+    this.hasNotificationPermission = json['hasNotificationPermission'] as bool;
     this.pushDisabled = json['pushDisabled'] as bool;
     this.subscribed = json['subscribed'] as bool;
     this.emailSubscribed = json['emailSubscribed'] as bool;
