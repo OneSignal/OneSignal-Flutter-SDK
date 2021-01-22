@@ -51,7 +51,7 @@ class OneSignalSerializer {
 
         hash.put("emailUserId", state.getEmailUserId());
         hash.put("emailAddress", state.getEmailAddress());
-        hash.put("subscribed", state.isSubscribed());
+        hash.put("isSubscribed", state.isSubscribed());
 
         return hash;
     }
@@ -59,7 +59,7 @@ class OneSignalSerializer {
     static HashMap<String, Object> convertDeviceStateToMap(OSDeviceState state) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("areNotificationsEnabled", state.areNotificationsEnabled());
+        hash.put("hasNotificationPermission", state.areNotificationsEnabled());
         hash.put("pushDisabled", state.isPushDisabled());
         hash.put("subscribed", state.isSubscribed());
         hash.put("emailSubscribed", state.isEmailSubscribed());
