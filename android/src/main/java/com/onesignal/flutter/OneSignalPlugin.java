@@ -275,9 +275,15 @@ public class OneSignalPlugin
 
   private void setExternalUserId(MethodCall call, final Result result) {
     String externalUserId = call.argument("externalUserId");
-    OneSignal.setExternalUserId(externalUserId, new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
+    String authHashToken = call.argument("authHashToken");
+    if (externalUserId != null && externalUserId.length() == 0)
+      externalUserId = null;
+    if (authHashToken != null && authHashToken.length() == 0)
+      authHashToken = null;
+
+    OneSignal.setExternalUserId(externalUserId, authHashToken, new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
       @Override
-      public void onComplete(JSONObject results) {
+      public void onSuccess(JSONObject results) {
         try {
           replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
         } catch (JSONException e) {
@@ -285,19 +291,33 @@ public class OneSignalPlugin
                   "Encountered an error attempting to deserialize server response for setExternalUserId: " + e.getMessage());
         }
       }
+
+      @Override
+      public void onFailure(OneSignal.ExternalIdError error) {
+        replyError(result, "OneSignal",
+                "Encountered an error setting external id: " + error.getMessage(),
+                null);
+      }
     });
   }
 
   private void removeExternalUserId(final Result result) {
     OneSignal.removeExternalUserId(new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
       @Override
-      public void onComplete(JSONObject results) {
+      public void onSuccess(JSONObject results) {
         try {
           replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
         } catch (JSONException e) {
           OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
                   "Encountered an error attempting to deserialize server response for removeExternalUserId: " + e.getMessage());
         }
+      }
+
+      @Override
+      public void onFailure(OneSignal.ExternalIdError error) {
+        replyError(result, "OneSignal",
+                "Encountered an error removing external id: " + error.getMessage(),
+                null);
       }
     });
   }

@@ -181,7 +181,7 @@
 }
 
 - (void)oneSignalLog:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal onesignal_Log:(ONE_S_LOG_LEVEL)[call.arguments[@"logLevel"] integerValue] message:(NSString *)call.arguments[@"message"]];
+    [OneSignal onesignalLog:(ONE_S_LOG_LEVEL)[call.arguments[@"logLevel"] integerValue] message:(NSString *)call.arguments[@"message"]];
     result(nil);
 }
 
@@ -274,17 +274,26 @@
 
 - (void)setExternalUserId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     id externalId = call.arguments[@"externalUserId"];
+    id authHashToken = call.arguments[@"authHashToken"];
     if (externalId == [NSNull null])
         externalId = nil;
+    if (authHashToken == [NSNull null])
+        authHashToken = nil;
 
-    [OneSignal setExternalUserId:externalId withCompletion:^(NSDictionary *results) {
-       result(results);
+    [OneSignal setExternalUserId:externalId withExternalIdAuthHashToken:authHashToken withSuccess:^(NSDictionary *results) {
+        result(results);
+    } withFailure: ^(NSError* error) {
+        [OneSignal onesignalLog:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"Set external user id Failure with error: %@", error]];
+        result(error.flutterError);
     }];
 }
 
 - (void)removeExternalUserId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal removeExternalUserId:^(NSDictionary *results) {
         result(results);
+    } withFailure:^(NSError *error) {
+        [OneSignal onesignalLog:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"Remove external user id Failure with error: %@", error]];
+        result(error.flutterError);
     }];
 }
 
@@ -329,7 +338,7 @@
     OSNotificationDisplayResponse completion = self.notificationCompletionCache[notificationId];
     
     if (!completion) {
-        [OneSignal onesignal_Log:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
+        [OneSignal onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
         return;
     }
 
