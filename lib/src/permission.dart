@@ -69,8 +69,10 @@ class OSPermissionStateChanges extends JSONStringRepresentable {
   OSPermissionState to;
 
   OSPermissionStateChanges(Map<String, dynamic> json) {
-    this.from = OSPermissionState(json['from']);
-    this.to = OSPermissionState(json['to']);
+    if (json.containsKey('from'))
+      this.from = OSPermissionState(json['from'].cast<String, dynamic>());
+    if (json.containsKey('to'))
+      this.to = OSPermissionState(json['to'].cast<String, dynamic>());
   }
 
   String jsonRepresentation() {
