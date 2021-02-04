@@ -104,6 +104,9 @@
     [OneSignal addSubscriptionObserver:self];
     [OneSignal addPermissionObserver:self];
     [OneSignal addEmailSubscriptionObserver:self];
+    [OneSignal setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
+        [OneSignalPlugin.sharedInstance handleNotificationOpened:result];
+    }];
     [OneSignal setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
         [OneSignalPlugin.sharedInstance handleNotificationWillShowInForeground:notification completion:completion];
     }];
@@ -250,7 +253,6 @@
 }
 
 - (void)setEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-
     NSString *email = call.arguments[@"email"];
     NSString *emailAuthHashToken = call.arguments[@"emailAuthHashToken"];
 
