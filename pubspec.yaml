@@ -7,7 +7,11 @@ homepage: https://github.com/OneSignal/OneSignal-Flutter-SDK
 flutter:
   plugin:
     androidPackage: com.onesignal.flutter
-    pluginClass: OneSignalPlugin
+    platforms:
+      android:
+        pluginClass: OneSignalPlugin
+      ios:
+        pluginClass: OneSignalPlugin
 
 dependencies:
   flutter:
