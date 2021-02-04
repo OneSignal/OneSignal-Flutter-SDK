@@ -21,8 +21,7 @@ export 'src/outcome_event.dart';
 typedef void ReceivedNotificationHandler(OSNotification notification);
 typedef void OpenedNotificationHandler(OSNotificationOpenedResult openedResult);
 typedef void SubscriptionChangedHandler(OSSubscriptionStateChanges changes);
-typedef void EmailSubscriptionChangeHandler(
-  OSEmailSubscriptionStateChanges changes);
+typedef void EmailSubscriptionChangeHandler(OSEmailSubscriptionStateChanges changes);
 typedef void PermissionChangeHandler(OSPermissionStateChanges changes);
 typedef void InAppMessageClickedHandler(OSInAppMessageAction action);
 typedef void NotificationWillShowInForegroundHandler(OSNotificationReceivedEvent event);
@@ -359,7 +358,7 @@ class OneSignal {
     } else if (call.method == 'OneSignal#permissionChanged' &&
         this._onPermissionChangedHandler != null) {
       this._onPermissionChangedHandler(
-          OSPermissionStateChanges(call.arguments.cast<String, dynamic>()));
+           OSPermissionStateChanges(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#emailSubscriptionChanged' &&
         this._onEmailSubscriptionChangedHandler != null) {
       this._onEmailSubscriptionChangedHandler(
