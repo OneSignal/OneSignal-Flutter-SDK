@@ -206,7 +206,7 @@
     }];
 }
 
-- (NSDictionary* _Nonnull)getDeviceState:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+- (void)getDeviceState:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     OSDeviceState *deviceState = OneSignal.getDeviceState;
     
     NSMutableDictionary *json = [NSMutableDictionary new];
@@ -221,7 +221,7 @@
     json[@"emailSubscribed"] = @(deviceState.isEmailSubscribed);
     json[@"notificationPermissionStatus"] = @(deviceState.notificationPermissionStatus);
 
-    return json;
+    result(json);
 }
 
 - (void)disablePush:(FlutterMethodCall *)call withResult:(FlutterResult)result {
