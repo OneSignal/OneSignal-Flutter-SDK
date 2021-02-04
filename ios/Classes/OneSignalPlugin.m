@@ -360,7 +360,7 @@
 }
 
 #pragma mark OSSubscriptionObserver
-- (void)onOSSubscriptionChanged:(OSSubscriptionStateChanges*)stateChanges {
+- (void)onOSSubscriptionChanged:(OSSubscriptionStateChanges *)stateChanges {
    [self.channel invokeMethod:@"OneSignal#subscriptionChanged" arguments: stateChanges.toDictionary];
 }
 
