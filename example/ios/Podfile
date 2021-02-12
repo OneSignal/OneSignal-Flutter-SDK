@@ -55,7 +55,7 @@ target 'Runner' do
 end
 
 target 'OneSignalNotificationServiceExtension' do
-   pod 'OneSignal', '3.0.1'
+   pod 'OneSignal', '3.2.0'
 end
 
 post_install do |installer|
