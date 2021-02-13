@@ -243,6 +243,11 @@ class OneSignal {
     return response.cast<String, dynamic>();
   }
 
+  /// Allows you to manually remove all OneSignal notifications from the Notification Shade
+  Future<void> clearOneSignalNotifications() async {
+    return await _channel.invokeMethod("OneSignal#clearOneSignalNotifications");
+  }
+
   /// Allows you to prompt the user for permission to use location services
   Future<void> promptLocationPermission() async {
     return await _channel.invokeMethod("OneSignal#promptLocation");
