@@ -125,6 +125,8 @@ public class OneSignalPlugin
       this.completeNotification(call, result);
     else if (call.method.contentEquals("OneSignal#clearOneSignalNotifications"))
       this.clearOneSignalNotifications(call, result);
+    else if (call.method.contentEquals("OneSignal#removeNotification"))
+      this.removeNotification(call, result);
     else
       replyNotImplemented(result);
   }
@@ -354,6 +356,13 @@ public class OneSignalPlugin
 
   private void clearOneSignalNotifications(MethodCall call, final Result reply) {
     OneSignal.clearOneSignalNotifications();
+
+    replySuccess(reply, null);
+  }
+
+  private void removeNotification(MethodCall call, final Result reply) {
+    int notificationId = call.argument("notificationId");
+    OneSignal.removeNotification(notificationId);
 
     replySuccess(reply, null);
   }
