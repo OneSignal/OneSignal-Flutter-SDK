@@ -93,6 +93,8 @@ public class OneSignalPlugin
       this.setRequiresUserPrivacyConsent(call, result);
     else if (call.method.contentEquals("OneSignal#consentGranted"))
       this.consentGranted(call, result);
+    else if (call.method.contentEquals("OneSignal#userProvidedPrivacyConsent"))
+      this.userProvidedPrivacyConsent(call, result);
     else if (call.method.contentEquals("OneSignal#promptPermission"))
       this.promptPermission(call, result);
     else if (call.method.contentEquals("OneSignal#getDeviceState"))
@@ -190,6 +192,12 @@ public class OneSignalPlugin
     }
 
     replySuccess(reply, null);
+  }
+
+  private void userProvidedPrivacyConsent(MethodCall call, Result reply) {
+    boolean result = OneSignal.userProvidedPrivacyConsent();
+
+    replySuccess(reply, result);
   }
 
   private void promptPermission(MethodCall call, Result result) {
