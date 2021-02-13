@@ -123,6 +123,8 @@ public class OneSignalPlugin
       this.initNotificationWillShowInForegroundHandlerParams();
     else if (call.method.contentEquals("OneSignal#completeNotification"))
       this.completeNotification(call, result);
+    else if (call.method.contentEquals("OneSignal#clearOneSignalNotifications"))
+      this.clearOneSignalNotifications(call, result);
     else
       replyNotImplemented(result);
   }
@@ -348,6 +350,12 @@ public class OneSignalPlugin
 
   private void initNotificationWillShowInForegroundHandlerParams() {
     this.hasSetNotificationWillShowInForegroundHandler = true;
+  }
+
+  private void clearOneSignalNotifications(MethodCall call, final Result reply) {
+    OneSignal.clearOneSignalNotifications();
+
+    replySuccess(reply, null);
   }
 
   private void completeNotification(MethodCall call, final Result reply) {
