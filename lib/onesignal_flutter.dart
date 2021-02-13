@@ -136,6 +136,14 @@ class OneSignal {
         .invokeMethod("OneSignal#consentGranted", {'granted': granted});
   }
 
+  /// A boolean value indicating if the user provided privacy consent
+  Future<bool> userProvidedPrivacyConsent() async {
+    var val =
+        await _channel.invokeMethod("OneSignal#userProvidedPrivacyConsent");
+
+    return val as bool;
+  }
+
   /// A boolean value indicating if the OneSignal SDK is waiting for the
   /// user's consent before it can initialize (if you set the app to
   /// require the user's consent)
