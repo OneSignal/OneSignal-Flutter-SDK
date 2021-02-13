@@ -248,6 +248,12 @@ class OneSignal {
     return await _channel.invokeMethod("OneSignal#clearOneSignalNotifications");
   }
 
+  /// Allows you to manually cancel a single OneSignal notification based on its Android notification integer ID
+  void removeNotification(int notificationId) {
+    _channel.invokeMethod("OneSignal#removeNotification",
+        {'notificationId': notificationId});
+  }
+
   /// Allows you to prompt the user for permission to use location services
   Future<void> promptLocationPermission() async {
     return await _channel.invokeMethod("OneSignal#promptLocation");
