@@ -27,7 +27,7 @@ class OneSignalMockChannelController {
     print("Mock method called: ${call.method}");
     switch (call.method) {
       case "OneSignal#setAppId":
-        this.state.initialize(call.arguments);
+        this.state.setAppId(call.arguments);
         break;
       case "OneSignal#setLogLevel":
         this.state.setLogLevel(call.arguments);
@@ -106,7 +106,7 @@ class OneSignalState {
     parameters, and sets properties on the object itself
   */
 
-  void initialize(Map<dynamic, dynamic> params) {
+  void setAppId(Map<dynamic, dynamic> params) {
     this.appId = params['appId'];
   }
 
