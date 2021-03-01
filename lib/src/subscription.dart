@@ -67,7 +67,6 @@ class OSEmailSubscriptionState extends JSONStringRepresentable {
 
   OSEmailSubscriptionState(Map<String, dynamic> json) {
     this.subscribed = false;
-    print("OSEmailSubscriptionState with json: $json");
     if (json.containsKey('emailAddress') && json['emailAddress'] != null)
       this.emailAddress = json['emailAddress'] as String;
 
