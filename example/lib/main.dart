@@ -36,9 +36,10 @@ class _MyAppState extends State<MyApp> {
 
     OneSignal.shared
         .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-        this.setState(() {
-        _debugLabelString =
-            "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+          print('NOTIFICATION OPENED HANDLER CALLED WITH: ${result}');
+          this.setState(() {
+          _debugLabelString =
+              "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
     });
 
@@ -89,8 +90,13 @@ class _MyAppState extends State<MyApp> {
     // Some examples of how to use In App Messaging public methods with OneSignal SDK
     oneSignalInAppMessagingTriggerExamples();
 
+    OneSignal.shared.disablePush(false);
+
     // Some examples of how to use Outcome Events public methods with OneSignal SDK
-    // oneSignalOutcomeEventsExamples();
+    oneSignalOutcomeEventsExamples();
+
+    bool userProvidedPrivacyConsent = await OneSignal.shared.userProvidedPrivacyConsent();
+    print("USER PROVIDED PRIVACY CONSENT: $userProvidedPrivacyConsent");
   }
 
   void _handleGetTags() {
@@ -114,6 +120,14 @@ class _MyAppState extends State<MyApp> {
     }).catchError((error) {
       print("Encountered an error sending tags: $error");
     });
+
+    print("Sending tags array");
+    var sendTags = {'test': 'value'};
+    OneSignal.shared.sendTags(sendTags).then((response) {
+      print("Successfully sent tags with response: $response");
+    }).catchError((error) {
+      print("Encountered an error sending tags: $error");
+    });
   }
 
   void _handlePromptForPushPermission() {
@@ -123,9 +137,10 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
-  void _handleGetDeviceState() {
+  void _handleGetDeviceState() async {
     print("Getting DeviceState");
     OneSignal.shared.getDeviceState().then((deviceState) {
+      print("DeviceState: ${deviceState.jsonRepresentation()}");
       this.setState(() {
         _debugLabelString = deviceState.jsonRepresentation();
       });
@@ -174,6 +189,13 @@ class _MyAppState extends State<MyApp> {
       print("Successfully deleted tags with response $response");
     }).catchError((error) {
       print("Encountered error deleting tag: $error");
+    });
+
+    print("Deleting tags array");
+    OneSignal.shared.deleteTags(['test']).then((response) {
+      print("Successfully sent tags with response: $response");
+    }).catchError((error) {
+      print("Encountered an error sending tags: $error");
     });
   }
 
