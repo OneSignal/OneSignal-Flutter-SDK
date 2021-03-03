@@ -34,7 +34,7 @@ android {
 }
 
 dependencies {
-    api 'com.onesignal:OneSignal:4.1.0'
+    api 'com.onesignal:OneSignal:4.2.0'
 }
 
 // Adds required manifestPlaceholders keys to allow mainifest merge gradle step to complete
