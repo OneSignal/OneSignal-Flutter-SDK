@@ -4,6 +4,8 @@
 
 ### OneSignal Flutter SDK [![Build Status](https://travis-ci.org/OneSignal/OneSignal-Flutter-SDK.svg?branch=master)](https://travis-ci.org/OneSignal/OneSignal-Flutter-SDK)
 
+> Now supports null safety.
+
 ---
 
 [OneSignal](https://onesignal.com/) is a free push notification service for mobile apps. This SDK makes it easy to integrate your Flutter iOS and/or Android apps with OneSignal.
