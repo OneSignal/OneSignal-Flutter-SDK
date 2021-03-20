@@ -19,7 +19,7 @@ void main() {
     onesignal.init(testAppId,
         iOSSettings: {OSiOSSettings.autoPrompt: true}).then(expectAsync1((v) {
       expect(channelController.state.appId, testAppId);
-      expect(channelController.state.iosSettings['kOSSettingsKeyAutoPrompt'],
+      expect(channelController.state.iosSettings?['kOSSettingsKeyAutoPrompt'],
           true);
     }));
   });
@@ -70,9 +70,9 @@ void main() {
       "content_available": true,
       "include_player_ids": [testPlayerId]
     }).then(expectAsync1((v) {
-      expect(channelController.state.postNotificationJson['content_available'],
+      expect(channelController.state.postNotificationJson?['content_available'],
           true);
-      expect(channelController.state.postNotificationJson['include_player_ids'],
+      expect(channelController.state.postNotificationJson?['include_player_ids'],
           [testPlayerId]);
     }));
   });

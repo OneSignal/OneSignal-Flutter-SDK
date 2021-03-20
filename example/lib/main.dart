@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
 
+import 'package:flutter/material.dart';
 //import OneSignal
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
@@ -39,7 +39,8 @@ class _MyAppState extends State<MyApp> {
       OSiOSSettings.promptBeforeOpeningPushUrl: true
     };
 
-    OneSignal.shared.setNotificationReceivedHandler((OSNotification notification) {
+    OneSignal.shared
+        .setNotificationReceivedHandler((OSNotification notification) {
       this.setState(() {
         _debugLabelString =
             "Received notification: \n${notification.jsonRepresentation().replaceAll("\\n", "\n")}";
@@ -55,7 +56,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     OneSignal.shared
-    .setInAppMessageClickedHandler((OSInAppMessageAction action) {
+        .setInAppMessageClickedHandler((OSInAppMessageAction action) {
       this.setState(() {
         _debugLabelString =
             "In App Message Clicked: \n${action.jsonRepresentation().replaceAll("\\n", "\n")}";
@@ -83,11 +84,13 @@ class _MyAppState extends State<MyApp> {
     OneSignal.shared
         .setInFocusDisplayType(OSNotificationDisplayType.notification);
 
-    bool requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
+    bool? requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
 
-    this.setState(() {
-      _enableConsentButton = requiresConsent;
-    });
+    if (requiresConsent != null) {
+      this.setState(() {
+        _enableConsentButton = requiresConsent;
+      });
+    }
 
     // Some examples of how to use In App Messaging public methods with OneSignal SDK
     oneSignalInAppMessagingTriggerExamples();
@@ -129,9 +132,11 @@ class _MyAppState extends State<MyApp> {
   void _handleGetPermissionSubscriptionState() {
     print("Getting permissionSubscriptionState");
     OneSignal.shared.getPermissionSubscriptionState().then((status) {
-      this.setState(() {
-        _debugLabelString = status.jsonRepresentation();
-      });
+      if (status != null) {
+        this.setState(() {
+          _debugLabelString = status.jsonRepresentation();
+        });
+      }
     });
   }
 
@@ -183,34 +188,34 @@ class _MyAppState extends State<MyApp> {
   void _handleSetExternalUserId() {
     print("Setting external user ID");
     OneSignal.shared.setExternalUserId(_externalUserId).then((results) {
-        if (results == null) return;
+      if (results == null) return;
 
-        this.setState(() {
-            _debugLabelString = "External user id set: $results";
-        });
+      this.setState(() {
+        _debugLabelString = "External user id set: $results";
+      });
     });
   }
 
   void _handleRemoveExternalUserId() {
     OneSignal.shared.removeExternalUserId().then((results) {
-        if (results == null) return;
+      if (results == null) return;
 
-        this.setState(() {
-           _debugLabelString = "External user id removed: $results";
-        });
+      this.setState(() {
+        _debugLabelString = "External user id removed: $results";
+      });
     });
   }
 
   void _handleSendNotification() async {
     var status = await OneSignal.shared.getPermissionSubscriptionState();
 
-    var playerId = status.subscriptionStatus.userId;
+    var playerId = status?.subscriptionStatus.userId;
 
     var imgUrlString =
         "http://cdn1-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-2.jpg";
 
     var notification = OSCreateNotification(
-        playerIds: [playerId],
+        playerIds: playerId != null ? [playerId] : [],
         content: "this is a test from OneSignal's Flutter SDK",
         heading: "Test Notification",
         iosAttachments: {"id1": imgUrlString},
@@ -230,10 +235,11 @@ class _MyAppState extends State<MyApp> {
   void _handleSendSilentNotification() async {
     var status = await OneSignal.shared.getPermissionSubscriptionState();
 
-    var playerId = status.subscriptionStatus.userId;
+    var playerId = status?.subscriptionStatus.userId;
 
     var notification = OSCreateNotification.silentNotification(
-        playerIds: [playerId], additionalData: {'test': 'value'});
+        playerIds: playerId != null ? [playerId] : [],
+        additionalData: {'test': 'value'});
 
     var response = await OneSignal.shared.postNotification(notification);
 
@@ -261,7 +267,8 @@ class _MyAppState extends State<MyApp> {
     OneSignal.shared.removeTriggerForKey("trigger_2");
 
     // Get the value for a trigger by its key
-    Object triggerValue = await OneSignal.shared.getTriggerValueForKey("trigger_3");
+    Object? triggerValue =
+        await OneSignal.shared.getTriggerValueForKey("trigger_3");
     print("'trigger_3' key trigger value: " + triggerValue.toString());
 
     // Create a list and bulk remove triggers based on keys supplied
@@ -296,8 +303,8 @@ class _MyAppState extends State<MyApp> {
   }
 
   Future<void> outcomeAwaitExample() async {
-      var outcomeEvent = await OneSignal.shared.sendOutcome("await_normal_1");
-      print(outcomeEvent.jsonRepresentation());
+    var outcomeEvent = await OneSignal.shared.sendOutcome("await_normal_1");
+    print(outcomeEvent.jsonRepresentation());
   }
 
   @override
@@ -400,12 +407,12 @@ class _MyAppState extends State<MyApp> {
                     )
                   ]),
                   new TableRow(children: [
-                    new OneSignalButton(
-                        "Set External User ID", _handleSetExternalUserId, !_enableConsentButton)
+                    new OneSignalButton("Set External User ID",
+                        _handleSetExternalUserId, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
-                    new OneSignalButton(
-                        "Remove External User ID", _handleRemoveExternalUserId, !_enableConsentButton)
+                    new OneSignalButton("Remove External User ID",
+                        _handleRemoveExternalUserId, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new Container(
@@ -436,16 +443,15 @@ class OneSignalButton extends StatefulWidget {
 class OneSignalButtonState extends State<OneSignalButton> {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
     return new Table(
       children: [
         new TableRow(children: [
-          new FlatButton(
-            disabledColor: Color.fromARGB(180, 212, 86, 83),
-            disabledTextColor: Colors.white,
-            color: Color.fromARGB(255, 212, 86, 83),
-            textColor: Colors.white,
-            padding: EdgeInsets.all(8.0),
+          new TextButton(
+            style: TextButton.styleFrom(
+              backgroundColor: Color.fromARGB(255, 212, 86, 83),
+              textStyle: TextStyle(color: Colors.white),
+              padding: EdgeInsets.all(8.0),
+            ),
             child: new Text(widget.title),
             onPressed: widget.enabled ? widget.onPressed : null,
           )

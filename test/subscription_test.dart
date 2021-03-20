@@ -25,7 +25,7 @@ void main() {
 
   test('expect subscription correctly parses `subscribed`', () {
     expect(subscriptionChanges.to.subscribed,
-        !subscriptionChanges.from.subscribed);
+        !subscriptionChanges.from.subscribed!);
   });
 
   test('expect subscription correctly parses `userSubscriptionSetting`', () {

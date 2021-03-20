@@ -12,7 +12,7 @@ void main() {
   });
 
   test('expect notification to parse additional data correctly', () {
-    expect(silentNotification.additionalData['test'], 'value');
+    expect(silentNotification.additionalData?['test'], 'value');
   });
 
   //normal notification tests

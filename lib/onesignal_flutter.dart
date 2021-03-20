@@ -22,7 +22,7 @@ typedef void ReceivedNotificationHandler(OSNotification notification);
 typedef void OpenedNotificationHandler(OSNotificationOpenedResult openedResult);
 typedef void SubscriptionChangedHandler(OSSubscriptionStateChanges changes);
 typedef void EmailSubscriptionChangeHandler(
-  OSEmailSubscriptionStateChanges changes);
+    OSEmailSubscriptionStateChanges changes);
 typedef void PermissionChangeHandler(OSPermissionStateChanges changes);
 typedef void InAppMessageClickedHandler(OSInAppMessageAction action);
 
@@ -31,21 +31,22 @@ class OneSignal {
   /// Note that the iOS and Android native libraries are static,
   /// so if you create multiple instances of OneSignal, they will
   /// mostly share the same state.
-  static OneSignal shared = new OneSignal();
+  static OneSignal shared = OneSignal();
 
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal');
   MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
-  MethodChannel _inAppMessagesChannel = const MethodChannel('OneSignal#inAppMessages');
+  MethodChannel _inAppMessagesChannel =
+      const MethodChannel('OneSignal#inAppMessages');
   MethodChannel _outcomesChannel = const MethodChannel('OneSignal#outcomes');
 
   // event handlers
-  ReceivedNotificationHandler _onReceivedNotification;
-  OpenedNotificationHandler _onOpenedNotification;
-  SubscriptionChangedHandler _onSubscriptionChangedHandler;
-  EmailSubscriptionChangeHandler _onEmailSubscriptionChangedHandler;
-  PermissionChangeHandler _onPermissionChangedHandler;
-  InAppMessageClickedHandler _onInAppMessageClickedHandler;
+  ReceivedNotificationHandler? _onReceivedNotification;
+  OpenedNotificationHandler? _onOpenedNotification;
+  SubscriptionChangedHandler? _onSubscriptionChangedHandler;
+  EmailSubscriptionChangeHandler? _onEmailSubscriptionChangedHandler;
+  PermissionChangeHandler? _onPermissionChangedHandler;
+  InAppMessageClickedHandler? _onInAppMessageClickedHandler;
 
   // constructor method
   OneSignal() {
@@ -55,7 +56,7 @@ class OneSignal {
   /// The initializer for OneSignal. Note that this initializer
   /// accepts an iOSSettings object, in Android you can pass null.
   Future<void> init(String appId,
-      {Map<OSiOSSettings, dynamic> iOSSettings}) async {
+      {Map<OSiOSSettings, dynamic>? iOSSettings}) async {
     _onesignalLog(OSLogLevel.verbose,
         "Initializing the OneSignal Flutter SDK ($sdkVersion)");
 
@@ -134,26 +135,26 @@ class OneSignal {
   /// A boolean value indicating if the OneSignal SDK is waiting for the
   /// user's consent before it can initialize (if you set the app to
   /// require the user's consent)
-  Future<bool> requiresUserPrivacyConsent() async {
+  Future<bool?> requiresUserPrivacyConsent() async {
     var val =
         await _channel.invokeMethod("OneSignal#requiresUserPrivacyConsent");
 
-    return val as bool;
+    return val as bool?;
   }
 
   /// in iOS, will prompt the user for permission to send push notifications.
-  Future<bool> promptUserForPushNotificationPermission(
+  Future<bool?> promptUserForPushNotificationPermission(
       {bool fallbackToSettings = false}) async {
     dynamic result = await _channel.invokeMethod(
         "OneSignal#promptPermission", {'fallback': fallbackToSettings});
 
-    return result as bool;
+    return result as bool?;
   }
 
   /// The current setting that controls how notifications are displayed.
-  Future<OSNotificationDisplayType> inFocusDisplayType() async {
-    int type = await _channel.invokeMethod("OneSignal#inFocusDisplayType");
-    return OSNotificationDisplayType.values[type];
+  Future<OSNotificationDisplayType?> inFocusDisplayType() async {
+    int? type = await _channel.invokeMethod("OneSignal#inFocusDisplayType");
+    return type != null ? OSNotificationDisplayType.values[type] : null;
   }
 
   Future<void> setInFocusDisplayType(
@@ -167,19 +168,19 @@ class OneSignal {
   /// This method can often take more than five seconds to complete,
   /// so please do NOT block any user-interactive content while
   /// waiting for this request to complete.
-  Future<Map<String, dynamic>> sendTag(String key, dynamic value) async {
-    Map<dynamic, dynamic> response = await this.sendTags({key: value});
-    return response.cast<String, dynamic>();
+  Future<Map<String, dynamic>?> sendTag(String key, dynamic value) async {
+    Map<dynamic, dynamic>? response = await this.sendTags({key: value});
+    return response?.cast<String, dynamic>();
   }
 
   /// Updates the user's OneSignal tags. This method is additive
   /// This method can often take more than five seconds to complete,
   /// so please do NOT block any user-interactive content while
   /// waiting for this request to complete.
-  Future<Map<String, dynamic>> sendTags(Map<String, dynamic> tags) async {
-    Map<dynamic, dynamic> response =
+  Future<Map<String, dynamic>?> sendTags(Map<String, dynamic> tags) async {
+    Map<dynamic, dynamic>? response =
         await _tagsChannel.invokeMethod("OneSignal#sendTags", tags);
-    return response.cast<String, dynamic>();
+    return response?.cast<String, dynamic>();
   }
 
   /// An asynchronous method that makes an HTTP request to OneSignal's
@@ -187,38 +188,41 @@ class OneSignal {
   /// This request can take a while to complete: please do NOT block
   /// any user-interactive content while waiting for this request
   /// to finish.
-  Future<Map<String, dynamic>> getTags() async {
-    Map<dynamic, dynamic> tags =
+  Future<Map<String, dynamic>?> getTags() async {
+    Map<dynamic, dynamic>? tags =
         await _tagsChannel.invokeMethod("OneSignal#getTags");
-    return tags.cast<String, dynamic>();
+    return tags?.cast<String, dynamic>();
   }
 
   /// Allows you to delete a single key/value pair from the user's tags
   /// by specifying the key. This method can often take more than five
   /// seconds to complete, so please do NOT block any user-interactive
   /// content while waiting for this request to complete.
-  Future<Map<String, dynamic>> deleteTag(String key) async {
-    Map<dynamic, dynamic> response = await this.deleteTags([key]);
-    return response.cast<String, dynamic>();
+  Future<Map<String, dynamic>?> deleteTag(String key) async {
+    Map<dynamic, dynamic>? response = await this.deleteTags([key]);
+    return response?.cast<String, dynamic>();
   }
 
   /// Allows you to delete an array of tags by specifying an
   /// array of keys.
-  Future<Map<String, dynamic>> deleteTags(List<String> keys) async {
-    Map<dynamic, dynamic> response =
+  Future<Map<String, dynamic>?> deleteTags(List<String> keys) async {
+    Map<dynamic, dynamic>? response =
         await _tagsChannel.invokeMethod("OneSignal#deleteTags", keys);
-    return response.cast<String, dynamic>();
+    return response?.cast<String, dynamic>();
   }
 
   /// Returns an `OSPermissionSubscriptionState` object, which contains three properties:
   ///   1. `subscriptionStatus` : Describes the current user's OneSignal Push notification subscription
   ///   2. `emailSubscriptionStatus` : The current user's email subscription state
   ///   3. `permissionStatus` : The current user's permission, ie. have they answered the iOS permission prompt
-  Future<OSPermissionSubscriptionState> getPermissionSubscriptionState() async {
+  Future<OSPermissionSubscriptionState?>
+      getPermissionSubscriptionState() async {
     var json =
         await _channel.invokeMethod("OneSignal#getPermissionSubscriptionState");
 
-    return OSPermissionSubscriptionState(json.cast<String, dynamic>());
+    return json != null
+        ? OSPermissionSubscriptionState(json.cast<String, dynamic>())
+        : null;
   }
 
   /// Allows you to manually disable or enable push notifications for this user.
@@ -231,18 +235,18 @@ class OneSignal {
 
   /// Allows you to post a notification to the current user (or a different user
   /// if you specify their OneSignal user ID).
-  Future<Map<String, dynamic>> postNotificationWithJson(
+  Future<Map<String, dynamic>?> postNotificationWithJson(
       Map<String, dynamic> json) async {
-    Map<dynamic, dynamic> response =
+    Map<dynamic, dynamic>? response =
         await _channel.invokeMethod("OneSignal#postNotification", json);
-    return response.cast<String, dynamic>();
+    return response?.cast<String, dynamic>();
   }
 
-  Future<Map<String, dynamic>> postNotification(
+  Future<Map<String, dynamic>?> postNotification(
       OSCreateNotification notification) async {
-    Map<dynamic, dynamic> response = await _channel.invokeMethod(
+    Map<dynamic, dynamic>? response = await _channel.invokeMethod(
         "OneSignal#postNotification", notification.mapRepresentation());
-    return response.cast<String, dynamic>();
+    return response?.cast<String, dynamic>();
   }
 
   /// Allows you to prompt the user for permission to use location services
@@ -261,7 +265,7 @@ class OneSignal {
   /// Identity Verification. The email auth hash is a hash of your app's API key and the
   /// user ID. We recommend you generate this token from your backend server, do NOT
   /// store your API key in your app as this is highly insecure.
-  Future<void> setEmail({String email, String emailAuthHashToken}) async {
+  Future<void> setEmail({String? email, String? emailAuthHashToken}) async {
     return await _channel.invokeMethod("OneSignal#setEmail",
         {'email': email, 'emailAuthHashToken': emailAuthHashToken});
   }
@@ -275,113 +279,124 @@ class OneSignal {
   /// OneSignal allows you to set a custom ID for your users. This makes it so that
   /// if your app has its own user ID's, you can use your own custom user ID's with
   /// our API instead of having to save their OneSignal user ID's.
-  Future<Map<String, dynamic>> setExternalUserId(String externalId, [String authHashToken]) async {
-    Map<dynamic, dynamic> results =
-        await _channel.invokeMethod("OneSignal#setExternalUserId", {'externalUserId' : externalId, 'authHashToken' : authHashToken});
-    return results.cast<String, dynamic>();
+  Future<Map<String, dynamic>?> setExternalUserId(String? externalId,
+      [String? authHashToken]) async {
+    Map<dynamic, dynamic>? results = await _channel.invokeMethod(
+        "OneSignal#setExternalUserId",
+        {'externalUserId': externalId, 'authHashToken': authHashToken});
+    return results?.cast<String, dynamic>();
   }
 
   /// Removes the external user ID that was set for the current user.
-  Future<Map<String, dynamic>> removeExternalUserId() async {
-    Map<dynamic, dynamic> results =
+  Future<Map<String, dynamic>?> removeExternalUserId() async {
+    Map<dynamic, dynamic>? results =
         await _channel.invokeMethod("OneSignal#removeExternalUserId");
-    return results.cast<String, dynamic>();
+    return results?.cast<String, dynamic>();
   }
 
   /// Adds a single key, value trigger, which will trigger an in app message
   /// if one exists matching the specific trigger added
   Future<void> addTrigger(String key, Object value) async {
-    return await _inAppMessagesChannel.invokeMethod("OneSignal#addTrigger", {key : value});
+    return await _inAppMessagesChannel
+        .invokeMethod("OneSignal#addTrigger", {key: value});
   }
 
   /// Adds one or more key, value triggers, which will trigger in app messages
   /// (one at a time) if any exist matching the specific triggers added
   Future<void> addTriggers(Map<String, Object> triggers) async {
-    return await _inAppMessagesChannel.invokeMethod("OneSignal#addTriggers", triggers);
+    return await _inAppMessagesChannel.invokeMethod(
+        "OneSignal#addTriggers", triggers);
   }
 
   /// Remove a single key, value trigger to prevent an in app message from
   /// showing with that trigger
   Future<void> removeTriggerForKey(String key) async {
-    return await _inAppMessagesChannel.invokeMethod("OneSignal#removeTriggerForKey", key);
+    return await _inAppMessagesChannel.invokeMethod(
+        "OneSignal#removeTriggerForKey", key);
   }
 
   /// Remove one or more key, value triggers to prevent any in app messages
   /// from showing with those triggers
   Future<void> removeTriggersForKeys(List<String> keys) async {
-    return await _inAppMessagesChannel.invokeMethod("OneSignal#removeTriggersForKeys", keys);
+    return await _inAppMessagesChannel.invokeMethod(
+        "OneSignal#removeTriggersForKeys", keys);
   }
 
   /// Get the trigger value associated with the key provided
-  Future<Object> getTriggerValueForKey(String key) async {
-    return await _inAppMessagesChannel.invokeMethod("OneSignal#getTriggerValueForKey", key);
+  Future<Object?> getTriggerValueForKey(String key) async {
+    return await _inAppMessagesChannel.invokeMethod(
+        "OneSignal#getTriggerValueForKey", key);
   }
 
   /// Toggles the showing of all in app messages
   Future<void> pauseInAppMessages(bool pause) async {
-    return await _inAppMessagesChannel.invokeMethod("OneSignal#pauseInAppMessages", pause);
+    return await _inAppMessagesChannel.invokeMethod(
+        "OneSignal#pauseInAppMessages", pause);
   }
 
   /// Send a normal outcome event for the current session and notifications with the attribution window
   /// Counted each time sent successfully, failed ones will be cached and reattempted in future
   Future<OSOutcomeEvent> sendOutcome(String name) async {
-    var json = await _outcomesChannel.invokeMethod("OneSignal#sendOutcome", name);
+    var json =
+        await _outcomesChannel.invokeMethod("OneSignal#sendOutcome", name);
 
-    if (json == null)
-      return new OSOutcomeEvent();
+    if (json == null) return OSOutcomeEvent();
 
-    return new OSOutcomeEvent.fromMap(json.cast<String, dynamic>());
+    return OSOutcomeEvent.fromMap(json.cast<String, dynamic>());
   }
 
   /// Send a unique outcome event for the current session and notifications with the attribution window
   /// Counted once per notification when sent successfully, failed ones will be cached and reattempted in future
   Future<OSOutcomeEvent> sendUniqueOutcome(String name) async {
-    var json = await _outcomesChannel.invokeMethod("OneSignal#sendUniqueOutcome", name);
+    var json = await _outcomesChannel.invokeMethod(
+        "OneSignal#sendUniqueOutcome", name);
 
-    if (json == null)
-      return new OSOutcomeEvent();
+    if (json == null) return OSOutcomeEvent();
 
-    return new OSOutcomeEvent.fromMap(json.cast<String, dynamic>());
+    return OSOutcomeEvent.fromMap(json.cast<String, dynamic>());
   }
 
   /// Send an outcome event with a value for the current session and notifications with the attribution window
   /// Counted each time sent successfully, failed ones will be cached and reattempted in future
   Future<OSOutcomeEvent> sendOutcomeWithValue(String name, double value) async {
-    var json = await _outcomesChannel.invokeMethod("OneSignal#sendOutcomeWithValue", {"outcome_name" : name, "outcome_value" : value});
+    var json = await _outcomesChannel.invokeMethod(
+        "OneSignal#sendOutcomeWithValue",
+        {"outcome_name": name, "outcome_value": value});
 
-    if (json == null)
-      return new OSOutcomeEvent();
+    if (json == null) return OSOutcomeEvent();
 
-    return new OSOutcomeEvent.fromMap(json.cast<String, dynamic>());
+    return OSOutcomeEvent.fromMap(json.cast<String, dynamic>());
   }
 
   // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#handleReceivedNotification' &&
         this._onReceivedNotification != null) {
-      this._onReceivedNotification(
-          OSNotification(call.arguments.cast<String, dynamic>()));
+      this
+          ._onReceivedNotification
+          ?.call(OSNotification(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#handleOpenedNotification' &&
         this._onOpenedNotification != null) {
-      this._onOpenedNotification(
+      this._onOpenedNotification?.call(
           OSNotificationOpenedResult(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#subscriptionChanged' &&
         this._onSubscriptionChangedHandler != null) {
-      this._onSubscriptionChangedHandler(
+      this._onSubscriptionChangedHandler?.call(
           OSSubscriptionStateChanges(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#permissionChanged' &&
         this._onPermissionChangedHandler != null) {
-      this._onPermissionChangedHandler(
+      this._onPermissionChangedHandler?.call(
           OSPermissionStateChanges(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#emailSubscriptionChanged' &&
         this._onEmailSubscriptionChangedHandler != null) {
-      this._onEmailSubscriptionChangedHandler(
+      this._onEmailSubscriptionChangedHandler?.call(
           OSEmailSubscriptionStateChanges(
               call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#handleClickedInAppMessage' &&
         this._onInAppMessageClickedHandler != null) {
-      this._onInAppMessageClickedHandler(
-          OSInAppMessageAction(call.arguments.cast<String, dynamic>()));
+      this
+          ._onInAppMessageClickedHandler
+          ?.call(OSInAppMessageAction(call.arguments.cast<String, dynamic>()));
     }
     return null;
   }
@@ -392,7 +407,7 @@ class OneSignal {
         <String, dynamic>{'logLevel': level.index, 'message': message});
   }
 
-  Map<String, dynamic> _processSettings(Map<OSiOSSettings, dynamic> settings) {
+  Map<String, dynamic> _processSettings(Map<OSiOSSettings, dynamic>? settings) {
     var finalSettings = Map<String, dynamic>();
 
     if (settings == null) return finalSettings;

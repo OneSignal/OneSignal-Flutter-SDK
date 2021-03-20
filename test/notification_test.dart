@@ -25,11 +25,11 @@ void main() {
   });
 
   test('expect raw payload to be parsed correctly', () {
-    expect(notification.payload.rawPayload['test'], "raw payload");
+    expect(notification.payload.rawPayload?['test'], "raw payload");
   });
 
   test('expect attachments to be parsed correctly', () {
-    expect(notification.payload.attachments['id'], "https://www.onesignal.com");
+    expect(notification.payload.attachments?['id'], "https://www.onesignal.com");
   });
 
   test('expect body to be parsed correctly', () {
