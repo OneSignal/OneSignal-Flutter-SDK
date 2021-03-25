@@ -13,7 +13,7 @@ void main() {
   });
 
   test('expect buttons to be parsed correctly', () {
-    expect(notification.buttons.first.id, "test1");
+    expect(notification.buttons!.first.id, "test1");
   });
 
   test('expect content available to be parsed correctly', () {
@@ -25,11 +25,11 @@ void main() {
   });
 
   test('expect raw payload to be parsed correctly', () {
-    expect(notification.rawPayload['test'], "raw payload");
+    expect(notification.rawPayload!['test'], "raw payload");
   });
 
   test('expect attachments to be parsed correctly', () {
-    expect(notification.attachments['id'], "https://www.onesignal.com");
+    expect(notification.attachments!['id'], "https://www.onesignal.com");
   });
 
   test('expect body to be parsed correctly', () {
