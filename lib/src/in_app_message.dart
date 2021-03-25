@@ -6,16 +6,16 @@ import 'package:onesignal_flutter/src/utils.dart';
 class OSInAppMessageAction extends JSONStringRepresentable {
 
   // Name of the action event defined for the IAM element
-  String clickName;
+  String? clickName;
 
   // URL given to the IAM element defined in the dashboard
-  String clickUrl;
+  String? clickUrl;
 
   // Determines if a first click has occurred or not on the IAM element
-  bool firstClick;
+  bool firstClick = false;
 
   // Whether or not the click action should dismiss the IAM
-  bool closesMessage;
+  bool closesMessage = false;
 
   OSInAppMessageAction(Map<String, dynamic> json) {
     this.clickName = json["click_name"];

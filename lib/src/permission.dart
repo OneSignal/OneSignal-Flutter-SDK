@@ -3,9 +3,9 @@ import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/utils.dart';
 
 class OSPermissionState extends JSONStringRepresentable {
-  bool hasPrompted; // iOS only
-  bool provisional; //iOS only
-  OSNotificationPermission status;
+  bool hasPrompted = false; // iOS only
+  bool provisional = false; //iOS only
+  OSNotificationPermission? status;
 
   OSPermissionState(Map<String, dynamic> json) {
     if (json.containsKey('status')) {
@@ -35,15 +35,15 @@ class OSPermissionState extends JSONStringRepresentable {
     return convertToJsonString({
       'hasPrompted': this.hasPrompted,
       'provisional': this.provisional,
-      'status': this.status.index
+      'status': this.status?.index ?? null
     });
   }
 }
 
 class OSPermissionSubscriptionState extends JSONStringRepresentable {
-  OSPermissionState permissionStatus;
-  OSSubscriptionState subscriptionStatus;
-  OSEmailSubscriptionState emailSubscriptionStatus;
+  late OSPermissionState permissionStatus;
+  late OSSubscriptionState subscriptionStatus;
+  late OSEmailSubscriptionState emailSubscriptionStatus;
 
   OSPermissionSubscriptionState(Map<String, dynamic> json) {
     this.permissionStatus =
@@ -65,8 +65,8 @@ class OSPermissionSubscriptionState extends JSONStringRepresentable {
 }
 
 class OSPermissionStateChanges extends JSONStringRepresentable {
-  OSPermissionState from;
-  OSPermissionState to;
+  late OSPermissionState from;
+  late OSPermissionState to;
 
   OSPermissionStateChanges(Map<String, dynamic> json) {
     if (json.containsKey('from'))
@@ -85,24 +85,24 @@ class OSPermissionStateChanges extends JSONStringRepresentable {
 
 class OSDeviceState extends JSONStringRepresentable {
 
-  bool hasNotificationPermission;
-  bool pushDisabled;
-  bool subscribed;
-  bool emailSubscribed;
-  String userId;
-  String pushToken;
-  String emailUserId;
-  String emailAddress;
+  bool hasNotificationPermission = false;
+  bool pushDisabled = false;
+  bool subscribed = false;
+  bool emailSubscribed = false;
+  String? userId;
+  String? pushToken;
+  String? emailUserId;
+  String? emailAddress;
 
   OSDeviceState(Map<String, dynamic> json) {
     this.hasNotificationPermission = json['hasNotificationPermission'] as bool;
     this.pushDisabled = json['pushDisabled'] as bool;
     this.subscribed = json['subscribed'] as bool;
     this.emailSubscribed = json['emailSubscribed'] as bool;
-    this.userId = json['userId'] as String;
-    this.pushToken = json['pushToken'] as String;
-    this.emailUserId = json['emailUserId'] as String;
-    this.emailAddress = json['emailAddress'] as String;
+    this.userId = json['userId'] as String?;
+    this.pushToken = json['pushToken'] as String?;
+    this.emailUserId = json['emailUserId'] as String?;
+    this.emailAddress = json['emailAddress'] as String?;
   }
 
   String jsonRepresentation() {

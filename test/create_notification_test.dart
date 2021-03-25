@@ -12,7 +12,7 @@ void main() {
   });
 
   test('expect notification to parse additional data correctly', () {
-    expect(silentNotification.additionalData['test'], 'value');
+    expect(silentNotification.additionalData!['test'], 'value');
   });
 
   //normal notification tests
@@ -94,7 +94,7 @@ void main() {
   });
 
   test('expect buttons to be parsed correctly', () {
-    var buttonsJson = notificationJson['buttons'] as List<Map<String, dynamic>>;
+    List<dynamic> buttonsJson = notificationJson['buttons'];
     expect(buttonsJson.first['id'], 'test_id');
     expect(buttonsJson.first['text'], 'test_text');
     expect(buttonsJson.first['icon'], 'test_icon');

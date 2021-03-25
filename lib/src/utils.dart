@@ -78,7 +78,7 @@ dynamic convertEnumCaseToValue(dynamic key) {
 abstract class JSONStringRepresentable {
   String jsonRepresentation();
 
-  String convertToJsonString(Map<String, dynamic> object) => JsonEncoder
+  String convertToJsonString(Map<String, dynamic>? object) => JsonEncoder
       .withIndent('  ')
       .convert(object)
       .replaceAll("\\n", "\n")
