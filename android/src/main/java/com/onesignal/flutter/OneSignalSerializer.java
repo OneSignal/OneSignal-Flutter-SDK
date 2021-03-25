@@ -59,6 +59,9 @@ class OneSignalSerializer {
     static HashMap<String, Object> convertDeviceStateToMap(OSDeviceState state) {
         HashMap<String, Object> hash = new HashMap<>();
 
+        if (state == null)
+            return hash;
+
         hash.put("hasNotificationPermission", state.areNotificationsEnabled());
         hash.put("pushDisabled", state.isPushDisabled());
         hash.put("subscribed", state.isSubscribed());

@@ -13,8 +13,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   String _debugLabelString = "";
-  String _emailAddress;
-  String _externalUserId;
+  String? _emailAddress;
+  String? _externalUserId;
   bool _enableConsentButton = false;
 
   // CHANGE THIS parameter to true if you want to test GDPR privacy consent
@@ -140,9 +140,9 @@ class _MyAppState extends State<MyApp> {
   void _handleGetDeviceState() async {
     print("Getting DeviceState");
     OneSignal.shared.getDeviceState().then((deviceState) {
-      print("DeviceState: ${deviceState.jsonRepresentation()}");
+      print("DeviceState: ${deviceState?.jsonRepresentation()}");
       this.setState(() {
-        _debugLabelString = deviceState.jsonRepresentation();
+        _debugLabelString = deviceState?.jsonRepresentation() ?? "Device state null";
       });
     });
   }
@@ -152,7 +152,7 @@ class _MyAppState extends State<MyApp> {
 
     print("Setting email");
 
-    OneSignal.shared.setEmail(email: _emailAddress).whenComplete(() {
+    OneSignal.shared.setEmail(email: _emailAddress!).whenComplete(() {
       print("Successfully set email");
     }).catchError((error) {
       print("Failed to set email with error: $error");
@@ -201,7 +201,9 @@ class _MyAppState extends State<MyApp> {
 
   void _handleSetExternalUserId() {
     print("Setting external user ID");
-    OneSignal.shared.setExternalUserId(_externalUserId).then((results) {
+    if (_externalUserId == null) return;
+
+    OneSignal.shared.setExternalUserId(_externalUserId!).then((results) {
         if (results == null) return;
 
         this.setState(() {
@@ -223,7 +225,10 @@ class _MyAppState extends State<MyApp> {
   void _handleSendNotification() async {
     var deviceState = await OneSignal.shared.getDeviceState();
 
-    var playerId = deviceState.userId;
+    if (deviceState == null || deviceState.userId == null)
+        return;
+
+    var playerId = deviceState.userId!;
 
     var imgUrlString =
         "http://cdn1-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-2.jpg";
@@ -249,7 +254,10 @@ class _MyAppState extends State<MyApp> {
   void _handleSendSilentNotification() async {
     var deviceState = await OneSignal.shared.getDeviceState();
 
-    var playerId = deviceState.userId;
+    if (deviceState == null || deviceState.userId == null)
+        return;
+
+    var playerId = deviceState.userId!;
 
     var notification = OSCreateNotification.silentNotification(
         playerIds: [playerId], additionalData: {'test': 'value'});
@@ -280,8 +288,8 @@ class _MyAppState extends State<MyApp> {
     OneSignal.shared.removeTriggerForKey("trigger_2");
 
     // Get the value for a trigger by its key
-    Object triggerValue = await OneSignal.shared.getTriggerValueForKey("trigger_3");
-    print("'trigger_3' key trigger value: " + triggerValue.toString());
+    Object? triggerValue = await OneSignal.shared.getTriggerValueForKey("trigger_3");
+    print("'trigger_3' key trigger value: ${triggerValue?.toString() ?? null}");
 
     // Create a list and bulk remove triggers based on keys supplied
     List<String> keys = ["trigger_1", "trigger_3"];

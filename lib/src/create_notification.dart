@@ -11,90 +11,90 @@ class OSCreateNotification extends JSONStringRepresentable {
   List<String> playerIds;
 
   /// The notification's content (excluding title)
-  String content;
+  String? content;
 
   /// The language code (ie. "en" for English) for this notification
   /// defaults to "en" (English)
-  String languageCode;
+  String? languageCode;
 
   /// The title/heading for the notification
-  String heading;
+  String? heading;
 
   /// The subtitle for the notification (iOS 10+ only)
-  String subtitle;
+  String? subtitle;
 
   /// Tells the app to launch in the background (iOS only)
-  bool contentAvailable;
+  bool? contentAvailable;
 
   /// Tells the app to launch the Notification Service extension,
   /// which can mutate your notification (ie. download attachments)
-  bool mutableContent;
+  bool? mutableContent;
 
   /// Additional data you wish to send with the notification
-  Map<String, dynamic> additionalData;
+  Map<String, dynamic>? additionalData;
 
   /// The URL to open when the user taps the notification
-  String url;
+  String? url;
 
   /// Media (images, videos, etc.) for iOS
   /// Maps a custom ID to a resource URL
   /// in the format {'id' : 'https://.....'}
-  Map<String, String> iosAttachments;
+  Map<String, String>? iosAttachments;
 
   /// An image to use as the big picture (android only)
-  String bigPicture;
+  String? bigPicture;
 
   /// A list of buttons to attach to the notification
-  List<OSActionButton> buttons;
+  List<OSActionButton>? buttons;
 
   /// The category identifier for iOS (controls various aspects
   /// of the notification, for example, whether to launch a
   /// Notification Content Extension) (iOS only)
-  String iosCategory;
+  String? iosCategory;
 
   /// The sound to play (iOS only)
-  String iosSound;
+  String? iosSound;
 
   /// The sound to play (Android only)
-  String androidSound;
+  String? androidSound;
 
   /// A small icon (Android only)
   /// Can be a drawable resource name or a URL
-  String androidSmallIcon;
+  String? androidSmallIcon;
 
   /// A large icon (android only)
   /// Can be a drawable resource name or a URL
-  String androidLargeIcon;
+  String? androidLargeIcon;
 
   /// The Android Oreo Notification Category to send the notification under
-  String androidChannelId;
+  String? androidChannelId;
 
   /// can be 'Increase' or 'SetTo'
-  OSCreateNotificationBadgeType iosBadgeType;
+  OSCreateNotificationBadgeType? iosBadgeType;
 
   /// The actual badge count to either set to directly, or increment by
   /// To decrement the user's badge count, send a negative value
-  int iosBadgeCount;
+  int? iosBadgeCount;
 
   /// If multiple notifications have the same collapse ID, only the most
   /// recent notification will be shown
-  String collapseId;
+  String? collapseId;
 
   /// Allows you to send a notification at a specific date
-  DateTime sendAfter;
+  DateTime? sendAfter;
 
   /// You can use several options to send notifications at specific times
   /// ie. you can send notifications to different user's at the same time
   /// in each timezone with the 'timezone' delayedOption
-  OSCreateNotificationDelayOption delayedOption;
+  OSCreateNotificationDelayOption? delayedOption;
 
   /// Used with delayedOption == timezone, lets you specify what time of day
   /// each user should receive the notification, ie. "9:00 AM"
-  String deliveryTimeOfDay;
+  String? deliveryTimeOfDay;
 
   OSCreateNotification(
-      {@required this.playerIds,
-      @required this.content,
+      {required this.playerIds,
+      required this.content,
       this.languageCode,
       this.heading,
       this.subtitle,
@@ -119,7 +119,7 @@ class OSCreateNotification extends JSONStringRepresentable {
       this.deliveryTimeOfDay});
 
   OSCreateNotification.silentNotification(
-      {@required this.playerIds,
+      {required this.playerIds,
       this.additionalData,
       this.sendAfter,
       this.delayedOption,
@@ -164,7 +164,7 @@ class OSCreateNotification extends JSONStringRepresentable {
 
     // adds optional parameters that require transformations
     if (this.sendAfter != null)
-      json['send_after'] = dateToStringWithOffset(this.sendAfter);
+      json['send_after'] = dateToStringWithOffset(this.sendAfter!);
     if (this.iosBadgeType != null)
       json['ios_badgeType'] = convertEnumCaseToValue(this.iosBadgeType);
     if (this.delayedOption != null)
@@ -172,8 +172,8 @@ class OSCreateNotification extends JSONStringRepresentable {
 
     // adds buttons
     if (this.buttons != null) {
-      var btns = List<Map<String, dynamic>>();
-      this.buttons.forEach((btn) => btns.add(btn.mapRepresentation()));
+      var btns = [];
+      this.buttons!.forEach((btn) => btns.add(btn.mapRepresentation()));
       json['buttons'] = btns;
     }
 
