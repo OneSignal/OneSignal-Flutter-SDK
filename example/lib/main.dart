@@ -289,7 +289,7 @@ class _MyAppState extends State<MyApp> {
 
     // Get the value for a trigger by its key
     Object? triggerValue = await OneSignal.shared.getTriggerValueForKey("trigger_3");
-    print("'trigger_3' key trigger value: ${triggerValue?.toString() ?? null}");
+    print("'trigger_3' key trigger value: ${triggerValue?.toString()}");
 
     // Create a list and bulk remove triggers based on keys supplied
     List<String> keys = ["trigger_1", "trigger_3"];
