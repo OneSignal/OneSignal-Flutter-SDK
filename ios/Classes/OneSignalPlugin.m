@@ -44,6 +44,8 @@
 */
 @property (atomic) BOOL waitingForUserConsent;
 
+@property (atomic) BOOL hasSetNotificationOpenedHandler;
+@property (atomic) BOOL hasSetInAppMessageClickedHandler;
 @property (atomic) BOOL hasSetNotificationWillShowInForegroundHandler;
 
 /*
@@ -76,6 +78,9 @@
         sharedInstance.waitingForUserConsent = false;
         sharedInstance.receivedNotificationCache = [NSMutableDictionary new];;
         sharedInstance.notificationCompletionCache = [NSMutableDictionary new];;
+        sharedInstance.hasSetNotificationOpenedHandler = false;
+        sharedInstance.hasSetInAppMessageClickedHandler = false;
+        sharedInstance.hasSetNotificationWillShowInForegroundHandler = false;
     });
     return sharedInstance;
 }
@@ -104,11 +109,11 @@
     [OneSignal addSubscriptionObserver:self];
     [OneSignal addPermissionObserver:self];
     [OneSignal addEmailSubscriptionObserver:self];
-    [OneSignal setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
-        [OneSignalPlugin.sharedInstance handleNotificationOpened:result];
-    }];
     [OneSignal setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
         [OneSignalPlugin.sharedInstance handleNotificationWillShowInForeground:notification completion:completion];
+    }];
+    [OneSignal setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
+       [OneSignalPlugin.sharedInstance handleNotificationOpened:result];
     }];
 }
 
@@ -300,6 +305,8 @@
 }
 
 - (void)initNotificationOpenedHandlerParams {
+    _hasSetNotificationOpenedHandler = true;
+    
     if (self.coldStartOpenResult) {
         [self handleNotificationOpened:self.coldStartOpenResult];
         self.coldStartOpenResult = nil;
@@ -307,6 +314,8 @@
 }
 
 - (void)initInAppMessageClickedHandlerParams {
+    _hasSetInAppMessageClickedHandler = true;
+
     if (self.inAppMessageClickedResult) {
         [self handleInAppMessageClicked:self.inAppMessageClickedResult];
         self.inAppMessageClickedResult = nil;
@@ -319,6 +328,11 @@
 
 #pragma mark Opened Notification Handlers
 - (void)handleNotificationOpened:(OSNotificationOpenedResult *)result {
+    if (!self.hasSetNotificationOpenedHandler) {
+        _coldStartOpenResult = result;
+        return;
+    }
+
     [self.channel invokeMethod:@"OneSignal#handleOpenedNotification" arguments:result.toJson];
 }
 
@@ -358,6 +372,11 @@
 
 #pragma mark In App Message Click Handler
 - (void)handleInAppMessageClicked:(OSInAppMessageAction *)action {
+    if (!self.hasSetInAppMessageClickedHandler) {
+        _inAppMessageClickedResult = action;
+        return;
+    }
+
     [self.channel invokeMethod:@"OneSignal#handleClickedInAppMessage" arguments:action.toJson];
 }
 
