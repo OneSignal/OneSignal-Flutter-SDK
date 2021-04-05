@@ -140,10 +140,11 @@ public class OneSignalPlugin
     String appId = call.argument("appId");
     Context context = flutterRegistrar.activeContext();
 
+    OneSignal.setInAppMessageClickHandler(this);
     OneSignal.initWithContext(context);
     OneSignal.setAppId(appId);
 
-    if (hasSetRequiresPrivacyConsent)
+    if (hasSetRequiresPrivacyConsent && !OneSignal.userProvidedPrivacyConsent())
       this.waitingForUserPrivacyConsent = true;
     else
       this.addObservers();
@@ -156,6 +157,7 @@ public class OneSignalPlugin
     OneSignal.addEmailSubscriptionObserver(this);
     OneSignal.addPermissionObserver(this);
     OneSignal.setNotificationWillShowInForegroundHandler(this);
+    OneSignal.setNotificationOpenedHandler(this);
   }
 
   private void setLogLevel(MethodCall call, Result reply) {

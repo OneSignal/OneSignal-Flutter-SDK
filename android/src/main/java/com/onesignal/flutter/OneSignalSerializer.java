@@ -106,7 +106,7 @@ class OneSignalSerializer {
 
         hash.put("androidNotificationId", notification.getAndroidNotificationId());
 
-        if (notification.getGroupedNotifications() != null) {
+        if (notification.getGroupedNotifications() != null && !notification.getGroupedNotifications().isEmpty()) {
             JSONArray payloadJsonArray = new JSONArray();
             for (OSNotification groupedNotification : notification.getGroupedNotifications())
                 payloadJsonArray.put(groupedNotification.toJSONObject());

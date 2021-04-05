@@ -292,11 +292,11 @@ class OSNotificationAction {
 
   /// The ID of the button on your notification
   /// that the user tapped
-  late String actionId;
+  String? actionId;
 
   OSNotificationAction(Map<String, dynamic> json) {
     this.type = OSNotificationActionType.opened;
-    this.actionId = json['id'] as String;
+    this.actionId = json['id'] as String?;
 
     if (json.containsKey('type'))
       this.type = OSNotificationActionType.values[json['type'] as int];
