@@ -44,18 +44,8 @@
 */
 @property (atomic) BOOL waitingForUserConsent;
 
-@property (atomic) BOOL hasSetNotificationOpenedHandler;
 @property (atomic) BOOL hasSetInAppMessageClickedHandler;
 @property (atomic) BOOL hasSetNotificationWillShowInForegroundHandler;
-
-/*
-    Holds reference to any notifications received before the
-    flutter runtime channel has been opened
-    Thus, if a user taps a notification while the app is
-    terminated, the SDK will still notify the app once the
-    channel is open
-*/
-@property (strong, nonatomic) OSNotificationOpenedResult *coldStartOpenResult;
 
 /*
     Holds reference to any in app messages received before any click action
@@ -78,7 +68,6 @@
         sharedInstance.waitingForUserConsent = false;
         sharedInstance.receivedNotificationCache = [NSMutableDictionary new];;
         sharedInstance.notificationCompletionCache = [NSMutableDictionary new];;
-        sharedInstance.hasSetNotificationOpenedHandler = false;
         sharedInstance.hasSetInAppMessageClickedHandler = false;
         sharedInstance.hasSetNotificationWillShowInForegroundHandler = false;
     });
@@ -111,9 +100,6 @@
     [OneSignal addEmailSubscriptionObserver:self];
     [OneSignal setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
         [OneSignalPlugin.sharedInstance handleNotificationWillShowInForeground:notification completion:completion];
-    }];
-    [OneSignal setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
-       [OneSignalPlugin.sharedInstance handleNotificationOpened:result];
     }];
 }
 
@@ -305,12 +291,10 @@
 }
 
 - (void)initNotificationOpenedHandlerParams {
-    _hasSetNotificationOpenedHandler = true;
-    
-    if (self.coldStartOpenResult) {
-        [self handleNotificationOpened:self.coldStartOpenResult];
-        self.coldStartOpenResult = nil;
-    }
+    [OneSignal setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
+        [OneSignal onesignalLog:ONE_S_LL_VERBOSE message:@"setNotificationOpenedHandler called from addObservers"];
+        [OneSignalPlugin.sharedInstance handleNotificationOpened:result];
+    }];
 }
 
 - (void)initInAppMessageClickedHandlerParams {
@@ -328,11 +312,6 @@
 
 #pragma mark Opened Notification Handlers
 - (void)handleNotificationOpened:(OSNotificationOpenedResult *)result {
-    if (!self.hasSetNotificationOpenedHandler) {
-        _coldStartOpenResult = result;
-        return;
-    }
-
     [self.channel invokeMethod:@"OneSignal#handleOpenedNotification" arguments:result.toJson];
 }
 
