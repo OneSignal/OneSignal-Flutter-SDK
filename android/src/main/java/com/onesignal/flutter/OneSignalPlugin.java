@@ -43,9 +43,7 @@ public class OneSignalPlugin
         OneSignal.OSNotificationWillShowInForegroundHandler {
 
   /** Plugin registration. */
-  private OSNotificationOpenedResult coldStartNotificationResult;
   private OSInAppMessageAction inAppMessageClickedResult;
-  private boolean hasSetNotificationOpenedHandler = false;
   private boolean hasSetInAppMessageClickedHandler = false;
   private boolean hasSetNotificationWillShowInForegroundHandler = false;
   private boolean hasSetRequiresPrivacyConsent = false;
@@ -157,7 +155,6 @@ public class OneSignalPlugin
     OneSignal.addEmailSubscriptionObserver(this);
     OneSignal.addPermissionObserver(this);
     OneSignal.setNotificationWillShowInForegroundHandler(this);
-    OneSignal.setNotificationOpenedHandler(this);
   }
 
   private void setLogLevel(MethodCall call, Result reply) {
@@ -337,11 +334,7 @@ public class OneSignalPlugin
   }
 
   private void initNotificationOpenedHandlerParams() {
-    this.hasSetNotificationOpenedHandler = true;
-    if (this.coldStartNotificationResult != null) {
-      this.notificationOpened(this.coldStartNotificationResult);
-      this.coldStartNotificationResult = null;
-    }
+    OneSignal.setNotificationOpenedHandler(this);
   }
 
   private void initInAppMessageClickedHandlerParams() {
@@ -403,11 +396,6 @@ public class OneSignalPlugin
 
   @Override
   public void notificationOpened(OSNotificationOpenedResult result) {
-    if (!this.hasSetNotificationOpenedHandler) {
-      this.coldStartNotificationResult = result;
-      return;
-    }
-
     try {
       invokeMethodOnUiThread("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationOpenResultToMap(result));
     } catch (JSONException e) {
