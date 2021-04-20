@@ -143,10 +143,9 @@ class OneSignalSerializer {
         if (notification.getCollapseId() != null)
             hash.put("collapseId", notification.getCollapseId());
         hash.put("priority", notification.getPriority());
-        if (notification.getAdditionalData() != null)
-            hash.put("additionalData", notification.getAdditionalData());
-
-        if (notification.getActionButtons() != null) {
+        if (notification.getAdditionalData() != null && notification.getAdditionalData().length() > 0)
+            hash.put("additionalData", convertJSONObjectToHashMap(notification.getAdditionalData()));
+        if (notification.getActionButtons() != null && !notification.getActionButtons().isEmpty()) {
             ArrayList<HashMap> buttons = new ArrayList<>();
 
             List<OSNotification.ActionButton> actionButtons = notification.getActionButtons();
@@ -168,7 +167,7 @@ class OneSignalSerializer {
 
         hash.put("rawPayload", notification.getRawPayload());
 
-        Log.d("onesignal", "Created json raw payload: " + convertJSONObjectToHashMap(new JSONObject(notification.getRawPayload())).toString());
+        Log.d("onesignal", "Created json raw payload: " + hash.toString());
 
         return hash;
     }
@@ -235,7 +234,7 @@ class OneSignalSerializer {
 
         hash.put("image", layout.getImage());
         hash.put("bodyTextColor", layout.getBodyTextColor());
-        hash.put("titleTextColor", layout.getBodyTextColor());
+        hash.put("titleTextColor", layout.getTitleTextColor());
 
         return hash;
     }

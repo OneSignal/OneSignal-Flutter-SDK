@@ -171,7 +171,6 @@ class OSNotification extends JSONStringRepresentable {
 
   //converts JSON map to OSNotification instance
   OSNotification(Map<String, dynamic> json) {
-
     // iOS Specific Parameters
     if (json.containsKey('contentAvailable'))
       this.contentAvailable = json['contentAvailable'] as bool?;
@@ -386,7 +385,7 @@ class OSNotificationReceivedEvent extends JSONStringRepresentable {
 
   String jsonRepresentation() {
     return convertToJsonString({
-      'notification': this.notification.jsonRepresentation
+      'notification': this.notification.jsonRepresentation()
     });
   }
 }
