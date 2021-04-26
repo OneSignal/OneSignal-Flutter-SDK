@@ -248,7 +248,7 @@ class OSNotification extends JSONStringRepresentable {
     }
 
     if (json.containsKey('buttons')) {
-      this.buttons = [];
+      this.buttons = List<OSActionButton>.empty(growable: true);
       var btns = json['buttons'] as List<dynamic>;
       for (var btn in btns) {
         var serialized = btn.cast<String, dynamic>();
