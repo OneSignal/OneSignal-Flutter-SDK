@@ -172,7 +172,7 @@ class OSCreateNotification extends JSONStringRepresentable {
 
     // adds buttons
     if (this.buttons != null) {
-      var btns = [];
+      var btns = List<Map<String, dynamic>>.empty(growable: true);
       this.buttons!.forEach((btn) => btns.add(btn.mapRepresentation()));
       json['buttons'] = btns;
     }
