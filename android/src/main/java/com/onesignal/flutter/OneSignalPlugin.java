@@ -11,6 +11,8 @@ import com.onesignal.OSNotificationOpenedResult;
 import com.onesignal.OSNotificationReceivedEvent;
 import com.onesignal.OSPermissionObserver;
 import com.onesignal.OSPermissionStateChanges;
+import com.onesignal.OSSMSSubscriptionObserver;
+import com.onesignal.OSSMSSubscriptionStateChanges;
 import com.onesignal.OSSubscriptionObserver;
 import com.onesignal.OSSubscriptionStateChanges;
 import com.onesignal.OneSignal;
@@ -39,6 +41,7 @@ public class OneSignalPlugin
         OneSignal.OSInAppMessageClickHandler,
         OSSubscriptionObserver,
         OSEmailSubscriptionObserver,
+        OSSMSSubscriptionObserver,
         OSPermissionObserver,
         OneSignal.OSNotificationWillShowInForegroundHandler {
 
@@ -157,6 +160,7 @@ public class OneSignalPlugin
   private void addObservers() {
     OneSignal.addSubscriptionObserver(this);
     OneSignal.addEmailSubscriptionObserver(this);
+    OneSignal.addSMSSubscriptionObserver(this);
     OneSignal.addPermissionObserver(this);
     OneSignal.setNotificationWillShowInForegroundHandler(this);
   }
@@ -439,6 +443,11 @@ public class OneSignalPlugin
   }
 
   @Override
+  public void onSMSSubscriptionChanged(OSSMSSubscriptionStateChanges stateChanges) {
+    invokeMethodOnUiThread("OneSignal#smsSubscriptionChanged", OneSignalSerializer.convertSMSSubscriptionStateChangesToMap(stateChanges));
+  }
+
+  @Override
   public void onOSPermissionChanged(OSPermissionStateChanges stateChanges) {
     invokeMethodOnUiThread("OneSignal#permissionChanged", OneSignalSerializer.convertPermissionStateChangesToMap(stateChanges));
   }
@@ -483,4 +492,5 @@ public class OneSignalPlugin
               "Encountered an error attempting to convert OSNotificationReceivedEvent object to hash map: " + e.getMessage());
     }
   }
+
 }
