@@ -22,6 +22,7 @@ typedef void ReceivedNotificationHandler(OSNotification notification);
 typedef void OpenedNotificationHandler(OSNotificationOpenedResult openedResult);
 typedef void SubscriptionChangedHandler(OSSubscriptionStateChanges changes);
 typedef void EmailSubscriptionChangeHandler(OSEmailSubscriptionStateChanges changes);
+typedef void SMSSubscriptionChangeHandler(OSSMSSubscriptionStateChanges changes);
 typedef void PermissionChangeHandler(OSPermissionStateChanges changes);
 typedef void InAppMessageClickedHandler(OSInAppMessageAction action);
 typedef void NotificationWillShowInForegroundHandler(OSNotificationReceivedEvent event);
@@ -43,6 +44,7 @@ class OneSignal {
   OpenedNotificationHandler? _onOpenedNotification;
   SubscriptionChangedHandler? _onSubscriptionChangedHandler;
   EmailSubscriptionChangeHandler? _onEmailSubscriptionChangedHandler;
+  SMSSubscriptionChangeHandler? _onSMSSubscriptionChangedHandler;
   PermissionChangeHandler? _onPermissionChangedHandler;
   InAppMessageClickedHandler? _onInAppMessageClickedHandler;
   NotificationWillShowInForegroundHandler? _onNotificationWillShowInForegroundHandler;
@@ -96,6 +98,13 @@ class OneSignal {
   /// notifications). For example, if you call setEmail() or logoutEmail().
   void setEmailSubscriptionObserver(EmailSubscriptionChangeHandler handler) {
     _onEmailSubscriptionChangedHandler = handler;
+  }
+
+  /// The SMS subscription handler will be called whenever the user's SMS
+  /// subscription changes (OneSignal can also send SMSs in addition to push
+  /// notifications). For example, if you call setSMSNumber() or logoutSMSNumber().
+  void setSMSSubscriptionObserver(SMSSubscriptionChangeHandler handler) {
+    _onSMSSubscriptionChangedHandler = handler;
   }
 
   /// The in app message clicked handler is called whenever the user clicks a
@@ -405,6 +414,10 @@ class OneSignal {
         this._onEmailSubscriptionChangedHandler != null) {
       this._onEmailSubscriptionChangedHandler!(
           OSEmailSubscriptionStateChanges(call.arguments.cast<String, dynamic>()));
+    } else if (call.method == 'OneSignal#smsSubscriptionChanged' &&
+        this._onSMSSubscriptionChangedHandler != null) {
+      this._onSMSSubscriptionChangedHandler!(
+          OSSMSSubscriptionStateChanges(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#handleClickedInAppMessage' &&
         this._onInAppMessageClickedHandler != null) {
       this._onInAppMessageClickedHandler!(

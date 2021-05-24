@@ -105,3 +105,50 @@ class OSEmailSubscriptionStateChanges extends JSONStringRepresentable {
     });
   }
 }
+
+/// Represents the user's OneSignal SMS subscription state,
+class OSSMSSubscriptionState extends JSONStringRepresentable {
+  bool subscribed = false;
+  String? smsUserId;
+  String? smsNumber;
+
+  OSSMSSubscriptionState(Map<String, dynamic> json) {
+    this.subscribed = false;
+    if (json.containsKey('smsNumber') && json['smsNumber'] != null)
+      this.smsNumber = json['smsNumber'] as String?;
+
+    if (json.containsKey('smsUserId') && json['smsUserId'] != null) {
+      this.smsUserId = json['smsUserId'] as String?;
+      this.subscribed = true;
+    }
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString({
+      'subscribed': this.subscribed,
+      'smsUserId': this.smsUserId,
+      'smsNumber': this.smsNumber
+    });
+  }
+}
+
+/// An instance of this class describes a change in the user's
+/// email subscription state with OneSignal
+class OSSMSSubscriptionStateChanges extends JSONStringRepresentable {
+  late OSSMSSubscriptionState from;
+  late OSSMSSubscriptionState to;
+
+  OSSMSSubscriptionStateChanges(Map<String, dynamic> json) {
+    if (json.containsKey('from'))
+      this.from = OSSMSSubscriptionState(json['from'].cast<String, dynamic>());
+    if (json.containsKey('to'))
+      this.to = OSSMSSubscriptionState(json['to'].cast<String, dynamic>());
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString(<String, dynamic>{
+      'from': this.from.jsonRepresentation(),
+      'to': this.to.jsonRepresentation()
+    });
+  }
+}
