@@ -78,6 +78,11 @@ class _MyAppState extends State<MyApp> {
       print("EMAIL SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
     });
 
+    OneSignal.shared.setSMSSubscriptionObserver(
+        (OSSMSSubscriptionStateChanges changes) {
+      print("SMS SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
+    });
+
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     await OneSignal.shared
         .setAppId("380dc082-5231-4cc2-ab51-a03da5a0e4c2");
