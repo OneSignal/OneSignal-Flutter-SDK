@@ -109,6 +109,10 @@ public class OneSignalPlugin
       this.setEmail(call, result);
     else if (call.method.contentEquals("OneSignal#logoutEmail"))
       this.logoutEmail(result);
+    else if (call.method.contentEquals("OneSignal#setSMSNumber"))
+      this.setSMSNumber(call, result);
+    else if (call.method.contentEquals("OneSignal#logoutSMSNumber"))
+      this.logoutSMSNumber(result);
     else if (call.method.contentEquals("OneSignal#setExternalUserId"))
       this.setExternalUserId(call, result);
     else if (call.method.contentEquals("OneSignal#removeExternalUserId"))
@@ -279,6 +283,51 @@ public class OneSignalPlugin
       public void onFailure(EmailUpdateError error) {
         replyError(reply, "OneSignal",
                 "Encountered an error loggoing out of email: " + error.getMessage(),
+                null);
+      }
+    });
+  }
+
+  private void setSMSNumber(MethodCall call, final Result reply) {
+    String smsNumber = call.argument("smsNumber");
+    String smsAuthHashToken = call.argument("smsAuthHashToken");
+
+    OneSignal.setSMSNumber(smsNumber, smsAuthHashToken, new OneSignal.OSSMSUpdateHandler() {
+      @Override
+      public void onSuccess(JSONObject result) {
+        try {
+          replySuccess(reply, OneSignalSerializer.convertJSONObjectToHashMap(result));
+        } catch (JSONException e) {
+          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
+                  "Encountered an error attempting to deserialize server response for setSMSNumber: " + e.getMessage());
+        }
+      }
+
+      @Override
+      public void onFailure(OneSignal.OSSMSUpdateError error) {
+        replyError(reply, "OneSignal",
+                "Encountered an error setting SMS Number: " + error.getMessage(),
+                null);
+      }
+    });
+  }
+
+  private void logoutSMSNumber(final Result reply) {
+    OneSignal.logoutSMSNumber(new OneSignal.OSSMSUpdateHandler() {
+      @Override
+      public void onSuccess(JSONObject result) {
+        try {
+          replySuccess(reply, OneSignalSerializer.convertJSONObjectToHashMap(result));
+        } catch (JSONException e) {
+          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
+                  "Encountered an error attempting to deserialize server response for logoutSMSNumber: " + e.getMessage());
+        }
+      }
+
+      @Override
+      public void onFailure(OneSignal.OSSMSUpdateError error) {
+        replyError(reply, "OneSignal",
+                "Encountered an error logging out SMS number: " + error.getMessage(),
                 null);
       }
     });

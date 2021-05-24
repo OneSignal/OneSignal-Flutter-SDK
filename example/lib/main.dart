@@ -14,6 +14,7 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   String _debugLabelString = "";
   String? _emailAddress;
+  String? _smsNumber;
   String? _externalUserId;
   bool _enableConsentButton = false;
 
@@ -161,10 +162,33 @@ class _MyAppState extends State<MyApp> {
 
   void _handleLogoutEmail() {
     print("Logging out of email");
+
     OneSignal.shared.logoutEmail().then((v) {
       print("Successfully logged out of email");
     }).catchError((error) {
       print("Failed to log out of email: $error");
+    });
+  }
+
+    void _handleSetSMSNumber() {
+    if (_smsNumber == null) return;
+
+    print("Setting SMS Number");
+
+    OneSignal.shared.setSMSNumber(smsNumber: _smsNumber!).then((response) {
+      print("Successfully set SMSNumber with response $response");
+    }).catchError((error) {
+      print("Failed to set SMS Number with error: $error");
+    });
+  }
+
+  void _handleLogoutSMSNumber() {
+    print("Logging out of smsNumber");
+
+    OneSignal.shared.logoutSMSNumber().then((response) {
+      print("Successfully logoutEmail with response $response");
+    }).catchError((error) {
+      print("Failed to log out of SMSNumber: $error");
     });
   }
 
@@ -384,6 +408,34 @@ class _MyAppState extends State<MyApp> {
                   ]),
                   new TableRow(children: [
                     new OneSignalButton("Logout Email", _handleLogoutEmail,
+                        !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new TextField(
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                          hintText: "SMS Number",
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 212, 86, 83),
+                          )),
+                      onChanged: (text) {
+                        this.setState(() {
+                          _smsNumber = text == "" ? null : text;
+                        });
+                      },
+                    )
+                  ]),
+                  new TableRow(children: [
+                    Container(
+                      height: 8.0,
+                    )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Set SMS Number", _handleSetSMSNumber, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Logout SMS Number", _handleLogoutSMSNumber,
                         !_enableConsentButton)
                   ]),
                   new TableRow(children: [
