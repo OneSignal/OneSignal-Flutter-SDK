@@ -218,6 +218,9 @@
     json[@"emailUserId"] = deviceState.emailUserId;
     json[@"emailAddress"] = deviceState.emailAddress;
     json[@"emailSubscribed"] = @(deviceState.isEmailSubscribed);
+    json[@"smsUserId"] = deviceState.smsUserId;
+    json[@"smsNumber"] = deviceState.smsNumber;
+    json[@"smsSubscribed"] = @(deviceState.isSMSSubscribed);
     json[@"notificationPermissionStatus"] = @(deviceState.notificationPermissionStatus);
 
     result(json);
