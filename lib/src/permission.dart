@@ -89,20 +89,26 @@ class OSDeviceState extends JSONStringRepresentable {
   bool pushDisabled = false;
   bool subscribed = false;
   bool emailSubscribed = false;
+  bool smsSubscribed = false;
   String? userId;
   String? pushToken;
   String? emailUserId;
   String? emailAddress;
+  String? smsUserId;
+  String? smsNumber;
 
   OSDeviceState(Map<String, dynamic> json) {
     this.hasNotificationPermission = json['hasNotificationPermission'] as bool;
     this.pushDisabled = json['pushDisabled'] as bool;
     this.subscribed = json['subscribed'] as bool;
     this.emailSubscribed = json['emailSubscribed'] as bool;
+    this.smsSubscribed = json['smsSubscribed'] as bool;
     this.userId = json['userId'] as String?;
     this.pushToken = json['pushToken'] as String?;
     this.emailUserId = json['emailUserId'] as String?;
     this.emailAddress = json['emailAddress'] as String?;
+    this.smsUserId = json['smsUserId'] as String?;
+    this.smsNumber = json['smsNumber'] as String?;
   }
 
   String jsonRepresentation() {
@@ -114,7 +120,10 @@ class OSDeviceState extends JSONStringRepresentable {
       'pushToken': this.pushToken,
       'isEmailSubscribed': this.emailSubscribed,
       'emailUserId': this.emailUserId,
-      'emailAddress': this.emailAddress
+      'emailAddress': this.emailAddress,
+      'isSMSSubscribed': this.smsSubscribed,
+      'smsUserId': this.smsUserId,
+      'smsNumber': this.smsNumber
     });
   }
 }
