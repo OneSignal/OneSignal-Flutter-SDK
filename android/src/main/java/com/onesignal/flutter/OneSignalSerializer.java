@@ -78,10 +78,13 @@ class OneSignalSerializer {
         hash.put("pushDisabled", state.isPushDisabled());
         hash.put("subscribed", state.isSubscribed());
         hash.put("emailSubscribed", state.isEmailSubscribed());
+        hash.put("smsSubscribed", state.isSMSSubscribed());
         hash.put("userId", state.getUserId());
         hash.put("pushToken", state.getPushToken());
         hash.put("emailUserId", state.getEmailUserId());
         hash.put("emailAddress", state.getEmailAddress());
+        hash.put("smsUserId", state.getSMSUserId());
+        hash.put("smsNumber", state.getSMSNumber());
 
         return hash;
     }
