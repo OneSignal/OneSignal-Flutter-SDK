@@ -133,6 +133,10 @@
         [self setEmail:call withResult:result];
     else if ([@"OneSignal#logoutEmail" isEqualToString:call.method])
         [self logoutEmail:call withResult:result];
+    else if ([@"OneSignal#setSMSNumber" isEqualToString:call.method])
+        [self setSMSNumber:call withResult:result];
+    else if ([@"OneSignal#logoutSMSNumber" isEqualToString:call.method])
+        [self logoutSMSNumber:call withResult:result];
     else if ([@"OneSignal#setExternalUserId" isEqualToString:call.method])
         [self setExternalUserId:call withResult:result];
     else if ([@"OneSignal#removeExternalUserId" isEqualToString:call.method])
@@ -260,6 +264,28 @@
 - (void)logoutEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal logoutEmailWithSuccess:^{
         result(nil);
+    } withFailure:^(NSError *error) {
+        result(error.flutterError);
+    }];
+}
+
+- (void)setSMSNumber:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *smsNumber = call.arguments[@"smsNumber"];
+    NSString *smsAuthHashToken = call.arguments[@"smsAuthHashToken"];
+
+    if ([smsAuthHashToken isKindOfClass:[NSNull class]])
+        smsAuthHashToken = nil;
+
+    [OneSignal setSMSNumber:smsNumber withSMSAuthHashToken:smsAuthHashToken withSuccess:^(NSDictionary *results){
+        result(results);
+    } withFailure:^(NSError *error) {
+        result(error.flutterError);
+    }];
+}
+
+- (void)logoutSMSNumber:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal logoutSMSNumberWithSuccess:^(NSDictionary *results){
+        result(results);
     } withFailure:^(NSError *error) {
         result(error.flutterError);
     }];

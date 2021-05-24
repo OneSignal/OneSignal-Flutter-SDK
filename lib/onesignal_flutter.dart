@@ -285,6 +285,25 @@ class OneSignal {
     return await _channel.invokeMethod("OneSignal#logoutEmail");
   }
 
+  /// Sets the user's SMS number so you can send them SMSs through the OneSignal dashboard
+  /// and API. The `smsAuthHashToken` is optional (but highly recommended) as part of
+  /// Identity Verification. The SMS auth hash is a hash of your app's API key and the
+  /// user ID. We recommend you generate this token from your backend server, do NOT
+  /// store your API key in your app as this is highly insecure.
+  Future<Map<String, dynamic>> setSMSNumber({required String smsNumber, String? smsAuthHashToken}) async {
+    Map<dynamic, dynamic> results =
+        await _channel.invokeMethod("OneSignal#setSMSNumber", {'smsNumber': smsNumber, 'smsAuthHashToken': smsAuthHashToken});
+    return results.cast<String, dynamic>();
+  }
+
+  /// Dissociates the user's SMS number from OneSignal, akin to turning off push notifications
+  /// for SMS number.
+  Future<Map<String, dynamic>> logoutSMSNumber() async {
+    Map<dynamic, dynamic> results =
+        await _channel.invokeMethod("OneSignal#logoutSMSNumber");
+    return results.cast<String, dynamic>();
+  }
+
   /// OneSignal allows you to set a custom ID for your users. This makes it so that
   /// if your app has its own user ID's, you can use your own custom user ID's with
   /// our API instead of having to save their OneSignal user ID's.
