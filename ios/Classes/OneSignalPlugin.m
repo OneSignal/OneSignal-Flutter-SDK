@@ -99,6 +99,7 @@
     [OneSignal addSubscriptionObserver:self];
     [OneSignal addPermissionObserver:self];
     [OneSignal addEmailSubscriptionObserver:self];
+    [OneSignal addSMSSubscriptionObserver:self];
     [OneSignal setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
         [OneSignalPlugin.sharedInstance handleNotificationWillShowInForeground:notification completion:completion];
     }];
@@ -397,6 +398,11 @@
 #pragma mark OSEmailSubscriptionObserver
 - (void)onOSEmailSubscriptionChanged:(OSEmailSubscriptionStateChanges *)stateChanges {
     [self.channel invokeMethod:@"OneSignal#emailSubscriptionChanged" arguments:stateChanges.toDictionary];
+}
+
+#pragma mark OSSMSSubscriptionObserver
+- (void)onOSSMSSubscriptionChanged:(OSSMSSubscriptionStateChanges *)stateChanges {
+    [self.channel invokeMethod:@"OneSignal#smsSubscriptionChanged" arguments:stateChanges.toDictionary];
 }
 
 @end
