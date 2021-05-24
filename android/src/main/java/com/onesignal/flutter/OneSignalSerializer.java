@@ -13,6 +13,8 @@ import com.onesignal.OSNotificationReceivedEvent;
 import com.onesignal.OSOutcomeEvent;
 import com.onesignal.OSPermissionState;
 import com.onesignal.OSPermissionStateChanges;
+import com.onesignal.OSSMSSubscriptionState;
+import com.onesignal.OSSMSSubscriptionStateChanges;
 import com.onesignal.OSSubscriptionState;
 import com.onesignal.OSSubscriptionStateChanges;
 import com.onesignal.OSOutcomeEvent;
@@ -56,6 +58,16 @@ class OneSignalSerializer {
         return hash;
     }
 
+    private static HashMap<String, Object> convertSMSSubscriptionStateToMap(OSSMSSubscriptionState state) {
+        HashMap<String, Object> hash = new HashMap<>();
+
+        hash.put("smsUserId", state.getSMSNumber());
+        hash.put("smsNumber", state.getSMSNumber());
+        hash.put("isSubscribed", state.isSubscribed());
+
+        return hash;
+    }
+
     static HashMap<String, Object> convertDeviceStateToMap(OSDeviceState state) {
         HashMap<String, Object> hash = new HashMap<>();
 
@@ -88,6 +100,15 @@ class OneSignalSerializer {
 
         hash.put("to", convertEmailSubscriptionStateToMap(changes.getTo()));
         hash.put("from", convertEmailSubscriptionStateToMap(changes.getFrom()));
+
+        return hash;
+    }
+
+    static HashMap<String, Object> convertSMSSubscriptionStateChangesToMap(OSSMSSubscriptionStateChanges changes) {
+        HashMap<String, Object> hash = new HashMap<>();
+
+        hash.put("to", convertSMSSubscriptionStateToMap(changes.getTo()));
+        hash.put("from", convertSMSSubscriptionStateToMap(changes.getFrom()));
 
         return hash;
     }
