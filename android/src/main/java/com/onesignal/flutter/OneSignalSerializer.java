@@ -152,7 +152,7 @@ class OneSignalSerializer {
         if (notification.getSmallIconAccentColor() != null)
             hash.put("smallIconAccentColor", notification.getSmallIconAccentColor());
         if (notification.getLaunchURL() != null)
-            hash.put("launchURL", notification.getLaunchURL());
+            hash.put("launchUrl", notification.getLaunchURL());
         if (notification.getSound() != null)
             hash.put("sound", notification.getSound());
         if (notification.getLedColor() != null)
