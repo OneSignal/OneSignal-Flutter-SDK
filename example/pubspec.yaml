@@ -14,7 +14,7 @@ dev_dependencies:
     sdk: flutter
 
   onesignal_flutter:
-    path: ^3.0.0-beta3
+    path: ^3.0.0-beta4
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
