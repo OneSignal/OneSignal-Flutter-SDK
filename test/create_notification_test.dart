@@ -93,6 +93,10 @@ void main() {
     expect(notificationJson['delivery_time_of_day'], '9:00 AM');
   });
 
+  test('expect ttl to be parsed correctly', () {
+    expect(notificationJson['ttl'], 259200);
+  });
+
   test('expect buttons to be parsed correctly', () {
     var buttonsJson = notificationJson['buttons'] as List<Map<String, dynamic>>;
     expect(buttonsJson.first['id'], 'test_id');

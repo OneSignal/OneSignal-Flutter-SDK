@@ -48,6 +48,7 @@ final notificationJson = OSCreateNotification(
         iosBadgeType: OSCreateNotificationBadgeType.increase,
         iosBadgeCount: 2,
         collapseId: 'test_collapse_id',
+        ttl: 259200,
         sendAfter: DateTime.fromMillisecondsSinceEpoch(1532464704571,
             isUtc: true), //corresponds to 2018-07-24T20:38:24.571Z UTC00:00:00
         delayedOption: OSCreateNotificationDelayOption.lastActive,
