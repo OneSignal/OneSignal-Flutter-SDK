@@ -217,9 +217,10 @@ class OSNotification extends JSONStringRepresentable {
           json['backgroundImageLayout'].cast<String, dynamic>());
     }
     if (json.containsKey('groupedNotifications')) {
-      String jsonGroupedNotifications = json['groupedNotifications'] as String;
-      List jsonList = jsonDecode(jsonGroupedNotifications) as List;
-      this.groupedNotifications = jsonList.map((item) => OSNotification(item)).toList();
+      final dynamic jsonGroupedNotifications = json['groupedNotifications'];
+      final jsonList = jsonDecode(jsonGroupedNotifications.toString()) as List<dynamic>;
+      this.groupedNotifications = jsonList.map((dynamic item) =>
+          OSNotification(item as Map<String, dynamic>)).toList();
     }
     
     // shared parameters

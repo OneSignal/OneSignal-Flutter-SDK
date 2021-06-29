@@ -135,7 +135,7 @@ class OneSignalSerializer {
             for (OSNotification groupedNotification : notification.getGroupedNotifications())
                 payloadJsonArray.put(groupedNotification.toJSONObject());
 
-            hash.put("groupedNotifications", payloadJsonArray);
+            hash.put("groupedNotifications", payloadJsonArray.toString());
         }
 
         hash.put("notificationId", notification.getNotificationId());
