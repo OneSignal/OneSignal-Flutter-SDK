@@ -32,7 +32,7 @@ target 'Runner' do
 end
 
 target 'OneSignalNotificationServiceExtension' do
-  pod 'OneSignalXCFramework', '3.4.4'
+  pod 'OneSignalXCFramework', '3.5.3'
 end
 
 post_install do |installer|
