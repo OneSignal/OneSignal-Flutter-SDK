@@ -61,7 +61,7 @@ class OneSignalSerializer {
     private static HashMap<String, Object> convertSMSSubscriptionStateToMap(OSSMSSubscriptionState state) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("smsUserId", state.getSMSNumber());
+        hash.put("smsUserId", state.getSmsUserId());
         hash.put("smsNumber", state.getSMSNumber());
         hash.put("isSubscribed", state.isSubscribed());
 
