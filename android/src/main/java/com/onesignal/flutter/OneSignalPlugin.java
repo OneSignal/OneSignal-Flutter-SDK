@@ -158,6 +158,12 @@ public class OneSignalPlugin
   }
 
   private void addObservers() {
+    // Clean observers before setting, avoid being call twice
+    OneSignal.removeSubscriptionObserver(this);
+    OneSignal.removeEmailSubscriptionObserver(this);
+    OneSignal.removeSMSSubscriptionObserver(this);
+    OneSignal.removePermissionObserver(this);
+
     OneSignal.addSubscriptionObserver(this);
     OneSignal.addEmailSubscriptionObserver(this);
     OneSignal.addSMSSubscriptionObserver(this);
