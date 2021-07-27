@@ -17,13 +17,13 @@ import com.onesignal.OSSubscriptionObserver;
 import com.onesignal.OSSubscriptionStateChanges;
 import com.onesignal.OneSignal;
 import com.onesignal.OneSignal.EmailUpdateError;
-import com.onesignal.OneSignal.EmailUpdateHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -231,28 +231,7 @@ public class OneSignalPlugin
 
   private void postNotification(MethodCall call, final Result reply) {
     JSONObject json = new JSONObject((Map<String, Object>) call.arguments);
-    OneSignal.postNotification(json, new OneSignal.PostNotificationResponseHandler() {
-      @Override
-      public void onSuccess(JSONObject response) {
-        try {
-          replySuccess(reply, OneSignalSerializer.convertJSONObjectToHashMap(response));
-        } catch (JSONException e) {
-          replyError(reply, "OneSignal", "Encountered an error attempting to deserialize server response: " + e.getMessage(), null);
-        }
-      }
-
-      @Override
-      public void onFailure(final JSONObject response) {
-        try {
-          replyError(reply, "OneSignal",
-                  "Encountered an error attempting to post notification: " + response.toString(),
-                  OneSignalSerializer.convertJSONObjectToHashMap(response));
-        } catch (JSONException e) {
-          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
-                  "Encountered an error attempting to deserialize server response: " + e.getMessage());
-        }
-      }
-    });
+    OneSignal.postNotification(json, new OSFlutterResultHandler(flutterRegistrar, channel, reply, "postNotification"));
   }
 
   private void promptLocation(Result reply) {
@@ -269,80 +248,22 @@ public class OneSignalPlugin
     String email = call.argument("email");
     String emailAuthHashToken = call.argument("emailAuthHashToken");
 
-    OneSignal.setEmail(email, emailAuthHashToken, new EmailUpdateHandler() {
-      @Override
-      public void onSuccess() {
-        replySuccess(reply, null);
-      }
-
-      @Override
-      public void onFailure(EmailUpdateError error) {
-        replyError(reply, "OneSignal",
-                "Encountered an error setting email: " + error.getMessage(),
-                null);
-      }
-    });
+    OneSignal.setEmail(email, emailAuthHashToken, new OSFlutterEmailHandle(flutterRegistrar, channel, reply, "setEmail"));
   }
 
   private void logoutEmail(final Result reply) {
-    OneSignal.logoutEmail(new EmailUpdateHandler() {
-      @Override
-      public void onSuccess() {
-        replySuccess(reply, null);
-      }
-
-      @Override
-      public void onFailure(EmailUpdateError error) {
-        replyError(reply, "OneSignal",
-                "Encountered an error loggoing out of email: " + error.getMessage(),
-                null);
-      }
-    });
+    OneSignal.logoutEmail(new OSFlutterEmailHandle(flutterRegistrar, channel, reply, "logoutEmail"));
   }
 
   private void setSMSNumber(MethodCall call, final Result reply) {
     String smsNumber = call.argument("smsNumber");
     String smsAuthHashToken = call.argument("smsAuthHashToken");
 
-    OneSignal.setSMSNumber(smsNumber, smsAuthHashToken, new OneSignal.OSSMSUpdateHandler() {
-      @Override
-      public void onSuccess(JSONObject result) {
-        try {
-          replySuccess(reply, OneSignalSerializer.convertJSONObjectToHashMap(result));
-        } catch (JSONException e) {
-          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
-                  "Encountered an error attempting to deserialize server response for setSMSNumber: " + e.getMessage());
-        }
-      }
-
-      @Override
-      public void onFailure(OneSignal.OSSMSUpdateError error) {
-        replyError(reply, "OneSignal",
-                "Encountered an error setting SMS Number: " + error.getMessage(),
-                null);
-      }
-    });
+    OneSignal.setSMSNumber(smsNumber, smsAuthHashToken, new OSFlutterResultHandler(flutterRegistrar, channel, reply, "setSMSNumber"));
   }
 
   private void logoutSMSNumber(final Result reply) {
-    OneSignal.logoutSMSNumber(new OneSignal.OSSMSUpdateHandler() {
-      @Override
-      public void onSuccess(JSONObject result) {
-        try {
-          replySuccess(reply, OneSignalSerializer.convertJSONObjectToHashMap(result));
-        } catch (JSONException e) {
-          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
-                  "Encountered an error attempting to deserialize server response for logoutSMSNumber: " + e.getMessage());
-        }
-      }
-
-      @Override
-      public void onFailure(OneSignal.OSSMSUpdateError error) {
-        replyError(reply, "OneSignal",
-                "Encountered an error logging out SMS number: " + error.getMessage(),
-                null);
-      }
-    });
+    OneSignal.logoutSMSNumber(new OSFlutterResultHandler(flutterRegistrar, channel, reply, "logoutSMSNumber"));
   }
 
   private void setLanguage(MethodCall call, final Result result) {
@@ -361,45 +282,11 @@ public class OneSignalPlugin
     if (authHashToken != null && authHashToken.length() == 0)
       authHashToken = null;
 
-    OneSignal.setExternalUserId(externalUserId, authHashToken, new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
-      @Override
-      public void onSuccess(JSONObject results) {
-        try {
-          replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
-        } catch (JSONException e) {
-          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
-                  "Encountered an error attempting to deserialize server response for setExternalUserId: " + e.getMessage());
-        }
-      }
-
-      @Override
-      public void onFailure(OneSignal.ExternalIdError error) {
-        replyError(result, "OneSignal",
-                "Encountered an error setting external id: " + error.getMessage(),
-                null);
-      }
-    });
+    OneSignal.setExternalUserId(externalUserId, authHashToken, new OSFlutterResultHandler(flutterRegistrar, channel, result, "setExternalUserId"));
   }
 
   private void removeExternalUserId(final Result result) {
-    OneSignal.removeExternalUserId(new OneSignal.OSExternalUserIdUpdateCompletionHandler() {
-      @Override
-      public void onSuccess(JSONObject results) {
-        try {
-          replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
-        } catch (JSONException e) {
-          OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
-                  "Encountered an error attempting to deserialize server response for removeExternalUserId: " + e.getMessage());
-        }
-      }
-
-      @Override
-      public void onFailure(OneSignal.ExternalIdError error) {
-        replyError(result, "OneSignal",
-                "Encountered an error removing external id: " + error.getMessage(),
-                null);
-      }
-    });
+    OneSignal.removeExternalUserId(new OSFlutterResultHandler(flutterRegistrar, channel, result, "removeExternalUserId"));
   }
 
   private void initNotificationOpenedHandlerParams() {
@@ -506,6 +393,92 @@ public class OneSignalPlugin
       e.getStackTrace();
       OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
               "Encountered an error attempting to convert OSNotificationReceivedEvent object to hash map: " + e.getMessage());
+    }
+  }
+
+  static class OSFlutterEmailHandle extends FlutterRegistrarResponder
+          implements OneSignal.EmailUpdateHandler {
+    private final Result result;
+    private final String methodName;
+    private final AtomicBoolean replySubmitted = new AtomicBoolean(false);
+
+    OSFlutterEmailHandle(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
+        this.flutterRegistrar = flutterRegistrar;
+        this.channel = channel;
+        this.result = res;
+        this.methodName = methodName;
+    }
+
+    @Override
+    public void onSuccess() {
+      if (this.replySubmitted.getAndSet(true))
+          return;
+
+      replySuccess(result, null);
+    }
+
+    @Override
+    public void onFailure(EmailUpdateError error) {
+      if (this.replySubmitted.getAndSet(true))
+          return;
+
+      replyError(result, "OneSignal",
+              "Encountered an error when " + methodName + ": " + error.getMessage(),
+              null);
+    }
+  }
+
+  static class OSFlutterResultHandler extends FlutterRegistrarResponder
+            implements OneSignal.OSExternalUserIdUpdateCompletionHandler, OneSignal.OSSMSUpdateHandler, OneSignal.PostNotificationResponseHandler {
+    private final Result result;
+    private final String methodName;
+    private final AtomicBoolean replySubmitted = new AtomicBoolean(false);
+
+    OSFlutterResultHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
+        this.flutterRegistrar = flutterRegistrar;
+        this.channel = channel;
+        this.result = res;
+        this.methodName = methodName;
+    }
+
+    @Override
+    public void onSuccess(JSONObject results) {
+      if (this.replySubmitted.getAndSet(true))
+          return;
+
+      try {
+          replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
+      } catch (JSONException e) {
+          replyError(result, "OneSignal", "Encountered an error attempting to deserialize server response for " + methodName + ": " + e.getMessage(), null);
+      }
+    }
+
+    @Override
+    public void onFailure(OneSignal.OSSMSUpdateError error) {
+      if (this.replySubmitted.getAndSet(true))
+          return;
+
+      replyError(result, "OneSignal", "Encountered an error when " + methodName + " (" + error.getType() + "): " + error.getMessage(), null);
+    }
+
+    @Override
+    public void onFailure(OneSignal.ExternalIdError error) {
+      if (this.replySubmitted.getAndSet(true))
+          return;
+
+      replyError(result, "OneSignal", "Encountered an error when " + methodName + " (" + error.getType() + "): " + error.getMessage(), null);
+    }
+
+    @Override
+    public void onFailure(JSONObject response) {
+      if (this.replySubmitted.getAndSet(true))
+          return;
+
+      try {
+          replyError(result, "OneSignal", "Encountered an error attempting to " + methodName + " " + response.toString(), OneSignalSerializer.convertJSONObjectToHashMap(response));
+      } catch (JSONException jsonException) {
+          replyError(result, "OneSignal", "Encountered an error attempting to deserialize server response " + methodName + " " + jsonException.getMessage(), null);
+      }
     }
   }
 
