@@ -67,6 +67,9 @@ class OneSignalMockChannelController {
       case "OneSignal#removeExternalUserId":
         this.state.externalId = null;
         return {"success" : true};
+      case "OneSignal#setLanguage":
+      this.state.language = (call.arguments as Map<dynamic, dynamic>)['language'] as String?;;
+      return {"success" : true};
     }
   }
 }
@@ -93,6 +96,7 @@ class OneSignalState {
   OSNotificationDisplayType? inFocusDisplayType;
   bool? disablePush;
   String? externalId;
+  String? language;
 
   // tags
   Map<dynamic, dynamic>? tags;
