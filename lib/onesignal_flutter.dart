@@ -329,6 +329,12 @@ class OneSignal {
     return results.cast<String, dynamic>();
   }
 
+  Future<Map<String, dynamic>> setLanguage(String language) async {
+    Map<dynamic, dynamic> results =
+        await (_channel.invokeMethod("OneSignal#setLanguage", {'language' : language}));
+    return results.cast<String, dynamic>();
+  }
+
   /// Adds a single key, value trigger, which will trigger an in app message
   /// if one exists matching the specific trigger added
   Future<void> addTrigger(String key, Object value) async {
