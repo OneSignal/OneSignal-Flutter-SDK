@@ -142,6 +142,8 @@
         [self setExternalUserId:call withResult:result];
     else if ([@"OneSignal#removeExternalUserId" isEqualToString:call.method])
         [self removeExternalUserId:call withResult:result];
+    else if ([@"OneSignal#setLanguage" isEqualToString:call.method])
+        [self setLanguage:call withResult:result];
     else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method])
         [self initNotificationOpenedHandlerParams];
     else if ([@"OneSignal#initInAppMessageClickedHandlerParams" isEqualToString:call.method])
@@ -318,6 +320,14 @@
         [OneSignal onesignalLog:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"Remove external user id Failure with error: %@", error]];
         result(error.flutterError);
     }];
+}
+
+- (void)setLanguage:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    id language = call.arguments[@"language"];
+    if (language == [NSNull null])
+        language = nil;
+
+    [OneSignal setLanguage:language];
 }
 
 - (void)initNotificationOpenedHandlerParams {
