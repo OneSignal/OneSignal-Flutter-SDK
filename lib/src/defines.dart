@@ -1,4 +1,4 @@
-String sdkVersion = "2.2.0";
+String sdkVersion = "3.1.0";
 
 /// Determines how notifications should be displayed
 enum OSNotificationDisplayType { none, alert, notification }
@@ -7,8 +7,13 @@ enum OSNotificationDisplayType { none, alert, notification }
 /// or took a specific action by tapping a button (`actionTaken`)
 enum OSNotificationActionType { opened, actionTaken }
 
-//// NOTE: provisional permission is only available in iOS 12
-enum OSNotificationPermission { notDetermined, denied, authorized, provisional }
+enum OSNotificationPermission {
+  notDetermined,
+  denied,
+  authorized,
+  provisional, // only available in iOS 12
+  ephemeral, // only available in iOS 14
+}
 
 /// An enum that declares different types of log levels you can
 /// use with the OneSignal SDK, going from the least verbose (none)

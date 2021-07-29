@@ -96,6 +96,7 @@ class OSDeviceState extends JSONStringRepresentable {
   String? emailAddress;
   String? smsUserId;
   String? smsNumber;
+  OSNotificationPermission? notificationPermissionStatus;
 
   OSDeviceState(Map<String, dynamic> json) {
     this.hasNotificationPermission = json['hasNotificationPermission'] as bool;
@@ -109,6 +110,7 @@ class OSDeviceState extends JSONStringRepresentable {
     this.emailAddress = json['emailAddress'] as String?;
     this.smsUserId = json['smsUserId'] as String?;
     this.smsNumber = json['smsNumber'] as String?;
+    this.notificationPermissionStatus = json['notificationPermissionStatus'] == null ? null : OSNotificationPermission.values[json['notificationPermissionStatus']];
   }
 
   String jsonRepresentation() {
@@ -123,7 +125,8 @@ class OSDeviceState extends JSONStringRepresentable {
       'emailAddress': this.emailAddress,
       'isSMSSubscribed': this.smsSubscribed,
       'smsUserId': this.smsUserId,
-      'smsNumber': this.smsNumber
+      'smsNumber': this.smsNumber,
+      'notificationPermissionStatus': this.notificationPermissionStatus?.index,
     });
   }
 }
