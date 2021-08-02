@@ -324,8 +324,9 @@
 
 - (void)setLanguage:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     id language = call.arguments[@"language"];
-    if (language == [NSNull null])
+    if (language == [NSNull null]) {
         language = nil;
+    }
 
     [OneSignal setLanguage:language];
 }

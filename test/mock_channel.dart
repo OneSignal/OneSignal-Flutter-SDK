@@ -68,7 +68,7 @@ class OneSignalMockChannelController {
         this.state.externalId = null;
         return {"success" : true};
       case "OneSignal#setLanguage":
-        this.state.language = (call.arguments as Map<dynamic, dynamic>)['language'] as String?;;
+        this.state.language = (call.arguments as Map<dynamic, dynamic>)['language'] as String?;
         return {"success" : true};
     }
   }

@@ -341,7 +341,7 @@ public class OneSignalPlugin
 
   private void setLanguage(MethodCall call, final Result result) {
     String language = call.argument("language");
-    if(language != null && language.length() == 0)
+    if (language != null && language.length() == 0)
       language = null;
 
       OneSignal.setLanguage(language);
