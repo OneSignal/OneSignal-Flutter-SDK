@@ -120,6 +120,8 @@ public class OneSignalPlugin
       this.setExternalUserId(call, result);
     else if (call.method.contentEquals("OneSignal#removeExternalUserId"))
       this.removeExternalUserId(result);
+    else if (call.method.contentEquals("OneSignal#setLanguage"))
+      this.setLanguage(call, result);
     else if (call.method.contentEquals("OneSignal#initNotificationOpenedHandlerParams"))
       this.initNotificationOpenedHandlerParams();
     else if (call.method.contentEquals("OneSignal#initInAppMessageClickedHandlerParams"))
@@ -335,6 +337,14 @@ public class OneSignalPlugin
                 null);
       }
     });
+  }
+
+  private void setLanguage(MethodCall call, final Result result) {
+    String language = call.argument("language");
+    if (language != null && language.length() == 0)
+      language = null;
+
+      OneSignal.setLanguage(language);
   }
 
   private void setExternalUserId(MethodCall call, final Result result) {

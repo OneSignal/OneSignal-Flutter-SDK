@@ -109,4 +109,11 @@ void main() {
       expect(channelController.state.externalId, null);
     }));
   });
+
+  //Set Language test
+  test('setting language', () {
+    onesignal.setLanguage('fr').then(expectAsync1((v) {
+      expect(channelController.state.language, 'fr');
+    }));
+  });
 }
