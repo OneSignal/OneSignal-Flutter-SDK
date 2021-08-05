@@ -396,23 +396,19 @@ public class OneSignalPlugin
     }
   }
 
-  static class OSFlutterEmailHandle extends FlutterRegistrarResponder
+  static class OSFlutterEmailHandle extends OSFlutterHandler
           implements OneSignal.EmailUpdateHandler {
-    private final Result result;
-    private final String methodName;
-    private final AtomicBoolean replySubmitted = new AtomicBoolean(false);
 
     OSFlutterEmailHandle(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
-        this.flutterRegistrar = flutterRegistrar;
-        this.channel = channel;
-        this.result = res;
-        this.methodName = methodName;
+      super(flutterRegistrar, channel, res, methodName);
     }
 
     @Override
     public void onSuccess() {
-      if (this.replySubmitted.getAndSet(true))
-          return;
+      if (this.replySubmitted.getAndSet(true)) {
+        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.DEBUG, "OneSignal " + methodName + " handler called twice, ignoring!");
+        return;
+      }
 
       replySuccess(result, null);
     }
@@ -428,23 +424,19 @@ public class OneSignalPlugin
     }
   }
 
-  static class OSFlutterSMSHandler extends FlutterRegistrarResponder
+  static class OSFlutterSMSHandler extends OSFlutterHandler
           implements OneSignal.OSSMSUpdateHandler {
-    private final Result result;
-    private final String methodName;
-    private final AtomicBoolean replySubmitted = new AtomicBoolean(false);
 
     OSFlutterSMSHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
-      this.flutterRegistrar = flutterRegistrar;
-      this.channel = channel;
-      this.result = res;
-      this.methodName = methodName;
+      super(flutterRegistrar, channel, res, methodName);
     }
 
     @Override
     public void onSuccess(JSONObject results) {
-      if (this.replySubmitted.getAndSet(true))
+      if (this.replySubmitted.getAndSet(true)) {
+        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.DEBUG, "OneSignal " + methodName + " handler called twice, ignoring! response: " + results);
         return;
+      }
 
       try {
         replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
@@ -462,23 +454,19 @@ public class OneSignalPlugin
     }
   }
 
-  static class OSFlutterExternalUserIdHandler extends FlutterRegistrarResponder
+  static class OSFlutterExternalUserIdHandler extends OSFlutterHandler
           implements OneSignal.OSExternalUserIdUpdateCompletionHandler {
-    private final Result result;
-    private final String methodName;
-    private final AtomicBoolean replySubmitted = new AtomicBoolean(false);
 
     OSFlutterExternalUserIdHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
-      this.flutterRegistrar = flutterRegistrar;
-      this.channel = channel;
-      this.result = res;
-      this.methodName = methodName;
+      super(flutterRegistrar, channel, res, methodName);
     }
 
     @Override
     public void onSuccess(JSONObject results) {
-      if (this.replySubmitted.getAndSet(true))
+      if (this.replySubmitted.getAndSet(true)) {
+        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.DEBUG, "OneSignal " + methodName + " handler called twice, ignoring! response: " + results);
         return;
+      }
 
       try {
         replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
@@ -496,23 +484,19 @@ public class OneSignalPlugin
     }
   }
 
-  static class OSFlutterPostNotificationHandler extends FlutterRegistrarResponder
+  static class OSFlutterPostNotificationHandler extends OSFlutterHandler
             implements OneSignal.PostNotificationResponseHandler {
-    private final Result result;
-    private final String methodName;
-    private final AtomicBoolean replySubmitted = new AtomicBoolean(false);
 
     OSFlutterPostNotificationHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
-        this.flutterRegistrar = flutterRegistrar;
-        this.channel = channel;
-        this.result = res;
-        this.methodName = methodName;
+      super(flutterRegistrar, channel, res, methodName);
     }
 
     @Override
     public void onSuccess(JSONObject results) {
-      if (this.replySubmitted.getAndSet(true))
-          return;
+      if (this.replySubmitted.getAndSet(true)) {
+        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.DEBUG, "OneSignal " + methodName + " handler called twice, ignoring! response: " + results);
+        return;
+      }
 
       try {
           replySuccess(result, OneSignalSerializer.convertJSONObjectToHashMap(results));
@@ -523,8 +507,10 @@ public class OneSignalPlugin
 
     @Override
     public void onFailure(JSONObject response) {
-      if (this.replySubmitted.getAndSet(true))
-          return;
+      if (this.replySubmitted.getAndSet(true)) {
+        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.DEBUG, "OneSignal " + methodName + " handler called twice, ignoring! response: " + response);
+        return;
+      }
 
       try {
           replyError(result, "OneSignal", "Encountered an error attempting to " + methodName + " " + response.toString(), OneSignalSerializer.convertJSONObjectToHashMap(response));
@@ -534,4 +520,16 @@ public class OneSignalPlugin
     }
   }
 
+  static class OSFlutterHandler extends FlutterRegistrarResponder {
+    protected final Result result;
+    protected final String methodName;
+    protected final AtomicBoolean replySubmitted = new AtomicBoolean(false);
+
+    OSFlutterHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
+      this.flutterRegistrar = flutterRegistrar;
+      this.channel = channel;
+      this.result = res;
+      this.methodName = methodName;
+    }
+  }
 }
