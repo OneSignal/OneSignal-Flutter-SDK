@@ -248,11 +248,11 @@ public class OneSignalPlugin
     String email = call.argument("email");
     String emailAuthHashToken = call.argument("emailAuthHashToken");
 
-    OneSignal.setEmail(email, emailAuthHashToken, new OSFlutterEmailHandle(flutterRegistrar, channel, reply, "setEmail"));
+    OneSignal.setEmail(email, emailAuthHashToken, new OSFlutterEmailHandler(flutterRegistrar, channel, reply, "setEmail"));
   }
 
   private void logoutEmail(final Result reply) {
-    OneSignal.logoutEmail(new OSFlutterEmailHandle(flutterRegistrar, channel, reply, "logoutEmail"));
+    OneSignal.logoutEmail(new OSFlutterEmailHandler(flutterRegistrar, channel, reply, "logoutEmail"));
   }
 
   private void setSMSNumber(MethodCall call, final Result reply) {
@@ -396,10 +396,10 @@ public class OneSignalPlugin
     }
   }
 
-  static class OSFlutterEmailHandle extends OSFlutterHandler
+  static class OSFlutterEmailHandler extends OSFlutterHandler
           implements OneSignal.EmailUpdateHandler {
 
-    OSFlutterEmailHandle(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
+    OSFlutterEmailHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
       super(flutterRegistrar, channel, res, methodName);
     }
 
