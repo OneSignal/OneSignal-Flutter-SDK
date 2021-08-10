@@ -28,7 +28,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
-class OneSignalSerializer {
+public class OneSignalSerializer {
     private static HashMap<String, Object> convertSubscriptionStateToMap(OSSubscriptionState state) {
         HashMap<String, Object> hash = new HashMap<>();
 
@@ -232,7 +232,7 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertNotificationReceivedEventToMap(OSNotificationReceivedEvent notificationReceivedEvent) throws JSONException {
+    public static HashMap<String, Object> convertNotificationReceivedEventToMap(OSNotificationReceivedEvent notificationReceivedEvent) throws JSONException {
         return convertNotificationToMap(notificationReceivedEvent.getNotification());
     }
 

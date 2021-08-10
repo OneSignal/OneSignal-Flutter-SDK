@@ -1,5 +1,6 @@
 package com.onesignal.flutter;
 
+import android.app.Activity;
 import android.content.Context;
 
 import com.onesignal.OSDeviceState;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.flutter.embedding.engine.FlutterShellArgs;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -52,6 +54,8 @@ public class OneSignalPlugin
   private boolean hasSetRequiresPrivacyConsent = false;
   private boolean waitingForUserPrivacyConsent = false;
 
+  private Activity mainActivity;
+
   private HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
   public static void registerWith(Registrar registrar) {
@@ -63,6 +67,7 @@ public class OneSignalPlugin
     plugin.channel = new MethodChannel(registrar.messenger(), "OneSignal");
     plugin.channel.setMethodCallHandler(plugin);
     plugin.flutterRegistrar = registrar;
+    plugin.mainActivity = registrar.activity();
 
     // Create a callback for the flutterRegistrar to connect the applications onDestroy
     plugin.flutterRegistrar.addViewDestroyListener(new PluginRegistry.ViewDestroyListener() {
@@ -128,6 +133,8 @@ public class OneSignalPlugin
       this.initInAppMessageClickedHandlerParams();
     else if (call.method.contentEquals("OneSignal#initNotificationWillShowInForegroundHandlerParams"))
       this.initNotificationWillShowInForegroundHandlerParams();
+    else if (call.method.contentEquals("OneSignal#initNotificationWillShowHandlerParams"))
+      this.initNotificationWillShowHandlerParams(call, result);
     else if (call.method.contentEquals("OneSignal#completeNotification"))
       this.completeNotification(call, result);
     else if (call.method.contentEquals("OneSignal#clearOneSignalNotifications"))
@@ -298,6 +305,33 @@ public class OneSignalPlugin
     if (this.inAppMessageClickedResult != null) {
       this.inAppMessageClicked(this.inAppMessageClickedResult);
       this.inAppMessageClickedResult = null;
+    }
+  }
+
+  private void initNotificationWillShowHandlerParams(MethodCall call, Result result) {
+    this.hasSetNotificationWillShowInForegroundHandler = true;
+
+    @SuppressWarnings("unchecked")
+    Map<String, Object> arguments = ((Map<String, Object>) call.arguments);
+
+    long pluginCallbackHandle = 0;
+
+    Object arg1 = arguments.get("notificationCallbackHandle");
+
+    if (arg1 instanceof Long) {
+      pluginCallbackHandle = (Long) arg1;
+    } else {
+      pluginCallbackHandle = Long.valueOf((Integer) arg1);
+    }
+
+
+    FlutterShellArgs shellArgs = null;
+    if (mainActivity != null) {
+      // Supports both Flutter Activity types:
+      //    io.flutter.embedding.android.FlutterFragmentActivity
+      //    io.flutter.embedding.android.FlutterActivity
+      // We could use `getFlutterShellArgs()` but this is only available on `FlutterActivity`.
+      shellArgs = FlutterShellArgs.fromIntent(mainActivity.getIntent());
     }
   }
 
