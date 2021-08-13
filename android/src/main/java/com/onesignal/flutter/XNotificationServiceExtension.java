@@ -21,6 +21,7 @@ import com.onesignal.OneSignal.OSRemoteNotificationReceivedHandler;
 
 public class XNotificationServiceExtension implements OSRemoteNotificationReceivedHandler {
 
+    private static final String TAG = "OneSignal - XNotificationServiceExtension";
     public static BackgroundExecutor be;
     public static HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
@@ -29,8 +30,7 @@ public class XNotificationServiceExtension implements OSRemoteNotificationReceiv
         OSNotification notification = notificationReceivedEvent.getNotification();
         XNotificationServiceExtension.notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
         JSONObject data = notification.getAdditionalData();
-        Log.i("OneSignal", "Received Notification Data: " + data.toString());
-        // notificationReceivedEvent.complete(null);
+        Log.i(TAG, "Received Notification Data: " + data.toString());
 
         if (ContextHolder.getApplicationContext() == null) {
             ContextHolder.setApplicationContext(context.getApplicationContext());
@@ -38,19 +38,20 @@ public class XNotificationServiceExtension implements OSRemoteNotificationReceiv
         if (XNotificationServiceExtension.be == null) {
             XNotificationServiceExtension.be = new BackgroundExecutor();
         }
-        Log.i("OneSignal", "Checking isolated BackgroundExecutor.");
+        Log.i(TAG, "Checking isolated BackgroundExecutor.");
         try {
             HashMap<String, Object> receivedMap = OneSignalSerializer.convertNotificationReceivedEventToMap(notificationReceivedEvent);
             XNotificationServiceExtension.be.startBackgroundIsolate(new IsolateStatusHandler() {
                 @Override
                 public void done() {
                     if (XNotificationServiceExtension.be != null) {
+                        Log.i(TAG, "Executing dart code in isolate.");
                         XNotificationServiceExtension.be.executeDartCallbackInBackgroundIsolate(receivedMap);
                     }
                 }
             });
         } catch (Exception e) {
-            Log.i("OneSignal", "Exception on XNotificationServiceExtension", e);
+            Log.i(TAG, "Exception while executing dart code in isolate", e);
         }
     }
 }

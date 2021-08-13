@@ -34,7 +34,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * callback dispatcher, used to invoke Dart callbacks while backgrounded.
  */
 public class BackgroundExecutor implements MethodCallHandler {
-  private static final String TAG = "BackgroundExecutor";
+  private static final String TAG = "OneSignal - BackgroundExecutor";
+  private static final String CHANNEL = "OneSignalBackground";
+  private static final String OSK = "one_signal_key";
   private static final String CALLBACK_HANDLE_KEY = "callback_handle";
   private static final String USER_CALLBACK_HANDLE_KEY = "user_callback_handle";
 
@@ -69,7 +71,7 @@ public class BackgroundExecutor implements MethodCallHandler {
   public static void setCallbackDispatcher(long callbackHandle) {
     Context context = ContextHolder.getApplicationContext();
     SharedPreferences prefs =
-        context.getSharedPreferences("one_signal_key", 0);
+        context.getSharedPreferences(OSK, 0);
     prefs.edit().putLong(CALLBACK_HANDLE_KEY, callbackHandle).apply();
   }
 
@@ -82,7 +84,7 @@ public class BackgroundExecutor implements MethodCallHandler {
         // is running. From this point forward, the Android side of this plugin can send
         // callback handles through the background method channel, and the Dart side will execute
         // the Dart methods corresponding to those callback handles.
-        Log.i("OneSignal", "Background channel ready");
+        Log.i(TAG, "Background channel ready");
 
         result.success(true);
       } else {
@@ -128,7 +130,7 @@ public class BackgroundExecutor implements MethodCallHandler {
    * </ul>
    */
   public void startBackgroundIsolate(IsolateStatusHandler isolate) {
-    Log.i("OneSignal", "Starting background isolate.");
+    Log.i(TAG, "Starting background isolate.");
     if (isNotRunning()) {
       long callbackHandle = getPluginCallbackHandle();
       if (callbackHandle != 0) {
@@ -268,7 +270,7 @@ public class BackgroundExecutor implements MethodCallHandler {
     }
     SharedPreferences prefs =
         ContextHolder.getApplicationContext()
-            .getSharedPreferences("one_signal_key", 0);
+            .getSharedPreferences(OSK, 0);
     return prefs.getLong(USER_CALLBACK_HANDLE_KEY, 0);
   }
 
@@ -279,7 +281,7 @@ public class BackgroundExecutor implements MethodCallHandler {
   public static void setUserCallbackHandle(long callbackHandle) {
     Context context = ContextHolder.getApplicationContext();
     SharedPreferences prefs =
-        context.getSharedPreferences("one_signal_key", 0);
+        context.getSharedPreferences(OSK, 0);
     prefs.edit().putLong(USER_CALLBACK_HANDLE_KEY, callbackHandle).apply();
   }
 
@@ -290,15 +292,14 @@ public class BackgroundExecutor implements MethodCallHandler {
     }
     SharedPreferences prefs =
         ContextHolder.getApplicationContext()
-            .getSharedPreferences("one_signal_key", 0);
+            .getSharedPreferences(OSK, 0);
     return prefs.getLong(CALLBACK_HANDLE_KEY, 0);
   }
 
   // This channel is responsible for sending requests from Android to Dart to execute Dart
   // callbacks in the background isolate.
   private void initializeMethodChannel(BinaryMessenger isolate) {
-    backgroundChannel =
-        new MethodChannel(isolate, "OneSignalBackground");
+    backgroundChannel = new MethodChannel(isolate, CHANNEL);
     backgroundChannel.setMethodCallHandler(this);
   }
 }
