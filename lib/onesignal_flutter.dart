@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -173,6 +174,10 @@ class OneSignal {
 
   void setNotificationWillShowHandler(
       NotificationWillShowInForegroundHandler handler) {
+    if (Platform.isIOS) {
+      setNotificationWillShowInForegroundHandler(handler);
+      return;
+    }
     final CallbackHandle bgHandle =
         PluginUtilities.getCallbackHandle(_callbackDispatcher)!;
     final CallbackHandle notificationHandler =
