@@ -2,6 +2,7 @@ package com.onesignal.flutter;
 
 import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 import com.onesignal.OSDeviceState;
 import com.onesignal.OSEmailSubscriptionObserver;
@@ -68,6 +69,10 @@ public class OneSignalPlugin
     plugin.channel.setMethodCallHandler(plugin);
     plugin.flutterRegistrar = registrar;
     plugin.mainActivity = registrar.activity();
+
+    if (ContextHolder.getApplicationContext() == null) {
+      ContextHolder.setApplicationContext(plugin.mainActivity.getApplicationContext());
+    }
 
     // Create a callback for the flutterRegistrar to connect the applications onDestroy
     plugin.flutterRegistrar.addViewDestroyListener(new PluginRegistry.ViewDestroyListener() {
@@ -315,8 +320,10 @@ public class OneSignalPlugin
     Map<String, Object> arguments = ((Map<String, Object>) call.arguments);
 
     long pluginCallbackHandle = 0;
+    long notificationCallbackHandle = 0;
 
-    Object arg1 = arguments.get("notificationCallbackHandle");
+    Object arg1 = arguments.get("pluginCallbackHandle");
+    Object arg2 = arguments.get("notificationCallbackHandle");
 
     if (arg1 instanceof Long) {
       pluginCallbackHandle = (Long) arg1;
@@ -324,6 +331,11 @@ public class OneSignalPlugin
       pluginCallbackHandle = Long.valueOf((Integer) arg1);
     }
 
+    if (arg2 instanceof Long) {
+      notificationCallbackHandle = (Long) arg2;
+    } else {
+      notificationCallbackHandle = Long.valueOf((Integer) arg2);
+    }
 
     FlutterShellArgs shellArgs = null;
     if (mainActivity != null) {
@@ -333,6 +345,22 @@ public class OneSignalPlugin
       // We could use `getFlutterShellArgs()` but this is only available on `FlutterActivity`.
       shellArgs = FlutterShellArgs.fromIntent(mainActivity.getIntent());
     }
+
+    if (XNotificationServiceExtension.be != null) {
+      Log.i("OneSignal", "Attempted to start a duplicate background isolate. Returning...");
+      return;
+    }
+
+    XNotificationServiceExtension.be = new BackgroundExecutor();
+    XNotificationServiceExtension.be.setCallbackDispatcher(pluginCallbackHandle);
+    XNotificationServiceExtension.be.setUserCallbackHandle(notificationCallbackHandle);
+    Log.i("OneSignal", "Starting background isolate. Returning...");
+    XNotificationServiceExtension.be.startBackgroundIsolate(pluginCallbackHandle, shellArgs, new IsolateStatusHandler() {
+      @Override
+      public void done() {
+        // nothing to do here
+      }
+    });
   }
 
   private void initNotificationWillShowInForegroundHandlerParams() {
@@ -356,6 +384,10 @@ public class OneSignalPlugin
     String notificationId = call.argument("notificationId");
     boolean shouldDisplay = call.argument("shouldDisplay");
     OSNotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
+
+    if (notificationReceivedEvent == null && XNotificationServiceExtension.notificationReceivedEventCache != null) {
+        notificationReceivedEvent = XNotificationServiceExtension.notificationReceivedEventCache.get(notificationId);
+    }
 
     if (notificationReceivedEvent == null) {
       OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Could not find notification completion block with id: " + notificationId);

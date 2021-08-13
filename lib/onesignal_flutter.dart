@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'dart:ui';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 import 'package:onesignal_flutter/src/subscription.dart';
@@ -30,6 +32,47 @@ typedef void PermissionChangeHandler(OSPermissionStateChanges changes);
 typedef void InAppMessageClickedHandler(OSInAppMessageAction action);
 typedef void NotificationWillShowInForegroundHandler(
     OSNotificationReceivedEvent event);
+
+void _callbackDispatcher() {
+  // Initialize state necessary for MethodChannels.
+  WidgetsFlutterBinding.ensureInitialized();
+
+  const MethodChannel _channel = MethodChannel('OneSignalBackground');
+
+  // This is where we handle background events from the native portion of the plugin.
+  _channel.setMethodCallHandler((MethodCall call) async {
+    if (call.method == 'OneSignal#onBackgroundNotification') {
+      final CallbackHandle notificationCallbackHandle =
+          CallbackHandle.fromRawHandle(
+              call.arguments['notificationCallbackHandle']);
+
+      // PluginUtilities.getCallbackFromHandle performs a lookup based on the
+      // callback handle and returns a tear-off of the original callback.
+      final closure =
+          PluginUtilities.getCallbackFromHandle(notificationCallbackHandle)!
+              as Future<void> Function(OSNotificationReceivedEvent);
+
+      try {
+        Map<String, dynamic> messageMap =
+            Map<String, dynamic>.from(call.arguments['message']);
+        final notification = OSNotificationReceivedEvent(messageMap);
+        await closure(notification);
+      } catch (e) {
+        // ignore: avoid_print
+        print(
+            'OneSignal: An error occurred in your background messaging handler:');
+        // ignore: avoid_print
+        print(e);
+      }
+    } else {
+      throw UnimplementedError('${call.method} has not been implemented');
+    }
+  });
+
+  // Once we've finished initializing, let the native portion of the plugin
+  // know that it can start scheduling alarms.
+  _channel.invokeMethod<void>('OneSignal#backgroundHandlerInitialized');
+}
 
 class OneSignal {
   /// A singleton representing the OneSignal SDK.
@@ -130,12 +173,15 @@ class OneSignal {
 
   void setNotificationWillShowHandler(
       NotificationWillShowInForegroundHandler handler) {
-    _onNotificationWillShowInForegroundHandler = handler;
-    // _channel.invokeMethod("OneSignal#initNotificationWillShowInForegroundHandlerParams");
+    final CallbackHandle bgHandle =
+        PluginUtilities.getCallbackHandle(_callbackDispatcher)!;
     final CallbackHandle notificationHandler =
         PluginUtilities.getCallbackHandle(handler)!;
-    _channel.invokeMapMethod("OneSignal#initNotificationWillShowHandlerParams",
-        {'notificationCallbackHandle': notificationHandler.toRawHandle()});
+    _channel
+        .invokeMapMethod("OneSignal#initNotificationWillShowHandlerParams", {
+      'notificationCallbackHandle': notificationHandler.toRawHandle(),
+      'pluginCallbackHandle': bgHandle.toRawHandle(),
+    });
   }
 
   /// The notification foreground handler is called whenever a notification arrives
@@ -457,6 +503,10 @@ class OneSignal {
           OSInAppMessageAction(call.arguments.cast<String, dynamic>()));
     } else if (call.method ==
             'OneSignal#handleNotificationWillShowInForeground' &&
+        this._onNotificationWillShowInForegroundHandler != null) {
+      this._onNotificationWillShowInForegroundHandler!(
+          OSNotificationReceivedEvent(call.arguments.cast<String, dynamic>()));
+    } else if (call.method == 'OneSignal#handleNotificationWillShow' &&
         this._onNotificationWillShowInForegroundHandler != null) {
       this._onNotificationWillShowInForegroundHandler!(
           OSNotificationReceivedEvent(call.arguments.cast<String, dynamic>()));
