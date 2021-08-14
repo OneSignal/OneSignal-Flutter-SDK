@@ -1,14 +1,14 @@
 {
    "subscription_changed_test" : {
       "from": {
-         "subscribed": false,  
-         "userSubscriptionSetting": true,  
+         "isSubscribed": false,  
+         "isPushDisabled": true,  
          "pushToken": "07afbb0b4cb6e7ae5e81efc7fd5d35267ea9a4f12120045aebe29945e52ea30e",  
          "userId": null
       },
       "to": {  
-         "subscribed": true,  
-         "userSubscriptionSetting": true,  
+         "isSubscribed": true,  
+         "isPushDisabled": true,  
          "pushToken": "07afbb0b4cb6e7ae5e81efc7fd5d35267ea9a4f12120045aebe29945e52ea30e",  
          "userId": "c1b395fc-3b17-4c18-aaa6-195cd3461311"
       }

@@ -23,13 +23,13 @@ void main() {
         subscriptionChanges.to.pushToken, subscriptionChanges.from.pushToken);
   });
 
-  test('expect subscription correctly parses `subscribed`', () {
-    expect(subscriptionChanges.to.subscribed,
-        !subscriptionChanges.from.subscribed);
+  test('expect subscription correctly parses `isSubscribed`', () {
+    expect(subscriptionChanges.to.isSubscribed,
+        !subscriptionChanges.from.isSubscribed);
   });
 
-  test('expect subscription correctly parses `userSubscriptionSetting`', () {
-    expect(subscriptionChanges.to.userSubscriptionSetting, true);
+  test('expect subscription correctly parses `isPushDisabled`', () {
+    expect(subscriptionChanges.to.isPushDisabled, true);
   });
 
   // Email Subscription State Tests

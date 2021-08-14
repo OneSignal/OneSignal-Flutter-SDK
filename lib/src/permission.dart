@@ -86,8 +86,8 @@ class OSPermissionStateChanges extends JSONStringRepresentable {
 class OSDeviceState extends JSONStringRepresentable {
 
   bool hasNotificationPermission = false;
-  bool pushDisabled = false;
-  bool subscribed = false;
+  bool isPushDisabled = false;
+  bool isSubscribed = false;
   bool emailSubscribed = false;
   bool smsSubscribed = false;
   String? userId;
@@ -100,8 +100,8 @@ class OSDeviceState extends JSONStringRepresentable {
 
   OSDeviceState(Map<String, dynamic> json) {
     this.hasNotificationPermission = json['hasNotificationPermission'] as bool;
-    this.pushDisabled = json['pushDisabled'] as bool;
-    this.subscribed = json['subscribed'] as bool;
+    this.isPushDisabled = json['isPushDisabled'] as bool;
+    this.isSubscribed = json['isSubscribed'] as bool;
     this.emailSubscribed = json['emailSubscribed'] as bool;
     this.smsSubscribed = json['smsSubscribed'] as bool;
     this.userId = json['userId'] as String?;
@@ -116,8 +116,8 @@ class OSDeviceState extends JSONStringRepresentable {
   String jsonRepresentation() {
     return convertToJsonString({
       'hasNotificationPermission': this.hasNotificationPermission,
-      'isPushDisabled': this.pushDisabled,
-      'isSubscribed': this.subscribed,
+      'isPushDisabled': this.isPushDisabled,
+      'isSubscribed': this.isSubscribed,
       'userId': this.userId,
       'pushToken': this.pushToken,
       'isEmailSubscribed': this.emailSubscribed,
