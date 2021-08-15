@@ -70,8 +70,7 @@ void _callbackDispatcher() {
     }
   });
 
-  // Once we've finished initializing, let the native portion of the plugin
-  // know that it can start scheduling alarms.
+  print("OneSignalPlugin - plugin callback ready");
   _channel.invokeMethod<void>('OneSignal#backgroundHandlerInitialized');
 }
 
@@ -176,7 +175,6 @@ class OneSignal {
       NotificationWillShowInForegroundHandler handler) {
     if (Platform.isIOS) {
       setNotificationWillShowInForegroundHandler(handler);
-      return;
     }
     final CallbackHandle bgHandle =
         PluginUtilities.getCallbackHandle(_callbackDispatcher)!;

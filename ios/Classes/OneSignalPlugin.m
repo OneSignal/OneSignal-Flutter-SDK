@@ -26,6 +26,7 @@
  */
 
 #import "OneSignalPlugin.h"
+#import "XOneSignalNotificationService.h"
 #import "OSFlutterCategories.h"
 #import "OSFlutterTagsController.h"
 #import "OSFlutterInAppMessagesController.h"
@@ -35,6 +36,8 @@
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 
+@property (strong, nonatomic) FlutterEngine *headlessRunner;
+@property (strong, nonatomic) NSObject<FlutterPluginRegistrar> *registrar;
 /*
     Will be true if the SDK is waiting for the
     user's consent before initializing.
@@ -56,6 +59,8 @@
 @property (strong, nonatomic) NSMutableDictionary* notificationCompletionCache;
 @property (strong, nonatomic) NSMutableDictionary* receivedNotificationCache;
 
+@property (strong, nonatomic) NSUserDefaults *persistentState;
+
 @end
 
 @implementation OneSignalPlugin
@@ -74,6 +79,9 @@
     return sharedInstance;
 }
 
+static FlutterPluginRegistrantCallback registerPlugins = nil;
+static BOOL backgroundIsolateRun = NO;
+
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
 
@@ -88,11 +96,34 @@
                                      methodChannelWithName:@"OneSignal"
                                      binaryMessenger:[registrar messenger]];
 
+    OneSignalPlugin.sharedInstance.registrar = registrar;
+    OneSignalPlugin.sharedInstance.headlessRunner = [[FlutterEngine alloc] 
+                        initWithName:@"OneSignalHeadlessRunner" 
+                        project:nil 
+                        allowHeadlessExecution:YES];
+
+    OneSignalPlugin.sharedInstance.persistentState = [NSUserDefaults standardUserDefaults];
+
+
+    OneSignalPlugin.sharedInstance.callbackChannel =
+        [FlutterMethodChannel methodChannelWithName:@"OneSignalBackground"
+        binaryMessenger:OneSignalPlugin.sharedInstance.headlessRunner.binaryMessenger];
+
     [registrar addMethodCallDelegate:OneSignalPlugin.sharedInstance channel:OneSignalPlugin.sharedInstance.channel];
+    // [registrar addMethodCallDelegate:OneSignalPlugin.sharedInstance channel:OneSignalPlugin.sharedInstance.callbackChannel];
 
     [OSFlutterTagsController registerWithRegistrar:registrar];
     [OSFlutterInAppMessagesController registerWithRegistrar:registrar];
     [OSFlutterOutcomeEventsController registerWithRegistrar:registrar];
+}
+
++ (void)setPluginRegistrantCallback:(FlutterPluginRegistrantCallback)callback {
+    registerPlugins = callback;
+}
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    [self initNotificationWillShowHandlerParamsById:[self getCallbackDispatcherHandle] withNotification: [self getCallbackNotificationHandle]];
+    return YES;
 }
 
 - (void)addObservers {
@@ -150,8 +181,12 @@
         [self initInAppMessageClickedHandlerParams];
     else if ([@"OneSignal#initNotificationWillShowInForegroundHandlerParams" isEqualToString:call.method])
         [self initNotificationWillShowInForegroundHandlerParams];
+    else if ([@"OneSignal#initNotificationWillShowHandlerParams" isEqualToString:call.method])
+        [self initNotificationWillShowHandlerParams:call withResult:result];
     else if ([@"OneSignal#completeNotification" isEqualToString:call.method])
         [self completeNotification:call withResult:result];
+    else if ([@"OneSignal#backgroundHandlerInitialized" isEqualToString:call.method])
+        NSLog(@"Background channel ready");
     else
         result(FlutterMethodNotImplemented);
 }
@@ -348,6 +383,65 @@
 
 - (void)initNotificationWillShowInForegroundHandlerParams {
     self.hasSetNotificationWillShowInForegroundHandler = YES;
+}
+
+- (int64_t)getCallbackDispatcherHandle {
+  id handle = [OneSignalPlugin.sharedInstance.persistentState objectForKey:@"callback_dispatcher_handle"];
+  if (handle == nil) {
+    return 0;
+  }
+  return [handle longLongValue];
+}
+
+- (void)setCallbackDispatcherHandle:(int64_t)handle {
+  [OneSignalPlugin.sharedInstance.persistentState setObject:[NSNumber numberWithLongLong:handle]
+                       forKey:@"callback_dispatcher_handle"];
+}
+
+- (int64_t)getCallbackNotificationHandle {
+  id handle = [OneSignalPlugin.sharedInstance.persistentState objectForKey:@"callback_notification_handle"];
+  if (handle == nil) {
+    return 0;
+  }
+  return [handle longLongValue];
+}
+
+- (void)setCallbackNotificationHandle:(int64_t)handle {
+  [OneSignalPlugin.sharedInstance.persistentState setObject:[NSNumber numberWithLongLong:handle]
+                       forKey:@"callback_notification_handle"];
+}
+
+- (void)initNotificationWillShowHandlerParams:(FlutterMethodCall*)call withResult:(FlutterResult)result {
+    int64_t pluginCallbackHandle = [call.arguments[@"pluginCallbackHandle"] longValue];
+    int64_t notificationCallbackHandle = [call.arguments[@"notificationCallbackHandle"] longValue];
+    [self initNotificationWillShowHandlerParamsById:pluginCallbackHandle withNotification: notificationCallbackHandle];
+}
+
+- (void)initNotificationWillShowHandlerParamsById:(int64_t)dispatcherCallbackHandle withNotification: (int64_t)notificationCallbackHandle {
+    NSLog(@"Initializing Headless Runner");
+
+    NSAssert(dispatcherCallbackHandle != 0, @"dispatcherCallbackHandle can't be 0");
+    NSAssert(notificationCallbackHandle != 0, @"notificationCallbackHandle can't be 0");
+
+    [self setCallbackDispatcherHandle:dispatcherCallbackHandle];
+    [self setCallbackNotificationHandle:notificationCallbackHandle];
+  
+    FlutterCallbackInformation *info = [FlutterCallbackCache lookupCallbackInformation:dispatcherCallbackHandle];
+    NSAssert(info != nil, @"failed to find callback");
+  
+    NSString *entrypoint = info.callbackName;
+    NSString *uri = info.callbackLibraryPath;
+    [OneSignalPlugin.sharedInstance.headlessRunner runWithEntrypoint:entrypoint libraryURI:uri];
+
+    // Once our headless runner has been started, we need to register the application's plugins
+    // with the runner in order for them to work on the background isolate. `registerPlugins` is
+    // a callback set from AppDelegate.m in the main application. This callback should register
+    // all relevant plugins (excluding those which require UI).
+    [OneSignalPlugin.sharedInstance.registrar addMethodCallDelegate:self channel:OneSignalPlugin.sharedInstance.callbackChannel];
+    if (!backgroundIsolateRun && registerPlugins != nil) {
+        registerPlugins(OneSignalPlugin.sharedInstance.headlessRunner);
+    }
+    backgroundIsolateRun = YES;
 }
 
 #pragma mark Opened Notification Handlers
