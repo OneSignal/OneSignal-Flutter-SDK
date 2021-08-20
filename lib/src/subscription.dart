@@ -4,13 +4,13 @@ import 'package:onesignal_flutter/src/utils.dart';
 class OSSubscriptionState extends JSONStringRepresentable {
   /// Indicates if you have ever called setSubscription(false) to
   /// programmatically disable notifications for this user
-  bool userSubscriptionSetting = false;
+  bool isPushDisabled = false;
 
   /// A boolean parameter that indicates if the  user
   /// is subscribed to your app with OneSignal
   /// This is only true if the `userId`, `pushToken`, and
-  /// `userSubscriptionSetting` parameters are defined/true.
-  bool subscribed = false;
+  /// `isPushDisabled` parameters are defined/true.
+  bool isSubscribed = false;
 
   /// The current user's User ID (AKA playerID) with OneSignal
   String? userId; //the user's 'playerId' on OneSignal
@@ -19,8 +19,8 @@ class OSSubscriptionState extends JSONStringRepresentable {
   String? pushToken;
 
   OSSubscriptionState(Map<String, dynamic> json) {
-    this.subscribed = json['subscribed'] as bool;
-    this.userSubscriptionSetting = json['userSubscriptionSetting'] as bool;
+    this.isSubscribed = json['isSubscribed'] as bool;
+    this.isPushDisabled = json['isPushDisabled'] as bool;
 
     if (json.containsKey('userId')) this.userId = json['userId'] as String?;
     if (json.containsKey('pushToken'))
@@ -29,8 +29,8 @@ class OSSubscriptionState extends JSONStringRepresentable {
 
   String jsonRepresentation() {
     return convertToJsonString({
-      'subscribed': this.subscribed,
-      'userSubscriptionSetting': this.userSubscriptionSetting,
+      'isSubscribed': this.isSubscribed,
+      'isPushDisabled': this.isPushDisabled,
       'pushToken': this.pushToken,
       'userId': this.userId
     });
