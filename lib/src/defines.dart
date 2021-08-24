@@ -1,4 +1,4 @@
-String sdkVersion = "3.2.0";
+String sdkVersion = "3.2.1";
 
 /// Determines how notifications should be displayed
 enum OSNotificationDisplayType { none, alert, notification }
@@ -29,12 +29,7 @@ enum OSiOSSettings {
   inFocusDisplayOption
 }
 
-enum OSSession {
-    DIRECT,
-    INDIRECT,
-    UNATTRIBUTED,
-    DISABLED
-}
+enum OSSession { DIRECT, INDIRECT, UNATTRIBUTED, DISABLED }
 
 /// Applies to iOS notifications only
 /// Determines if the badgeCount is used to increment
