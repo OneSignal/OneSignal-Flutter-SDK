@@ -1,5 +1,5 @@
-import 'package:onesignal_flutter/src/subscription.dart';
 import 'package:onesignal_flutter/src/defines.dart';
+import 'package:onesignal_flutter/src/subscription.dart';
 import 'package:onesignal_flutter/src/utils.dart';
 
 class OSPermissionState extends JSONStringRepresentable {
@@ -84,7 +84,6 @@ class OSPermissionStateChanges extends JSONStringRepresentable {
 }
 
 class OSDeviceState extends JSONStringRepresentable {
-
   bool hasNotificationPermission = false;
   bool isPushDisabled = false;
   bool isSubscribed = false;
@@ -100,8 +99,8 @@ class OSDeviceState extends JSONStringRepresentable {
 
   OSDeviceState(Map<String, dynamic> json) {
     this.hasNotificationPermission = json['hasNotificationPermission'] as bool;
-    this.isPushDisabled = json['isPushDisabled'] as bool;
-    this.isSubscribed = json['isSubscribed'] as bool;
+    this.isPushDisabled = json['pushDisabled'] as bool;
+    this.isSubscribed = json['subscribed'] as bool;
     this.emailSubscribed = json['emailSubscribed'] as bool;
     this.smsSubscribed = json['smsSubscribed'] as bool;
     this.userId = json['userId'] as String?;
@@ -110,7 +109,10 @@ class OSDeviceState extends JSONStringRepresentable {
     this.emailAddress = json['emailAddress'] as String?;
     this.smsUserId = json['smsUserId'] as String?;
     this.smsNumber = json['smsNumber'] as String?;
-    this.notificationPermissionStatus = json['notificationPermissionStatus'] == null ? null : OSNotificationPermission.values[json['notificationPermissionStatus']];
+    this.notificationPermissionStatus = json['notificationPermissionStatus'] ==
+            null
+        ? null
+        : OSNotificationPermission.values[json['notificationPermissionStatus']];
   }
 
   String jsonRepresentation() {
