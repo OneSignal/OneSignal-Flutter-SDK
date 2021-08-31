@@ -49,12 +49,12 @@ class _MyAppState extends State<MyApp> {
            print('FOREGROUND HANDLER CALLED WITH: ${event}');
            /// Display Notification, send null to not display
            event.complete(null);
-          
+
            this.setState(() {
            _debugLabelString =
               "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
-    });  
+    });
 
     OneSignal.shared
         .setInAppMessageClickedHandler((OSInAppMessageAction action) {
@@ -85,7 +85,7 @@ class _MyAppState extends State<MyApp> {
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     await OneSignal.shared
-        .setAppId("380dc082-5231-4cc2-ab51-a03da5a0e4c2");
+        .setAppId("b40b7cc7-13dc-4662-8b48-efa668f9b72a");
 
     bool requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
 

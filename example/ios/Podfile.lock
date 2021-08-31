@@ -1,9 +1,9 @@
 PODS:
   - Flutter (1.0.0)
-  - onesignal_flutter (3.1.0):
+  - onesignal_flutter (3.2.3):
     - Flutter
-    - OneSignalXCFramework (= 3.5.3)
-  - OneSignalXCFramework (3.5.3)
+    - OneSignalXCFramework (= 3.7.0)
+  - OneSignalXCFramework (3.7.0)
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
@@ -22,8 +22,8 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  onesignal_flutter: 79eb89d25249b078d3c358fb7827b22909f7fbed
-  OneSignalXCFramework: 4e08d8353adec161c3d9174e2572c849e1225c9f
+  onesignal_flutter: abfc75e8d08a0d9c977aacfab9454af58f4f4fcc
+  OneSignalXCFramework: 974dc438d68910cf04f3c8ab034e0131d41438c1
 
 PODFILE CHECKSUM: b074b7b0bedd9b715d33807e4b6c0f0dcee63e1e
 
