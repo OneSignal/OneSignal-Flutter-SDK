@@ -85,6 +85,16 @@ class OSNotification extends JSONStringRepresentable {
   /// The subtitle of the notification
   String? subtitle;
 
+  /// (iOS Only)
+  /// value between 0 and 1 for sorting notifications in a notification summary
+  double? relevanceScore;
+
+  /// (iOS Only)
+  /// The interruption level for the notification. This controls how the
+  /// notification will be displayed to the user if they are using focus modes
+  /// or notification summaries
+  String? interruptionLevel;
+
   /// (Android Only)
   /// Summary notifications grouped
   /// Notification payload will have the most recent notification received.
@@ -186,6 +196,10 @@ class OSNotification extends JSONStringRepresentable {
       this.subtitle = json['subtitle'] as String?;
     if (json.containsKey('attachments'))
       this.attachments = json['attachments'].cast<String, dynamic>();
+    if (json.containsKey('relevanceScore'))
+      this.relevanceScore = json['relevanceScore'] as double?;
+    if (json.containsKey('interruptionLevel'))
+      this.interruptionLevel = json['interruptionLevel'] as String?;
 
     // Android Specific Parameters
     if (json.containsKey("smallIcon"))
