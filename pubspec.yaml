@@ -3,7 +3,7 @@ description: OneSignal is a free push notification service for mobile apps. This
 version: 3.2.3
 author: Brad Hesse <brad@onesignal.com>, Josh Kasten <josh@onesignal.com>
 homepage: https://github.com/OneSignal/OneSignal-Flutter-SDK
-publish_to: 'none'
+# publish_to: 'none'
 
 flutter:
   plugin:
