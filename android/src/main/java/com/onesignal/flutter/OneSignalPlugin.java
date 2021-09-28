@@ -1,6 +1,8 @@
 package com.onesignal.flutter;
 
+import android.app.Activity;
 import android.content.Context;
+import android.util.Log;
 
 import com.onesignal.OSDeviceState;
 import com.onesignal.OSEmailSubscriptionObserver;
@@ -25,6 +27,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.flutter.embedding.engine.FlutterShellArgs;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -52,6 +55,8 @@ public class OneSignalPlugin
   private boolean hasSetRequiresPrivacyConsent = false;
   private boolean waitingForUserPrivacyConsent = false;
 
+  private Activity mainActivity;
+
   private HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
   public static void registerWith(Registrar registrar) {
@@ -63,6 +68,11 @@ public class OneSignalPlugin
     plugin.channel = new MethodChannel(registrar.messenger(), "OneSignal");
     plugin.channel.setMethodCallHandler(plugin);
     plugin.flutterRegistrar = registrar;
+    plugin.mainActivity = registrar.activity();
+
+    if (ContextHolder.getApplicationContext() == null) {
+      ContextHolder.setApplicationContext(plugin.mainActivity.getApplicationContext());
+    }
 
     // Create a callback for the flutterRegistrar to connect the applications onDestroy
     plugin.flutterRegistrar.addViewDestroyListener(new PluginRegistry.ViewDestroyListener() {
@@ -128,6 +138,8 @@ public class OneSignalPlugin
       this.initInAppMessageClickedHandlerParams();
     else if (call.method.contentEquals("OneSignal#initNotificationWillShowInForegroundHandlerParams"))
       this.initNotificationWillShowInForegroundHandlerParams();
+    else if (call.method.contentEquals("OneSignal#initNotificationWillShowHandlerParams"))
+      this.initNotificationWillShowHandlerParams(call, result);
     else if (call.method.contentEquals("OneSignal#completeNotification"))
       this.completeNotification(call, result);
     else if (call.method.contentEquals("OneSignal#clearOneSignalNotifications"))
@@ -301,6 +313,56 @@ public class OneSignalPlugin
     }
   }
 
+  private void initNotificationWillShowHandlerParams(MethodCall call, Result result) {
+    this.hasSetNotificationWillShowInForegroundHandler = true;
+
+    @SuppressWarnings("unchecked")
+    Map<String, Object> arguments = ((Map<String, Object>) call.arguments);
+
+    long pluginCallbackHandle = 0;
+    long notificationCallbackHandle = 0;
+
+    Object arg1 = arguments.get("pluginCallbackHandle");
+    Object arg2 = arguments.get("notificationCallbackHandle");
+
+    if (arg1 instanceof Long) {
+      pluginCallbackHandle = (Long) arg1;
+    } else {
+      pluginCallbackHandle = Long.valueOf((Integer) arg1);
+    }
+
+    if (arg2 instanceof Long) {
+      notificationCallbackHandle = (Long) arg2;
+    } else {
+      notificationCallbackHandle = Long.valueOf((Integer) arg2);
+    }
+
+    FlutterShellArgs shellArgs = null;
+    if (mainActivity != null) {
+      // Supports both Flutter Activity types:
+      //    io.flutter.embedding.android.FlutterFragmentActivity
+      //    io.flutter.embedding.android.FlutterActivity
+      // We could use `getFlutterShellArgs()` but this is only available on `FlutterActivity`.
+      shellArgs = FlutterShellArgs.fromIntent(mainActivity.getIntent());
+    }
+
+    if (XNotificationServiceExtension.be != null) {
+      Log.i("OneSignal", "Attempted to start a duplicate background isolate. Returning...");
+      return;
+    }
+
+    XNotificationServiceExtension.be = new BackgroundExecutor();
+    XNotificationServiceExtension.be.setCallbackDispatcher(pluginCallbackHandle);
+    XNotificationServiceExtension.be.setUserCallbackHandle(notificationCallbackHandle);
+    Log.i("OneSignal", "Starting background isolate. Returning...");
+    XNotificationServiceExtension.be.startBackgroundIsolate(pluginCallbackHandle, shellArgs, new IsolateStatusHandler() {
+      @Override
+      public void done() {
+        // nothing to do here
+      }
+    });
+  }
+
   private void initNotificationWillShowInForegroundHandlerParams() {
     this.hasSetNotificationWillShowInForegroundHandler = true;
   }
@@ -322,6 +384,10 @@ public class OneSignalPlugin
     String notificationId = call.argument("notificationId");
     boolean shouldDisplay = call.argument("shouldDisplay");
     OSNotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
+
+    if (notificationReceivedEvent == null && XNotificationServiceExtension.notificationReceivedEventCache != null) {
+        notificationReceivedEvent = XNotificationServiceExtension.notificationReceivedEventCache.get(notificationId);
+    }
 
     if (notificationReceivedEvent == null) {
       OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Could not find notification completion block with id: " + notificationId);
