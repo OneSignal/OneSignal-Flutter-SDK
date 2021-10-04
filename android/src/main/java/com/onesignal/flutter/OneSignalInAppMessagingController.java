@@ -5,6 +5,7 @@ import com.onesignal.OneSignal;
 import java.util.Collection;
 import java.util.Map;
 
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -14,11 +15,11 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 public class OneSignalInAppMessagingController extends FlutterRegistrarResponder implements MethodCallHandler {
     private MethodChannel channel;
 
-    static void registerWith(Registrar registrar) {
+    static void registerWith(BinaryMessenger messenger) {
         OneSignalInAppMessagingController controller = new OneSignalInAppMessagingController();
-        controller.channel = new MethodChannel(registrar.messenger(), "OneSignal#inAppMessages");
+        controller.messenger = messenger;
+        controller.channel = new MethodChannel(messenger, "OneSignal#inAppMessages");
         controller.channel.setMethodCallHandler(controller);
-        controller.flutterRegistrar = registrar;
     }
 
     @Override
