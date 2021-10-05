@@ -1,5 +1,6 @@
 package com.onesignal.flutter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 
 import com.onesignal.OSDeviceState;
@@ -25,6 +26,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import androidx.annotation.NonNull;
+import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -36,7 +40,8 @@ import io.flutter.view.FlutterNativeView;
 /** OnesignalPlugin */
 public class OneSignalPlugin
         extends FlutterRegistrarResponder
-        implements MethodCallHandler,
+        implements FlutterPlugin, 
+        MethodCallHandler,
         OneSignal.OSNotificationOpenedHandler,
         OneSignal.OSInAppMessageClickHandler,
         OSSubscriptionObserver,
@@ -52,32 +57,61 @@ public class OneSignalPlugin
   private boolean hasSetRequiresPrivacyConsent = false;
   private boolean waitingForUserPrivacyConsent = false;
 
-  private HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
+  private final HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
-  public static void registerWith(Registrar registrar) {
+  public OneSignalPlugin() {
+  }
+
+  private void init(Context context, BinaryMessenger messenger)
+  {
+    this.context = context;
+    this.messenger = messenger;
+
     OneSignal.sdkType = "flutter";
 
-    OneSignalPlugin plugin = new OneSignalPlugin();
+    waitingForUserPrivacyConsent = false;
+    channel = new MethodChannel(messenger, "OneSignal");
+    channel.setMethodCallHandler(this);
 
-    plugin.waitingForUserPrivacyConsent = false;
-    plugin.channel = new MethodChannel(registrar.messenger(), "OneSignal");
-    plugin.channel.setMethodCallHandler(plugin);
-    plugin.flutterRegistrar = registrar;
+    OneSignalTagsController.registerWith(messenger);
+    OneSignalInAppMessagingController.registerWith(messenger);
+    OneSignalOutcomeEventsController.registerWith(messenger);
+  }
+
+  @Override
+  public void onAttachedToEngine(@NonNull FlutterPlugin.FlutterPluginBinding flutterPluginBinding) {
+    init(
+        flutterPluginBinding.getApplicationContext(),
+        flutterPluginBinding.getBinaryMessenger()
+    );
+  }
+
+  @Override
+  public void onDetachedFromEngine(@NonNull FlutterPlugin.FlutterPluginBinding binding) {
+    onDetachedFromEngine();
+  }
+
+  private void onDetachedFromEngine() {
+    OneSignal.setNotificationOpenedHandler(null);
+    OneSignal.setInAppMessageClickHandler(null);
+  }
+
+  // This static method is only to remain compatible with apps that don’t use the v2 Android embedding.
+  @Deprecated()
+  @SuppressLint("Registrar")
+  public static void registerWith(Registrar registrar) {
+    final OneSignalPlugin plugin = new OneSignalPlugin();
+    plugin.init(registrar.context(), registrar.messenger());
 
     // Create a callback for the flutterRegistrar to connect the applications onDestroy
-    plugin.flutterRegistrar.addViewDestroyListener(new PluginRegistry.ViewDestroyListener() {
+    registrar.addViewDestroyListener(new PluginRegistry.ViewDestroyListener() {
       @Override
       public boolean onViewDestroy(FlutterNativeView flutterNativeView) {
         // Remove all handlers so they aren't triggered with wrong context
-        OneSignal.setNotificationOpenedHandler(null);
-        OneSignal.setInAppMessageClickHandler(null);
+        plugin.onDetachedFromEngine();
         return false;
       }
     });
-
-    OneSignalTagsController.registerWith(registrar);
-    OneSignalInAppMessagingController.registerWith(registrar);
-    OneSignalOutcomeEventsController.registerWith(registrar);
   }
 
   @Override
@@ -145,7 +179,6 @@ public class OneSignalPlugin
 
   private void setAppId(MethodCall call, Result reply) {
     String appId = call.argument("appId");
-    Context context = flutterRegistrar.activeContext();
 
     OneSignal.setInAppMessageClickHandler(this);
     OneSignal.initWithContext(context);
@@ -231,7 +264,7 @@ public class OneSignalPlugin
 
   private void postNotification(MethodCall call, final Result reply) {
     JSONObject json = new JSONObject((Map<String, Object>) call.arguments);
-    OneSignal.postNotification(json, new OSFlutterPostNotificationHandler(flutterRegistrar, channel, reply, "postNotification"));
+    OneSignal.postNotification(json, new OSFlutterPostNotificationHandler(messenger, channel, reply, "postNotification"));
   }
 
   private void promptLocation(Result reply) {
@@ -248,22 +281,22 @@ public class OneSignalPlugin
     String email = call.argument("email");
     String emailAuthHashToken = call.argument("emailAuthHashToken");
 
-    OneSignal.setEmail(email, emailAuthHashToken, new OSFlutterEmailHandler(flutterRegistrar, channel, reply, "setEmail"));
+    OneSignal.setEmail(email, emailAuthHashToken, new OSFlutterEmailHandler(messenger, channel, reply, "setEmail"));
   }
 
   private void logoutEmail(final Result reply) {
-    OneSignal.logoutEmail(new OSFlutterEmailHandler(flutterRegistrar, channel, reply, "logoutEmail"));
+    OneSignal.logoutEmail(new OSFlutterEmailHandler(messenger, channel, reply, "logoutEmail"));
   }
 
   private void setSMSNumber(MethodCall call, final Result reply) {
     String smsNumber = call.argument("smsNumber");
     String smsAuthHashToken = call.argument("smsAuthHashToken");
 
-    OneSignal.setSMSNumber(smsNumber, smsAuthHashToken, new OSFlutterSMSHandler(flutterRegistrar, channel, reply, "setSMSNumber"));
+    OneSignal.setSMSNumber(smsNumber, smsAuthHashToken, new OSFlutterSMSHandler(messenger, channel, reply, "setSMSNumber"));
   }
 
   private void logoutSMSNumber(final Result reply) {
-    OneSignal.logoutSMSNumber(new OSFlutterSMSHandler(flutterRegistrar, channel, reply, "logoutSMSNumber"));
+    OneSignal.logoutSMSNumber(new OSFlutterSMSHandler(messenger, channel, reply, "logoutSMSNumber"));
   }
 
   private void setLanguage(MethodCall call, final Result result) {
@@ -282,11 +315,11 @@ public class OneSignalPlugin
     if (authHashToken != null && authHashToken.length() == 0)
       authHashToken = null;
 
-    OneSignal.setExternalUserId(externalUserId, authHashToken, new OSFlutterExternalUserIdHandler(flutterRegistrar, channel, result, "setExternalUserId"));
+    OneSignal.setExternalUserId(externalUserId, authHashToken, new OSFlutterExternalUserIdHandler(messenger, channel, result, "setExternalUserId"));
   }
 
   private void removeExternalUserId(final Result result) {
-    OneSignal.removeExternalUserId(new OSFlutterExternalUserIdHandler(flutterRegistrar, channel, result, "removeExternalUserId"));
+    OneSignal.removeExternalUserId(new OSFlutterExternalUserIdHandler(messenger, channel, result, "removeExternalUserId"));
   }
 
   private void initNotificationOpenedHandlerParams() {
@@ -399,8 +432,8 @@ public class OneSignalPlugin
   static class OSFlutterEmailHandler extends OSFlutterHandler
           implements OneSignal.EmailUpdateHandler {
 
-    OSFlutterEmailHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
-      super(flutterRegistrar, channel, res, methodName);
+    OSFlutterEmailHandler(BinaryMessenger messenger, MethodChannel channel, Result res, String methodName) {
+      super(messenger, channel, res, methodName);
     }
 
     @Override
@@ -427,8 +460,8 @@ public class OneSignalPlugin
   static class OSFlutterSMSHandler extends OSFlutterHandler
           implements OneSignal.OSSMSUpdateHandler {
 
-    OSFlutterSMSHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
-      super(flutterRegistrar, channel, res, methodName);
+    OSFlutterSMSHandler(BinaryMessenger messenger, MethodChannel channel, Result res, String methodName) {
+      super(messenger, channel, res, methodName);
     }
 
     @Override
@@ -457,8 +490,8 @@ public class OneSignalPlugin
   static class OSFlutterExternalUserIdHandler extends OSFlutterHandler
           implements OneSignal.OSExternalUserIdUpdateCompletionHandler {
 
-    OSFlutterExternalUserIdHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
-      super(flutterRegistrar, channel, res, methodName);
+    OSFlutterExternalUserIdHandler(BinaryMessenger messenger, MethodChannel channel, Result res, String methodName) {
+      super(messenger, channel, res, methodName);
     }
 
     @Override
@@ -487,8 +520,8 @@ public class OneSignalPlugin
   static class OSFlutterPostNotificationHandler extends OSFlutterHandler
             implements OneSignal.PostNotificationResponseHandler {
 
-    OSFlutterPostNotificationHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
-      super(flutterRegistrar, channel, res, methodName);
+    OSFlutterPostNotificationHandler(BinaryMessenger messenger, MethodChannel channel, Result res, String methodName) {
+      super(messenger, channel, res, methodName);
     }
 
     @Override
@@ -525,8 +558,8 @@ public class OneSignalPlugin
     protected final String methodName;
     protected final AtomicBoolean replySubmitted = new AtomicBoolean(false);
 
-    OSFlutterHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result res, String methodName) {
-      this.flutterRegistrar = flutterRegistrar;
+    OSFlutterHandler(BinaryMessenger messenger, MethodChannel channel, Result res, String methodName) {
+      this.messenger = messenger;
       this.channel = channel;
       this.result = res;
       this.methodName = methodName;

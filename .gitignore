@@ -6,5 +6,12 @@
 pubspec.lock
 
 build/
-.idea/
 android/.idea
+.flutter-plugins-dependencies
+flutter_export_environment.sh
+
+# IntelliJ related
+*.iml
+*.ipr
+*.iws
+.idea/

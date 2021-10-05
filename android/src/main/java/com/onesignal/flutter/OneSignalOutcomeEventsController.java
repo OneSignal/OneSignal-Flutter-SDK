@@ -6,6 +6,7 @@ import com.onesignal.OSOutcomeEvent;
 import java.util.HashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -21,8 +22,8 @@ class OSFlutterOutcomeEventsHandler extends FlutterRegistrarResponder implements
     // this property guarantees the callback will never be called more than once.
     private AtomicBoolean replySubmitted = new AtomicBoolean(false);
 
-    OSFlutterOutcomeEventsHandler(PluginRegistry.Registrar flutterRegistrar, MethodChannel channel, Result result) {
-        this.flutterRegistrar = flutterRegistrar;
+    OSFlutterOutcomeEventsHandler(BinaryMessenger messenger, MethodChannel channel, Result result) {
+        this.messenger = messenger;
         this.channel = channel;
         this.result = result;
     }
@@ -42,14 +43,12 @@ class OSFlutterOutcomeEventsHandler extends FlutterRegistrarResponder implements
 
 public class OneSignalOutcomeEventsController extends FlutterRegistrarResponder implements MethodCallHandler {
     private MethodChannel channel;
-    private Registrar registrar;
 
-    static void registerWith(Registrar registrar) {
+    static void registerWith(BinaryMessenger messenger) {
         OneSignalOutcomeEventsController controller = new OneSignalOutcomeEventsController();
-        controller.registrar = registrar;
-        controller.channel = new MethodChannel(registrar.messenger(), "OneSignal#outcomes");
+        controller.messenger = messenger;
+        controller.channel = new MethodChannel(messenger, "OneSignal#outcomes");
         controller.channel.setMethodCallHandler(controller);
-        controller.flutterRegistrar = registrar;
     }
 
     @Override
@@ -72,7 +71,7 @@ public class OneSignalOutcomeEventsController extends FlutterRegistrarResponder 
             return;
         }
 
-        OneSignal.sendOutcome(name, new OSFlutterOutcomeEventsHandler(registrar, channel, result));
+        OneSignal.sendOutcome(name, new OSFlutterOutcomeEventsHandler(messenger, channel, result));
     }
 
     private void sendUniqueOutcome(MethodCall call, Result result) {
@@ -83,7 +82,7 @@ public class OneSignalOutcomeEventsController extends FlutterRegistrarResponder 
             return;
         }
 
-        OneSignal.sendUniqueOutcome(name, new OSFlutterOutcomeEventsHandler(registrar, channel, result));
+        OneSignal.sendUniqueOutcome(name, new OSFlutterOutcomeEventsHandler(messenger, channel, result));
     }
 
     private void sendOutcomeWithValue(MethodCall call, Result result) {
@@ -100,7 +99,7 @@ public class OneSignalOutcomeEventsController extends FlutterRegistrarResponder 
             return;
         }
 
-        OneSignal.sendOutcomeWithValue(name, value.floatValue(), new OSFlutterOutcomeEventsHandler(registrar, channel, result));
+        OneSignal.sendOutcomeWithValue(name, value.floatValue(), new OSFlutterOutcomeEventsHandler(messenger, channel, result));
     }
 
 }

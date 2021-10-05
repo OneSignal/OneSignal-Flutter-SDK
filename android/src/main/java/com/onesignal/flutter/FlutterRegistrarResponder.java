@@ -1,5 +1,6 @@
 package com.onesignal.flutter;
 
+import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
@@ -7,12 +8,14 @@ import com.onesignal.OneSignal;
 
 import java.util.HashMap;
 
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 
 abstract class FlutterRegistrarResponder {
+   Context context;
    MethodChannel channel;
-   PluginRegistry.Registrar flutterRegistrar;
+   BinaryMessenger messenger;
 
    /**
     * MethodChannel class is home to success() method used by Result class
