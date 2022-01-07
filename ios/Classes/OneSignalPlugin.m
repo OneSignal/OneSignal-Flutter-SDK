@@ -56,6 +56,12 @@
 @property (strong, nonatomic) NSMutableDictionary* notificationCompletionCache;
 @property (strong, nonatomic) NSMutableDictionary* receivedNotificationCache;
 
+@property (atomic) BOOL hasSetOnWillDisplayInAppMessageHandler;
+@property (atomic) BOOL hasSetOnDidDisplayInAppMessageHandler;
+@property (atomic) BOOL hasSetOnWillDismissInAppMessageHandler;
+@property (atomic) BOOL hasSetOnDidDismissInAppMessageHandler;
+
+@property (strong, nonatomic) OSInAppMessage *inAppMessage;
 @end
 
 @implementation OneSignalPlugin
@@ -70,6 +76,10 @@
         sharedInstance.notificationCompletionCache = [NSMutableDictionary new];;
         sharedInstance.hasSetInAppMessageClickedHandler = false;
         sharedInstance.hasSetNotificationWillShowInForegroundHandler = false;
+        sharedInstance.hasSetOnWillDisplayInAppMessageHandler = false;
+        sharedInstance.hasSetOnDidDisplayInAppMessageHandler = false;
+        sharedInstance.hasSetOnWillDismissInAppMessageHandler = false;
+        sharedInstance.hasSetOnDidDismissInAppMessageHandler = false;
     });
     return sharedInstance;
 }
@@ -152,6 +162,14 @@
         [self initNotificationWillShowInForegroundHandlerParams];
     else if ([@"OneSignal#completeNotification" isEqualToString:call.method])
         [self completeNotification:call withResult:result];
+    else if ([@"OneSignal#onWillDisplayInAppMessageHandlerParams" isEqualToString:call.method])
+        [self onWillDisplayInAppMessageHandlerParams];
+    else if ([@"OneSignal#onDidDisplayInAppMessageHandlerParams" isEqualToString:call.method])
+        [self onDidDisplayInAppMessageHandlerParams];
+    else if ([@"OneSignal#onWillDismissInAppMessageHandlerParams" isEqualToString:call.method])
+        [self onWillDismissInAppMessageHandlerParams];
+    else if ([@"OneSignal#onDidDismissInAppMessageHandlerParams" isEqualToString:call.method])
+        [self onDidDismissInAppMessageHandlerParams];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -160,6 +178,8 @@
      [OneSignal setInAppMessageClickHandler:^(OSInAppMessageAction *action) {
          [self handleInAppMessageClicked:action];
      }];
+
+    [OneSignal setInAppMessageLifecycleHandler:self];
     
     [OneSignal setAppId:call.arguments[@"appId"]];
 
@@ -397,6 +417,60 @@
     }
 
     [self.channel invokeMethod:@"OneSignal#handleClickedInAppMessage" arguments:action.toJson];
+}
+
+#pragma mark In App Message lifecycle Handler
+- (void)onWillDisplayInAppMessageHandlerParams {
+    self.hasSetOnWillDisplayInAppMessageHandler = YES;
+
+    if (self.inAppMessage) {
+        [self onWillDisplayInAppMessage:self.inAppMessage];
+        self.inAppMessage = nil;
+    }
+}
+
+- (void)onDidDisplayInAppMessageHandlerParams {
+    self.hasSetOnDidDisplayInAppMessageHandler = YES;
+
+    if (self.inAppMessage) {
+        [self onDidDisplayInAppMessage:self.inAppMessage];
+        self.inAppMessage = nil;
+    }
+}
+
+- (void)onWillDismissInAppMessageHandlerParams {
+    self.hasSetOnWillDismissInAppMessageHandler = YES;
+
+    if (self.inAppMessage) {
+        [self onWillDismissInAppMessage:self.inAppMessage];
+        self.inAppMessage = nil;
+    }
+}
+
+- (void)onDidDismissInAppMessageHandlerParams {
+    self.hasSetOnDidDismissInAppMessageHandler = YES;
+
+    if (self.inAppMessage) {
+        [self onDidDismissInAppMessage:self.inAppMessage];
+        self.inAppMessage = nil;
+    }
+}
+
+#pragma mark OSInAppMessageLifeCycleHandler
+- (void)onWillDisplayInAppMessage:(OSInAppMessage *) result {
+    [self.channel invokeMethod:@"OneSignal#onWillDisplayInAppMessage" arguments:result.toJson];
+}
+
+- (void)onDidDisplayInAppMessage:(OSInAppMessage *) result {
+    [self.channel invokeMethod:@"OneSignal#onDidDisplayInAppMessage" arguments:result.toJson];
+}
+
+- (void)onWillDismissInAppMessage:(OSInAppMessage *) result {
+    [self.channel invokeMethod:@"OneSignal#onWillDismissInAppMessage" arguments:result.toJson];
+}
+
+- (void)onDidDismissInAppMessage:(OSInAppMessage *) result {
+    [self.channel invokeMethod:@"OneSignal#onDidDismissInAppMessage" arguments:result.toJson];
 }
 
 #pragma mark OSSubscriptionObserver
