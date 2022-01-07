@@ -97,6 +97,16 @@
 }
 @end
 
+@implementation OSInAppMessage (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"message_id"] = self.messageId;
+
+    return json;
+}
+@end
+
 @implementation NSError (Flutter)
 - (FlutterError *)flutterError {
     return [FlutterError errorWithCode:[NSString stringWithFormat:@"%i", (int)self.code] message:self.localizedDescription details:nil];

@@ -43,6 +43,10 @@
 - (NSDictionary *)toJson;
 @end
 
+@interface OSInAppMessage (Flutter)
+- (NSDictionary *)toJson;
+@end
+
 @interface NSError (Flutter)
 - (FlutterError *)flutterError;
 @end
