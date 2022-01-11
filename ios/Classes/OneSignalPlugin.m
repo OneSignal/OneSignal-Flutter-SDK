@@ -202,9 +202,10 @@
 }
 
 - (void)promptPermission:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    BOOL fallbackToSettings = [call.arguments[@"fallback"] boolValue];
     [OneSignal promptForPushNotificationsWithUserResponse:^(BOOL accepted) {
         result(@(accepted));
-    }];
+    } fallbackToSettings:fallbackToSettings];
 }
 
 - (void)getDeviceState:(FlutterMethodCall *)call withResult:(FlutterResult)result {
