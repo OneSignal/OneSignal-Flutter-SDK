@@ -83,6 +83,22 @@ class _MyAppState extends State<MyApp> {
       print("SMS SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
     });
 
+    OneSignal.shared.setOnWillDisplayInAppMessageHandler((message) {
+      print("ON WILL DISPLAY IN APP MESSAGE ${message.messageId}");
+    });
+
+    OneSignal.shared.setOnDidDisplayInAppMessageHandler((message) {
+      print("ON DID DISPLAY IN APP MESSAGE ${message.messageId}");
+    });
+
+    OneSignal.shared.setOnWillDismissInAppMessageHandler((message) {
+      print("ON WILL DISMISS IN APP MESSAGE ${message.messageId}");
+    });
+
+    OneSignal.shared.setOnDidDismissInAppMessageHandler((message) {
+      print("ON DID DISMISS IN APP MESSAGE ${message.messageId}");
+    });
+
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     await OneSignal.shared
         .setAppId("380dc082-5231-4cc2-ab51-a03da5a0e4c2");
