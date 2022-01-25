@@ -171,11 +171,11 @@ public class OneSignalPlugin
     else if (call.method.contentEquals("OneSignal#onWillDisplayInAppMessageHandlerParams"))
       this.OnWillDisplayInAppMessageHandlerParams();
     else if (call.method.contentEquals("OneSignal#onDidDisplayInAppMessageHandlerParams"))
-      this.OnWillDisplayInAppMessageHandlerParams();  
+      this.OnDidDisplayInAppMessageHandlerParams();  
     else if (call.method.contentEquals("OneSignal#onWillDismissInAppMessageHandlerParams"))
-      this.OnWillDisplayInAppMessageHandlerParams();  
+      this.OnWillDismissInAppMessageHandlerParams();  
     else if (call.method.contentEquals("OneSignal#onDidDismissInAppMessageHandlerParams"))
-      this.OnWillDisplayInAppMessageHandlerParams();  
+      this.OnDidDismissInAppMessageHandlerParams();  
     else if (call.method.contentEquals("OneSignal#initNotificationWillShowInForegroundHandlerParams"))
       this.initNotificationWillShowInForegroundHandlerParams();
     else if (call.method.contentEquals("OneSignal#completeNotification"))
