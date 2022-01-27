@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'onesignal_flutter'
-  s.version          = '3.2.7'
+  s.version          = '3.2.8'
   s.summary          = 'The OneSignal Flutter SDK'
   s.description      = 'Allows you to easily add OneSignal to your flutter projects, to make sending and handling push notifications easy'
   s.homepage         = 'https://www.onesignal.com'
