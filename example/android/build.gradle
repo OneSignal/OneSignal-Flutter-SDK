@@ -1,11 +1,25 @@
 buildscript {
+    ext {
+        buildVersions = [
+            compileSdkVersion: 31,
+            targetSdkVersion: 31
+        ]
+        kotlinVersion = '1.4.32'
+        huaweiHMSPushVersion = '6.1.0.300'
+        huaweiHMSLocationVersion = '4.0.0.300'
+    }
+
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://developer.huawei.com/repo/' }
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.5.0'
+        classpath 'com.android.tools.build:gradle:7.0.4'
+        classpath "com.google.gms:google-services:4.3.10"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVersion"
+        classpath "com.huawei.agconnect:agcp:1.6.2.300"
     }
 }
 
@@ -13,6 +27,7 @@ allprojects {
     repositories {
         google()
         mavenCentral()
+        maven { url 'https://developer.huawei.com/repo/' }
     }
 }
 

@@ -13,3 +13,16 @@ plugins.each { name, path ->
     include ":$name"
     project(":$name").projectDir = pluginDirectory
 }
+
+include(':onesignal_local_native_sdk')
+// TODO: Update to your absolution path here:
+project(':onesignal_local_native_sdk').projectDir = new File('/Users/josh/Documents/repos/OneSignal-Android-SDK/OneSignalSDK/onesignal')
+gradle.rootProject {
+    allprojects {
+        configurations.all {
+            resolutionStrategy.dependencySubstitution {
+                substitute(module('com.onesignal:OneSignal')).using(project(':onesignal_local_native_sdk'))
+            }
+        }
+    }
+}
