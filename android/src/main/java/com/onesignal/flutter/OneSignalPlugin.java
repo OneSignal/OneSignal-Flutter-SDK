@@ -3,6 +3,9 @@ package com.onesignal.flutter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+
 import com.onesignal.OSDeviceState;
 import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSEmailSubscriptionStateChanges;
@@ -48,7 +51,8 @@ public class OneSignalPlugin
         OSEmailSubscriptionObserver,
         OSSMSSubscriptionObserver,
         OSPermissionObserver,
-        OneSignal.OSNotificationWillShowInForegroundHandler {
+        OneSignal.OSNotificationWillShowInForegroundHandler,
+        ActivityAware {
 
   /** Plugin registration. */
   private OSInAppMessageAction inAppMessageClickedResult;
@@ -62,10 +66,37 @@ public class OneSignalPlugin
   public OneSignalPlugin() {
   }
 
+  @Override
+  public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+    System.out.println("onAttachedToActivity​: " + binding.getActivity());
+    init(
+      binding.getActivity(),
+      null
+    );
+  }
+
+  @Override
+  public void onDetachedFromActivity() {
+    // this.activity = null;
+  }
+
+  @Override
+  public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+    System.out.println("onReattachedToActivityForConfigChanges: " + binding.getActivity());
+    // this.activity = binding.getActivity();
+  }
+
+  @Override
+  public void onDetachedFromActivityForConfigChanges() {
+    // this.activity = null;
+  }
+
   private void init(Context context, BinaryMessenger messenger)
   {
+    System.out.println("Flutter init:context:" + context);
     this.context = context;
-    this.messenger = messenger;
+    if (this.messenger == null)
+      this.messenger = messenger;
 
     OneSignal.sdkType = "flutter";
 
@@ -80,6 +111,9 @@ public class OneSignalPlugin
 
   @Override
   public void onAttachedToEngine(@NonNull FlutterPlugin.FlutterPluginBinding flutterPluginBinding) {
+    System.out.println("onAttachedToEngine: " + flutterPluginBinding);
+    // System.out.println("registerWith:registrar.context():" + registrar.context());
+    // System.out.println("registerWith:registrar.activeContext():" + registrar.activeContext());
     init(
         flutterPluginBinding.getApplicationContext(),
         flutterPluginBinding.getBinaryMessenger()
@@ -101,7 +135,9 @@ public class OneSignalPlugin
   @SuppressLint("Registrar")
   public static void registerWith(Registrar registrar) {
     final OneSignalPlugin plugin = new OneSignalPlugin();
-    plugin.init(registrar.context(), registrar.messenger());
+    System.out.println("registerWith:registrar.context():" + registrar.context());
+    System.out.println("registerWith:registrar.activeContext():" + registrar.activeContext());
+    plugin.init(registrar.activeContext(), registrar.messenger());
 
     // Create a callback for the flutterRegistrar to connect the applications onDestroy
     registrar.addViewDestroyListener(new PluginRegistry.ViewDestroyListener() {
@@ -180,6 +216,10 @@ public class OneSignalPlugin
   private void setAppId(MethodCall call, Result reply) {
     String appId = call.argument("appId");
 
+    // flutterRegistrar.activeContext();
+
+    System.out.println("2TEST HERE setAppId");
+    OneSignal.setLogLevel(OneSignal.LOG_LEVEL.VERBOSE, OneSignal.LOG_LEVEL.NONE);
     OneSignal.setInAppMessageClickHandler(this);
     OneSignal.initWithContext(context);
     OneSignal.setAppId(appId);
