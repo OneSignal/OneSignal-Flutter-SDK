@@ -3,6 +3,9 @@ package com.onesignal.flutter;
 import android.annotation.SuppressLint;
 import android.content.Context;
 
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+
 import com.onesignal.OSDeviceState;
 import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSEmailSubscriptionStateChanges;
@@ -42,6 +45,7 @@ public class OneSignalPlugin
         extends FlutterRegistrarResponder
         implements FlutterPlugin, 
         MethodCallHandler,
+        ActivityAware,
         OneSignal.OSNotificationOpenedHandler,
         OneSignal.OSInAppMessageClickHandler,
         OSSubscriptionObserver,
@@ -65,17 +69,20 @@ public class OneSignalPlugin
   private void init(Context context, BinaryMessenger messenger)
   {
     this.context = context;
-    this.messenger = messenger;
+
+    if (this.messenger == null) {
+      this.messenger = messenger;
+    }
 
     OneSignal.sdkType = "flutter";
 
     waitingForUserPrivacyConsent = false;
-    channel = new MethodChannel(messenger, "OneSignal");
+    channel = new MethodChannel(this.messenger, "OneSignal");
     channel.setMethodCallHandler(this);
 
-    OneSignalTagsController.registerWith(messenger);
-    OneSignalInAppMessagingController.registerWith(messenger);
-    OneSignalOutcomeEventsController.registerWith(messenger);
+    OneSignalTagsController.registerWith(this.messenger);
+    OneSignalInAppMessagingController.registerWith(this.messenger);
+    OneSignalOutcomeEventsController.registerWith(this.messenger);
   }
 
   @Override
@@ -96,12 +103,33 @@ public class OneSignalPlugin
     OneSignal.setInAppMessageClickHandler(null);
   }
 
+  @Override
+  public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
+    // onAttachedToEngine is called first that sets the BinaryMessenger so we can pass null here.
+    init(
+      binding.getActivity(),
+      null
+    );
+  }
+
+  @Override
+  public void onDetachedFromActivity() {
+  }
+
+  @Override
+  public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+  }
+
+  @Override
+  public void onDetachedFromActivityForConfigChanges() {
+  }
+
   // This static method is only to remain compatible with apps that don’t use the v2 Android embedding.
   @Deprecated()
   @SuppressLint("Registrar")
   public static void registerWith(Registrar registrar) {
     final OneSignalPlugin plugin = new OneSignalPlugin();
-    plugin.init(registrar.context(), registrar.messenger());
+    plugin.init(registrar.activeContext(), registrar.messenger());
 
     // Create a callback for the flutterRegistrar to connect the applications onDestroy
     registrar.addViewDestroyListener(new PluginRegistry.ViewDestroyListener() {
