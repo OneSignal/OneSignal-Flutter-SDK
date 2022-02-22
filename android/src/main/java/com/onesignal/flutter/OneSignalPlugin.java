@@ -59,11 +59,6 @@ public class OneSignalPlugin
   private boolean hasSetRequiresPrivacyConsent = false;
   private boolean waitingForUserPrivacyConsent = false;
 
-  private OSInAppMessage inAppMessage;
-  private boolean hasSetOnWillDisplayInAppMessageHandler = false;
-  private boolean hasSetOnDidDisplayInAppMessageHandler = false;
-  private boolean hasSetOnWillDismissInAppMessageHandler = false;
-  private boolean hasSetOnDidDismissInAppMessageHandler = false;
 
   private final HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
