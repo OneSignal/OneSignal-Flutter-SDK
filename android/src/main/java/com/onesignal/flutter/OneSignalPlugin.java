@@ -168,14 +168,6 @@ public class OneSignalPlugin
       this.initNotificationOpenedHandlerParams();
     else if (call.method.contentEquals("OneSignal#initInAppMessageClickedHandlerParams"))
       this.initInAppMessageClickedHandlerParams();
-    else if (call.method.contentEquals("OneSignal#onWillDisplayInAppMessageHandlerParams"))
-      this.OnWillDisplayInAppMessageHandlerParams();
-    else if (call.method.contentEquals("OneSignal#onDidDisplayInAppMessageHandlerParams"))
-      this.OnDidDisplayInAppMessageHandlerParams();  
-    else if (call.method.contentEquals("OneSignal#onWillDismissInAppMessageHandlerParams"))
-      this.OnWillDismissInAppMessageHandlerParams();  
-    else if (call.method.contentEquals("OneSignal#onDidDismissInAppMessageHandlerParams"))
-      this.OnDidDismissInAppMessageHandlerParams();  
     else if (call.method.contentEquals("OneSignal#initNotificationWillShowInForegroundHandlerParams"))
       this.initNotificationWillShowInForegroundHandlerParams();
     else if (call.method.contentEquals("OneSignal#completeNotification"))
@@ -427,96 +419,28 @@ public class OneSignalPlugin
   }
 
   /* in app message lifecycle */
-  private void OnWillDisplayInAppMessageHandlerParams() {
-    this.hasSetOnWillDisplayInAppMessageHandler = true;
-    if(this.inAppMessage != null) {
-        this.onWillDisplayInAppMessageFlutter(this.inAppMessage);
-        this.inAppMessage = null;
-    }
-  }
-
-  private void OnDidDisplayInAppMessageHandlerParams() {
-      this.hasSetOnDidDisplayInAppMessageHandler = true;
-      if(this.inAppMessage != null) {
-          this.onDidDisplayInAppMessageFlutter(this.inAppMessage);
-          this.inAppMessage = null;
-      }
-  }
-
-  private void OnWillDismissInAppMessageHandlerParams() {
-      this.hasSetOnWillDismissInAppMessageHandler = true;
-      if(this.inAppMessage != null) {
-          this.onWillDismissInAppMessageFlutter(this.inAppMessage);
-          this.inAppMessage = null;
-      }
-  }
-
-  private void OnDidDismissInAppMessageHandlerParams() {
-      this.hasSetOnDidDismissInAppMessageHandler = true;
-      if(this.inAppMessage != null) {
-          this.onDidDismissInAppMessageFlutter(this.inAppMessage);
-          this.inAppMessage = null;
-      }
-  }
-
   public void setInAppMessageLifecycleHandler() {
     OneSignal.setInAppMessageLifecycleHandler(new OSInAppMessageLifecycleHandler() {
         @Override
         public void onWillDisplayInAppMessage(OSInAppMessage message) { 
-          onWillDisplayInAppMessageFlutter(message);
+          invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
         }
 
         @Override
         public void onDidDisplayInAppMessage(OSInAppMessage message) {
-          onDidDisplayInAppMessageFlutter(message);
+          invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
         }
 
         @Override
         public void onWillDismissInAppMessage(OSInAppMessage message) {
-          onWillDismissInAppMessageFlutter(message);
+          invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
         }
 
         @Override
         public void onDidDismissInAppMessage(OSInAppMessage message) {
-          onDidDismissInAppMessageFlutter(message);
+          invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
         }
     });
-  }
-
-  public void onWillDisplayInAppMessageFlutter(OSInAppMessage message) {
-    if (!this.hasSetOnWillDisplayInAppMessageHandler) {
-      this.inAppMessage = message;
-      return;
-    }
-    
-    invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
-  }
-
-  public void onDidDisplayInAppMessageFlutter(OSInAppMessage message) {
-    if (!this.hasSetOnDidDisplayInAppMessageHandler) {
-      this.inAppMessage = message;
-      return;
-    }
-      
-    invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
-  }
-
-  public void onWillDismissInAppMessageFlutter(OSInAppMessage message) {
-    if (!this.hasSetOnWillDismissInAppMessageHandler) {
-      this.inAppMessage = message;
-      return;
-    }
-
-    invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
-  }
-
-  public void onDidDismissInAppMessageFlutter(OSInAppMessage message) {
-    if (!this.hasSetOnDidDismissInAppMessageHandler) {
-      this.inAppMessage = message;
-      return;
-    }
-      
-    invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
   }
 
   @Override
