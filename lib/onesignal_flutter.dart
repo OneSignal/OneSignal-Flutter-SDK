@@ -124,30 +124,30 @@ class OneSignal {
 
   /// The in app message will display handler is called whenever the in app message
   /// is about to be displayed
-  void setOnWillDisplayInAppMessageHandler(OnWillDisplayInAppMessageHandler handler) {
+  void setOnWillDisplayInAppMessageHandler(
+      OnWillDisplayInAppMessageHandler handler) {
     _onWillDisplayInAppMessageHandler = handler;
-    _channel.invokeMethod("OneSignal#onWillDisplayInAppMessageHandlerParams");
   }
 
   /// The in app message did display handler is called whenever the in app message
   /// is displayed
-  void setOnDidDisplayInAppMessageHandler(OnDidDisplayInAppMessageHandler handler) {
+  void setOnDidDisplayInAppMessageHandler(
+      OnDidDisplayInAppMessageHandler handler) {
     _onDidDisplayInAppMessageHandler = handler;
-    _channel.invokeMethod("OneSignal#onDidDisplayInAppMessageHandlerParams");
   }
 
   /// The in app message will dismiss handler is called whenever the in app message
   /// is about to be dismissed
-  void setOnWillDismissInAppMessageHandler(OnWillDismissInAppMessageHandler handler) {
+  void setOnWillDismissInAppMessageHandler(
+      OnWillDismissInAppMessageHandler handler) {
     _onWillDismissInAppMessageHandler = handler;
-    _channel.invokeMethod("OneSignal#onWillDismissInAppMessageHandlerParams");
   }
 
   /// The in app message did dismiss handler is called whenever the in app message
   /// is dismissed
-  void setOnDidDismissInAppMessageHandler(OnDidDismissInAppMessageHandler handler) {
+  void setOnDidDismissInAppMessageHandler(
+      OnDidDismissInAppMessageHandler handler) {
     _onDidDismissInAppMessageHandler = handler;
-    _channel.invokeMethod("OneSignal#onDidDismissInAppMessageHandlerParams");
   }
 
   /// The notification foreground handler is called whenever a notification arrives
