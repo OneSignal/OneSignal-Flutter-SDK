@@ -55,7 +55,6 @@
 
 @property (strong, nonatomic) NSMutableDictionary* notificationCompletionCache;
 @property (strong, nonatomic) NSMutableDictionary* receivedNotificationCache;
-
 @end
 
 @implementation OneSignalPlugin
@@ -162,6 +161,8 @@
      }];
     
     [OneSignal setAppId:call.arguments[@"appId"]];
+
+    [OneSignal setInAppMessageLifecycleHandler: self];
 
     // If the user has required privacy consent, the SDK will not
     // add these observers. So we should delay adding the observers
@@ -397,6 +398,23 @@
     }
 
     [self.channel invokeMethod:@"OneSignal#handleClickedInAppMessage" arguments:action.toJson];
+}
+
+#pragma mark OSInAppMessageLifeCycleHandler
+- (void)onWillDisplayInAppMessage:(OSInAppMessage *) result {
+    [self.channel invokeMethod:@"OneSignal#onWillDisplayInAppMessage" arguments:result.toJson];
+}
+
+- (void)onDidDisplayInAppMessage:(OSInAppMessage *) result {
+    [self.channel invokeMethod:@"OneSignal#onDidDisplayInAppMessage" arguments:result.toJson];
+}
+
+- (void)onWillDismissInAppMessage:(OSInAppMessage *) result {
+    [self.channel invokeMethod:@"OneSignal#onWillDismissInAppMessage" arguments:result.toJson];
+}
+
+- (void)onDidDismissInAppMessage:(OSInAppMessage *) result {
+    [self.channel invokeMethod:@"OneSignal#onDidDismissInAppMessage" arguments:result.toJson];
 }
 
 #pragma mark OSSubscriptionObserver

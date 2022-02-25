@@ -10,6 +10,8 @@ import com.onesignal.OSDeviceState;
 import com.onesignal.OSEmailSubscriptionObserver;
 import com.onesignal.OSEmailSubscriptionStateChanges;
 import com.onesignal.OSInAppMessageAction;
+import com.onesignal.OSInAppMessage;
+import com.onesignal.OSInAppMessageLifecycleHandler;
 import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationOpenedResult;
 import com.onesignal.OSNotificationReceivedEvent;
@@ -60,6 +62,7 @@ public class OneSignalPlugin
   private boolean hasSetNotificationWillShowInForegroundHandler = false;
   private boolean hasSetRequiresPrivacyConsent = false;
   private boolean waitingForUserPrivacyConsent = false;
+
 
   private final HashMap<String, OSNotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
@@ -204,6 +207,7 @@ public class OneSignalPlugin
     OneSignal.setInAppMessageClickHandler(this);
     OneSignal.initWithContext(context);
     OneSignal.setAppId(appId);
+    setInAppMessageLifecycleHandler();
 
     if (hasSetRequiresPrivacyConsent && !OneSignal.userProvidedPrivacyConsent())
       this.waitingForUserPrivacyConsent = true;
@@ -428,6 +432,31 @@ public class OneSignalPlugin
     }
 
     invokeMethodOnUiThread("OneSignal#handleClickedInAppMessage", OneSignalSerializer.convertInAppMessageClickedActionToMap(action));
+  }
+
+  /* in app message lifecycle */
+  public void setInAppMessageLifecycleHandler() {
+    OneSignal.setInAppMessageLifecycleHandler(new OSInAppMessageLifecycleHandler() {
+        @Override
+        public void onWillDisplayInAppMessage(OSInAppMessage message) { 
+          invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+        }
+
+        @Override
+        public void onDidDisplayInAppMessage(OSInAppMessage message) {
+          invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+        }
+
+        @Override
+        public void onWillDismissInAppMessage(OSInAppMessage message) {
+          invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+        }
+
+        @Override
+        public void onDidDismissInAppMessage(OSInAppMessage message) {
+          invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+        }
+    });
   }
 
   @Override

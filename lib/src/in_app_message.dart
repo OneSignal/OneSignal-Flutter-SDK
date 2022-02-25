@@ -34,3 +34,17 @@ class OSInAppMessageAction extends JSONStringRepresentable {
   }
 
 }
+
+class OSInAppMessage extends JSONStringRepresentable {
+  String? messageId;
+
+  OSInAppMessage(Map<String, dynamic> json) {
+    this.messageId = json["message_id"];
+  } 
+
+  String jsonRepresentation() {
+    return convertToJsonString({
+      'message_id': this.messageId
+    });
+  }
+}

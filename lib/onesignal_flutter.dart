@@ -25,6 +25,10 @@ typedef void EmailSubscriptionChangeHandler(OSEmailSubscriptionStateChanges chan
 typedef void SMSSubscriptionChangeHandler(OSSMSSubscriptionStateChanges changes);
 typedef void PermissionChangeHandler(OSPermissionStateChanges changes);
 typedef void InAppMessageClickedHandler(OSInAppMessageAction action);
+typedef void OnWillDisplayInAppMessageHandler(OSInAppMessage message);
+typedef void OnDidDisplayInAppMessageHandler(OSInAppMessage message);
+typedef void OnWillDismissInAppMessageHandler(OSInAppMessage message);
+typedef void OnDidDismissInAppMessageHandler(OSInAppMessage message);
 typedef void NotificationWillShowInForegroundHandler(OSNotificationReceivedEvent event);
 
 class OneSignal {
@@ -47,6 +51,10 @@ class OneSignal {
   SMSSubscriptionChangeHandler? _onSMSSubscriptionChangedHandler;
   PermissionChangeHandler? _onPermissionChangedHandler;
   InAppMessageClickedHandler? _onInAppMessageClickedHandler;
+  OnWillDisplayInAppMessageHandler? _onWillDisplayInAppMessageHandler;
+  OnDidDisplayInAppMessageHandler? _onDidDisplayInAppMessageHandler;
+  OnWillDismissInAppMessageHandler? _onWillDismissInAppMessageHandler;
+  OnDidDismissInAppMessageHandler? _onDidDismissInAppMessageHandler;
   NotificationWillShowInForegroundHandler? _onNotificationWillShowInForegroundHandler;
 
   // constructor method
@@ -112,6 +120,34 @@ class OneSignal {
   void setInAppMessageClickedHandler(InAppMessageClickedHandler handler) {
     _onInAppMessageClickedHandler = handler;
     _channel.invokeMethod("OneSignal#initInAppMessageClickedHandlerParams");
+  }
+
+  /// The in app message will display handler is called whenever the in app message
+  /// is about to be displayed
+  void setOnWillDisplayInAppMessageHandler(
+      OnWillDisplayInAppMessageHandler handler) {
+    _onWillDisplayInAppMessageHandler = handler;
+  }
+
+  /// The in app message did display handler is called whenever the in app message
+  /// is displayed
+  void setOnDidDisplayInAppMessageHandler(
+      OnDidDisplayInAppMessageHandler handler) {
+    _onDidDisplayInAppMessageHandler = handler;
+  }
+
+  /// The in app message will dismiss handler is called whenever the in app message
+  /// is about to be dismissed
+  void setOnWillDismissInAppMessageHandler(
+      OnWillDismissInAppMessageHandler handler) {
+    _onWillDismissInAppMessageHandler = handler;
+  }
+
+  /// The in app message did dismiss handler is called whenever the in app message
+  /// is dismissed
+  void setOnDidDismissInAppMessageHandler(
+      OnDidDismissInAppMessageHandler handler) {
+    _onDidDismissInAppMessageHandler = handler;
   }
 
   /// The notification foreground handler is called whenever a notification arrives
@@ -428,6 +464,22 @@ class OneSignal {
         this._onInAppMessageClickedHandler != null) {
       this._onInAppMessageClickedHandler!(
           OSInAppMessageAction(call.arguments.cast<String, dynamic>()));
+    } else if (call.method == 'OneSignal#onWillDisplayInAppMessage' &&
+        this._onWillDisplayInAppMessageHandler != null) {
+      this._onWillDisplayInAppMessageHandler!(
+          OSInAppMessage(call.arguments.cast<String, dynamic>()));
+    } else if (call.method == 'OneSignal#onDidDisplayInAppMessage' &&
+        this._onDidDisplayInAppMessageHandler != null) {
+      this._onDidDisplayInAppMessageHandler!(
+          OSInAppMessage(call.arguments.cast<String, dynamic>()));
+    } else if (call.method == 'OneSignal#onWillDismissInAppMessage' &&
+        this._onWillDismissInAppMessageHandler != null) {
+      this._onWillDismissInAppMessageHandler!(
+          OSInAppMessage(call.arguments.cast<String, dynamic>()));
+    } else if (call.method == 'OneSignal#onDidDismissInAppMessage' &&
+        this._onDidDismissInAppMessageHandler != null) {
+      this._onDidDismissInAppMessageHandler!(
+          OSInAppMessage(call.arguments.cast<String, dynamic>()));
     } else if (call.method == 'OneSignal#handleNotificationWillShowInForeground' &&
         this._onNotificationWillShowInForegroundHandler != null) {
       this._onNotificationWillShowInForegroundHandler!(

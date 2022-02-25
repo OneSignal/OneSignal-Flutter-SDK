@@ -6,6 +6,7 @@ import com.onesignal.OSDeviceState;
 import com.onesignal.OSEmailSubscriptionState;
 import com.onesignal.OSEmailSubscriptionStateChanges;
 import com.onesignal.OSInAppMessageAction;
+import com.onesignal.OSInAppMessage;
 import com.onesignal.OSNotification;
 import com.onesignal.OSNotificationAction;
 import com.onesignal.OSNotificationOpenedResult;
@@ -228,6 +229,14 @@ class OneSignalSerializer {
         hash.put("click_url", action.getClickUrl());
         hash.put("first_click", action.isFirstClick());
         hash.put("closes_message", action.doesCloseMessage());
+
+        return hash;
+    }
+
+    static HashMap<String, Object> convertInAppMessageToMap(OSInAppMessage message) {
+        HashMap<String, Object> hash = new HashMap<>();
+
+        hash.put("message_id", message.getMessageId());
 
         return hash;
     }
