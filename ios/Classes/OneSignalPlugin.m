@@ -125,6 +125,8 @@
         [self disablePush:call withResult:result];
     else if ([@"OneSignal#postNotification" isEqualToString:call.method])
         [self postNotification:call withResult:result];
+    else if ([@"OneSignal#setLaunchURLsInApp" isEqualToString:call.method])
+        [self setLaunchURLsInApp:call withResult:result];
     else if ([@"OneSignal#promptLocation" isEqualToString:call.method])
         [self promptLocation:call withResult:result];
     else if ([@"OneSignal#setLocationShared" isEqualToString:call.method])
@@ -242,6 +244,12 @@
     } onFailure:^(NSError *error) {
         result(error.flutterError);
     }];
+}
+
+- (void)setLaunchURLsInApp:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    BOOL isEnabled = [call.arguments[@"isEnabled"] boolValue];
+    [OneSignal setLaunchURLsInApp:isEnabled];
+    result(nil);
 }
 
 - (void)promptLocation:(FlutterMethodCall *)call withResult:(FlutterResult)result {

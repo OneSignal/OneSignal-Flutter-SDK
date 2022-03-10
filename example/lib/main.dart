@@ -103,6 +103,9 @@ class _MyAppState extends State<MyApp> {
     await OneSignal.shared
         .setAppId("380dc082-5231-4cc2-ab51-a03da5a0e4c2");
 
+    // iOS-only method to open launch URLs in Safari when set to false
+    OneSignal.shared.setLaunchURLsInApp(false);
+
     bool requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
 
     this.setState(() {
