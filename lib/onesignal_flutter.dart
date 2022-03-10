@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 import 'package:onesignal_flutter/src/subscription.dart';
@@ -162,6 +163,19 @@ class OneSignal {
   void completeNotification(String notificationId, bool shouldDisplay) {
     _channel.invokeMethod("OneSignal#completeNotification",
         {'notificationId': notificationId, 'shouldDisplay': shouldDisplay});
+  }
+
+  /// Only applies to iOS
+  /// Sets if launch URLs should be opened within the application or in Safari.
+  /// When set to true, launch URLs will open an in-app browser.
+  Future<void> setLaunchURLsInApp(bool isEnabled) async {
+    if (Platform.isIOS) {
+      await _channel.invokeMethod(
+        "OneSignal#setLaunchURLsInApp", {'isEnabled': isEnabled});
+    } else {
+      _onesignalLog(OSLogLevel.info,
+          "setLaunchURLsInApp: this function is not supported on Android");
+    }
   }
 
   /// Allows you to completely disable the SDK until your app calls the
