@@ -61,27 +61,12 @@ PODS:
     - nanopb/encode (= 2.30908.0)
   - nanopb/decode (2.30908.0)
   - nanopb/encode (2.30908.0)
-  - onesignal_flutter (3.3.1):
-    - Flutter
-    - OneSignalXCFramework
-  - OneSignalXCFramework (3.11.2):
-    - OneSignalXCFramework/OneSignalCore (= 3.11.2)
-    - OneSignalXCFramework/OneSignalExtension (= 3.11.2)
-    - OneSignalXCFramework/OneSignalOutcomes (= 3.11.2)
-  - OneSignalXCFramework/OneSignalCore (3.11.2)
-  - OneSignalXCFramework/OneSignalExtension (3.11.2):
-    - OneSignalXCFramework/OneSignalCore
-    - OneSignalXCFramework/OneSignalOutcomes
-  - OneSignalXCFramework/OneSignalOutcomes (3.11.2):
-    - OneSignalXCFramework/OneSignalCore
   - PromisesObjC (2.1.0)
 
 DEPENDENCIES:
   - firebase_core (from `.symlinks/plugins/firebase_core/ios`)
   - firebase_messaging (from `.symlinks/plugins/firebase_messaging/ios`)
   - Flutter (from `Flutter`)
-  - onesignal_flutter (from `.symlinks/plugins/onesignal_flutter/ios`)
-  - OneSignalXCFramework (from `~/Documents/GitHub/OneSignal-iOS-SDK/`)
 
 SPEC REPOS:
   trunk:
@@ -102,10 +87,6 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/firebase_messaging/ios"
   Flutter:
     :path: Flutter
-  onesignal_flutter:
-    :path: ".symlinks/plugins/onesignal_flutter/ios"
-  OneSignalXCFramework:
-    :path: "~/Documents/GitHub/OneSignal-iOS-SDK/"
 
 SPEC CHECKSUMS:
   Firebase: 5f8193dff4b5b7c5d5ef72ae54bb76c08e2b841d
@@ -119,10 +100,8 @@ SPEC CHECKSUMS:
   GoogleDataTransport: 5fffe35792f8b96ec8d6775f5eccd83c998d5a3b
   GoogleUtilities: e0913149f6b0625b553d70dae12b49fc62914fd1
   nanopb: a0ba3315591a9ae0a16a309ee504766e90db0c96
-  onesignal_flutter: 9c346b4e1cbb2315799e00dcd237b484de5ca710
-  OneSignalXCFramework: 81ceac017a290f23793443323090cfbe888f74ea
   PromisesObjC: 99b6f43f9e1044bd87a95a60beff28c2c44ddb72
 
-PODFILE CHECKSUM: aaed8433b9c242d2b33111bb8c527d064fe2fedd
+PODFILE CHECKSUM: e2f77915a9aa08f210975a60431ce451b5f9b46b
 
 COCOAPODS: 1.11.3
