@@ -51,13 +51,13 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyDCXGTL9RA-Qhmu50v1Yv9i8H8nxuGnHes',
-    appId: '1:923735631350:ios:687419382c6ee44b87d3d7',
+    appId: '1:923735631350:ios:5f81d46ffbdf080587d3d7',
     messagingSenderId: '923735631350',
     projectId: 'emandsdktest',
     databaseURL: 'https://emandsdktest.firebaseio.com',
     storageBucket: 'emandsdktest.appspot.com',
     iosClientId:
         '923735631350-i3dv6o6de4i4em2kr3helkrpmjsqlqdi.apps.googleusercontent.com',
-    iosBundleId: 'com.example.onesignal',
+    iosBundleId: 'com.example.onesignalFlutterSample',
   );
 }

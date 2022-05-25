@@ -1,5 +1,10 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 
 //import OneSignal
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -17,9 +22,10 @@ class _MyAppState extends State<MyApp> {
   String? _smsNumber;
   String? _externalUserId;
   bool _enableConsentButton = false;
+  late StreamSubscription _messageSubscription;
 
   // CHANGE THIS parameter to true if you want to test GDPR privacy consent
-  bool _requireConsent = true;
+  bool _requireConsent = false;
 
   @override
   void initState() {
@@ -27,9 +33,25 @@ class _MyAppState extends State<MyApp> {
     initPlatformState();
   }
 
+  Future<void> initFirebaseMessaging() async {
+    var firebaseToken = await FirebaseMessaging.instance.getToken();
+    print('ECM Firebase token: $firebaseToken');
+  }
+
   // Platform messages are asynchronous, so we initialize in an async method.
   Future<void> initPlatformState() async {
     if (!mounted) return;
+
+    await Firebase.initializeApp(
+      options: DefaultFirebaseOptions.currentPlatform,
+    );
+    await initFirebaseMessaging();
+    await FirebaseMessaging.instance
+        .setForegroundNotificationPresentationOptions(
+      alert: true, // Required to display a heads up notification
+      badge: true,
+      sound: true,
+    );
 
     OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
 
@@ -123,6 +145,24 @@ class _MyAppState extends State<MyApp> {
     bool userProvidedPrivacyConsent =
         await OneSignal.shared.userProvidedPrivacyConsent();
     print("USER PROVIDED PRIVACY CONSENT: $userProvidedPrivacyConsent");
+
+    _messageSubscription =
+        FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      String? title = message.notification?.title;
+      print("ECM notification received: $title");
+    });
+    FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
+  }
+
+  Future<void> _firebaseMessagingBackgroundHandler(
+      RemoteMessage message) async {
+    Future onDidReceiveLocalNotification(
+        int? id, String? title, String? body, String? payload) async {
+      print('onDidReceiveLocalNotification');
+    }
+
+    String? title = message.notification?.title;
+    print("ECM notification received: $title");
   }
 
   void _handleGetTags() {
@@ -520,6 +560,12 @@ class _MyAppState extends State<MyApp> {
             ),
           )),
     );
+  }
+
+  @override
+  void dispose() {
+    _messageSubscription.cancel();
+    super.dispose();
   }
 }
 
