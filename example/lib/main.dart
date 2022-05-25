@@ -142,9 +142,9 @@ class _MyAppState extends State<MyApp> {
     // Some examples of how to use Outcome Events public methods with OneSignal SDK
     oneSignalOutcomeEventsExamples();
 
-    bool userProvidedPrivacyConsent =
-        await OneSignal.shared.userProvidedPrivacyConsent();
-    print("USER PROVIDED PRIVACY CONSENT: $userProvidedPrivacyConsent");
+    // bool userProvidedPrivacyConsent =
+    //     await OneSignal.shared.userProvidedPrivacyConsent();
+    // print("USER PROVIDED PRIVACY CONSENT: $userProvidedPrivacyConsent");
 
     _messageSubscription =
         FirebaseMessaging.onMessage.listen((RemoteMessage message) {
