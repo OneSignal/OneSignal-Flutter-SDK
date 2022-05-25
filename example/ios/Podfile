@@ -32,7 +32,7 @@ target 'Runner' do
 end
 
 target 'OneSignalNotificationServiceExtension' do
-  #pod 'OneSignalXCFramework', :path => "~/Documents/GitHub/OneSignal-iOS-SDK/"
+  pod 'OneSignalXCFramework', :path => "~/Documents/GitHub/OneSignal-iOS-SDK/"
 end
 
 post_install do |installer|
