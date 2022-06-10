@@ -16,6 +16,7 @@ class _MyAppState extends State<MyApp> {
   String? _emailAddress;
   String? _smsNumber;
   String? _externalUserId;
+  String? _language;
   bool _enableConsentButton = false;
 
   // CHANGE THIS parameter to true if you want to test GDPR privacy consent
@@ -181,6 +182,18 @@ class _MyAppState extends State<MyApp> {
       print("Successfully set email");
     }).catchError((error) {
       print("Failed to set email with error: $error");
+    });
+  }
+
+  void _handleSetLanguage() {
+    if (_language == null) return;
+
+    print("Setting language");
+
+    OneSignal.shared.setLanguage(_language!).then((response) {
+      print("Successfully set language with response: $response");
+    }).catchError((error) {
+      print("Failed to set language with error: $error");
     });
   }
 
@@ -509,6 +522,30 @@ class _MyAppState extends State<MyApp> {
                   new TableRow(children: [
                     new OneSignalButton(
                         "Remove External User ID", _handleRemoveExternalUserId, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new TextField(
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                          hintText: "Language",
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 212, 86, 83),
+                          )),
+                      onChanged: (text) {
+                        this.setState(() {
+                          _language = text == "" ? null : text;
+                        });
+                      },
+                    )
+                  ]),
+                  new TableRow(children: [
+                    Container(
+                      height: 8.0,
+                    )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Set Language", _handleSetLanguage, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new Container(
