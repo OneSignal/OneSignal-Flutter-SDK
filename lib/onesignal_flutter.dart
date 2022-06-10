@@ -379,6 +379,8 @@ class OneSignal {
     return results.cast<String, dynamic>();
   }
 
+  /// Sets the user's language.
+  /// Applies also to the email and/or SMS player if those are logged in on the device.
   Future<Map<String, dynamic>> setLanguage(String language) async {
     Map<dynamic, dynamic> results =
         await (_channel.invokeMethod("OneSignal#setLanguage", {'language' : language}));
