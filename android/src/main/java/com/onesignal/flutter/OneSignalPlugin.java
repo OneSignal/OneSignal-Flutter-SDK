@@ -329,7 +329,7 @@ public class OneSignalPlugin
     if (language != null && language.length() == 0)
       language = null;
 
-      OneSignal.setLanguage(language);
+      OneSignal.setLanguage(language, new OSFlutterSetLanguageHandler(messenger, channel, result, "setLanguage"));
   }
 
   private void setExternalUserId(MethodCall call, final Result result) {
@@ -600,6 +600,47 @@ public class OneSignalPlugin
       } catch (JSONException jsonException) {
           replyError(result, "OneSignal", "Encountered an error attempting to deserialize server response " + methodName + " " + jsonException.getMessage(), null);
       }
+    }
+  }
+
+  static class OSFlutterSetLanguageHandler extends OSFlutterHandler
+          implements OneSignal.OSSetLanguageCompletionHandler {
+
+    OSFlutterSetLanguageHandler(BinaryMessenger messenger, MethodChannel channel, Result res, String methodName) {
+      super(messenger, channel, res, methodName);
+    }
+
+    @Override
+    public void onSuccess(String results) {
+      if (this.replySubmitted.getAndSet(true)) {
+        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.DEBUG, "OneSignal " + methodName + " handler called twice, ignoring! response: " + results);
+        return;
+      }
+
+      if (results == null) { // The results currently is always null.
+        results = "Successfully set language.";
+      }
+
+      HashMap<String, Object> responseMap = new HashMap<>();
+      responseMap.put("success", true);
+      responseMap.put("message", results);
+      replySuccess(result, responseMap);
+    }
+
+    @Override
+    public void onFailure(OneSignal.OSLanguageError error) {
+      if (this.replySubmitted.getAndSet(true)) {
+        return;
+      }
+
+      String errorMessage = error.getMessage();
+      if (errorMessage == null) {
+        errorMessage = "Failed to set language.";
+      }
+
+      replyError(result, "OneSignal",
+              "Encountered an error when " + methodName + ": " + errorMessage,
+              null);
     }
   }
 

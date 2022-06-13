@@ -338,7 +338,12 @@
         language = nil;
     }
 
-    [OneSignal setLanguage:language];
+    [OneSignal setLanguage:language withSuccess:^(NSDictionary *results) {
+        result(results);
+    } withFailure:^(NSError *error) {
+        [OneSignal onesignalLog:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"Set language Failure with error: %@", error]];
+        result(error.flutterError);
+    }];
 }
 
 - (void)initNotificationOpenedHandlerParams {
