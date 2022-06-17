@@ -1,4 +1,4 @@
-String sdkVersion = "3.3.1";
+String sdkVersion = "3.3.2";
 
 /// Determines how notifications should be displayed
 enum OSNotificationDisplayType { none, alert, notification }
