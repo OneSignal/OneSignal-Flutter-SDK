@@ -278,7 +278,8 @@ public class OneSignalPlugin
   }
 
   private void promptPermission(MethodCall call, Result result) {
-    OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "promptPermission() is not applicable in Android");
+    boolean fallback = call.argument("fallback");
+    OneSignal.promptForPushNotifications(fallback);
     replySuccess(result, null);
   }
 

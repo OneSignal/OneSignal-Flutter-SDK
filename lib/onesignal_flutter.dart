@@ -213,8 +213,9 @@ class OneSignal {
     return val as bool;
   }
 
-  /// in iOS, will prompt the user for permission to send push notifications.
-  //  in Android, it will always return false, since notification permission is by default given
+  // in iOS and Android 13+, will prompt the user for permission to send push notifications.
+  //  in lower Android versions it will always return false, since notification
+  //  permission is by default given
   Future<bool> promptUserForPushNotificationPermission(
       {bool fallbackToSettings = false}) async {
     dynamic result = await _channel.invokeMethod(
