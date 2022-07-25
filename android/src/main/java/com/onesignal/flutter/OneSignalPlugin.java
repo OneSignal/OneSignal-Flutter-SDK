@@ -278,8 +278,8 @@ public class OneSignalPlugin
   }
 
   private void promptPermission(MethodCall call, Result result) {
-    OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "promptPermission() is not applicable in Android");
-    replySuccess(result, null);
+    boolean fallback = call.argument("fallback");
+    OneSignal.promptForPushNotifications(fallback, new OSFlutterPromptForPushNotificationPermissionResponseHandler(messenger, channel, result, "promptPermission"));
   }
 
   private void getDeviceState(Result reply) {
@@ -564,6 +564,22 @@ public class OneSignalPlugin
         return;
 
       replyError(result, "OneSignal", "Encountered an error when " + methodName + " (" + error.getType() + "): " + error.getMessage(), null);
+    }
+  }
+
+  static class OSFlutterPromptForPushNotificationPermissionResponseHandler extends OSFlutterHandler
+            implements OneSignal.PromptForPushNotificationPermissionResponseHandler {
+    OSFlutterPromptForPushNotificationPermissionResponseHandler(BinaryMessenger messenger, MethodChannel channel, Result res, String methodName) {
+      super(messenger, channel, res, methodName);
+    }
+      
+    @Override
+    public void response(boolean accepted) {
+      if (this.replySubmitted.getAndSet(true)) {
+        OneSignal.onesignalLog(OneSignal.LOG_LEVEL.DEBUG, "OneSignal " + methodName + " handler called twice, ignoring! response");
+        return;
+      }
+      replySuccess(result, accepted);
     }
   }
 
