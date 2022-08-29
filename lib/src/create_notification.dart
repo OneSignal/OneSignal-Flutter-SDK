@@ -1,6 +1,4 @@
 import 'package:onesignal_flutter/src/utils.dart';
-import 'package:flutter/foundation.dart';
-import 'package:onesignal_flutter/src/notification.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 /// The parameters & format to create push notifications is
