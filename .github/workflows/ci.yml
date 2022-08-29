@@ -15,11 +15,11 @@ jobs:
 
     steps:
       - name: Setup Flutter
-      - uses: subosito/flutter-action@v2
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: '2.10.4'
           channel: 'stable'
-      - run: flutter doctor -v
+        run: flutter doctor -v
 
       - name: Checkout OneSignal-Flutter-SDK
         uses: actions/checkout@v3
