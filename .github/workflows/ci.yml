@@ -30,7 +30,7 @@ jobs:
         run: flutter analyze --no-pub --no-fatal-infos
 
       - name: Ensure the Dart code is formatted correctly
-        run: flutter format -o none --set-exit-if-changed .
+        run: flutter format -o json --set-exit-if-changed .
 
       - name: Run Flutter unit tests
         run: flutter test
