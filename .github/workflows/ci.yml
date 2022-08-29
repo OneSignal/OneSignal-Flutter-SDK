@@ -1,0 +1,54 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - '**'
+    paths-ignore:
+      - '.github/**'
+      - '.vscode/**'
+      - 'README.md'
+  push:
+    branches:
+      - dev
+    paths-ignore:
+      - '.github/**'
+      - '.vscode/**'
+      - 'README.md'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Setup Flutter
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '2.10.4'
+          channel: 'stable'
+      - run: flutter doctor -v
+
+      - name: Checkout OneSignal-Flutter-SDK
+        uses: actions/checkout@v3
+        run: flutter pub get
+
+      # - name: Cache Flutter packages
+      #   uses: actions/cache@v3
+      #   with:
+      #     path: ~/.pub-cache/hosted/pub.dartlang.org
+
+      #     key: ${{ runner.OS }}-flutter-${{ hashFiles('**/pubspec.lock') }}
+      #     restore-keys: |
+      #       ${{ runner.os }}-build-${{ env.cache-name }}-
+      #       ${{ runner.os }}-build-
+      #       ${{ runner.os }}-
+
+      - name: Static Analysis
+        run: flutter analyze
+
+      - name: Ensure the Dart code is formatted correctly
+        run: flutter format --set-exit-if-changed --dry-run .
+
+      - name: Run Flutter unit tests
+        run: flutter test
