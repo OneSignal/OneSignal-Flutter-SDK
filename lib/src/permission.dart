@@ -84,7 +84,6 @@ class OSPermissionStateChanges extends JSONStringRepresentable {
 }
 
 class OSDeviceState extends JSONStringRepresentable {
-
   bool hasNotificationPermission = false;
   bool pushDisabled = false;
   bool subscribed = false;
@@ -110,7 +109,10 @@ class OSDeviceState extends JSONStringRepresentable {
     this.emailAddress = json['emailAddress'] as String?;
     this.smsUserId = json['smsUserId'] as String?;
     this.smsNumber = json['smsNumber'] as String?;
-    this.notificationPermissionStatus = json['notificationPermissionStatus'] == null ? null : OSNotificationPermission.values[json['notificationPermissionStatus']];
+    this.notificationPermissionStatus = json['notificationPermissionStatus'] ==
+            null
+        ? null
+        : OSNotificationPermission.values[json['notificationPermissionStatus']];
   }
 
   String jsonRepresentation() {
