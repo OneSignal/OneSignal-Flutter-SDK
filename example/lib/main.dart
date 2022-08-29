@@ -38,22 +38,23 @@ class _MyAppState extends State<MyApp> {
 
     OneSignal.shared
         .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-          print('NOTIFICATION OPENED HANDLER CALLED WITH: ${result}');
-          this.setState(() {
-          _debugLabelString =
-              "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      print('NOTIFICATION OPENED HANDLER CALLED WITH: $result');
+      this.setState(() {
+        _debugLabelString =
+            "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
     });
 
-    OneSignal.shared
-        .setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
-           print('FOREGROUND HANDLER CALLED WITH: ${event}');
-           /// Display Notification, send null to not display
-           event.complete(null);
-          
-           this.setState(() {
-           _debugLabelString =
-              "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+    OneSignal.shared.setNotificationWillShowInForegroundHandler(
+        (OSNotificationReceivedEvent event) {
+      print('FOREGROUND HANDLER CALLED WITH: $event');
+
+      /// Display Notification, send null to not display
+      event.complete(null);
+
+      this.setState(() {
+        _debugLabelString =
+            "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
     });  
 
