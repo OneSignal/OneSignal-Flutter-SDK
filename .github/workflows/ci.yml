@@ -19,7 +19,6 @@ jobs:
         with:
           flutter-version: '2.10.4'
           channel: 'stable'
-        run: flutter doctor -v
 
       - name: Checkout OneSignal-Flutter-SDK
         uses: actions/checkout@v3
