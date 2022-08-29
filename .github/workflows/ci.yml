@@ -7,13 +7,6 @@ on:
       - '.github/**'
       - '.vscode/**'
       - 'README.md'
-  push:
-    branches:
-      - dev
-    paths-ignore:
-      - '.github/**'
-      - '.vscode/**'
-      - 'README.md'
   workflow_dispatch:
 
 jobs:
