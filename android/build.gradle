@@ -1,5 +1,5 @@
 group 'com.onesignal.flutter'
-version '3.4.2'
+version '3.4.3'
 
 buildscript {
     repositories {
@@ -34,5 +34,5 @@ android {
 }
 
 dependencies {
-    api 'com.onesignal:OneSignal:4.8.2'
+    api 'com.onesignal:OneSignal:4.8.3'
 }
