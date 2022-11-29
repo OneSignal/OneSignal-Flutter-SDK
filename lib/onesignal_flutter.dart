@@ -312,6 +312,29 @@ class OneSignal {
     return await _channel.invokeMethod("OneSignal#clearOneSignalNotifications");
   }
 
+  /// Only applies to iOS
+  /// Associates a temporary push token with an Activity ID on the OneSignal server.
+  Future<void> enterLiveActivity(String activityId, String token) async {
+    if (Platform.isIOS) {
+      await _channel.invokeMethod("OneSignal#enterLiveActivity", {'activityId': activityId, 'token': token});
+    } else {
+      _onesignalLog(OSLogLevel.info,
+          "enterLiveActivity: this function is not supported on Android");
+    }
+  }
+
+  /// Only applies to iOS
+  /// Deletes activityId associated temporary push token on the OneSignal server.
+  Future<void> exitLiveActivity(String activityId) async {
+    if (Platform.isIOS) {
+      await _channel.invokeMethod("OneSignal#exitLiveActivity",
+        {'activityId': activityId});
+    } else {
+      _onesignalLog(OSLogLevel.info,
+          "exitLiveActivity: this function is not supported on Android");
+    }
+  }
+
   /// Allows you to manually cancel a single OneSignal notification based on its Android notification integer ID
   void removeNotification(int notificationId) {
     _channel.invokeMethod("OneSignal#removeNotification",

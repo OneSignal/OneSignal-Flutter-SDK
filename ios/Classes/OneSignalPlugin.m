@@ -153,6 +153,10 @@
         [self initNotificationWillShowInForegroundHandlerParams];
     else if ([@"OneSignal#completeNotification" isEqualToString:call.method])
         [self completeNotification:call withResult:result];
+    else if ([@"OneSignal#enterLiveActivity" isEqualToString:call.method])
+        [self enterLiveActivity:call withResult:result];
+    else if ([@"OneSignal#exitLiveActivity" isEqualToString:call.method])
+        [self exitLiveActivity:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -403,6 +407,30 @@
     [self.receivedNotificationCache removeObjectForKey:notificationId];
 }
 
+#pragma mark Live Activity
+
+- (void)enterLiveActivity:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *activityId = call.arguments[@"activityId"];
+    NSString *token = call.arguments[@"token"];
+
+    [OneSignal enterLiveActivity:activityId withToken:token withSuccess:^(NSDictionary *results) {
+        result(results);
+    } withFailure:^(NSError *error) {
+        [OneSignal onesignalLog:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"enterLiveActivity Failure with error: %@", error]];
+        result(error.flutterError);
+    }];
+}
+
+- (void)exitLiveActivity:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *activityId = call.arguments[@"activityId"];
+
+    [OneSignal exitLiveActivity:activityId withSuccess:^(NSDictionary *results) {
+        result(results);
+    } withFailure:^(NSError *error) {
+        [OneSignal onesignalLog:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"exitLiveActivity Failure with error: %@", error]];
+        result(error.flutterError);
+    }];
+}
 
 #pragma mark In App Message Click Handler
 - (void)handleInAppMessageClicked:(OSInAppMessageAction *)action {
