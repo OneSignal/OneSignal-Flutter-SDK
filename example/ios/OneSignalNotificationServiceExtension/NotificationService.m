@@ -6,7 +6,7 @@
 //  Copyright © 2018 The Chromium Authors. All rights reserved.
 //
 
-#import <OneSignal/OneSignal.h>
+#import <OneSignalFramework/OneSignalFramework.h>
 
 #import "NotificationService.h"
 

@@ -25,8 +25,8 @@
  * THE SOFTWARE.
  */
 
-#import <OneSignal/OneSignal.h>
 #import <Flutter/Flutter.h>
+#import <OneSignalFramework/OneSignalFramework.h>
 
 #ifndef OneSignalCategories_h
 #define OneSignalCategories_h
