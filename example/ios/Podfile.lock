@@ -1,14 +1,37 @@
 PODS:
   - Flutter (1.0.0)
-  - onesignal_flutter (3.1.0):
+  - onesignal_flutter (5.0.0-alpha-02):
     - Flutter
-    - OneSignalXCFramework (= 3.5.3)
-  - OneSignalXCFramework (3.5.3)
+    - OneSignalXCFramework (= 5.0.0-alpha-02)
+  - OneSignalXCFramework (5.0.0-alpha-02):
+    - OneSignalXCFramework/OneSignalCore (= 5.0.0-alpha-02)
+    - OneSignalXCFramework/OneSignalExtension (= 5.0.0-alpha-02)
+    - OneSignalXCFramework/OneSignalNotifications (= 5.0.0-alpha-02)
+    - OneSignalXCFramework/OneSignalOSCore (= 5.0.0-alpha-02)
+    - OneSignalXCFramework/OneSignalOutcomes (= 5.0.0-alpha-02)
+    - OneSignalXCFramework/OneSignalUser (= 5.0.0-alpha-02)
+  - OneSignalXCFramework/OneSignalCore (5.0.0-alpha-02)
+  - OneSignalXCFramework/OneSignalExtension (5.0.0-alpha-02):
+    - OneSignalXCFramework/OneSignalCore
+    - OneSignalXCFramework/OneSignalOutcomes
+  - OneSignalXCFramework/OneSignalNotifications (5.0.0-alpha-02):
+    - OneSignalXCFramework/OneSignalCore
+    - OneSignalXCFramework/OneSignalExtension
+    - OneSignalXCFramework/OneSignalOutcomes
+  - OneSignalXCFramework/OneSignalOSCore (5.0.0-alpha-02):
+    - OneSignalXCFramework/OneSignalCore
+  - OneSignalXCFramework/OneSignalOutcomes (5.0.0-alpha-02):
+    - OneSignalXCFramework/OneSignalCore
+  - OneSignalXCFramework/OneSignalUser (5.0.0-alpha-02):
+    - OneSignalXCFramework/OneSignalCore
+    - OneSignalXCFramework/OneSignalNotifications
+    - OneSignalXCFramework/OneSignalOSCore
+    - OneSignalXCFramework/OneSignalOutcomes
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - onesignal_flutter (from `.symlinks/plugins/onesignal_flutter/ios`)
-  - OneSignalXCFramework (< 4.0, >= 3.0.0)
+  - OneSignalXCFramework (= 5.0.0-alpha-02)
 
 SPEC REPOS:
   trunk:
@@ -21,10 +44,10 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/onesignal_flutter/ios"
 
 SPEC CHECKSUMS:
-  Flutter: 434fef37c0980e73bb6479ef766c45957d4b510c
-  onesignal_flutter: 79eb89d25249b078d3c358fb7827b22909f7fbed
-  OneSignalXCFramework: 4e08d8353adec161c3d9174e2572c849e1225c9f
+  Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
+  onesignal_flutter: c4fe7cfb99196ccc89ecaef890bdd66abf00f5d7
+  OneSignalXCFramework: 8eec9904167f8c97c23c441709b648f353d22a41
 
-PODFILE CHECKSUM: b074b7b0bedd9b715d33807e4b6c0f0dcee63e1e
+PODFILE CHECKSUM: f0497bd2adc984c2ee14f5ec68f1959c4d6f7a55
 
-COCOAPODS: 1.10.1
+COCOAPODS: 1.11.3
