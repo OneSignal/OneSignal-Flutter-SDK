@@ -32,7 +32,12 @@ class _MyAppState extends State<MyApp> {
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    // OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+
+    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+
+    // NOTE: Replace with your own app ID from https://www.onesignal.com
+    OneSignal.shared.initialize("9c59a2aa-315a-4bf9-9fef-f76d575d3202");
 
     // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
@@ -99,9 +104,6 @@ class _MyAppState extends State<MyApp> {
     // OneSignal.shared.setOnDidDismissInAppMessageHandler((message) {
     //   print("ON DID DISMISS IN APP MESSAGE ${message.messageId}");
     // });
-
-    // NOTE: Replace with your own app ID from https://www.onesignal.com
-    await OneSignal.shared.setAppId("380dc082-5231-4cc2-ab51-a03da5a0e4c2");
 
     // iOS-only method to open launch URLs in Safari when set to false
     // OneSignal.shared.setLaunchURLsInApp(false);
