@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  *
- * Copyright 2017 OneSignal
+ * Copyright 2023 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,12 +25,36 @@
  * THE SOFTWARE.
  */
 
-#import <Flutter/Flutter.h>
+#import "OSFlutterDebug.h"
 #import <OneSignalFramework/OneSignalFramework.h>
+#import "OSFlutterCategories.h"
 
-@interface OneSignalPlugin : NSObject<FlutterPlugin>
+@implementation OSFlutterDebug
++ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
+    OSFlutterDebug *instance = [OSFlutterDebug new];
 
-// Do NOT initialize instances of this class.
-// You must only reference the shared instance.
-+ (instancetype)sharedInstance;
+    instance.channel = [FlutterMethodChannel
+                        methodChannelWithName:@"OneSignal#debug"
+                        binaryMessenger:[registrar messenger]];
+
+    [registrar addMethodCallDelegate:instance channel:instance.channel];
+}
+
+- (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
+    if ([@"OneSignal#setLogLevel" isEqualToString:call.method])
+        [self setLogLevel:call];
+    else if ([@"OneSignal#setVisualLevel" isEqualToString:call.method])
+        [self setVisualLevel:call];
+    else 
+        result(FlutterMethodNotImplemented);
+}
+
+- (void)setLogLevel:(FlutterMethodCall *)call {
+    [OneSignal.Debug setLogLevel:call.arguments[@"logLevel"]];
+}
+
+- (void)setVisualLevel:(FlutterMethodCall *)call {
+    [OneSignal.Debug setVisualLevel:call.arguments[@"visualLevel"]];
+}
+
 @end
