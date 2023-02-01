@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> {
 
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
 
-    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    OneSignal.Debug.setVisualLevel(OSLogLevel.verbose);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     OneSignal.shared.initialize("9c59a2aa-315a-4bf9-9fef-f76d575d3202");
