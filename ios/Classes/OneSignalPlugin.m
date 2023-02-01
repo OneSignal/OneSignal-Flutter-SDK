@@ -27,6 +27,9 @@
 
 #import "OneSignalPlugin.h"
 #import "OSFlutterCategories.h"
+#import "OSFlutterDebug.h"
+#import "OSFlutterUser.h"
+
 
 @interface OneSignalPlugin ()
 
@@ -58,29 +61,25 @@
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
 
-    [OneSignal initialize:nil withLaunchOptions:nil];
     [OneSignal setMSDKType:@"flutter"];
-
-    // Wrapper SDK's call init with no app ID early on in the
-    // app lifecycle. The developer will call init() later on
-    // from the Flutter plugin channel.
 
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
                                      methodChannelWithName:@"OneSignal"
                                      binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:OneSignalPlugin.sharedInstance channel:OneSignalPlugin.sharedInstance.channel];
-
+    [OSFlutterDebug registerWithRegistrar:registrar];
+    [OSFlutterUser registerWithRegistrar:registrar];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     if ([@"OneSignal#initialize" isEqualToString:call.method])
-        [self initialize:call withResult:result];
+        [self initialize:call];
     else 
         result(FlutterMethodNotImplemented);
 }
 
-- (void)initialize:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+- (void)initialize:(FlutterMethodCall *)call {
 
     [OneSignal initialize:call.arguments[@"appId"] withLaunchOptions:nil];
     // If the user has required privacy consent, the SDK will not
@@ -91,8 +90,7 @@
     // } else {
     //     [self addObservers];
     // }
-    result(nil);
+   // result(nil);
 }
-
 
 @end

@@ -4,6 +4,8 @@ import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/utils.dart';
+import 'package:onesignal_flutter/src/debug.dart';
+import 'package:onesignal_flutter/src/user.dart';
 
 export 'src/permission.dart';
 export 'src/defines.dart';
@@ -19,32 +21,27 @@ class OneSignal {
   /// so if you create multiple instances of OneSignal, they will
   /// mostly share the same state.
   static OneSignal shared = new OneSignal();
+  static OneSignalDebug Debug = new OneSignalDebug();
+  static OneSignalUser User = new OneSignalUser();
   
 
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal');
-  // MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
-
-  // event handlers
-  PermissionChangeHandler? _onPermissionChangedHandler;
-
-  // constructor method
-  OneSignal() {
-    this._channel.setMethodCallHandler(_handleMethod);
-  }
-
-  /// The initializer for OneSignal. Note that this initializer
-  /// accepts an iOSSettings object, in Android you can pass null.
-  Future<void> setAppId(String appId) async {
-    // _onesignalLog(OSLogLevel.verbose,
-    //     "Initializing the OneSignal Flutter SDK ($sdkVersion)");
-
-    await _channel.invokeMethod(
+ 
+  /// The initializer for OneSignal. 
+  ///
+  /// The initializer accepts an [appId] which the developer can get 
+  /// from the OneSignal consoleas well as a dictonary of [launchOptions]
+  void initialize(String appId) {
+    _channel.invokeMethod(
         'OneSignal#initialize', {'appId': appId});
   }
-
-   // Private function that gets called by ObjC/Java
-  Future<Null> _handleMethod(MethodCall call) async {
-    return null;
-  }
+  // constructor method
+  // OneSignal() {
+  //   this._channel.setMethodCallHandler(_handleMethod);
+  // }
+  //  // Private function that gets called by ObjC/Java
+  // Future<Null> _handleMethod(MethodCall call) async {
+  //   return null;
+  // }
 }
