@@ -4,9 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/utils.dart';
+import 'package:onesignal_flutter/src/onesignaldebug.dart';
 
 export 'src/permission.dart';
 export 'src/defines.dart';
+export 'src/onesignaldebug.dart';
 
 
 // Handlers for various events
@@ -19,30 +21,24 @@ class OneSignal {
   /// so if you create multiple instances of OneSignal, they will
   /// mostly share the same state.
   static OneSignal shared = new OneSignal();
+  static OneSignalDebug Debug = new OneSignalDebug();
   
 
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal');
-  // MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
-
-  // event handlers
-  PermissionChangeHandler? _onPermissionChangedHandler;
-
+ 
+  /// The initializer for OneSignal. 
+  ///
+  /// The initializer accepts an [appId] which the developer can get 
+  /// from the OneSignal consoleas well as a dictonary of [launchOptions]
+  void initialize(String appId) {
+    _channel.invokeMethod(
+        'OneSignal#initialize', {'appId': appId});
+  }
   // constructor method
   OneSignal() {
     this._channel.setMethodCallHandler(_handleMethod);
   }
-
-  /// The initializer for OneSignal. Note that this initializer
-  /// accepts an iOSSettings object, in Android you can pass null.
-  Future<void> setAppId(String appId) async {
-    // _onesignalLog(OSLogLevel.verbose,
-    //     "Initializing the OneSignal Flutter SDK ($sdkVersion)");
-
-    await _channel.invokeMethod(
-        'OneSignal#initialize', {'appId': appId});
-  }
-
    // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
     return null;
