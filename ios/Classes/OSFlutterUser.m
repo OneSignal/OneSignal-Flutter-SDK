@@ -130,7 +130,7 @@
 
 - (void)addEmail:(FlutterMethodCall *)call {
     NSString *email = call.arguments;
-    [OneSignal.User addEmail:*email];
+    [OneSignal.User addEmail:email];
 }
 
 - (void)removeEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
