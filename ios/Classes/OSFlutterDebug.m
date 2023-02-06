@@ -50,11 +50,13 @@
 }
 
 - (void)setLogLevel:(FlutterMethodCall *)call {
-    [OneSignal.Debug setLogLevel:call.arguments[@"logLevel"]];
+    ONE_S_LOG_LEVEL logLevel = (ONE_S_LOG_LEVEL)[call.arguments[@"logLevel"] intValue];
+    [OneSignal.Debug setLogLevel:logLevel];
 }
 
 - (void)setVisualLevel:(FlutterMethodCall *)call {
-    [OneSignal.Debug setVisualLevel:call.arguments[@"visualLevel"]];
+    ONE_S_LOG_LEVEL visualLogLevel = (ONE_S_LOG_LEVEL)[call.arguments[@"visualLevel"] intValue];
+    [OneSignal.Debug setVisualLevel:visualLogLevel];
 }
 
 @end
