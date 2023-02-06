@@ -8,15 +8,6 @@ class OneSignalDebug {
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal#debug');
 
-  // constructor method
-  OneSignalDebug() {
-    this._channel.setMethodCallHandler(_handleMethod);
-  }
-   // Private function that gets called by ObjC/Java
-  Future<Null> _handleMethod(MethodCall call) async {
-    return null;
-  }
-
   /// Sets the log level for the SDK. 
   ///
   /// The parameter [logLevel] controls

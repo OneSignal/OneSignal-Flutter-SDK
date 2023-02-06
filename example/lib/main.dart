@@ -37,7 +37,7 @@ class _MyAppState extends State<MyApp> {
     OneSignal.Debug.setVisualLevel(OSLogLevel.verbose);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
-    OneSignal.shared.initialize("9c59a2aa-315a-4bf9-9fef-f76d575d3202");
+    OneSignal.shared.initialize("77e32082-ea27-42e3-a898-c72e141824ef");
 
     // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
@@ -142,19 +142,11 @@ class _MyAppState extends State<MyApp> {
 
   void _handleSendTags() {
     print("Sending tags");
-    // OneSignal.shared.sendTag("test2", "val2").then((response) {
-    //   print("Successfully sent tags with response: $response");
-    // }).catchError((error) {
-    //   print("Encountered an error sending tags: $error");
-    // });
+    OneSignal.User.addTagWithKey("test2", "val2");
 
     print("Sending tags array");
-    var sendTags = {'test': 'value'};
-    // OneSignal.shared.sendTags(sendTags).then((response) {
-    //   print("Successfully sent tags with response: $response");
-    // }).catchError((error) {
-    //   print("Encountered an error sending tags: $error");
-    // });
+    var sendTags = {'test': 'value', 'test2': 'value2'};
+    OneSignal.User.addTags(sendTags);
   }
 
   void _handlePromptForPushPermission() {
@@ -174,60 +166,46 @@ class _MyAppState extends State<MyApp> {
     // });
   }
 
-  void _handleSetEmail() {
-    // if (_emailAddress == null) return;
-
-    print("Setting email");
-
-    // OneSignal.shared.setEmail(email: _emailAddress!).whenComplete(() {
-    //   print("Successfully set email");
-    // }).catchError((error) {
-    //   print("Failed to set email with error: $error");
-    // });
-  }
-
-  void _handleSetLanguage() {
-    // if (_language == null) return;
-
+   void _handleSetLanguage() {
+    if (_language == null) return;
     print("Setting language");
-
-    // OneSignal.shared.setLanguage(_language!).then((response) {
-    //   print("Successfully set language with response: $response");
-    // }).catchError((error) {
-    //   print("Failed to set language with error: $error");
-    // });
+    OneSignal.User.setLanguage(_language!);
   }
 
-  void _handleLogoutEmail() {
-    print("Logging out of email");
-
-    // OneSignal.shared.logoutEmail().then((v) {
-    //   print("Successfully logged out of email");
-    // }).catchError((error) {
-    //   print("Failed to log out of email: $error");
-    // });
+  void _handleSetEmail() {
+    if (_emailAddress == null) return;
+    print("Setting email");
+    
+    OneSignal.User.addEmail(_emailAddress!);
   }
 
-    void _handleSetSMSNumber() {
+  void _handleRemoveEmail() {
+    if (_emailAddress == null) return;
+    print("Remove email");
+
+    OneSignal.User.removeEmail(_emailAddress!).then((response) {
+      print("Successfully remove email with response $response");
+    }).catchError((error) {
+      print("Failed to remove email: $error");
+    });
+  }
+
+  void _handleSetSMSNumber() {
     if (_smsNumber == null) return;
-
     print("Setting SMS Number");
 
-    // OneSignal.shared.setSMSNumber(smsNumber: _smsNumber!).then((response) {
-    //   print("Successfully set SMSNumber with response $response");
-    // }).catchError((error) {
-    //   print("Failed to set SMS Number with error: $error");
-    // });
+    OneSignal.User.addSmsNumber(_smsNumber!);
   }
 
-  void _handleLogoutSMSNumber() {
-    print("Logging out of smsNumber");
+  void _handleRemoveSMSNumber() {
+    if (_smsNumber == null) return;
+    print("Remove smsNumber");
 
-    // OneSignal.shared.logoutSMSNumber().then((response) {
-    //   print("Successfully logoutEmail with response $response");
-    // }).catchError((error) {
-    //   print("Failed to log out of SMSNumber: $error");
-    // });
+    OneSignal.User.removeSmsNumber(_smsNumber!).then((response) {
+      print("Successfully remove smsNumber with response $response");
+    }).catchError((error) {
+      print("Failed to remove SMSNumber: $error");
+    });
   }
 
   void _handleConsent() {
@@ -245,20 +223,12 @@ class _MyAppState extends State<MyApp> {
     // OneSignal.shared.setLocationShared(true);
   }
 
-  void _handleDeleteTag() {
+  void _handleRemoveTag() {
     print("Deleting tag");
-    // OneSignal.shared.deleteTag("test2").then((response) {
-    //   print("Successfully deleted tags with response $response");
-    // }).catchError((error) {
-    //   print("Encountered error deleting tag: $error");
-    // });
+    OneSignal.User.removeTag("test2");
 
     print("Deleting tags array");
-    // OneSignal.shared.deleteTags(['test']).then((response) {
-    //   print("Successfully sent tags with response: $response");
-    // }).catchError((error) {
-    //   print("Encountered an error sending tags: $error");
-    // });
+    OneSignal.User.removeTags(['test']);
   }
 
   void _handleSetExternalUserId() {
@@ -401,15 +371,11 @@ class _MyAppState extends State<MyApp> {
             padding: EdgeInsets.all(10.0),
             child: SingleChildScrollView(
               child: new Table(
-                // children: [
-                //   new TableRow(children: [
-                //     new OneSignalButton(
-                //         "Get Tags", _handleGetTags, !_enableConsentButton)
-                //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton(
-                //         "Send Tags", _handleSendTags, !_enableConsentButton)
-                //   ]),
+                children: [
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Send Tags", _handleSendTags, !_enableConsentButton)
+                  ]),
                 //   new TableRow(children: [
                 //     new OneSignalButton("Prompt for Push Permission",
                 //         _handlePromptForPushPermission, !_enableConsentButton)
@@ -420,62 +386,62 @@ class _MyAppState extends State<MyApp> {
                 //         _handleGetDeviceState,
                 //         !_enableConsentButton)
                 //   ]),
-                //   new TableRow(children: [
-                //     new TextField(
-                //       textAlign: TextAlign.center,
-                //       decoration: InputDecoration(
-                //           hintText: "Email Address",
-                //           labelStyle: TextStyle(
-                //             color: Color.fromARGB(255, 212, 86, 83),
-                //           )),
-                //       onChanged: (text) {
-                //         this.setState(() {
-                //           _emailAddress = text == "" ? null : text;
-                //         });
-                //       },
-                //     )
-                //   ]),
-                //   new TableRow(children: [
-                //     Container(
-                //       height: 8.0,
-                //     )
-                //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton(
-                //         "Set Email", _handleSetEmail, !_enableConsentButton)
-                //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton("Logout Email", _handleLogoutEmail,
-                //         !_enableConsentButton)
-                //   ]),
-                //   new TableRow(children: [
-                //     new TextField(
-                //       textAlign: TextAlign.center,
-                //       decoration: InputDecoration(
-                //           hintText: "SMS Number",
-                //           labelStyle: TextStyle(
-                //             color: Color.fromARGB(255, 212, 86, 83),
-                //           )),
-                //       onChanged: (text) {
-                //         this.setState(() {
-                //           _smsNumber = text == "" ? null : text;
-                //         });
-                //       },
-                //     )
-                //   ]),
-                //   new TableRow(children: [
-                //     Container(
-                //       height: 8.0,
-                //     )
-                //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton(
-                //         "Set SMS Number", _handleSetSMSNumber, !_enableConsentButton)
-                //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton("Logout SMS Number", _handleLogoutSMSNumber,
-                //         !_enableConsentButton)
-                //   ]),
+                  new TableRow(children: [
+                    new TextField(
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                          hintText: "Email Address",
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 212, 86, 83),
+                          )),
+                      onChanged: (text) {
+                        this.setState(() {
+                          _emailAddress = text == "" ? null : text;
+                        });
+                      },
+                    )
+                  ]),
+                  new TableRow(children: [
+                    Container(
+                      height: 8.0,
+                    )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Set Email", _handleSetEmail, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Logout Email", _handleRemoveEmail,
+                        !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new TextField(
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                          hintText: "SMS Number",
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 212, 86, 83),
+                          )),
+                      onChanged: (text) {
+                        this.setState(() {
+                          _smsNumber = text == "" ? null : text;
+                        });
+                      },
+                    )
+                  ]),
+                  new TableRow(children: [
+                    Container(
+                      height: 8.0,
+                    )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Set SMS Number", _handleSetSMSNumber, !_enableConsentButton)
+                  ]),
+                  // new TableRow(children: [
+                  //   new OneSignalButton("Remove SMS Number", _handleRemoveSmsNumber,
+                  //       !_enableConsentButton)
+                  // ]),
                 //   new TableRow(children: [
                 //     new OneSignalButton("Provide GDPR Consent", _handleConsent,
                 //         _enableConsentButton)
@@ -484,10 +450,10 @@ class _MyAppState extends State<MyApp> {
                 //     new OneSignalButton("Set Location Shared",
                 //         _handleSetLocationShared, !_enableConsentButton)
                 //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton(
-                //         "Delete Tag", _handleDeleteTag, !_enableConsentButton)
-                //   ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Remove Tag", _handleRemoveTag, !_enableConsentButton)
+                  ]),
                 //   new TableRow(children: [
                 //     new OneSignalButton("Post Notification",
                 //         _handleSendNotification, !_enableConsentButton)
@@ -524,37 +490,37 @@ class _MyAppState extends State<MyApp> {
                 //     new OneSignalButton(
                 //         "Remove External User ID", _handleRemoveExternalUserId, !_enableConsentButton)
                 //   ]),
-                //   new TableRow(children: [
-                //     new TextField(
-                //       textAlign: TextAlign.center,
-                //       decoration: InputDecoration(
-                //           hintText: "Language",
-                //           labelStyle: TextStyle(
-                //             color: Color.fromARGB(255, 212, 86, 83),
-                //           )),
-                //       onChanged: (text) {
-                //         this.setState(() {
-                //           _language = text == "" ? null : text;
-                //         });
-                //       },
-                //     )
-                //   ]),
-                //   new TableRow(children: [
-                //     Container(
-                //       height: 8.0,
-                //     )
-                //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton(
-                //         "Set Language", _handleSetLanguage, !_enableConsentButton)
-                //   ]),
-                //   new TableRow(children: [
-                //     new Container(
-                //       child: new Text(_debugLabelString),
-                //       alignment: Alignment.center,
-                //     )
-                //   ]),
-                // ],
+                  new TableRow(children: [
+                    new TextField(
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                          hintText: "Language",
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 212, 86, 83),
+                          )),
+                      onChanged: (text) {
+                        this.setState(() {
+                          _language = text == "" ? null : text;
+                        });
+                      },
+                    )
+                  ]),
+                  new TableRow(children: [
+                    Container(
+                      height: 8.0,
+                    )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Set Language", _handleSetLanguage, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new Container(
+                      child: new Text(_debugLabelString),
+                      alignment: Alignment.center,
+                    )
+                  ]),
+                ],
               ),
             ),
           )),

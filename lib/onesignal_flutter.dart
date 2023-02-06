@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/utils.dart';
-import 'package:onesignal_flutter/src/onesignaldebug.dart';
+import 'package:onesignal_flutter/src/debug.dart';
+import 'package:onesignal_flutter/src/user.dart';
 
 export 'src/permission.dart';
 export 'src/defines.dart';
-export 'src/onesignaldebug.dart';
 
 
 // Handlers for various events
@@ -22,6 +22,7 @@ class OneSignal {
   /// mostly share the same state.
   static OneSignal shared = new OneSignal();
   static OneSignalDebug Debug = new OneSignalDebug();
+  static OneSignalUser User = new OneSignalUser();
   
 
   // private channels used to bridge to ObjC/Java
@@ -36,11 +37,11 @@ class OneSignal {
         'OneSignal#initialize', {'appId': appId});
   }
   // constructor method
-  OneSignal() {
-    this._channel.setMethodCallHandler(_handleMethod);
-  }
-   // Private function that gets called by ObjC/Java
-  Future<Null> _handleMethod(MethodCall call) async {
-    return null;
-  }
+  // OneSignal() {
+  //   this._channel.setMethodCallHandler(_handleMethod);
+  // }
+  //  // Private function that gets called by ObjC/Java
+  // Future<Null> _handleMethod(MethodCall call) async {
+  //   return null;
+  // }
 }
