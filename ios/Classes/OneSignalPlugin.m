@@ -76,11 +76,11 @@
     if ([@"OneSignal#initialize" isEqualToString:call.method])
         [self initialize:call];
     else if ([@"OneSignal#login" isEqualToString:call.method])
-        result(@(OneSignal.login));
+        [self login:call];
     else if ([@"OneSignal#getPrivacyConsent" isEqualToString:call.method])
         result(@(OneSignal.getPrivacyConsent));
     else if ([@"OneSignal#setPrivacyConsent" isEqualToString:call.method])
-        [self getPrivacyConsent:call];
+        [self setPrivacyConsent:call];
     else if ([@"OneSignal#requiresPrivacyConsent" isEqualToString:call.method])
         result(@(OneSignal.requiresPrivacyConsent));
     else if ([@"OneSignal#setRequiresPrivacyConsent" isEqualToString:call.method])
@@ -137,7 +137,7 @@
 
 - (void)setLaunchURLsInApp:(FlutterMethodCall *)call {
     BOOL launchUrlsInApp = [call.arguments[@"launchUrlsInApp"] boolValue];
-    [OneSignal setLaunchURLsInApp:launchUrlsInApp]
+    [OneSignal setLaunchURLsInApp:launchUrlsInApp];
 }
 
 #pragma mark Live Activity
@@ -149,7 +149,6 @@
     [OneSignal enterLiveActivity:activityId withToken:token withSuccess:^(NSDictionary *results) {
         result(results);
     } withFailure:^(NSError *error) {
-        [OneSignal onesignalLog:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"enterLiveActivity Failure with error: %@", error]];
         result(error.flutterError);
     }];
 }
@@ -160,7 +159,6 @@
     [OneSignal exitLiveActivity:activityId withSuccess:^(NSDictionary *results) {
         result(results);
     } withFailure:^(NSError *error) {
-        [OneSignal onesignalLog:ONE_S_LL_VERBOSE message:[NSString stringWithFormat:@"exitLiveActivity Failure with error: %@", error]];
         result(error.flutterError);
     }];
 }

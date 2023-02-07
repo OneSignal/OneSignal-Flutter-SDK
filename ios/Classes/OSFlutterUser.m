@@ -30,6 +30,7 @@
 #import <OneSignalUser/OneSignalUser.h>
 #import "OSFlutterCategories.h"
 
+
 @implementation OSFlutterUser
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     OSFlutterUser *instance = [OSFlutterUser new];

@@ -108,10 +108,7 @@ class OneSignal {
   Future<void> enterLiveActivity(String activityId, String token) async {
     if (Platform.isIOS) {
       await _channel.invokeMethod("OneSignal#enterLiveActivity", {'activityId': activityId, 'token': token});
-    } else {
-      _onesignalLog(OSLogLevel.info,
-          "enterLiveActivity: this function is not supported on Android");
-    }
+    } 
   }
 
   /// Only applies to iOS
@@ -120,9 +117,6 @@ class OneSignal {
     if (Platform.isIOS) {
       await _channel.invokeMethod("OneSignal#exitLiveActivity",
         {'activityId': activityId});
-    } else {
-      _onesignalLog(OSLogLevel.info,
-          "exitLiveActivity: this function is not supported on Android");
     }
   }
 
