@@ -1,28 +1,28 @@
 PODS:
   - Flutter (1.0.0)
-  - onesignal_flutter (5.0.0-alpha-02):
+  - onesignal_flutter (5.0.0-beta-01):
     - Flutter
-    - OneSignalXCFramework (= 5.0.0-alpha-02)
-  - OneSignalXCFramework (5.0.0-alpha-02):
-    - OneSignalXCFramework/OneSignalCore (= 5.0.0-alpha-02)
-    - OneSignalXCFramework/OneSignalExtension (= 5.0.0-alpha-02)
-    - OneSignalXCFramework/OneSignalNotifications (= 5.0.0-alpha-02)
-    - OneSignalXCFramework/OneSignalOSCore (= 5.0.0-alpha-02)
-    - OneSignalXCFramework/OneSignalOutcomes (= 5.0.0-alpha-02)
-    - OneSignalXCFramework/OneSignalUser (= 5.0.0-alpha-02)
-  - OneSignalXCFramework/OneSignalCore (5.0.0-alpha-02)
-  - OneSignalXCFramework/OneSignalExtension (5.0.0-alpha-02):
+    - OneSignalXCFramework (= 5.0.0-beta-01)
+  - OneSignalXCFramework (5.0.0-beta-01):
+    - OneSignalXCFramework/OneSignalCore (= 5.0.0-beta-01)
+    - OneSignalXCFramework/OneSignalExtension (= 5.0.0-beta-01)
+    - OneSignalXCFramework/OneSignalNotifications (= 5.0.0-beta-01)
+    - OneSignalXCFramework/OneSignalOSCore (= 5.0.0-beta-01)
+    - OneSignalXCFramework/OneSignalOutcomes (= 5.0.0-beta-01)
+    - OneSignalXCFramework/OneSignalUser (= 5.0.0-beta-01)
+  - OneSignalXCFramework/OneSignalCore (5.0.0-beta-01)
+  - OneSignalXCFramework/OneSignalExtension (5.0.0-beta-01):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalOutcomes
-  - OneSignalXCFramework/OneSignalNotifications (5.0.0-alpha-02):
+  - OneSignalXCFramework/OneSignalNotifications (5.0.0-beta-01):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalExtension
     - OneSignalXCFramework/OneSignalOutcomes
-  - OneSignalXCFramework/OneSignalOSCore (5.0.0-alpha-02):
+  - OneSignalXCFramework/OneSignalOSCore (5.0.0-beta-01):
     - OneSignalXCFramework/OneSignalCore
-  - OneSignalXCFramework/OneSignalOutcomes (5.0.0-alpha-02):
+  - OneSignalXCFramework/OneSignalOutcomes (5.0.0-beta-01):
     - OneSignalXCFramework/OneSignalCore
-  - OneSignalXCFramework/OneSignalUser (5.0.0-alpha-02):
+  - OneSignalXCFramework/OneSignalUser (5.0.0-beta-01):
     - OneSignalXCFramework/OneSignalCore
     - OneSignalXCFramework/OneSignalNotifications
     - OneSignalXCFramework/OneSignalOSCore
@@ -31,7 +31,7 @@ PODS:
 DEPENDENCIES:
   - Flutter (from `Flutter`)
   - onesignal_flutter (from `.symlinks/plugins/onesignal_flutter/ios`)
-  - OneSignalXCFramework (= 5.0.0-alpha-02)
+  - OneSignalXCFramework (= 5.0.0-beta-01)
 
 SPEC REPOS:
   trunk:
@@ -45,9 +45,9 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: f04841e97a9d0b0a8025694d0796dd46242b2854
-  onesignal_flutter: c4fe7cfb99196ccc89ecaef890bdd66abf00f5d7
-  OneSignalXCFramework: 8eec9904167f8c97c23c441709b648f353d22a41
+  onesignal_flutter: e369a8100290b3680412e27e91255916dd23ca22
+  OneSignalXCFramework: 7d3eb90c3e78908b0d72aa88600bfdab694460ec
 
-PODFILE CHECKSUM: f0497bd2adc984c2ee14f5ec68f1959c4d6f7a55
+PODFILE CHECKSUM: 004b8b86fe167483a0c84378eebc1addff2ac31b
 
 COCOAPODS: 1.11.3
