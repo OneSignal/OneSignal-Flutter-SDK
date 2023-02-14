@@ -53,6 +53,10 @@
         [self clearAll:call withResult:result];
     else if ([@"OneSignal#requestPermission" isEqualToString:call.method])
         [self requestPermission:call withResult:result];
+    else  if ([@"OneSignal#registerForProvisionalAuthorization" isEqualToString:call.method])
+        [self registerForProvisionalAuthorization:call withResult:result];
+    else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method])
+        [self initNotificationOpenedHandlerParams];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -70,6 +74,12 @@
     } fallbackToSettings:fallbackToSettings];
 }
 
+- (void)registerForProvisionalAuthorization:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal.Notifications registerForProvisionalAuthorization:^(BOOL accepted) {
+       result(@(accepted));
+    }];
+}
+
 - (void)onOSPermissionChanged:(OSPermissionState*)state {
     // Example of detecting the curret permission
     if (state.reachable == true) {
@@ -79,6 +89,17 @@
     }
     // prints out all properties
     NSLog(@"PermissionState:\n%@", state);
+}
+
+- (void)initNotificationOpenedHandlerParams {
+    [OneSignal.Notifications setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
+        [self handleNotificationOpened:result];
+    }];
+}
+
+#pragma mark Opened Notification Handlers
+- (void)handleNotificationOpened:(OSNotificationOpenedResult *)result {
+    [self.channel invokeMethod:@"OneSignal#handleOpenedNotification" arguments:result.toJson];
 }
 
 
