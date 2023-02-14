@@ -29,6 +29,7 @@
 #import <OneSignalFramework/OneSignalFramework.h>
 #import <OneSignalUser/OneSignalUser.h>
 #import "OSFlutterCategories.h"
+#import "OSFlutterPushSubscription.h"
 
 
 @implementation OSFlutterUser
@@ -40,6 +41,7 @@
                         binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:instance channel:instance.channel];
+    [OSFlutterPushSubscription registerWithRegistrar:registrar];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
