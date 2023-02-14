@@ -3,7 +3,13 @@ import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/defines.dart';
 
+import 'package:onesignal_flutter/src/pushsubscription.dart';
+
 class OneSignalUser {
+
+  static OneSignalPushSubscription _pushSubscription = new OneSignalPushSubscription();
+  // OneSignalPushSubscription _updatedAccount;  
+  OneSignalPushSubscription get pushSubscription => _pushSubscription;
 
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal#user');

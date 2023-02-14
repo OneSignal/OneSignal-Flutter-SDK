@@ -11,7 +11,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => new _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   String _debugLabelString = "";
   String? _emailAddress;
   String? _smsNumber;
@@ -32,12 +32,14 @@ class _MyAppState extends State<MyApp> {
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    OneSignal.Debug.setLogLevel(OSLogLevel.debug);
 
-    OneSignal.Debug.setVisualLevel(OSLogLevel.verbose);
+    OneSignal.Debug.setVisualLevel(OSLogLevel.none);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     OneSignal.shared.initialize("77e32082-ea27-42e3-a898-c72e141824ef");
+
+    OneSignal.User.pushSubscription.addObserver(this);
 
     // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
@@ -124,6 +126,10 @@ class _MyAppState extends State<MyApp> {
 
     // bool userProvidedPrivacyConsent = await OneSignal.shared.userProvidedPrivacyConsent();
     // print("USER PROVIDED PRIVACY CONSENT: $userProvidedPrivacyConsent");
+  }
+
+  void onOSPushSubscriptionChangedWithStateChanges(OSPushSubscriptionStateChanges stateChanges) {
+    print(stateChanges.jsonRepresentation());
   }
 
   void _handleGetTags() {
@@ -359,6 +365,14 @@ class _MyAppState extends State<MyApp> {
       // print(outcomeEvent.jsonRepresentation());
   }
 
+  void _handleOptIn() {
+     OneSignal.User.pushSubscription.optIn();
+  } 
+
+  void _handleOptOut() {
+    OneSignal.User.pushSubscription.optOut();
+  } 
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -519,6 +533,14 @@ class _MyAppState extends State<MyApp> {
                       child: new Text(_debugLabelString),
                       alignment: Alignment.center,
                     )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Opt In", _handleOptIn, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Opt Out", _handleOptOut, !_enableConsentButton)
                   ]),
                 ],
               ),
