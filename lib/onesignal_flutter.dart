@@ -4,16 +4,14 @@ import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/utils.dart';
-import 'package:onesignal_flutter/src/onesignaldebug.dart';
+import 'package:onesignal_flutter/src/debug.dart';
+import 'package:onesignal_flutter/src/user.dart';
+import 'package:onesignal_flutter/src/notifications.dart';
 
 export 'src/permission.dart';
 export 'src/defines.dart';
-export 'src/onesignaldebug.dart';
-
-
-// Handlers for various events
-typedef void PermissionChangeHandler(OSPermissionStateChanges changes);
-
+export 'src/pushsubscription.dart';
+export 'src/subscription.dart';
 
 class OneSignal {
   /// A singleton representing the OneSignal SDK.
@@ -22,6 +20,8 @@ class OneSignal {
   /// mostly share the same state.
   static OneSignal shared = new OneSignal();
   static OneSignalDebug Debug = new OneSignalDebug();
+  static OneSignalUser User = new OneSignalUser();
+  static OneSignalNotifications Notifications = new OneSignalNotifications();
   
 
   // private channels used to bridge to ObjC/Java

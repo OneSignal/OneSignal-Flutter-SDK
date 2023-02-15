@@ -11,7 +11,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => new _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   String _debugLabelString = "";
   String? _emailAddress;
   String? _smsNumber;
@@ -32,12 +32,14 @@ class _MyAppState extends State<MyApp> {
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    OneSignal.Debug.setLogLevel(OSLogLevel.debug);
 
-    OneSignal.Debug.setVisualLevel(OSLogLevel.verbose);
+    OneSignal.Debug.setAlertLevel(OSLogLevel.none);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     OneSignal.shared.initialize("9c59a2aa-315a-4bf9-9fef-f76d575d3202");
+
+    OneSignal.User.pushSubscription.addObserver(this);
 
     // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
@@ -126,6 +128,10 @@ class _MyAppState extends State<MyApp> {
     // print("USER PROVIDED PRIVACY CONSENT: $userProvidedPrivacyConsent");
   }
 
+  void onOSPushSubscriptionChangedWithStateChanges(OSPushSubscriptionStateChanges stateChanges) {
+    print(stateChanges.jsonRepresentation());
+  }
+
   void _handleGetTags() {
     // OneSignal.shared.getTags().then((tags) {
     //   if (tags == null) return;
@@ -189,23 +195,7 @@ class _MyAppState extends State<MyApp> {
   void _handleSetLanguage() {
     // if (_language == null) return;
 
-    print("Setting language");
-
-    // OneSignal.shared.setLanguage(_language!).then((response) {
-    //   print("Successfully set language with response: $response");
-    // }).catchError((error) {
-    //   print("Failed to set language with error: $error");
-    // });
-  }
-
-  void _handleLogoutEmail() {
-    print("Logging out of email");
-
-    // OneSignal.shared.logoutEmail().then((v) {
-    //   print("Successfully logged out of email");
-    // }).catchError((error) {
-    //   print("Failed to log out of email: $error");
-    // });
+    OneSignal.User.removeEmail(_emailAddress!);
   }
 
   void _handleSetSMSNumber() {
@@ -213,21 +203,14 @@ class _MyAppState extends State<MyApp> {
 
     print("Setting SMS Number");
 
-    // OneSignal.shared.setSMSNumber(smsNumber: _smsNumber!).then((response) {
-    //   print("Successfully set SMSNumber with response $response");
-    // }).catchError((error) {
-    //   print("Failed to set SMS Number with error: $error");
-    // });
+    OneSignal.User.addSms(_smsNumber!);
   }
 
   void _handleLogoutSMSNumber() {
     print("Logging out of smsNumber");
 
-    // OneSignal.shared.logoutSMSNumber().then((response) {
-    //   print("Successfully logoutEmail with response $response");
-    // }).catchError((error) {
-    //   print("Failed to log out of SMSNumber: $error");
-    // });
+    OneSignal.User.removeSms(_smsNumber!);
+
   }
 
   void _handleConsent() {
@@ -389,6 +372,14 @@ class _MyAppState extends State<MyApp> {
       // print(outcomeEvent.jsonRepresentation());
   }
 
+  void _handleOptIn() {
+     OneSignal.User.pushSubscription.optIn();
+  } 
+
+  void _handleOptOut() {
+    OneSignal.User.pushSubscription.optOut();
+  } 
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -524,37 +515,45 @@ class _MyAppState extends State<MyApp> {
                 //     new OneSignalButton(
                 //         "Remove External User ID", _handleRemoveExternalUserId, !_enableConsentButton)
                 //   ]),
-                //   new TableRow(children: [
-                //     new TextField(
-                //       textAlign: TextAlign.center,
-                //       decoration: InputDecoration(
-                //           hintText: "Language",
-                //           labelStyle: TextStyle(
-                //             color: Color.fromARGB(255, 212, 86, 83),
-                //           )),
-                //       onChanged: (text) {
-                //         this.setState(() {
-                //           _language = text == "" ? null : text;
-                //         });
-                //       },
-                //     )
-                //   ]),
-                //   new TableRow(children: [
-                //     Container(
-                //       height: 8.0,
-                //     )
-                //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton(
-                //         "Set Language", _handleSetLanguage, !_enableConsentButton)
-                //   ]),
-                //   new TableRow(children: [
-                //     new Container(
-                //       child: new Text(_debugLabelString),
-                //       alignment: Alignment.center,
-                //     )
-                //   ]),
-                // ],
+                  new TableRow(children: [
+                    new TextField(
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                          hintText: "Language",
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 212, 86, 83),
+                          )),
+                      onChanged: (text) {
+                        this.setState(() {
+                          _language = text == "" ? null : text;
+                        });
+                      },
+                    )
+                  ]),
+                  new TableRow(children: [
+                    Container(
+                      height: 8.0,
+                    )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Set Language", _handleSetLanguage, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new Container(
+                      child: new Text(_debugLabelString),
+                      alignment: Alignment.center,
+                    )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Opt In", _handleOptIn, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Opt Out", _handleOptOut, !_enableConsentButton)
+                  ]),
+                ],
               ),
             ),
           )),

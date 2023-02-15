@@ -28,6 +28,8 @@
 #import "OneSignalPlugin.h"
 #import "OSFlutterCategories.h"
 #import "OSFlutterDebug.h"
+#import "OSFlutterUser.h"
+#import "OSFlutterNotifications.h"
 
 
 @interface OneSignalPlugin ()
@@ -68,6 +70,9 @@
 
     [registrar addMethodCallDelegate:OneSignalPlugin.sharedInstance channel:OneSignalPlugin.sharedInstance.channel];
     [OSFlutterDebug registerWithRegistrar:registrar];
+    [OSFlutterUser registerWithRegistrar:registrar];
+    [OSFlutterNotifications registerWithRegistrar:registrar];
+    
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
