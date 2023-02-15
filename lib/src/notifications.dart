@@ -101,6 +101,13 @@ class OneSignalNotifications {
     _channel.invokeMethod("OneSignal#initNotificationWillShowInForegroundHandlerParams");
   } 
 
+   /// The notification foreground handler is called whenever a notification arrives
+  /// and the application is in foreground
+  void completeNotification(String notificationId, bool shouldDisplay) {
+    _channel.invokeMethod("OneSignal#completeNotification",
+        {'notificationId': notificationId, 'shouldDisplay': shouldDisplay});
+  }
+
 
   /// The notification opened handler is called whenever the user opens a
   /// OneSignal push notification, or taps an action button on a notification.
