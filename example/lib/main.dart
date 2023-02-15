@@ -69,8 +69,6 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
       });
     });  
 
-    OneSignal.InAppMessages.paused(false);
-
     OneSignal.InAppMessages
         .setInAppMessageClickedHandler((OSInAppMessageAction action) {
         this.setState(() {
@@ -120,19 +118,6 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     print(stateChanges.jsonRepresentation());
   }
 
-  void _handleGetTags() {
-    // OneSignal.shared.getTags().then((tags) {
-    //   if (tags == null) return;
-
-    //   setState((() {
-    //     _debugLabelString = "$tags";
-    //   }));
-    // }).catchError((error) {
-    //   setState(() {
-    //     _debugLabelString = "$error";
-    //   });
-    // });
-  }
 
   void _handleSendTags() {
     print("Sending tags");
@@ -141,6 +126,14 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     print("Sending tags array");
     var sendTags = {'test': 'value', 'test2': 'value2'};
     OneSignal.User.addTags(sendTags);
+  }
+
+  void _handleRemoveTag() {
+    print("Deleting tag");
+    OneSignal.User.removeTag("test2");
+
+    print("Deleting tags array");
+    OneSignal.User.removeTags(['test']);
   }
 
   void _handlePromptForPushPermission() {
@@ -208,13 +201,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     OneSignal.Location.setShared(true);
   }
 
-  void _handleRemoveTag() {
-    print("Deleting tag");
-    OneSignal.User.removeTag("test2");
-
-    print("Deleting tags array");
-    OneSignal.User.removeTags(['test']);
-  }
+  
 
   void _handleSetExternalUserId() {
     print("Setting external user ID");
@@ -287,33 +274,35 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   }
 
   oneSignalInAppMessagingTriggerExamples() async {
-    // /// Example addTrigger call for IAM
-    // /// This will add 1 trigger so if there are any IAM satisfying it, it
-    // /// will be shown to the user
-    // OneSignal.shared.addTrigger("trigger_1", "one");
+    /// Example addTrigger call for IAM
+    /// This will add 1 trigger so if there are any IAM satisfying it, it
+    /// will be shown to the user
+    OneSignal.InAppMessages.addTrigger("trigger_1", "one");
 
-    // /// Example addTriggers call for IAM
-    // /// This will add 2 triggers so if there are any IAM satisfying these, they
-    // /// will be shown to the user
-    // Map<String, Object> triggers = new Map<String, Object>();
-    // triggers["trigger_2"] = "two";
-    // triggers["trigger_3"] = "three";
-    // OneSignal.shared.addTriggers(triggers);
+    /// Example addTriggers call for IAM
+    /// This will add 2 triggers so if there are any IAM satisfying these, they
+    /// will be shown to the user
+    Map<String, Object> triggers = new Map<String, Object>();
+    triggers["trigger_2"] = "two";
+    triggers["trigger_3"] = "three";
+    OneSignal.InAppMessages.addTriggers(triggers);
 
-    // // Removes a trigger by its key so if any future IAM are pulled with
-    // // these triggers they will not be shown until the trigger is added back
-    // OneSignal.shared.removeTriggerForKey("trigger_2");
+    // Removes a trigger by its key so if any future IAM are pulled with
+    // these triggers they will not be shown until the trigger is added back
+    OneSignal.InAppMessages.removeTrigger("trigger_2");
 
-    // // Get the value for a trigger by its key
-    // Object? triggerValue = await OneSignal.shared.getTriggerValueForKey("trigger_3");
-    // print("'trigger_3' key trigger value: ${triggerValue?.toString()}");
 
-    // // Create a list and bulk remove triggers based on keys supplied
-    // List<String> keys = ["trigger_1", "trigger_3"];
-    // OneSignal.shared.removeTriggersForKeys(keys);
+    // Create a list and bulk remove triggers based on keys supplied
+    List<String> keys = ["trigger_1", "trigger_3"];
+    OneSignal.InAppMessages.removeTriggers(keys);
 
-    // // Toggle pausing (displaying or not) of IAMs
-    // OneSignal.shared.pauseInAppMessages(false);
+    OneSignal.InAppMessages.clearTriggers();
+
+    // Toggle pausing (displaying or not) of IAMs
+    OneSignal.InAppMessages.paused(false);
+    var arePaused = await OneSignal.InAppMessages.arePaused();
+    print('Notifications paused ${arePaused}');
+
   }
 
   oneSignalOutcomeExamples() async {

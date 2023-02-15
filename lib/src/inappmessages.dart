@@ -63,7 +63,7 @@ class OneSignalInAppMessages {
   }
 
    /// Gets whether of not in app messages are paused
-  Future<void> arePaused() async {
+  Future<bool> arePaused() async {
     return await _channel.invokeMethod("OneSignal#arePaused");
   }
   
