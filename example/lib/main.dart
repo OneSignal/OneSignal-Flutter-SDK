@@ -69,7 +69,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
       });
     });  
 
-    OneSignal.InAppMessages.pause(false);
+    OneSignal.InAppMessages.paused(false);
 
     OneSignal.InAppMessages
         .setInAppMessageClickedHandler((OSInAppMessageAction action) {
