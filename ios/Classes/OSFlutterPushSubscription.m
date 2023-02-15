@@ -31,6 +31,7 @@
 #import "OSFlutterCategories.h"
 
 @implementation OSFlutterPushSubscription
+
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     OSFlutterPushSubscription *instance = [OSFlutterPushSubscription new];
 
@@ -72,7 +73,6 @@
 
 - (void)addObserver:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal.User.pushSubscription addObserver:self];
-    NSLog(@"addObserver");
     result(nil);
 }
 
@@ -83,9 +83,7 @@
 }
 
 - (void)onOSPushSubscriptionChangedWithStateChanges:(OSPushSubscriptionStateChanges*)stateChanges {
-    [self.channel invokeMethod:@"OneSignal#pushSubscriptionChanged" arguments:stateChanges.toDictionary];
-    NSLog(@"onOSPushSubscriptionChangedWithStateChanges");
-   // NSLog(@"PushSubscriptionStateChanges:\n%@", stateChanges);
+    [self.channel invokeMethod:@"OneSignal#pushSubscriptionChanged" arguments:stateChanges.jsonRepresentation];
 }
 
 @end

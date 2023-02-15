@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
 
     OneSignal.Debug.setLogLevel(OSLogLevel.debug);
 
-    OneSignal.Debug.setVisualLevel(OSLogLevel.none);
+    OneSignal.Debug.setAlertLevel(OSLogLevel.none);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     OneSignal.shared.initialize("9c59a2aa-315a-4bf9-9fef-f76d575d3202");
@@ -195,23 +195,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   void _handleSetLanguage() {
     // if (_language == null) return;
 
-    print("Setting language");
-
-    // OneSignal.shared.setLanguage(_language!).then((response) {
-    //   print("Successfully set language with response: $response");
-    // }).catchError((error) {
-    //   print("Failed to set language with error: $error");
-    // });
-  }
-
-  void _handleLogoutEmail() {
-    print("Logging out of email");
-
-    // OneSignal.shared.logoutEmail().then((v) {
-    //   print("Successfully logged out of email");
-    // }).catchError((error) {
-    //   print("Failed to log out of email: $error");
-    // });
+    OneSignal.User.removeEmail(_emailAddress!);
   }
 
   void _handleSetSMSNumber() {
@@ -219,21 +203,14 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
 
     print("Setting SMS Number");
 
-    // OneSignal.shared.setSMSNumber(smsNumber: _smsNumber!).then((response) {
-    //   print("Successfully set SMSNumber with response $response");
-    // }).catchError((error) {
-    //   print("Failed to set SMS Number with error: $error");
-    // });
+    OneSignal.User.addSms(_smsNumber!);
   }
 
   void _handleLogoutSMSNumber() {
     print("Logging out of smsNumber");
 
-    // OneSignal.shared.logoutSMSNumber().then((response) {
-    //   print("Successfully logoutEmail with response $response");
-    // }).catchError((error) {
-    //   print("Failed to log out of SMSNumber: $error");
-    // });
+    OneSignal.User.removeSms(_smsNumber!);
+
   }
 
   void _handleConsent() {

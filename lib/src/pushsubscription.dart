@@ -74,9 +74,7 @@ class OneSignalPushSubscription {
   }
 
   Future<void> _onSubscriptionChangedHandler(OSPushSubscriptionStateChanges stateChanges) async {
-    print("update in flutter");
     for (var observer in _observers) {
-       print("observer fired");
       observer.onOSPushSubscriptionChangedWithStateChanges(stateChanges);
     }
   }
@@ -84,6 +82,5 @@ class OneSignalPushSubscription {
 
 class OneSignalPushSubscriptionObserver {
   void onOSPushSubscriptionChangedWithStateChanges(OSPushSubscriptionStateChanges stateChanges) {
-    print("update");
   }
 }

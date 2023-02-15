@@ -381,13 +381,15 @@ class OSAndroidBackgroundImageLayout extends JSONStringRepresentable {
   }
 }
 
-// class OSNotificationReceivedEvent extends JSONStringRepresentable {
+class OSNotificationReceivedEvent extends JSONStringRepresentable {
 
-//   late OSNotification notification;
+  late OSNotification notification;
 
-//   OSNotificationReceivedEvent(Map<String, dynamic> json) {
-//     notification = OSNotification(json);
-//   }
+  OSNotificationReceivedEvent(Map<String, dynamic> json) {
+    notification = OSNotification(json);
+  }
+
+  //TODO: remove
 
 //   void complete(OSNotification? notification) {
 //     print('OSNotificationReceivedEvent complete with notification: $notification');
@@ -398,9 +400,9 @@ class OSAndroidBackgroundImageLayout extends JSONStringRepresentable {
 //     }
 //   }
 
-//   String jsonRepresentation() {
-//     return convertToJsonString({
-//       'notification': this.notification.jsonRepresentation()
-//     });
-//   }
-// }
+  String jsonRepresentation() {
+    return convertToJsonString({
+      'notification': this.notification.jsonRepresentation()
+    });
+  }
+}

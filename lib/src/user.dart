@@ -84,23 +84,23 @@ class OneSignalUser {
   ///
   /// Returns false if the specified [email] does not exist 
   /// on the user within the SDK, and no request will be made.
-  Future<bool> removeEmail(String email) async {
+  Future<void> removeEmail(String email) async {
     return await _channel.invokeMethod("OneSignal#removeEmail");
   }
 
   /// Add a new SMS subscription to the current user.
   ///
   /// Add an SMS subscription by adding an [smsNumber]
-  void addSmsNumber(String smsNumber) {
-    _channel.invokeMethod("OneSignal#addSmsNumber", smsNumber);
+  void addSms(String smsNumber) {
+    _channel.invokeMethod("OneSignal#addSms", smsNumber);
   }
 
   /// Remove an SMS subscription from the current user. 
   ///
   /// Returns false if the specified [smsNumber] does not
   /// exist on the user within the SDK, and no request will be made.
-  Future<bool> removeSmsNumber(String smsNumber) async {
-    return await _channel.invokeMethod("OneSignal#removeSmsNumber");
+  Future<void> removeSms(String smsNumber) async {
+    return await _channel.invokeMethod("OneSignal#removeSms");
   }
 
 
