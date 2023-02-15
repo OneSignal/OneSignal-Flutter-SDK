@@ -28,15 +28,18 @@
 
 #import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
-#import <OneSignalNotifications/OneSignalNotifications.h>
+#import <OneSignalFramework/OneSignalFramework.h>
 
-@interface OSFlutterNotifications : NSObject<FlutterPlugin, OSPermissionObserver>
+@interface OSFlutterInAppMessages : NSObject<FlutterPlugin, OSInAppMessageLifecycleHandler>
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 + (instancetype)sharedInstance;
-@property (atomic) BOOL hasSetNotificationWillShowInForegroundHandler;
-@property (strong, nonatomic) NSMutableDictionary* notificationCompletionCache;
-@property (strong, nonatomic) NSMutableDictionary* receivedNotificationCache;
 
+@property (atomic) BOOL hasSetInAppMessageClickedHandler;
+/*
+    Holds reference to any in app messages received before any click action
+    occurs on the body, button or image elements of the in app message
+*/
+@property (strong, nonatomic) OSInAppMessageAction *inAppMessageClickedResult;
 
 @end
