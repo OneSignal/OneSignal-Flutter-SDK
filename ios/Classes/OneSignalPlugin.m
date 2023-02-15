@@ -32,6 +32,7 @@
 #import "OSFlutterNotifications.h"
 #import "OSFlutterSession.h"
 #import "OSFlutterLocation.h"
+#import "OSFlutterInAppMessages.h"
 
 
 @interface OneSignalPlugin ()
@@ -64,7 +65,7 @@
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
 
-    // [OneSignal setMSDKType:@"flutter"];
+    [OneSignal setMSDKType:@"flutter"];
 
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
                                      methodChannelWithName:@"OneSignal"
@@ -76,6 +77,7 @@
     [OSFlutterNotifications registerWithRegistrar:registrar];
     [OSFlutterSession registerWithRegistrar:registrar];
     [OSFlutterLocation registerWithRegistrar:registrar];
+    [OSFlutterInAppMessages registerWithRegistrar:registrar];
     
 }
 

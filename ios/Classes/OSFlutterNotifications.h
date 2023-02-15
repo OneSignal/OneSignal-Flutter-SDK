@@ -33,9 +33,10 @@
 @interface OSFlutterNotifications : NSObject<FlutterPlugin, OSPermissionObserver>
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
-
++ (instancetype)sharedInstance;
 @property (atomic) BOOL hasSetNotificationWillShowInForegroundHandler;
 @property (strong, nonatomic) NSMutableDictionary* notificationCompletionCache;
 @property (strong, nonatomic) NSMutableDictionary* receivedNotificationCache;
+
 
 @end

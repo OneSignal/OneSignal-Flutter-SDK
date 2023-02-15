@@ -58,8 +58,8 @@ class OneSignalInAppMessages {
   }
 
   /// Toggles the showing of all in app messages
-  Future<void> pause(bool pause) async {
-    return await _channel.invokeMethod("OneSignal#pause", pause);
+  Future<void> paused(bool pause) async {
+    return await _channel.invokeMethod("OneSignal#paused", pause);
   }
 
    /// Gets whether of not in app messages are paused
