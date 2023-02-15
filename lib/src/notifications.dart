@@ -87,9 +87,7 @@ class OneSignalNotifications {
   }
 
   Future<void> onOSPermissionChangedHandler(OSPermissionState state) async {
-    print("onOSPermissionChanged update in flutter");
     for (var observer in _observers) {
-       print("onOSPermissionChanged fired");
       observer.onOSPermissionChanged(state);
     }
   }
