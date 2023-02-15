@@ -222,7 +222,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
 
   void _handleSetLocationShared() {
     print("Setting location shared to true");
-    // OneSignal.shared.setLocationShared(true);
+    OneSignal.Location.setShared(true);
   }
 
   void _handleRemoveTag() {
@@ -440,10 +440,10 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
                 //     new OneSignalButton("Provide GDPR Consent", _handleConsent,
                 //         _enableConsentButton)
                 //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton("Set Location Shared",
-                //         _handleSetLocationShared, !_enableConsentButton)
-                //   ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Set Location Shared",
+                        _handleSetLocationShared, !_enableConsentButton)
+                  ]),
                   new TableRow(children: [
                     new OneSignalButton(
                         "Remove Tag", _handleRemoveTag, !_enableConsentButton)

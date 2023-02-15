@@ -8,6 +8,7 @@ import 'package:onesignal_flutter/src/debug.dart';
 import 'package:onesignal_flutter/src/user.dart';
 import 'package:onesignal_flutter/src/notifications.dart';
 import 'package:onesignal_flutter/src/session.dart';
+import 'package:onesignal_flutter/src/location.dart';
 
 export 'src/permission.dart';
 export 'src/defines.dart';
@@ -25,6 +26,7 @@ class OneSignal {
   static OneSignalUser User = new OneSignalUser();
   static OneSignalNotifications Notifications = new OneSignalNotifications();
   static OneSignalSession Session = new OneSignalSession();
+  static OneSignalLocation Location = new OneSignalLocation();
   
 
   // private channels used to bridge to ObjC/Java
