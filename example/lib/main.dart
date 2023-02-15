@@ -11,7 +11,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => new _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> {
+class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   String _debugLabelString = "";
   String? _emailAddress;
   String? _smsNumber;
@@ -32,12 +32,14 @@ class _MyAppState extends State<MyApp> {
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    OneSignal.Debug.setLogLevel(OSLogLevel.debug);
 
-    OneSignal.Debug.setVisualLevel(OSLogLevel.verbose);
+    OneSignal.Debug.setAlertLevel(OSLogLevel.none);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     OneSignal.shared.initialize("77e32082-ea27-42e3-a898-c72e141824ef");
+
+    OneSignal.User.pushSubscription.addObserver(this);
 
     // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
@@ -126,6 +128,10 @@ class _MyAppState extends State<MyApp> {
     // print("USER PROVIDED PRIVACY CONSENT: $userProvidedPrivacyConsent");
   }
 
+  void onOSPushSubscriptionChangedWithStateChanges(OSPushSubscriptionStateChanges stateChanges) {
+    print(stateChanges.jsonRepresentation());
+  }
+
   void _handleGetTags() {
     // OneSignal.shared.getTags().then((tags) {
     //   if (tags == null) return;
@@ -183,29 +189,22 @@ class _MyAppState extends State<MyApp> {
     if (_emailAddress == null) return;
     print("Remove email");
 
-    OneSignal.User.removeEmail(_emailAddress!).then((response) {
-      print("Successfully remove email with response $response");
-    }).catchError((error) {
-      print("Failed to remove email: $error");
-    });
+    OneSignal.User.removeEmail(_emailAddress!);
   }
 
   void _handleSetSMSNumber() {
     if (_smsNumber == null) return;
     print("Setting SMS Number");
 
-    OneSignal.User.addSmsNumber(_smsNumber!);
+    OneSignal.User.addSms(_smsNumber!);
   }
 
   void _handleRemoveSMSNumber() {
     if (_smsNumber == null) return;
     print("Remove smsNumber");
 
-    OneSignal.User.removeSmsNumber(_smsNumber!).then((response) {
-      print("Successfully remove smsNumber with response $response");
-    }).catchError((error) {
-      print("Failed to remove SMSNumber: $error");
-    });
+    OneSignal.User.removeSms(_smsNumber!);
+
   }
 
   void _handleConsent() {
@@ -358,6 +357,14 @@ class _MyAppState extends State<MyApp> {
       // var outcomeEvent = await OneSignal.shared.sendOutcome("await_normal_1");
       // print(outcomeEvent.jsonRepresentation());
   }
+
+  void _handleOptIn() {
+     OneSignal.User.pushSubscription.optIn();
+  } 
+
+  void _handleOptOut() {
+    OneSignal.User.pushSubscription.optOut();
+  } 
 
   @override
   Widget build(BuildContext context) {
@@ -519,6 +526,14 @@ class _MyAppState extends State<MyApp> {
                       child: new Text(_debugLabelString),
                       alignment: Alignment.center,
                     )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Opt In", _handleOptIn, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Opt Out", _handleOptOut, !_enableConsentButton)
                   ]),
                 ],
               ),

@@ -21,8 +21,8 @@ class OneSignalDebug {
   ///
   /// The parameter [visualLevel] controls
   /// if the SDK will show alerts for each logged message
-  void setVisualLevel( OSLogLevel visualLevel) {
-    _channel.invokeMethod("OneSignal#setVisualLevel",
+  void setAlertLevel( OSLogLevel visualLevel) {
+    _channel.invokeMethod("OneSignal#setAlertLevel",
         {'visualLevel': visualLevel.index});
   }
 }
