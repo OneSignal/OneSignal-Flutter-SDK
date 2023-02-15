@@ -75,6 +75,8 @@
         [self removePermissionObserver:call withResult:result];
     else if ([@"OneSignal#initNotificationWillShowInForegroundHandlerParams" isEqualToString:call.method])
         [self initNotificationWillShowInForegroundHandlerParams];
+    else if ([@"OneSignal#completeNotification" isEqualToString:call.method])
+        [self completeNotification:call withResult:result];
     else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method])
         [self initNotificationOpenedHandlerParams];
     else
@@ -132,6 +134,28 @@
     self.receivedNotificationCache[notification.notificationId] = notification;
     self.notificationCompletionCache[notification.notificationId] = completion;
     [self.channel invokeMethod:@"OneSignal#handleNotificationWillShowInForeground" arguments:notification.toJson];
+}
+
+- (void)completeNotification:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *notificationId = call.arguments[@"notificationId"];
+    BOOL shouldDisplay = [call.arguments[@"shouldDisplay"] boolValue];
+    OSNotificationDisplayResponse completion = self.notificationCompletionCache[notificationId];
+    
+    if (!completion) {
+        // TODO: log
+        //[OneSignal onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
+        return;
+    }
+
+    if (shouldDisplay) {
+        OSNotification *notification = self.receivedNotificationCache[notificationId];
+        completion(notification);
+    } else {
+        completion(nil);
+    }
+
+    [self.notificationCompletionCache removeObjectForKey:notificationId];
+    [self.receivedNotificationCache removeObjectForKey:notificationId];
 }
 
 #pragma mark Opened Notification
