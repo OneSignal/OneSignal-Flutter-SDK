@@ -67,10 +67,10 @@
         [self addEmail:call];
     else if ([@"OneSignal#removeEmail" isEqualToString:call.method])
         [self removeEmail:call withResult:result];
-    else if ([@"OneSignal#addSmsNumber" isEqualToString:call.method])
-        [self addSmsNumber:call];
-    else if ([@"OneSignal#removeSmsNumber" isEqualToString:call.method])
-        [self removeSmsNumber:call withResult:result];
+    else if ([@"OneSignal#addSms" isEqualToString:call.method])
+        [self addSms:call];
+    else if ([@"OneSignal#removeSms" isEqualToString:call.method])
+        [self removeSms:call withResult:result];
     
     else
         result(FlutterMethodNotImplemented);
@@ -138,17 +138,19 @@
 
 - (void)removeEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString *email = call.arguments[@"email"];
-    result(@([OneSignal.User removeEmail:email]));
+    [OneSignal.User removeEmail:email];
+    result(nil);
 }
 
-- (void)addSmsNumber:(FlutterMethodCall *)call {
+- (void)addSms:(FlutterMethodCall *)call {
     NSString *smsNumber = call.arguments;
-    [OneSignal.User addSmsNumber:smsNumber];
+    [OneSignal.User addSms:smsNumber];
 }
 
-- (void)removeSmsNumber:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+- (void)removeSms:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString *smsNumber = call.arguments[@"smsNumber"];
-    result(@([OneSignal.User removeSmsNumber:smsNumber]));
+    [OneSignal.User removeSms:smsNumber];
+    result(nil);
 }
 
 

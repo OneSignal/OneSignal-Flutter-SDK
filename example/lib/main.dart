@@ -34,7 +34,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
 
     OneSignal.Debug.setLogLevel(OSLogLevel.debug);
 
-    OneSignal.Debug.setVisualLevel(OSLogLevel.none);
+    OneSignal.Debug.setAlertLevel(OSLogLevel.none);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     OneSignal.shared.initialize("77e32082-ea27-42e3-a898-c72e141824ef");
@@ -189,29 +189,22 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     if (_emailAddress == null) return;
     print("Remove email");
 
-    OneSignal.User.removeEmail(_emailAddress!).then((response) {
-      print("Successfully remove email with response $response");
-    }).catchError((error) {
-      print("Failed to remove email: $error");
-    });
+    OneSignal.User.removeEmail(_emailAddress!);
   }
 
   void _handleSetSMSNumber() {
     if (_smsNumber == null) return;
     print("Setting SMS Number");
 
-    OneSignal.User.addSmsNumber(_smsNumber!);
+    OneSignal.User.addSms(_smsNumber!);
   }
 
   void _handleRemoveSMSNumber() {
     if (_smsNumber == null) return;
     print("Remove smsNumber");
 
-    OneSignal.User.removeSmsNumber(_smsNumber!).then((response) {
-      print("Successfully remove smsNumber with response $response");
-    }).catchError((error) {
-      print("Failed to remove SMSNumber: $error");
-    });
+    OneSignal.User.removeSms(_smsNumber!);
+
   }
 
   void _handleConsent() {

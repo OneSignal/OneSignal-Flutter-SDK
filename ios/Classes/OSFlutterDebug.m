@@ -43,8 +43,8 @@
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     if ([@"OneSignal#setLogLevel" isEqualToString:call.method])
         [self setLogLevel:call];
-    else if ([@"OneSignal#setVisualLevel" isEqualToString:call.method])
-        [self setVisualLevel:call];
+    else if ([@"OneSignal#setAlertLevel" isEqualToString:call.method])
+        [self setAlertLevel:call];
     else 
         result(FlutterMethodNotImplemented);
 }
@@ -54,9 +54,9 @@
     [OneSignal.Debug setLogLevel:logLevel];
 }
 
-- (void)setVisualLevel:(FlutterMethodCall *)call {
+- (void)setAlertLevel:(FlutterMethodCall *)call {
     ONE_S_LOG_LEVEL visualLogLevel = (ONE_S_LOG_LEVEL)[call.arguments[@"visualLevel"] intValue];
-    [OneSignal.Debug setVisualLevel:visualLogLevel];
+    [OneSignal.Debug setAlertLevel:visualLogLevel];
 }
 
 @end

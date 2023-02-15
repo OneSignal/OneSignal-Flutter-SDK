@@ -34,4 +34,8 @@
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 
+@property (atomic) BOOL hasSetNotificationWillShowInForegroundHandler;
+@property (strong, nonatomic) NSMutableDictionary* notificationCompletionCache;
+@property (strong, nonatomic) NSMutableDictionary* receivedNotificationCache;
+
 @end

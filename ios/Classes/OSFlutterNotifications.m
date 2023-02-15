@@ -31,6 +31,19 @@
 #import "OSFlutterCategories.h"
 
 @implementation OSFlutterNotifications
+
++ (instancetype)sharedInstance {
+    static OSFlutterNotifications *sharedInstance = nil;
+    static dispatch_once_t onceToken;
+    dispatch_once(&onceToken, ^{
+        sharedInstance = [OSFlutterNotifications new];
+        sharedInstance.hasSetNotificationWillShowInForegroundHandler = false;
+        sharedInstance.receivedNotificationCache = [NSMutableDictionary new];
+        sharedInstance.notificationCompletionCache = [NSMutableDictionary new];
+    });
+    return sharedInstance;
+}
+
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     OSFlutterNotifications *instance = [OSFlutterNotifications new];
 
@@ -39,9 +52,10 @@
                         binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:instance channel:instance.channel];
-    //  NSLog(@"OSFlutterPushSubscription initialized");
-
-    //  [OneSignal.Notifications addPermissionObserver:self];
+    
+    [OneSignal.Notifications setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
+        [OSFlutterNotifications.sharedInstance handleNotificationWillShowInForeground:notification completion:completion];
+    }];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result { 
@@ -55,6 +69,12 @@
         [self requestPermission:call withResult:result];
     else  if ([@"OneSignal#registerForProvisionalAuthorization" isEqualToString:call.method])
         [self registerForProvisionalAuthorization:call withResult:result];
+     else if ([@"OneSignal#addPermissionObserver" isEqualToString:call.method])
+        [self addPermissionObserver:call withResult:result];
+    else if ([@"OneSignal#removePermissionObserver" isEqualToString:call.method])
+        [self removePermissionObserver:call withResult:result];
+    else if ([@"OneSignal#initNotificationWillShowInForegroundHandlerParams" isEqualToString:call.method])
+        [self initNotificationWillShowInForegroundHandlerParams];
     else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method])
         [self initNotificationOpenedHandlerParams];
     else
@@ -80,24 +100,48 @@
     }];
 }
 
+
+
 - (void)onOSPermissionChanged:(OSPermissionState*)state {
-    // Example of detecting the curret permission
-    if (state.reachable == true) {
-        NSLog(@"Device has permission to display notifications");
-    } else {
-        NSLog(@"Device does not have permission to display notifications");
-    }
-    // prints out all properties
-    NSLog(@"PermissionState:\n%@", state);
+    [self.channel invokeMethod:@"OneSignal#OSPermissionChanged" arguments:state.jsonRepresentation];
 }
+
+- (void)addPermissionObserver:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal.Notifications addPermissionObserver:self];
+    result(nil);
+}
+
+// TODO: possibly don't need
+- (void)removePermissionObserver:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal.Notifications removePermissionObserver:self];
+    result(nil);
+}
+
+#pragma mark Received in Foreground Notification 
+
+- (void)initNotificationWillShowInForegroundHandlerParams {
+    self.hasSetNotificationWillShowInForegroundHandler = YES;
+}
+
+- (void)handleNotificationWillShowInForeground:(OSNotification *)notification completion:(OSNotificationDisplayResponse)completion {
+    if (!self.hasSetNotificationWillShowInForegroundHandler) {
+        completion(notification);
+        return;
+    }
+
+    self.receivedNotificationCache[notification.notificationId] = notification;
+    self.notificationCompletionCache[notification.notificationId] = completion;
+    [self.channel invokeMethod:@"OneSignal#handleNotificationWillShowInForeground" arguments:notification.toJson];
+}
+
+#pragma mark Opened Notification
 
 - (void)initNotificationOpenedHandlerParams {
     [OneSignal.Notifications setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
-        [self handleNotificationOpened:result];
+        [OSFlutterNotifications.sharedInstance handleNotificationOpened:result];
     }];
 }
 
-#pragma mark Opened Notification Handlers
 - (void)handleNotificationOpened:(OSNotificationOpenedResult *)result {
     [self.channel invokeMethod:@"OneSignal#handleOpenedNotification" arguments:result.toJson];
 }
