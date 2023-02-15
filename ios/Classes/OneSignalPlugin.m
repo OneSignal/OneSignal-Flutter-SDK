@@ -31,6 +31,7 @@
 #import "OSFlutterUser.h"
 #import "OSFlutterNotifications.h"
 #import "OSFlutterSession.h"
+#import "OSFlutterLocation.h"
 
 
 @interface OneSignalPlugin ()
@@ -74,6 +75,7 @@
     [OSFlutterUser registerWithRegistrar:registrar];
     [OSFlutterNotifications registerWithRegistrar:registrar];
     [OSFlutterSession registerWithRegistrar:registrar];
+    [OSFlutterLocation registerWithRegistrar:registrar];
     
 }
 
