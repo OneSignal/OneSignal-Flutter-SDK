@@ -41,28 +41,31 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
 
     OneSignal.User.pushSubscription.addObserver(this);
 
+    // Outcome Examples
+    oneSignalOutcomeExamples();
+
     // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
-    // OneSignal.shared
-    //     .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-    //       print('NOTIFICATION OPENED HANDLER CALLED WITH: ${result}');
-    //       this.setState(() {
-    //       _debugLabelString =
-    //           "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-    //   });
-    // });
+    OneSignal.Notifications
+        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
+          print('NOTIFICATION OPENED HANDLER CALLED WITH: ${result}');
+          this.setState(() {
+          _debugLabelString =
+              "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });
 
-    // OneSignal.shared
-    //     .setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
-    //        print('FOREGROUND HANDLER CALLED WITH: ${event}');
-    //        /// Display Notification, send null to not display
-    //        event.complete(null);
+    OneSignal.Notifications
+        .setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
+           print('FOREGROUND HANDLER CALLED WITH: ${event}');
+           /// Display Notification, send null to not display
+           event.complete(null);
           
-    //        this.setState(() {
-    //        _debugLabelString =
-    //           "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-    //   });
-    // });  
+           this.setState(() {
+           _debugLabelString =
+              "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });  
 
     // OneSignal.shared
     //     .setInAppMessageClickedHandler((OSInAppMessageAction action) {
@@ -344,32 +347,16 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     // OneSignal.shared.pauseInAppMessages(false);
   }
 
-  oneSignalOutcomeEventsExamples() async {
-    // Await example for sending outcomes
-    outcomeAwaitExample();
+  oneSignalOutcomeExamples() async {
+ 
+    OneSignal.Session.addOutcome("normal_1");
+    OneSignal.Session.addOutcome("normal_2");
 
-    // Send a normal outcome and get a reply with the name of the outcome
-    // OneSignal.shared.sendOutcome("normal_1");
-    // OneSignal.shared.sendOutcome("normal_2").then((outcomeEvent) {
-    //   print(outcomeEvent.jsonRepresentation());
-    // });
+    OneSignal.Session.addUniqueOutcome("unique_1");
+    OneSignal.Session.addUniqueOutcome("unique_2");
 
-    // Send a unique outcome and get a reply with the name of the outcome
-    // OneSignal.shared.sendUniqueOutcome("unique_1");
-    // OneSignal.shared.sendUniqueOutcome("unique_2").then((outcomeEvent) {
-    //   print(outcomeEvent.jsonRepresentation());
-    // });
-
-    // Send an outcome with a value and get a reply with the name of the outcome
-    // OneSignal.shared.sendOutcomeWithValue("value_1", 3.2);
-    // OneSignal.shared.sendOutcomeWithValue("value_2", 3.9).then((outcomeEvent) {
-    //   print(outcomeEvent.jsonRepresentation());
-    // });
-  }
-
-  Future<void> outcomeAwaitExample() async {
-      // var outcomeEvent = await OneSignal.shared.sendOutcome("await_normal_1");
-      // print(outcomeEvent.jsonRepresentation());
+    OneSignal.Session.addOutcomeWithValue("value_1", 3.2);
+    OneSignal.Session.addOutcomeWithValue("value_2", 3.9);
   }
 
   void _handleOptIn() {
