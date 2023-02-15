@@ -9,12 +9,14 @@ import 'package:onesignal_flutter/src/user.dart';
 import 'package:onesignal_flutter/src/notifications.dart';
 import 'package:onesignal_flutter/src/session.dart';
 import 'package:onesignal_flutter/src/location.dart';
+import 'package:onesignal_flutter/src/inappmessages.dart';
 
 export 'src/permission.dart';
 export 'src/defines.dart';
 export 'src/pushsubscription.dart';
 export 'src/subscription.dart';
 export 'src/notification.dart';
+export 'src/inappmessage.dart';
 
 class OneSignal {
   /// A singleton representing the OneSignal SDK.
@@ -27,6 +29,7 @@ class OneSignal {
   static OneSignalNotifications Notifications = new OneSignalNotifications();
   static OneSignalSession Session = new OneSignalSession();
   static OneSignalLocation Location = new OneSignalLocation();
+  static OneSignalInAppMessages InAppMessages = new OneSignalInAppMessages();
   
 
   // private channels used to bridge to ObjC/Java

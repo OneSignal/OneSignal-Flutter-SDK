@@ -64,7 +64,7 @@
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
 
-    [OneSignal setMSDKType:@"flutter"];
+    // [OneSignal setMSDKType:@"flutter"];
 
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
                                      methodChannelWithName:@"OneSignal"

@@ -44,6 +44,8 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     // Outcome Examples
     oneSignalOutcomeExamples();
 
+    OneSignal.shared.login("Testtesttest");
+
     // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
     OneSignal.Notifications
@@ -67,48 +69,31 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
       });
     });  
 
-    // OneSignal.shared
-    //     .setInAppMessageClickedHandler((OSInAppMessageAction action) {
-    //     this.setState(() {
-    //     _debugLabelString =
-    //         "In App Message Clicked: \n${action.jsonRepresentation().replaceAll("\\n", "\n")}";
-    //   });
-    // });
+    OneSignal.InAppMessages.pause(false);
 
-    // OneSignal.shared
-    //     .setSubscriptionObserver((OSSubscriptionStateChanges changes) {
-    //   print("SUBSCRIPTION STATE CHANGED: ${changes.jsonRepresentation()}");
-    // });
+    OneSignal.InAppMessages
+        .setInAppMessageClickedHandler((OSInAppMessageAction action) {
+        this.setState(() {
+        _debugLabelString =
+            "In App Message Clicked: \n${action.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });
 
-    // OneSignal.shared.setPermissionObserver((OSPermissionStateChanges changes) {
-    //   print("PERMISSION STATE CHANGED: ${changes.jsonRepresentation()}");
-    // });
+    OneSignal.InAppMessages.setOnWillDisplayInAppMessageHandler((message) {
+      print("ON WILL DISPLAY IN APP MESSAGE ${message.messageId}");
+    });
 
-    // OneSignal.shared.setEmailSubscriptionObserver(
-    //     (OSEmailSubscriptionStateChanges changes) {
-    //   print("EMAIL SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
-    // });
+    OneSignal.InAppMessages.setOnDidDisplayInAppMessageHandler((message) {
+      print("ON DID DISPLAY IN APP MESSAGE ${message.messageId}");
+    });
 
-    // OneSignal.shared.setSMSSubscriptionObserver(
-    //     (OSSMSSubscriptionStateChanges changes) {
-    //   print("SMS SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
-    // });
+    OneSignal.InAppMessages.setOnWillDismissInAppMessageHandler((message) {
+      print("ON WILL DISMISS IN APP MESSAGE ${message.messageId}");
+    });
 
-    // OneSignal.shared.setOnWillDisplayInAppMessageHandler((message) {
-    //   print("ON WILL DISPLAY IN APP MESSAGE ${message.messageId}");
-    // });
-
-    // OneSignal.shared.setOnDidDisplayInAppMessageHandler((message) {
-    //   print("ON DID DISPLAY IN APP MESSAGE ${message.messageId}");
-    // });
-
-    // OneSignal.shared.setOnWillDismissInAppMessageHandler((message) {
-    //   print("ON WILL DISMISS IN APP MESSAGE ${message.messageId}");
-    // });
-
-    // OneSignal.shared.setOnDidDismissInAppMessageHandler((message) {
-    //   print("ON DID DISMISS IN APP MESSAGE ${message.messageId}");
-    // });
+    OneSignal.InAppMessages.setOnDidDismissInAppMessageHandler((message) {
+      print("ON DID DISMISS IN APP MESSAGE ${message.messageId}");
+    });
 
     // iOS-only method to open launch URLs in Safari when set to false
     // OneSignal.shared.setLaunchURLsInApp(false);
@@ -160,9 +145,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
 
   void _handlePromptForPushPermission() {
     print("Prompting for Permission");
-    // OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
-    //   print("Accepted permission: $accepted");
-    // });
+    OneSignal.Notifications.requestPermission(true);
   }
 
   void _handleGetDeviceState() async {
@@ -370,10 +353,10 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
                     new OneSignalButton(
                         "Send Tags", _handleSendTags, !_enableConsentButton)
                   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton("Prompt for Push Permission",
-                //         _handlePromptForPushPermission, !_enableConsentButton)
-                //   ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Prompt for Push Permission",
+                        _handlePromptForPushPermission, !_enableConsentButton)
+                  ]),
                 //   new TableRow(children: [
                 //     new OneSignalButton(
                 //         "Print Device State",
