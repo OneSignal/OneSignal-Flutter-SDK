@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    OneSignal.Debug.setLogLevel(OSLogLevel.debug);
+    OneSignal.Debug.setLogLevel(OSLogLevel.none);
 
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
 
@@ -48,30 +48,31 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
 
     // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
-    OneSignal.Notifications
-        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-          print('NOTIFICATION OPENED HANDLER CALLED WITH: ${result}');
-          this.setState(() {
-          _debugLabelString =
-              "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+    OneSignal.Notifications.setNotificationOpenedHandler(
+        (OSNotificationOpenedResult result) {
+      print('NOTIFICATION OPENED HANDLER CALLED WITH: ${result}');
+      this.setState(() {
+        _debugLabelString =
+            "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
     });
 
-    OneSignal.Notifications
-        .setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent event) {
-           print('FOREGROUND HANDLER CALLED WITH: ${event}');
-           /// Display Notification, send null to not display
-           event.complete(null);
-          
-           this.setState(() {
-           _debugLabelString =
-              "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-      });
-    });  
+    OneSignal.Notifications.setNotificationWillShowInForegroundHandler(
+        (OSNotificationReceivedEvent event) {
+      print('FOREGROUND HANDLER CALLED WITH: ${event}');
 
-    OneSignal.InAppMessages
-        .setInAppMessageClickedHandler((OSInAppMessageAction action) {
-        this.setState(() {
+      /// Display Notification, send null to not display
+      event.complete(null);
+
+      this.setState(() {
+        _debugLabelString =
+            "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });
+
+    OneSignal.InAppMessages.setInAppMessageClickedHandler(
+        (OSInAppMessageAction action) {
+      this.setState(() {
         _debugLabelString =
             "In App Message Clicked: \n${action.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
@@ -114,10 +115,10 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     // print("USER PROVIDED PRIVACY CONSENT: $userProvidedPrivacyConsent");
   }
 
-  void onOSPushSubscriptionChangedWithStateChanges(OSPushSubscriptionStateChanges stateChanges) {
+  void onOSPushSubscriptionChangedWithStateChanges(
+      OSPushSubscriptionStateChanges stateChanges) {
     print(stateChanges.jsonRepresentation());
   }
-
 
   void _handleSendTags() {
     print("Sending tags");
@@ -151,7 +152,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     // });
   }
 
-   void _handleSetLanguage() {
+  void _handleSetLanguage() {
     if (_language == null) return;
     print("Setting language");
     OneSignal.User.setLanguage(_language!);
@@ -160,7 +161,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   void _handleSetEmail() {
     if (_emailAddress == null) return;
     print("Setting email");
-    
+
     OneSignal.User.addEmail(_emailAddress!);
   }
 
@@ -183,7 +184,6 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     print("Remove smsNumber");
 
     OneSignal.User.removeSms(_smsNumber!);
-
   }
 
   void _handleConsent() {
@@ -200,8 +200,6 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     print("Setting location shared to true");
     OneSignal.Location.setShared(true);
   }
-
-  
 
   void _handleSetExternalUserId() {
     print("Setting external user ID");
@@ -291,7 +289,6 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     // these triggers they will not be shown until the trigger is added back
     OneSignal.InAppMessages.removeTrigger("trigger_2");
 
-
     // Create a list and bulk remove triggers based on keys supplied
     List<String> keys = ["trigger_1", "trigger_3"];
     OneSignal.InAppMessages.removeTriggers(keys);
@@ -302,11 +299,9 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     OneSignal.InAppMessages.paused(false);
     var arePaused = await OneSignal.InAppMessages.arePaused();
     print('Notifications paused ${arePaused}');
-
   }
 
   oneSignalOutcomeExamples() async {
- 
     OneSignal.Session.addOutcome("normal_1");
     OneSignal.Session.addOutcome("normal_2");
 
@@ -318,12 +313,12 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   }
 
   void _handleOptIn() {
-     OneSignal.User.pushSubscription.optIn();
-  } 
+    OneSignal.User.pushSubscription.optIn();
+  }
 
   void _handleOptOut() {
     OneSignal.User.pushSubscription.optOut();
-  } 
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -346,12 +341,12 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
                     new OneSignalButton("Prompt for Push Permission",
                         _handlePromptForPushPermission, !_enableConsentButton)
                   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton(
-                //         "Print Device State",
-                //         _handleGetDeviceState,
-                //         !_enableConsentButton)
-                //   ]),
+                  //   new TableRow(children: [
+                  //     new OneSignalButton(
+                  //         "Print Device State",
+                  //         _handleGetDeviceState,
+                  //         !_enableConsentButton)
+                  //   ]),
                   new TableRow(children: [
                     new TextField(
                       textAlign: TextAlign.center,
@@ -401,17 +396,17 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
                     )
                   ]),
                   new TableRow(children: [
-                    new OneSignalButton(
-                        "Set SMS Number", _handleSetSMSNumber, !_enableConsentButton)
+                    new OneSignalButton("Set SMS Number", _handleSetSMSNumber,
+                        !_enableConsentButton)
                   ]),
                   // new TableRow(children: [
                   //   new OneSignalButton("Remove SMS Number", _handleRemoveSmsNumber,
                   //       !_enableConsentButton)
                   // ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton("Provide GDPR Consent", _handleConsent,
-                //         _enableConsentButton)
-                //   ]),
+                  //   new TableRow(children: [
+                  //     new OneSignalButton("Provide GDPR Consent", _handleConsent,
+                  //         _enableConsentButton)
+                  //   ]),
                   new TableRow(children: [
                     new OneSignalButton("Set Location Shared",
                         _handleSetLocationShared, !_enableConsentButton)
@@ -420,42 +415,42 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
                     new OneSignalButton(
                         "Remove Tag", _handleRemoveTag, !_enableConsentButton)
                   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton("Post Notification",
-                //         _handleSendNotification, !_enableConsentButton)
-                //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton("Post Silent Notification",
-                //         _handleSendSilentNotification, !_enableConsentButton)
-                //   ]),
-                //   new TableRow(children: [
-                //     new TextField(
-                //       textAlign: TextAlign.center,
-                //       decoration: InputDecoration(
-                //           hintText: "External User ID",
-                //           labelStyle: TextStyle(
-                //             color: Color.fromARGB(255, 212, 86, 83),
-                //           )),
-                //       onChanged: (text) {
-                //         this.setState(() {
-                //           _externalUserId = text == "" ? null : text;
-                //         });
-                //       },
-                //     )
-                //   ]),
-                //   new TableRow(children: [
-                //     Container(
-                //       height: 8.0,
-                //     )
-                //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton(
-                //         "Set External User ID", _handleSetExternalUserId, !_enableConsentButton)
-                //   ]),
-                //   new TableRow(children: [
-                //     new OneSignalButton(
-                //         "Remove External User ID", _handleRemoveExternalUserId, !_enableConsentButton)
-                //   ]),
+                  //   new TableRow(children: [
+                  //     new OneSignalButton("Post Notification",
+                  //         _handleSendNotification, !_enableConsentButton)
+                  //   ]),
+                  //   new TableRow(children: [
+                  //     new OneSignalButton("Post Silent Notification",
+                  //         _handleSendSilentNotification, !_enableConsentButton)
+                  //   ]),
+                  //   new TableRow(children: [
+                  //     new TextField(
+                  //       textAlign: TextAlign.center,
+                  //       decoration: InputDecoration(
+                  //           hintText: "External User ID",
+                  //           labelStyle: TextStyle(
+                  //             color: Color.fromARGB(255, 212, 86, 83),
+                  //           )),
+                  //       onChanged: (text) {
+                  //         this.setState(() {
+                  //           _externalUserId = text == "" ? null : text;
+                  //         });
+                  //       },
+                  //     )
+                  //   ]),
+                  //   new TableRow(children: [
+                  //     Container(
+                  //       height: 8.0,
+                  //     )
+                  //   ]),
+                  //   new TableRow(children: [
+                  //     new OneSignalButton(
+                  //         "Set External User ID", _handleSetExternalUserId, !_enableConsentButton)
+                  //   ]),
+                  //   new TableRow(children: [
+                  //     new OneSignalButton(
+                  //         "Remove External User ID", _handleRemoveExternalUserId, !_enableConsentButton)
+                  //   ]),
                   new TableRow(children: [
                     new TextField(
                       textAlign: TextAlign.center,
@@ -477,8 +472,8 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
                     )
                   ]),
                   new TableRow(children: [
-                    new OneSignalButton(
-                        "Set Language", _handleSetLanguage, !_enableConsentButton)
+                    new OneSignalButton("Set Language", _handleSetLanguage,
+                        !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new Container(
@@ -523,10 +518,10 @@ class OneSignalButtonState extends State<OneSignalButton> {
         new TableRow(children: [
           new TextButton(
             style: TextButton.styleFrom(
-              foregroundColor:Colors.white,
+              foregroundColor: Colors.white,
               disabledForegroundColor: Colors.white,
               backgroundColor: Color.fromARGB(255, 212, 86, 83),
-              disabledBackgroundColor:Color.fromARGB(180, 212, 86, 83),
+              disabledBackgroundColor: Color.fromARGB(180, 212, 86, 83),
               padding: EdgeInsets.all(8.0),
             ),
             child: new Text(widget.title),
