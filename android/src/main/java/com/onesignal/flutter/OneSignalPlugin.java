@@ -47,6 +47,7 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
     channel.setMethodCallHandler(this);
 
     OneSignalDebug.registerWith(messenger);
+    OneSignalLocation.registerWith(messenger);
     // OneSignalTagsController.registerWith(messenger);
     // OneSignalInAppMessagingController.registerWith(messenger);
     // OneSignalOutcomeEventsController.registerWith(messenger);
