@@ -46,6 +46,7 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
     channel = new MethodChannel(messenger, "OneSignal");
     channel.setMethodCallHandler(this);
 
+    OneSignalDebug.registerWith(messenger);
     // OneSignalTagsController.registerWith(messenger);
     // OneSignalInAppMessagingController.registerWith(messenger);
     // OneSignalOutcomeEventsController.registerWith(messenger);
@@ -106,7 +107,7 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
 
   @Override
   public void onMethodCall(MethodCall call, Result result) {
-    if (call.method.contentEquals("OneSignal#initalize"))
+    if (call.method.contentEquals("OneSignal#initialize"))
       this.initWithContext(call, result);
     else
       replyNotImplemented(result);
