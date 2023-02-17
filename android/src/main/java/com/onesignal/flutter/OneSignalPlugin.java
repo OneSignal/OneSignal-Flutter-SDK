@@ -49,6 +49,7 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
     OneSignalDebug.registerWith(messenger);
     OneSignalLocation.registerWith(messenger);
     OneSignalSession.registerWith(messenger);
+    OneSignalInAppMessages.registerWith(messenger);
     // OneSignalTagsController.registerWith(messenger);
     // OneSignalInAppMessagingController.registerWith(messenger);
     // OneSignalOutcomeEventsController.registerWith(messenger);

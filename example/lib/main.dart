@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    OneSignal.Debug.setLogLevel(OSLogLevel.none);
+    OneSignal.Debug.setLogLevel(OSLogLevel.debug);
 
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
 
@@ -44,7 +44,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     // Outcome Examples
     oneSignalOutcomeExamples();
 
-    OneSignal.shared.login("Testtesttest");
+    // OneSignal.shared.login("Testtesttest");
 
     // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
@@ -103,8 +103,8 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     //   _enableConsentButton = requiresConsent;
     // });
 
-    // // Some examples of how to use In App Messaging public methods with OneSignal SDK
-    // oneSignalInAppMessagingTriggerExamples();
+    // Some examples of how to use In App Messaging public methods with OneSignal SDK
+    oneSignalInAppMessagingTriggerExamples();
 
     // OneSignal.shared.disablePush(false);
 
@@ -301,7 +301,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     List<String> keys = ["trigger_1", "trigger_3"];
     OneSignal.InAppMessages.removeTriggers(keys);
 
-    OneSignal.InAppMessages.clearTriggers();
+    // OneSignal.InAppMessages.clearTriggers();
 
     // Toggle pausing (displaying or not) of IAMs
     OneSignal.InAppMessages.paused(false);
@@ -310,14 +310,14 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   }
 
   oneSignalOutcomeExamples() async {
-    OneSignal.Session.addOutcome("normal_1");
-    OneSignal.Session.addOutcome("normal_2");
+    // OneSignal.Session.addOutcome("normal_1");
+    // OneSignal.Session.addOutcome("normal_2");
 
-    OneSignal.Session.addUniqueOutcome("unique_1");
-    OneSignal.Session.addUniqueOutcome("unique_2");
+    // OneSignal.Session.addUniqueOutcome("unique_1");
+    // OneSignal.Session.addUniqueOutcome("unique_2");
 
-    OneSignal.Session.addOutcomeWithValue("value_1", 3.2);
-    OneSignal.Session.addOutcomeWithValue("value_2", 3.9);
+    // OneSignal.Session.addOutcomeWithValue("value_1", 3.2);
+    // OneSignal.Session.addOutcomeWithValue("value_2", 3.9);
   }
 
   void _handleOptIn() {
