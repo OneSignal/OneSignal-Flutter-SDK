@@ -302,14 +302,14 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   }
 
   oneSignalOutcomeExamples() async {
-    // OneSignal.Session.addOutcome("normal_1");
-    // OneSignal.Session.addOutcome("normal_2");
+    OneSignal.Session.addOutcome("normal_1");
+    OneSignal.Session.addOutcome("normal_2");
 
-    // OneSignal.Session.addUniqueOutcome("unique_1");
-    // OneSignal.Session.addUniqueOutcome("unique_2");
+    OneSignal.Session.addUniqueOutcome("unique_1");
+    OneSignal.Session.addUniqueOutcome("unique_2");
 
-    // OneSignal.Session.addOutcomeWithValue("value_1", 3.2);
-    // OneSignal.Session.addOutcomeWithValue("value_2", 3.9);
+    OneSignal.Session.addOutcomeWithValue("value_1", 3.2);
+    OneSignal.Session.addOutcomeWithValue("value_2", 3.9);
   }
 
   void _handleOptIn() {
