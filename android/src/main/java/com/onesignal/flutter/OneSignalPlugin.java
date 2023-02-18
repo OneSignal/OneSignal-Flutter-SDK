@@ -36,7 +36,7 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
   }
 
   private void init(Context context, BinaryMessenger messenger)
-  {
+  { 
     this.context = context;
     this.messenger = messenger;
 
@@ -49,6 +49,7 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
     OneSignalDebug.registerWith(messenger);
     OneSignalLocation.registerWith(messenger);
     OneSignalSession.registerWith(messenger);
+    OneSignalInAppMessages.registerWith(messenger);
     // OneSignalTagsController.registerWith(messenger);
     // OneSignalInAppMessagingController.registerWith(messenger);
     // OneSignalOutcomeEventsController.registerWith(messenger);
@@ -118,7 +119,6 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
   private void initWithContext(MethodCall call, Result reply) {
     String appId = call.argument("appId");
     OneSignal.initWithContext(context, appId);
-   
     // if (hasSetRequiresPrivacyConsent && !OneSignal.userProvidedPrivacyConsent())
     //   this.waitingForUserPrivacyConsent = true;
     // else

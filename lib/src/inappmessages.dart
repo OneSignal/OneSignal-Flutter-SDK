@@ -11,16 +11,13 @@ typedef void OnWillDismissInAppMessageHandler(OSInAppMessage message);
 typedef void OnDidDismissInAppMessageHandler(OSInAppMessage message);
 
 class OneSignalInAppMessages {
-
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal#inappmessages');
-
 
   // constructor method
   OneSignalInAppMessages() {
     this._channel.setMethodCallHandler(_handleMethod);
   }
-
 
   InAppMessageClickedHandler? _onInAppMessageClickedHandler;
   OnWillDisplayInAppMessageHandler? _onWillDisplayInAppMessageHandler;
@@ -28,10 +25,10 @@ class OneSignalInAppMessages {
   OnWillDismissInAppMessageHandler? _onWillDismissInAppMessageHandler;
   OnDidDismissInAppMessageHandler? _onDidDismissInAppMessageHandler;
 
-   /// Adds a single key, value trigger, which will trigger an in app message
+  /// Adds a single key, value trigger, which will trigger an in app message
   /// if one exists matching the specific trigger added
   Future<void> addTrigger(String key, Object value) async {
-    return await _channel.invokeMethod("OneSignal#addTrigger", {key : value});
+    return await _channel.invokeMethod("OneSignal#addTrigger", {key: value});
   }
 
   /// Adds one or more key, value triggers, which will trigger in app messages
@@ -62,11 +59,14 @@ class OneSignalInAppMessages {
     return await _channel.invokeMethod("OneSignal#paused", pause);
   }
 
-   /// Gets whether of not in app messages are paused
+  /// Gets whether of not in app messages are paused
   Future<bool> arePaused() async {
     return await _channel.invokeMethod("OneSignal#arePaused");
   }
-  
+
+  Future<bool> lifecycleInit() async {
+    return await _channel.invokeMethod("OneSignal#lifecycleInit");
+  }
 
   // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
@@ -90,7 +90,7 @@ class OneSignalInAppMessages {
         this._onDidDismissInAppMessageHandler != null) {
       this._onDidDismissInAppMessageHandler!(
           OSInAppMessage(call.arguments.cast<String, dynamic>()));
-    } 
+    }
     return null;
   }
 
@@ -128,5 +128,4 @@ class OneSignalInAppMessages {
       OnDidDismissInAppMessageHandler handler) {
     _onDidDismissInAppMessageHandler = handler;
   }
-
 }
