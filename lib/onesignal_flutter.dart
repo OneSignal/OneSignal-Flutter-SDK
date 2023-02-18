@@ -30,53 +30,49 @@ class OneSignal {
   static OneSignalSession Session = new OneSignalSession();
   static OneSignalLocation Location = new OneSignalLocation();
   static OneSignalInAppMessages InAppMessages = new OneSignalInAppMessages();
-  
 
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal');
- 
-  /// The initializer for OneSignal. 
+
+  /// The initializer for OneSignal.
   ///
-  /// The initializer accepts an [appId] which the developer can get 
+  /// The initializer accepts an [appId] which the developer can get
   /// from the OneSignal consoleas well as a dictonary of [launchOptions]
   void initialize(String appId) {
-    _channel.invokeMethod(
-        'OneSignal#initialize', {'appId': appId});
+    _channel.invokeMethod('OneSignal#initialize', {'appId': appId});
+    InAppMessages.lifecycleInit();
   }
 
-  /// Login to OneSignal under the user identified by the [externalId] provided. 
-  /// 
-  /// The act of logging a user into the OneSignal SDK will switch the 
+  /// Login to OneSignal under the user identified by the [externalId] provided.
+  ///
+  /// The act of logging a user into the OneSignal SDK will switch the
   /// [user] context to that specific user.
   void login(String externalId) {
-    _channel.invokeMethod(
-        'OneSignal#login', {'externalId': externalId});
+    _channel.invokeMethod('OneSignal#login', {'externalId': externalId});
   }
 
-  /// Logout the user previously logged in via [login]. The [user] property now 
+  /// Logout the user previously logged in via [login]. The [user] property now
   ///
-  /// references a new device-scoped user. A device-scoped user has no user identity 
-  /// that can later be retrieved, except through this device as long as the app 
+  /// references a new device-scoped user. A device-scoped user has no user identity
+  /// that can later be retrieved, except through this device as long as the app
   /// remains installed and the app data is not cleared.
   void logout() {
-    _channel.invokeMethod(
-        'OneSignal#logout');
+    _channel.invokeMethod('OneSignal#logout');
   }
 
-  /// Indicates whether privacy consent has been granted. 
+  /// Indicates whether privacy consent has been granted.
   ///
-  /// This field is only relevant when the application has 
+  /// This field is only relevant when the application has
   /// opted into data privacy protections. See [requiresPrivacyConsent].
   Future<bool> getPrivacyConsent() async {
-    var val =
-        await _channel.invokeMethod("OneSignal#getPrivacyConsent");
+    var val = await _channel.invokeMethod("OneSignal#getPrivacyConsent");
 
     return val as bool;
   }
 
   /// Sets the whether or not privacy consent has been [granted]
   ///
-  /// This field is only relevant when the application has 
+  /// This field is only relevant when the application has
   /// opted into data privacy protections. See [requiresPrivacyConsent].
   Future<void> setPrivacyConsent(bool granted) async {
     await _channel
@@ -87,8 +83,7 @@ class OneSignal {
   /// user's consent before it can initialize (if you set the app to
   /// require the user's consent)
   Future<bool> requiresPrivacyConsent() async {
-    var val =
-        await _channel.invokeMethod("OneSignal#requiresPrivacyConsent");
+    var val = await _channel.invokeMethod("OneSignal#requiresPrivacyConsent");
 
     return val as bool;
   }
@@ -102,8 +97,8 @@ class OneSignal {
   }
 
   /// This method can be used to set if launch URLs should be opened in safari or
-  /// within the application. Set to true to launch all notifications with a URL 
-  /// in the app instead of the default web browser. Make sure to call setLaunchURLsInApp 
+  /// within the application. Set to true to launch all notifications with a URL
+  /// in the app instead of the default web browser. Make sure to call setLaunchURLsInApp
   /// before the initialize call.
   void setLaunchURLsInApp(bool launchUrlsInApp) {
     _channel.invokeMethod(
@@ -114,17 +109,17 @@ class OneSignal {
   /// Associates a temporary push token with an Activity ID on the OneSignal server.
   Future<void> enterLiveActivity(String activityId, String token) async {
     if (Platform.isIOS) {
-      await _channel.invokeMethod("OneSignal#enterLiveActivity", {'activityId': activityId, 'token': token});
-    } 
+      await _channel.invokeMethod("OneSignal#enterLiveActivity",
+          {'activityId': activityId, 'token': token});
+    }
   }
 
   /// Only applies to iOS
   /// Deletes activityId associated temporary push token on the OneSignal server.
   Future<void> exitLiveActivity(String activityId) async {
     if (Platform.isIOS) {
-      await _channel.invokeMethod("OneSignal#exitLiveActivity",
-        {'activityId': activityId});
+      await _channel.invokeMethod(
+          "OneSignal#exitLiveActivity", {'activityId': activityId});
     }
   }
-
 }

@@ -23,17 +23,14 @@ IInAppMessageClickHandler{
     private IInAppMessageClickResult inAppMessageClickedResult;
     private boolean hasSetInAppMessageClickedHandler = false;
 
-    private static final OneSignalInAppMessages sharedInstance = new OneSignalInAppMessages();
+    
 
     static void registerWith(BinaryMessenger messenger) {
-      
+        OneSignalInAppMessages sharedInstance = new OneSignalInAppMessages();
+       
         sharedInstance.messenger = messenger;
         sharedInstance.channel = new MethodChannel(messenger, "OneSignal#inappmessages");
-        sharedInstance.channel.setMethodCallHandler(sharedInstance);
-
-
-        OneSignalInAppMessages.sharedInstance.setInAppMessageLifecycleHandler();
-        OneSignal.getInAppMessages().setInAppMessageClickHandler(null);
+        sharedInstance.channel.setMethodCallHandler(sharedInstance);   
     }
 
     @Override
@@ -52,6 +49,8 @@ IInAppMessageClickHandler{
             this.paused(call, result);
         else if (call.method.contentEquals("OneSignal#initInAppMessageClickedHandlerParams"))
             this.initInAppMessageClickedHandlerParams();
+        else if (call.method.contentEquals("OneSignal#lifecycleInit"))
+            this.lifecycleInit();
         else
             replyNotImplemented(result);
     }
@@ -96,13 +95,18 @@ IInAppMessageClickHandler{
         }
       }
 
+    public void lifecycleInit() {
+        this.setInAppMessageLifecycleHandler();
+        OneSignal.getInAppMessages().setInAppMessageClickHandler(this);
+    }
+
     public void inAppMessageClicked(IInAppMessageClickResult action) {
-        if (!OneSignalInAppMessages.sharedInstance.hasSetInAppMessageClickedHandler) {
-            OneSignalInAppMessages.sharedInstance.inAppMessageClickedResult = action;
+        if (!this.hasSetInAppMessageClickedHandler) {
+            this.inAppMessageClickedResult = action;
         return;
         }
 
-        invokeMethodOnUiThread("OneSignal#handleClickedInAppMessage", OneSignalSerializer.convertInAppMessageClickedActionToMap(action));
+        channel.invokeMethod("OneSignal#handleClickedInAppMessage", OneSignalSerializer.convertInAppMessageClickedActionToMap(action));
     }
 
     /* in app message lifecycle */
@@ -110,22 +114,22 @@ IInAppMessageClickHandler{
         OneSignal.getInAppMessages().setInAppMessageLifecycleHandler(new IInAppMessageLifecycleHandler() {
             @Override
             public void onWillDisplayInAppMessage(IInAppMessage message) { 
-            invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+                channel.invokeMethod("OneSignal#onWillDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
             }
 
             @Override
             public void onDidDisplayInAppMessage(IInAppMessage message) {
-            invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+                channel.invokeMethod("OneSignal#onDidDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
             }
 
             @Override
             public void onWillDismissInAppMessage(IInAppMessage message) {
-            invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+                channel.invokeMethod("OneSignal#onWillDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
             }
 
             @Override
             public void onDidDismissInAppMessage(IInAppMessage message) {
-            invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+                channel.invokeMethod("OneSignal#onDidDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
             }
         });
   }
