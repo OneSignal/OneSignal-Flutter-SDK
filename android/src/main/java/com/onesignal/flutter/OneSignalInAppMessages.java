@@ -23,8 +23,6 @@ IInAppMessageClickHandler{
     private IInAppMessageClickResult inAppMessageClickedResult;
     private boolean hasSetInAppMessageClickedHandler = false;
 
-    
-
     static void registerWith(BinaryMessenger messenger) {
         OneSignalInAppMessages sharedInstance = new OneSignalInAppMessages();
        

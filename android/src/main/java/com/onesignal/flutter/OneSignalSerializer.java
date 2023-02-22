@@ -2,11 +2,11 @@ package com.onesignal.flutter;
 
 import android.util.Log;
 
+import com.onesignal.user.subscriptions.ISubscription;
+import com.onesignal.user.subscriptions.IPushSubscription;
 
 import com.onesignal.inAppMessages.IInAppMessage;
-import com.onesignal.inAppMessages.IInAppMessageClickHandler;
 import com.onesignal.inAppMessages.IInAppMessageClickResult;
-import com.onesignal.inAppMessages.IInAppMessageLifecycleHandler;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -33,6 +33,17 @@ class OneSignalSerializer {
         HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("message_id", message.getMessageId());
+
+        return hash;
+    }
+
+    static HashMap<String, Object> convertOnSubscriptionChanged(IPushSubscription state) {
+        HashMap<String, Object> hash = new HashMap<>();
+        
+
+        hash.put("token", state.getToken());
+        hash.put("pushId", state.getId());
+        hash.put("optedIn", state.getOptedIn());
 
         return hash;
     }
