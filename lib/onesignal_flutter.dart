@@ -42,6 +42,7 @@ class OneSignal {
     _channel.invokeMethod('OneSignal#initialize', {'appId': appId});
     InAppMessages.lifecycleInit();
     User.pushSubscription.lifecycleInit();
+    Notifications.lifecycleInit();
   }
 
   /// Login to OneSignal under the user identified by the [externalId] provided.
