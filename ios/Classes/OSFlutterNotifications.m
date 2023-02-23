@@ -122,17 +122,15 @@
 #pragma mark Received in Foreground Notification 
 
 - (void)initNotificationWillShowInForegroundHandlerParams {
-    NSLog(@"hasSetNotificationWillShowInForegroundHandler1");
     self.hasSetNotificationWillShowInForegroundHandler = YES;
 }
 
 - (void)handleNotificationWillShowInForeground:(OSNotification *)notification completion:(OSNotificationDisplayResponse)completion {
-    NSLog(@"Notification will show in foreground1");
+   
     if (!self.hasSetNotificationWillShowInForegroundHandler) {
         completion(notification);
         return;
     }
-   NSLog(@"Notification will show in foreground2");
     self.receivedNotificationCache[notification.notificationId] = notification;
     self.notificationCompletionCache[notification.notificationId] = completion;
     [self.channel invokeMethod:@"OneSignal#handleNotificationWillShowInForeground" arguments:notification.toJson];
@@ -169,7 +167,6 @@
 }
 
 - (void)handleNotificationOpened:(OSNotificationOpenedResult *)result {
-     
     [self.channel invokeMethod:@"OneSignal#handleOpenedNotification" arguments:result.toJson];
 }
 

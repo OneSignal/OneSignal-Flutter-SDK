@@ -53,6 +53,7 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
     OneSignalInAppMessages.registerWith(messenger);
     OneSignalUser.registerWith(messenger);
     OneSignalPushSubscription.registerWith(messenger);
+    OneSignalNotifications.registerWith(messenger);
     // OneSignalTagsController.registerWith(messenger);
     // OneSignalInAppMessagingController.registerWith(messenger);
     // OneSignalOutcomeEventsController.registerWith(messenger);
