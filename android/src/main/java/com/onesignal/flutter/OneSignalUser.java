@@ -80,26 +80,24 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
         }
     }
 
-    private void addEmail(MethodCall call, final Result reply) {
-        String email = call.argument("email");
-    
-        OneSignal.getUser().addEmail(email);
+    private void addEmail(MethodCall call, Result result) {
+        OneSignal.getUser().addEmail((String) call.arguments);
+        replySuccess(result, null);
       }
     
-      private void removeEmail(MethodCall call, final Result reply) {
-        String email = call.argument("email");
-        OneSignal.getUser().removeEmail(email);
+      private void removeEmail(MethodCall call, Result result) {
+        OneSignal.getUser().removeEmail((String) call.arguments);
+        replySuccess(result, null);
       }
     
-      private void addSms(MethodCall call, final Result reply) {
-        String smsNumber = call.argument("smsNumber");
-    
-        OneSignal.getUser().addSms(smsNumber);
+      private void addSms(MethodCall call, Result result) {
+        OneSignal.getUser().addSms((String) call.arguments);
+        replySuccess(result, null);
       }
     
-      private void removeSms(MethodCall call, final Result reply) {
-        String smsNumber = call.argument("smsNumber");
-        OneSignal.getUser().removeSms(smsNumber);
+      private void removeSms(MethodCall call, Result result) {
+        OneSignal.getUser().removeSms((String) call.arguments);
+        replySuccess(result, null);
       }
       private void addTags(MethodCall call, Result result) {
         // call.arguments is being casted to a Map<String, Object> so a try-catch with

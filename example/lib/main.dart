@@ -42,9 +42,9 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     OneSignal.User.pushSubscription.addObserver(this);
 
     // Outcome Examples
-    oneSignalOutcomeExamples();
-
-    // OneSignal.shared.login("Testtesttest");
+    //oneSignalOutcomeExamples();
+    //OneSignal.shared.logout();
+    OneSignal.shared.login("Henry987656778");
 
     // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
@@ -304,7 +304,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     // OneSignal.InAppMessages.clearTriggers();
 
     // Toggle pausing (displaying or not) of IAMs
-    OneSignal.InAppMessages.paused(false);
+    OneSignal.InAppMessages.paused(true);
     var arePaused = await OneSignal.InAppMessages.arePaused();
     print('Notifications paused ${arePaused}');
   }

@@ -128,6 +128,7 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
       this.login(call, result);
     else if (call.method.contentEquals("OneSignal#logout"))
       this.logout(call, result);
+    else
       replyNotImplemented(result);
   }
 

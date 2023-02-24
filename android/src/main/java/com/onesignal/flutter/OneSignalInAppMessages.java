@@ -104,7 +104,7 @@ IInAppMessageClickHandler{
         return;
         }
 
-        channel.invokeMethod("OneSignal#handleClickedInAppMessage", OneSignalSerializer.convertInAppMessageClickedActionToMap(action));
+        invokeMethodOnUiThread("OneSignal#handleClickedInAppMessage", OneSignalSerializer.convertInAppMessageClickedActionToMap(action));
     }
 
     /* in app message lifecycle */
@@ -112,22 +112,22 @@ IInAppMessageClickHandler{
         OneSignal.getInAppMessages().setInAppMessageLifecycleHandler(new IInAppMessageLifecycleHandler() {
             @Override
             public void onWillDisplayInAppMessage(IInAppMessage message) { 
-                channel.invokeMethod("OneSignal#onWillDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+                invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
             }
 
             @Override
             public void onDidDisplayInAppMessage(IInAppMessage message) {
-                channel.invokeMethod("OneSignal#onDidDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+                invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
             }
 
             @Override
             public void onWillDismissInAppMessage(IInAppMessage message) {
-                channel.invokeMethod("OneSignal#onWillDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+                invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
             }
 
             @Override
             public void onDidDismissInAppMessage(IInAppMessage message) {
-                channel.invokeMethod("OneSignal#onDidDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+                invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
             }
         });
   }
