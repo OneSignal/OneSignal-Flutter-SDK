@@ -75,7 +75,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     }
 
     private void requestPermission(MethodCall call, Result result) {
-        boolean fallback = call.argument("fallback");
+        boolean fallback = (boolean) call.argument("fallbackToSettings");
         OneSignal.getNotifications().requestPermission(fallback, Continue.none());
     }
 
@@ -128,7 +128,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     @Override
     public void notificationClicked(INotificationClickResult result) {
         try {
-            channel.invokeMethod("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationClickedResultToMap(result));
+            invokeMethodOnUiThread("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationClickedResultToMap(result));
         } catch (JSONException e) {
         e.getStackTrace();
         // OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
@@ -148,7 +148,8 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
 
         try {
             HashMap<String, Object>  receivedMap = OneSignalSerializer.convertNotificationToMap(notification);
-            channel.invokeMethod("OneSignal#handleNotificationWillShowInForeground", receivedMap);
+            
+            invokeMethodOnUiThread("OneSignal#handleNotificationWillShowInForeground", receivedMap);
         } catch (JSONException e) {
             e.getStackTrace();
             // OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
@@ -159,7 +160,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     @Override
     public void onPermissionChanged(boolean permission)  { 
 
-        channel.invokeMethod("OneSignal#OSPermissionChanged", OneSignalSerializer.convertPermissionChanged(permission));
+        invokeMethodOnUiThread("OneSignal#OSPermissionChanged", OneSignalSerializer.convertPermissionChanged(permission));
     }
 
     public void lifecycleInit() {

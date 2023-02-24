@@ -66,8 +66,7 @@ public class OneSignalPushSubscription extends FlutterRegistrarResponder impleme
                     return;
                   }
                   IPushSubscription pushSubscription = (IPushSubscription) subscription;
-        
-                channel.invokeMethod("OneSignal#onSubscriptionChanged", OneSignalSerializer.convertOnSubscriptionChanged(pushSubscription));
+                  invokeMethodOnUiThread("OneSignal#onSubscriptionChanged", OneSignalSerializer.convertOnSubscriptionChanged(pushSubscription));
             }
 
         });
