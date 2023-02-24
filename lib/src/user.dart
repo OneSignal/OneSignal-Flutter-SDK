@@ -6,8 +6,8 @@ import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/pushsubscription.dart';
 
 class OneSignalUser {
-
-  static OneSignalPushSubscription _pushSubscription = new OneSignalPushSubscription();
+  static OneSignalPushSubscription _pushSubscription =
+      new OneSignalPushSubscription();
 
   OneSignalPushSubscription get pushSubscription => _pushSubscription;
 
@@ -18,19 +18,19 @@ class OneSignalUser {
   ///
   /// Sets the user's language to [language] this also applies to
   /// the email and/or SMS player if those are logged in on the device.
-  void setLanguage(String language)  {
-   _channel.invokeMethod("OneSignal#setLanguage", {'language' : language});
+  void setLanguage(String language) {
+    _channel.invokeMethod("OneSignal#setLanguage", {'language': language});
   }
 
   /// Set an [alias] for the current user.
-  /// 
-  /// If this [alias] label already exists on this user, 
+  ///
+  /// If this [alias] label already exists on this user,
   /// it will be overwritten with the new alias [id].
   void addAlias(String alias, dynamic id) {
     this.addAliases({alias: id});
   }
 
-  /// Set [aliases] for the current user. 
+  /// Set [aliases] for the current user.
   ///
   /// If any alias already exists, it will be overwritten to the new values.
   void addAliases(Map<String, dynamic> aliases) {
@@ -47,19 +47,19 @@ class OneSignalUser {
     _channel.invokeMethod("OneSignal#removeAliases", aliases);
   }
 
-  /// Add a tag for the current user. 
+  /// Add a tag for the current user.
   ///
-  /// Tags are [key] : [value] pairs used as building blocks for targeting 
-  /// specific users and/or personalizing messages. If the tag [key] already 
+  /// Tags are [key] : [value] pairs used as building blocks for targeting
+  /// specific users and/or personalizing messages. If the tag [key] already
   /// exists, it will be replaced with the [value] provided here.
   void addTagWithKey(String key, dynamic value) {
     this.addTags({key: value});
   }
 
-  /// Add multiple [tags] for the current user. 
+  /// Add multiple [tags] for the current user.
   ///
-  /// [Tags] are key:value pairs used as building blocks for targeting 
-  /// specific users and/or personalizing messages. If the tag key already 
+  /// [Tags] are key:value pairs used as building blocks for targeting
+  /// specific users and/or personalizing messages. If the tag key already
   /// exists, it will be replaced with the value provided here.
   void addTags(Map<String, dynamic> tags) {
     _channel.invokeMethod("OneSignal#addTags", tags);
@@ -80,9 +80,9 @@ class OneSignalUser {
     _channel.invokeMethod("OneSignal#addEmail", email);
   }
 
-  /// Remove an [email] subscription from the current user. 
+  /// Remove an [email] subscription from the current user.
   ///
-  /// Returns false if the specified [email] does not exist 
+  /// Returns false if the specified [email] does not exist
   /// on the user within the SDK, and no request will be made.
   Future<void> removeEmail(String email) async {
     return await _channel.invokeMethod("OneSignal#removeEmail");
@@ -95,14 +95,11 @@ class OneSignalUser {
     _channel.invokeMethod("OneSignal#addSms", smsNumber);
   }
 
-  /// Remove an SMS subscription from the current user. 
+  /// Remove an SMS subscription from the current user.
   ///
   /// Returns false if the specified [smsNumber] does not
   /// exist on the user within the SDK, and no request will be made.
   Future<void> removeSms(String smsNumber) async {
-    return await _channel.invokeMethod("OneSignal#removeSms");
+    return await _channel.invokeMethod("OneSignal#removeSms", smsNumber);
   }
-
-
- 
 }

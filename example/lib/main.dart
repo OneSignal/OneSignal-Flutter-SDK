@@ -32,7 +32,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    OneSignal.Debug.setLogLevel(OSLogLevel.debug);
+    OneSignal.Debug.setLogLevel(OSLogLevel.none);
 
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
 
@@ -42,9 +42,9 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     OneSignal.User.pushSubscription.addObserver(this);
 
     // Outcome Examples
-    oneSignalOutcomeExamples();
-
-    // OneSignal.shared.login("Testtesttest");
+    //oneSignalOutcomeExamples();
+    //OneSignal.shared.logout();
+    OneSignal.shared.login("Henry11111111");
 
     // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
 
@@ -59,7 +59,8 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
 
     OneSignal.Notifications.setNotificationWillShowInForegroundHandler(
         (OSNotificationReceivedEvent event) {
-      print('FOREGROUND HANDLER CALLED WITH: ${event}');
+      print(
+          'FOREGROUND HANDLER CALLED WITH1: ${event.notification.jsonRepresentation()}');
 
       /// Display Notification, send null to not display
       event.complete(null);
@@ -296,7 +297,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     // OneSignal.InAppMessages.clearTriggers();
 
     // Toggle pausing (displaying or not) of IAMs
-    OneSignal.InAppMessages.paused(false);
+    OneSignal.InAppMessages.paused(true);
     var arePaused = await OneSignal.InAppMessages.arePaused();
     print('Notifications paused ${arePaused}');
   }

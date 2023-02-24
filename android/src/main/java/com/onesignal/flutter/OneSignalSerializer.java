@@ -9,8 +9,9 @@ import com.onesignal.inAppMessages.IInAppMessage;
 import com.onesignal.inAppMessages.IInAppMessageClickResult;
 
 import com.onesignal.notifications.INotification;
+
+import com.onesignal.notifications.INotificationAction;
  import com.onesignal.notifications.INotificationClickResult;
- import com.onesignal.notifications.INotificationReceivedEvent;
  import com.onesignal.notifications.INotificationReceivedEvent;
 
 import org.json.JSONArray;
@@ -35,7 +36,6 @@ class OneSignalSerializer {
             hash.put("groupMessage", notification.getGroupMessage());
             hash.put("groupedNotifications", notification.getGroupedNotifications());
         }
-
 
         hash.put("notificationId", notification.getNotificationId());
         hash.put("title", notification.getTitle());
@@ -76,14 +76,29 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertNotificationClickedResultToMap(INotificationClickResult openResult) throws JSONException {
+    static HashMap<String, Object> convertNotificationClickResultToMap(INotificationClickResult openResult) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("actionId", openResult.getAction().getActionId());
-        hash.put("type", openResult.getAction().getType());
-        hash.put("title", openResult.getNotification().getTitle());
-        hash.put("message", openResult.getNotification().getBody());
-        hash.put("additionalData", openResult.getNotification().getAdditionalData());
+        hash.put("notification", convertNotificationToMap(openResult.getNotification()));
+        hash.put("action", convertNotificationActionToMap(openResult.getAction()));
+
+        return hash;
+    }
+
+    
+    private static HashMap<String, Object> convertNotificationActionToMap(INotificationAction action) {
+        HashMap<String, Object> hash = new HashMap<>();
+
+        hash.put("id", action.getActionId());
+
+        switch (action.getType()) {
+            case Opened:
+                hash.put("type", 0);
+                break;
+            case ActionTaken:
+                hash.put("type", 1);
+        }
+
         return hash;
     }
 
