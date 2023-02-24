@@ -14,7 +14,7 @@ import io.flutter.plugin.common.PluginRegistry;
 
 abstract class FlutterRegistrarResponder {
    Context context;
-   MethodChannel channel;
+   protected MethodChannel channel;
    BinaryMessenger messenger;
 
    /**
@@ -69,7 +69,7 @@ abstract class FlutterRegistrarResponder {
    }
 
    void invokeMethodOnUiThread(final String methodName, final HashMap map) {
-      final MethodChannel channel = this.channel;
+      //final MethodChannel channel = this.channel;
       runOnMainThread(new Runnable() {
          @Override
          public void run() {

@@ -37,7 +37,7 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickHandler, INotificationWillShowInForegroundHandler, IPermissionChangedHandler {
-    private MethodChannel channel;
+    // private MethodChannel channel;
 
     private boolean hasSetNotificationWillShowInForegroundHandler = false;
     private final HashMap<String, INotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
@@ -128,12 +128,23 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     @Override
     public void notificationClicked(INotificationClickResult result) {
         try {
-            invokeMethodOnUiThread("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationClickedResultToMap(result));
+            invokeMethodOnUiThread("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationClickResultToMap(result));
         } catch (JSONException e) {
-        e.getStackTrace();
-        // OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
-        //         "Encountered an error attempting to convert OSNotificationOpenResult object to hash map: " + e.getMessage());
+            e.getStackTrace();
+            android.util.Log.w("TestHenryTest ", e.toString());
         }
+    }
+
+    private JSONObject getJsonFromMap(Map<String, Object> map) throws JSONException {
+        JSONObject jsonData = new JSONObject();
+        for (String key : map.keySet()) {
+            Object value = map.get(key);
+            if (value instanceof Map<?, ?>) {
+                value = getJsonFromMap((Map<String, Object>) value);
+            }
+            jsonData.put(key, value);
+        }
+        return jsonData;
     }
 
     @Override
@@ -148,12 +159,9 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
 
         try {
             HashMap<String, Object>  receivedMap = OneSignalSerializer.convertNotificationToMap(notification);
-            
             invokeMethodOnUiThread("OneSignal#handleNotificationWillShowInForeground", receivedMap);
         } catch (JSONException e) {
             e.getStackTrace();
-            // OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR,
-            //         "Encountered an error attempting to convert OSNotificationReceivedEvent object to hash map: " + e.getMessage());
         }
     }
 
