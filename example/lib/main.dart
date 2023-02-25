@@ -118,6 +118,9 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
 
   void onOSPushSubscriptionChangedWithStateChanges(
       OSPushSubscriptionStateChanges stateChanges) {
+    print(OneSignal.User.pushSubscription.optedIn());
+    print(OneSignal.User.pushSubscription.id());
+    print(OneSignal.User.pushSubscription.token());
     print(stateChanges.jsonRepresentation());
   }
 
