@@ -25,9 +25,11 @@ class OneSignalNotifications {
     this._channel.setMethodCallHandler(_handleMethod);
   }
 
+  bool _permission = false;
+
   /// Whether this app has push notification permission.
-  Future<bool> permission() async {
-    return await _channel.invokeMethod("OneSignal#permission");
+  bool permission() {
+    return _permission;
   }
 
   /// Whether attempting to request notification permission will show a prompt.
@@ -80,7 +82,8 @@ class OneSignalNotifications {
     _observers.remove(observer);
   }
 
-  Future<bool> lifecycleInit() async {
+  Future<void> lifecycleInit() async {
+    _permission = await _channel.invokeMethod("OneSignal#permission");
     return await _channel.invokeMethod("OneSignal#lifecycleInit");
   }
 
@@ -102,6 +105,7 @@ class OneSignalNotifications {
   }
 
   Future<void> onOSPermissionChangedHandler(OSPermissionState state) async {
+    _permission = state.permission;
     for (var observer in _observers) {
       observer.onOSPermissionChanged(state);
     }

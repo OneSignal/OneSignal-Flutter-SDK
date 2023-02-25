@@ -64,7 +64,7 @@ class OneSignalInAppMessages {
     return await _channel.invokeMethod("OneSignal#arePaused");
   }
 
-  Future<bool> lifecycleInit() async {
+  Future<void> lifecycleInit() async {
     return await _channel.invokeMethod("OneSignal#lifecycleInit");
   }
 

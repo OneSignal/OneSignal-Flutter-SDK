@@ -52,7 +52,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
-    if (call.method.contentEquals("OneSignal#getPermission"))
+    if (call.method.contentEquals("OneSignal#permission"))
         replySuccess(result, OneSignal.getNotifications().getPermission());
     else if (call.method.contentEquals("OneSignal#requestPermission"))
         this.requestPermission(call, result);
