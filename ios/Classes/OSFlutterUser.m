@@ -85,22 +85,9 @@
     [OneSignal.User setLanguage:language];
 }
 
-// TODO: may not need this
-- (void)addAliasWithLabel:(FlutterMethodCall *)call {
-    NSString *aliasId = call.arguments[@"aliasId"];
-    NSNumber *aliasLabel = call.arguments[@"aliasLabel"];
-    [OneSignal.User addAliasWithLabel:aliasLabel id:aliasId];
-}
-
 - (void)addAliases:(FlutterMethodCall *)call {
     NSDictionary *aliases = call.arguments;
     [OneSignal.User addAliases:aliases];
-}
-
-// TODO: may not need this
-- (void)removeAlias:(FlutterMethodCall *)call {
-    NSNumber *aliasLabel = call.arguments[@"alias"];
-    [OneSignal.User removeAlias:aliasLabel];
 }
 
 - (void)removeAliases:(FlutterMethodCall *)call {
@@ -108,22 +95,9 @@
     [OneSignal.User removeAliases:aliases];
 }
 
-// TODO: may not need this
-- (void)addTagWithKey:(FlutterMethodCall *)call {
-    NSString *key = call.arguments[@"key"];
-    NSNumber *value = call.arguments[@"value"];
-    [OneSignal.User addTagWithKey:key value:value];
-}
-
 - (void)addTags:(FlutterMethodCall *)call {
     NSDictionary *tags = call.arguments;
     [OneSignal.User addTags:tags];
-}
-
-// TODO: may not need this
-- (void)removeTag:(FlutterMethodCall *)call {
-    NSNumber *key = call.arguments[@"key"];
-    [OneSignal.User removeTag:key];
 }
 
 - (void)removeTags:(FlutterMethodCall *)call {
@@ -152,7 +126,5 @@
     [OneSignal.User removeSms:smsNumber];
     result(nil);
 }
-
-
 
 @end

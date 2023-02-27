@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
-import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/inappmessage.dart';
 
 typedef void InAppMessageClickedHandler(OSInAppMessageAction action);

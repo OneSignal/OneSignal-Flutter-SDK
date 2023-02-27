@@ -41,12 +41,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
 
     OneSignal.User.pushSubscription.addObserver(this);
 
-    // Outcome Examples
-    //oneSignalOutcomeExamples();
-    //OneSignal.shared.logout();
-    OneSignal.shared.login("Henry11111111");
-
-    // OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
+    OneSignal.shared.setRequiresPrivacyConsent(_requireConsent);
 
     OneSignal.Notifications.setNotificationOpenedHandler(
         (OSNotificationOpenedResult result) {
@@ -96,24 +91,19 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     });
 
     // iOS-only method to open launch URLs in Safari when set to false
-    // OneSignal.shared.setLaunchURLsInApp(false);
+    OneSignal.shared.setLaunchURLsInApp(false);
 
-    // bool requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
+    bool requiresConsent = await OneSignal.shared.requiresPrivacyConsent();
 
-    // this.setState(() {
-    //   _enableConsentButton = requiresConsent;
-    // });
+    this.setState(() {
+      _enableConsentButton = requiresConsent;
+    });
 
     // Some examples of how to use In App Messaging public methods with OneSignal SDK
     oneSignalInAppMessagingTriggerExamples();
 
-    // OneSignal.shared.disablePush(false);
-
-    // // Some examples of how to use Outcome Events public methods with OneSignal SDK
-    // oneSignalOutcomeEventsExamples();
-
-    // bool userProvidedPrivacyConsent = await OneSignal.shared.userProvidedPrivacyConsent();
-    // print("USER PROVIDED PRIVACY CONSENT: $userProvidedPrivacyConsent");
+    // Some examples of how to use Outcome Events public methods with OneSignal SDK
+    oneSignalOutcomeExamples();
   }
 
   void onOSPushSubscriptionChangedWithStateChanges(
@@ -154,16 +144,6 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     OneSignal.Notifications.requestPermission(true);
   }
 
-  void _handleGetDeviceState() async {
-    print("Getting DeviceState");
-    // OneSignal.shared.getDeviceState().then((deviceState) {
-    //   print("DeviceState: ${deviceState?.jsonRepresentation()}");
-    //   this.setState(() {
-    //     _debugLabelString = deviceState?.jsonRepresentation() ?? "Device state null";
-    //   });
-    // });
-  }
-
   void _handleSetLanguage() {
     if (_language == null) return;
     print("Setting language");
@@ -200,12 +180,12 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
 
   void _handleConsent() {
     print("Setting consent to true");
-    // OneSignal.shared.consentGranted(true);
+    OneSignal.shared.setPrivacyConsent(true);
 
-    // print("Setting state");
-    // this.setState(() {
-    //   _enableConsentButton = false;
-    // });
+    print("Setting state");
+    this.setState(() {
+      _enableConsentButton = false;
+    });
   }
 
   void _handleSetLocationShared() {
@@ -213,74 +193,14 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     OneSignal.Location.setShared(true);
   }
 
-  void _handleSetExternalUserId() {
+  void _handleLogin() {
     print("Setting external user ID");
-    // if (_externalUserId == null) return;
-
-    // OneSignal.shared.setExternalUserId(_externalUserId!).then((results) {
-    //     if (results == null) return;
-
-    //     this.setState(() {
-    //         _debugLabelString = "External user id set: $results";
-    //     });
-    // });
+    if (_externalUserId == null) return;
+    OneSignal.shared.login(_externalUserId!);
   }
 
-  void _handleRemoveExternalUserId() {
-    // OneSignal.shared.removeExternalUserId().then((results) {
-    //     if (results == null) return;
-
-    //     this.setState(() {
-    //        _debugLabelString = "External user id removed: $results";
-    //     });
-    // });
-  }
-
-  void _handleSendNotification() async {
-    // var deviceState = await OneSignal.shared.getDeviceState();
-
-    // if (deviceState == null || deviceState.userId == null)
-    //     return;
-
-    // var playerId = deviceState.userId!;
-
-    // var imgUrlString =
-    //     "http://cdn1-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-2.jpg";
-
-    // var notification = OSCreateNotification(
-    //     playerIds: [playerId],
-    //     content: "this is a test from OneSignal's Flutter SDK",
-    //     heading: "Test Notification",
-    //     iosAttachments: {"id1": imgUrlString},
-    //     bigPicture: imgUrlString,
-    //     buttons: [
-    //       OSActionButton(text: "test1", id: "id1"),
-    //       OSActionButton(text: "test2", id: "id2")
-    //     ]);
-
-    // var response = await OneSignal.shared.postNotification(notification);
-
-    // this.setState(() {
-    //   _debugLabelString = "Sent notification with response: $response";
-    // });
-  }
-
-  void _handleSendSilentNotification() async {
-    // var deviceState = await OneSignal.shared.getDeviceState();
-
-    // if (deviceState == null || deviceState.userId == null)
-    //     return;
-
-    // var playerId = deviceState.userId!;
-
-    // var notification = OSCreateNotification.silentNotification(
-    //     playerIds: [playerId], additionalData: {'test': 'value'});
-
-    // var response = await OneSignal.shared.postNotification(notification);
-
-    // this.setState(() {
-    //   _debugLabelString = "Sent notification with response: $response";
-    // });
+  void _handleLogout() {
+    OneSignal.shared.logout();
   }
 
   oneSignalInAppMessagingTriggerExamples() async {
@@ -304,8 +224,6 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     // Create a list and bulk remove triggers based on keys supplied
     List<String> keys = ["trigger_1", "trigger_3"];
     OneSignal.InAppMessages.removeTriggers(keys);
-
-    // OneSignal.InAppMessages.clearTriggers();
 
     // Toggle pausing (displaying or not) of IAMs
     OneSignal.InAppMessages.paused(true);
@@ -353,12 +271,6 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
                     new OneSignalButton("Prompt for Push Permission",
                         _handlePromptForPushPermission, !_enableConsentButton)
                   ]),
-                  //   new TableRow(children: [
-                  //     new OneSignalButton(
-                  //         "Print Device State",
-                  //         _handleGetDeviceState,
-                  //         !_enableConsentButton)
-                  //   ]),
                   new TableRow(children: [
                     new TextField(
                       textAlign: TextAlign.center,
@@ -411,14 +323,14 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
                     new OneSignalButton("Set SMS Number", _handleSetSMSNumber,
                         !_enableConsentButton)
                   ]),
-                  // new TableRow(children: [
-                  //   new OneSignalButton("Remove SMS Number", _handleRemoveSmsNumber,
-                  //       !_enableConsentButton)
-                  // ]),
-                  //   new TableRow(children: [
-                  //     new OneSignalButton("Provide GDPR Consent", _handleConsent,
-                  //         _enableConsentButton)
-                  //   ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Remove SMS Number",
+                        _handleRemoveSMSNumber, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Provide GDPR Consent", _handleConsent,
+                        _enableConsentButton)
+                  ]),
                   new TableRow(children: [
                     new OneSignalButton("Set Location Shared",
                         _handleSetLocationShared, !_enableConsentButton)
@@ -427,42 +339,34 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
                     new OneSignalButton(
                         "Remove Tag", _handleRemoveTag, !_enableConsentButton)
                   ]),
-                  //   new TableRow(children: [
-                  //     new OneSignalButton("Post Notification",
-                  //         _handleSendNotification, !_enableConsentButton)
-                  //   ]),
-                  //   new TableRow(children: [
-                  //     new OneSignalButton("Post Silent Notification",
-                  //         _handleSendSilentNotification, !_enableConsentButton)
-                  //   ]),
-                  //   new TableRow(children: [
-                  //     new TextField(
-                  //       textAlign: TextAlign.center,
-                  //       decoration: InputDecoration(
-                  //           hintText: "External User ID",
-                  //           labelStyle: TextStyle(
-                  //             color: Color.fromARGB(255, 212, 86, 83),
-                  //           )),
-                  //       onChanged: (text) {
-                  //         this.setState(() {
-                  //           _externalUserId = text == "" ? null : text;
-                  //         });
-                  //       },
-                  //     )
-                  //   ]),
-                  //   new TableRow(children: [
-                  //     Container(
-                  //       height: 8.0,
-                  //     )
-                  //   ]),
-                  //   new TableRow(children: [
-                  //     new OneSignalButton(
-                  //         "Set External User ID", _handleSetExternalUserId, !_enableConsentButton)
-                  //   ]),
-                  //   new TableRow(children: [
-                  //     new OneSignalButton(
-                  //         "Remove External User ID", _handleRemoveExternalUserId, !_enableConsentButton)
-                  //   ]),
+                  new TableRow(children: [
+                    new TextField(
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                          hintText: "External User ID",
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 212, 86, 83),
+                          )),
+                      onChanged: (text) {
+                        this.setState(() {
+                          _externalUserId = text == "" ? null : text;
+                        });
+                      },
+                    )
+                  ]),
+                  new TableRow(children: [
+                    Container(
+                      height: 8.0,
+                    )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Set External User ID", _handleLogin,
+                        !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Remove External User ID",
+                        _handleLogout, !_enableConsentButton)
+                  ]),
                   new TableRow(children: [
                     new TextField(
                       textAlign: TextAlign.center,

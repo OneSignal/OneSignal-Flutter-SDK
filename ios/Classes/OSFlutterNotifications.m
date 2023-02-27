@@ -45,7 +45,6 @@
 }
 
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    //OSFlutterNotifications *instance = [OSFlutterNotifications new];
 
     OSFlutterNotifications.sharedInstance.channel = [FlutterMethodChannel
                         methodChannelWithName:@"OneSignal#notifications"
@@ -102,20 +101,12 @@
     }];
 }
 
-
-
 - (void)onOSPermissionChanged:(OSPermissionState*)state {
     [self.channel invokeMethod:@"OneSignal#OSPermissionChanged" arguments:state.jsonRepresentation];
 }
 
 - (void)addPermissionObserver:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal.Notifications addPermissionObserver:self];
-    result(nil);
-}
-
-// TODO: possibly don't need
-- (void)removePermissionObserver:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.Notifications removePermissionObserver:self];
     result(nil);
 }
 
@@ -142,8 +133,7 @@
     OSNotificationDisplayResponse completion = self.notificationCompletionCache[notificationId];
     
     if (!completion) {
-        // TODO: log
-        //[OneSignal onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
         return;
     }
 

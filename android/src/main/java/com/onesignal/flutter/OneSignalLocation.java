@@ -19,7 +19,6 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalLocation extends FlutterRegistrarResponder implements MethodCallHandler {
-    private MethodChannel channel;
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalLocation controller = new OneSignalLocation();

@@ -1,7 +1,5 @@
-import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/utils.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:convert';
 
 /// A class representing the notification, including the

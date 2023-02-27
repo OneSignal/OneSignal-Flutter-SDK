@@ -22,7 +22,6 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalPushSubscription extends FlutterRegistrarResponder implements MethodCallHandler, ISubscriptionChangedHandler {
-    private MethodChannel channel;
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalPushSubscription controller = new OneSignalPushSubscription();
