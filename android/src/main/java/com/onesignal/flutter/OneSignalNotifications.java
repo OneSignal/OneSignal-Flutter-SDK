@@ -1,5 +1,6 @@
 package com.onesignal.flutter;
 
+import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.OneSignal;
 import com.onesignal.Continue;
 
@@ -37,8 +38,6 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickHandler, INotificationWillShowInForegroundHandler, IPermissionChangedHandler {
-    // private MethodChannel channel;
-
     private boolean hasSetNotificationWillShowInForegroundHandler = false;
     private final HashMap<String, INotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
@@ -114,7 +113,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         INotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
 
         if (notificationReceivedEvent == null) {
-            //OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Could not find notification completion block with id: " + notificationId);
+            Logging.error("Could not find notification completion block with id: " + notificationId, null);
             return;
         }
 
@@ -131,7 +130,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
             invokeMethodOnUiThread("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationClickResultToMap(result));
         } catch (JSONException e) {
             e.getStackTrace();
-            android.util.Log.w("TestHenryTest ", e.toString());
+            Logging.error("Encountered an error attempting to convert INotificationClickResult object to hash map:" + e.toString(), null);
         }
     }
 
@@ -162,12 +161,12 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
             invokeMethodOnUiThread("OneSignal#handleNotificationWillShowInForeground", receivedMap);
         } catch (JSONException e) {
             e.getStackTrace();
+            Logging.error("Encountered an error attempting to convert INotification object to hash map:" + e.toString(), null);
         }
     }
 
     @Override
     public void onPermissionChanged(boolean permission)  { 
-
         invokeMethodOnUiThread("OneSignal#OSPermissionChanged", OneSignalSerializer.convertPermissionChanged(permission));
     }
 

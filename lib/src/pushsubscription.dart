@@ -1,8 +1,5 @@
 import 'dart:async';
-import 'dart:ffi';
-import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
-import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/subscription.dart';
 
 class OneSignalPushSubscription {
@@ -17,11 +14,6 @@ class OneSignalPushSubscription {
   // constructor method
   OneSignalPushSubscription() {
     this._channel.setMethodCallHandler(_handleMethod);
-    this._initPushSubscriptionState();
-  }
-
-  void _initPushSubscriptionState() {
-    _channel.invokeMethod("OneSignal#addObserver");
   }
 
   String? id() {
@@ -82,7 +74,7 @@ class OneSignalPushSubscription {
     return null;
   }
 
-  Future<void> _onSubscriptionChangedHandler(
+  void _onSubscriptionChangedHandler(
       OSPushSubscriptionStateChanges stateChanges) async {
     this._id = stateChanges.to.id;
     this._token = stateChanges.to.token;

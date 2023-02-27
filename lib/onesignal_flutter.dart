@@ -1,9 +1,6 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
-import 'package:onesignal_flutter/src/permission.dart';
-import 'package:onesignal_flutter/src/defines.dart';
-import 'package:onesignal_flutter/src/utils.dart';
 import 'package:onesignal_flutter/src/debug.dart';
 import 'package:onesignal_flutter/src/user.dart';
 import 'package:onesignal_flutter/src/notifications.dart';
@@ -49,8 +46,9 @@ class OneSignal {
   ///
   /// The act of logging a user into the OneSignal SDK will switch the
   /// [user] context to that specific user.
-  void login(String externalId) {
-    _channel.invokeMethod('OneSignal#login', {'externalId': externalId});
+  Future<void> login(String externalId) async {
+    return await _channel
+        .invokeMethod('OneSignal#login', {'externalId': externalId});
   }
 
   /// Logout the user previously logged in via [login]. The [user] property now
@@ -58,8 +56,8 @@ class OneSignal {
   /// references a new device-scoped user. A device-scoped user has no user identity
   /// that can later be retrieved, except through this device as long as the app
   /// remains installed and the app data is not cleared.
-  void logout() {
-    _channel.invokeMethod('OneSignal#logout');
+  Future<void> logout() async {
+    return await _channel.invokeMethod('OneSignal#logout');
   }
 
   /// Indicates whether privacy consent has been granted.
@@ -77,7 +75,7 @@ class OneSignal {
   /// This field is only relevant when the application has
   /// opted into data privacy protections. See [requiresPrivacyConsent].
   Future<void> setPrivacyConsent(bool granted) async {
-    await _channel
+    return await _channel
         .invokeMethod("OneSignal#setPrivacyConsent", {'granted': granted});
   }
 
@@ -94,7 +92,7 @@ class OneSignal {
   /// OneSignal.setPrivacyConsent(true) function. This is useful if you want
   /// to show a Terms and Conditions or privacy popup for GDPR.
   Future<void> setRequiresPrivacyConsent(bool require) async {
-    await _channel.invokeMethod(
+    return await _channel.invokeMethod(
         "OneSignal#setRequiresPrivacyConsent", {'required': require});
   }
 
@@ -102,16 +100,18 @@ class OneSignal {
   /// within the application. Set to true to launch all notifications with a URL
   /// in the app instead of the default web browser. Make sure to call setLaunchURLsInApp
   /// before the initialize call.
-  void setLaunchURLsInApp(bool launchUrlsInApp) {
-    _channel.invokeMethod(
-        'OneSignal#setLaunchURLsInApp', {'launchUrlsInApp': launchUrlsInApp});
+  Future<void> setLaunchURLsInApp(bool launchUrlsInApp) async {
+    if (Platform.isIOS) {
+      return await _channel.invokeMethod(
+          'OneSignal#setLaunchURLsInApp', {'launchUrlsInApp': launchUrlsInApp});
+    }
   }
 
   /// Only applies to iOS
   /// Associates a temporary push token with an Activity ID on the OneSignal server.
   Future<void> enterLiveActivity(String activityId, String token) async {
     if (Platform.isIOS) {
-      await _channel.invokeMethod("OneSignal#enterLiveActivity",
+      return await _channel.invokeMethod("OneSignal#enterLiveActivity",
           {'activityId': activityId, 'token': token});
     }
   }
@@ -120,7 +120,7 @@ class OneSignal {
   /// Deletes activityId associated temporary push token on the OneSignal server.
   Future<void> exitLiveActivity(String activityId) async {
     if (Platform.isIOS) {
-      await _channel.invokeMethod(
+      return await _channel.invokeMethod(
           "OneSignal#exitLiveActivity", {'activityId': activityId});
     }
   }

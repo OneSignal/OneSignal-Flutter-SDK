@@ -1,7 +1,5 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
-import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/notification.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 
@@ -83,7 +81,11 @@ class OneSignalNotifications {
   }
 
   Future<void> lifecycleInit() async {
+    await _channel.invokeMethod(
+        "OneSignal#initNotificationWillShowInForegroundHandlerParams");
     _permission = await _channel.invokeMethod("OneSignal#permission");
+    await _channel
+        .invokeMethod("OneSignal#initNotificationOpenedHandlerParams");
     return await _channel.invokeMethod("OneSignal#lifecycleInit");
   }
 
@@ -116,8 +118,6 @@ class OneSignalNotifications {
   void setNotificationWillShowInForegroundHandler(
       NotificationWillShowInForegroundHandler handler) {
     _onNotificationWillShowInForegroundHandler = handler;
-    _channel.invokeMethod(
-        "OneSignal#initNotificationWillShowInForegroundHandlerParams");
   }
 
   /// The notification foreground handler is called whenever a notification arrives
@@ -131,7 +131,6 @@ class OneSignalNotifications {
   /// OneSignal push notification, or taps an action button on a notification.
   void setNotificationOpenedHandler(OpenedNotificationHandler handler) {
     _onOpenedNotification = handler;
-    _channel.invokeMethod("OneSignal#initNotificationOpenedHandlerParams");
   }
 }
 
