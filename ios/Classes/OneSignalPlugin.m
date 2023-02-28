@@ -58,7 +58,8 @@
 
     // TODO version
     [OneSignal setMSDKType:@"flutter"];
-
+    [OneSignal sdkVersion: @"050000"];
+    
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
                                      methodChannelWithName:@"OneSignal"
                                      binaryMessenger:[registrar messenger]];

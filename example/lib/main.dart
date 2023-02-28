@@ -40,6 +40,12 @@ class _MyAppState extends State<MyApp>
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     OneSignal.shared.initialize("77e32082-ea27-42e3-a898-c72e141824ef");
 
+    // AndroidOnly stat only
+    // OneSignal.Notifications.removeNotification(1);
+    // OneSignal.Notifications.removeGroupedNotifications("group5");
+
+    OneSignal.Notifications.clearAll();
+
     OneSignal.User.pushSubscription.addObserver(this);
     OneSignal.Notifications.addPermssionObserver(this);
 
@@ -194,10 +200,12 @@ class _MyAppState extends State<MyApp>
     print("Setting external user ID");
     if (_externalUserId == null) return;
     OneSignal.shared.login(_externalUserId!);
+    OneSignal.User.addAlias("fb_id", "1341524");
   }
 
   void _handleLogout() {
     OneSignal.shared.logout();
+    OneSignal.User.removeAlias("fb_id");
   }
 
   oneSignalInAppMessagingTriggerExamples() async {
