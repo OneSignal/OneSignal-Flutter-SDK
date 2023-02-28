@@ -24,7 +24,6 @@ IInAppMessageClickHandler, IInAppMessageLifecycleHandler{
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalInAppMessages sharedInstance = new OneSignalInAppMessages();
-       
         sharedInstance.messenger = messenger;
         sharedInstance.channel = new MethodChannel(messenger, "OneSignal#inappmessages");
         sharedInstance.channel.setMethodCallHandler(sharedInstance);   

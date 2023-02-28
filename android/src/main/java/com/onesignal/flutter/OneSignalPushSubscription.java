@@ -6,6 +6,8 @@ import com.onesignal.user.subscriptions.IPushSubscription;
 import com.onesignal.user.subscriptions.ISubscription;
 import com.onesignal.user.subscriptions.ISubscriptionChangedHandler;
 
+import com.onesignal.debug.internal.logging.Logging;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -65,9 +67,9 @@ public class OneSignalPushSubscription extends FlutterRegistrarResponder impleme
     public void onSubscriptionChanged(ISubscription subscription) { 
     if (!(subscription instanceof IPushSubscription)){
         return;
-        }
+    }
         IPushSubscription pushSubscription = (IPushSubscription) subscription;
-        invokeMethodOnUiThread("OneSignal#onSubscriptionChanged", OneSignalSerializer.convertOnSubscriptionChanged(pushSubscription));
+        invokeMethodOnUiThread("OneSignal#pushSubscriptionChanged", OneSignalSerializer.convertOnSubscriptionChanged(pushSubscription));
     }
 
 } 

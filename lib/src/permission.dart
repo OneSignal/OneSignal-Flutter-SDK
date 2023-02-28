@@ -4,7 +4,7 @@ class OSPermissionState extends JSONStringRepresentable {
   bool permission = false;
   OSPermissionState(Map<String, dynamic> json) {
     if (json.containsKey('permission')) {
-      bool enabled = json['permission'] as bool;
+      permission = json['permission'] as bool;
     }
   }
 

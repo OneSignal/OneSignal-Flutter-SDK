@@ -16,12 +16,12 @@ class OneSignalPushSubscription {
     this._channel.setMethodCallHandler(_handleMethod);
   }
 
-  String? id() {
+  String? get id {
     return this._id;
   }
 
   /// The readonly push token.
-  String? token() {
+  String? get token {
     return this._token;
   }
 
@@ -29,7 +29,7 @@ class OneSignalPushSubscription {
   /// This returns true when the app has notifications permission and optedOut is called.
   /// Note: Does not take into account the existence of the subscription ID and push token.
   /// This boolean may return true but push notifications may still not be received by the user.
-  bool? optedIn() {
+  bool? get optedIn {
     return _optedIn;
   }
 
@@ -68,25 +68,26 @@ class OneSignalPushSubscription {
   // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#pushSubscriptionChanged') {
-      this._onSubscriptionChangedHandler(OSPushSubscriptionStateChanges(
-          call.arguments.cast<String, dynamic>()));
+      this._onSubscriptionChangedHandler(
+          OSPushSubscriptionState(call.arguments.cast<String, dynamic>()));
     }
     return null;
   }
 
   void _onSubscriptionChangedHandler(
-      OSPushSubscriptionStateChanges stateChanges) async {
-    this._id = stateChanges.to.id;
-    this._token = stateChanges.to.token;
-    this._optedIn = stateChanges.to.optedIn;
+      OSPushSubscriptionState stateChanges) async {
+    print(stateChanges.jsonRepresentation());
+    this._id = stateChanges.id;
+    this._token = stateChanges.token;
+    this._optedIn = stateChanges.optedIn;
 
     for (var observer in _observers) {
-      observer.onOSPushSubscriptionChangedWithStateChanges(stateChanges);
+      observer.onOSPushSubscriptionChangedWithState(stateChanges);
     }
   }
 }
 
 class OneSignalPushSubscriptionObserver {
-  void onOSPushSubscriptionChangedWithStateChanges(
-      OSPushSubscriptionStateChanges stateChanges) {}
+  void onOSPushSubscriptionChangedWithState(
+      OSPushSubscriptionState stateChanges) {}
 }

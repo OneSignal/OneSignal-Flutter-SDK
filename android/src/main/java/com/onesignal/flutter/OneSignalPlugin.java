@@ -8,6 +8,7 @@ import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 
 import com.onesignal.OneSignal;
 import com.onesignal.Continue;
+import com.onesignal.common.OneSignalWrapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,8 +38,10 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
   { 
     this.context = context;
     this.messenger = messenger;
-    // TODO version
-    // OneSignal.sdkType = "flutter";
+    OneSignalWrapper.setSdkType("flutter");  
+    // For 5.0.0-beta, hard code to reflect SDK version
+    OneSignalWrapper.setSdkVersion("050000");
+    
     channel = new MethodChannel(messenger, "OneSignal");
     channel.setMethodCallHandler(this);
 
@@ -116,6 +119,8 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
       this.setPrivacyConsent(call, result);
     else if (call.method.contentEquals("OneSignal#login"))
       this.login(call, result);
+      else if (call.method.contentEquals("OneSignal#loginWithJWT"))
+      this.loginWithJWT(call, result);
     else if (call.method.contentEquals("OneSignal#logout"))
       this.logout(call, result);
     else
@@ -142,6 +147,11 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
 
   private void login(MethodCall call, Result result) {
     OneSignal.login((String) call.argument("externalId"));
+    replySuccess(result, null);
+  }
+
+  private void loginWithJWT(MethodCall call, Result result) {
+    OneSignal.login((String) call.argument("externalId"), (String) call.argument("jwt"));
     replySuccess(result, null);
   }
   private void logout(MethodCall call, Result result) {
