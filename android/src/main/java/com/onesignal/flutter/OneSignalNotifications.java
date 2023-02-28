@@ -62,11 +62,11 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     else if (call.method.contentEquals("OneSignal#clearAll"))
         this.clearAll(call, result);
     else if (call.method.contentEquals("OneSignal#initNotificationOpenedHandlerParams"))
-        this.initNotificationOpenedHandlerParams();
+        this.initNotificationOpenedHandlerParams(call, result);
     else if (call.method.contentEquals("OneSignal#initNotificationWillShowInForegroundHandlerParams"))
         this.initNotificationWillShowInForegroundHandlerParams();
     else if (call.method.contentEquals("OneSignal#completeNotification"))
-        this.initNotificationWillShowInForegroundHandlerParams();
+        this.completeNotification(call, result);
     else if (call.method.contentEquals("OneSignal#lifecycleInit"))
         this.lifecycleInit();
     else
@@ -98,8 +98,9 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     }
     
     
-    private void initNotificationOpenedHandlerParams() {
+    private void initNotificationOpenedHandlerParams(MethodCall call, Result result) {
         OneSignal.getNotifications().setNotificationClickHandler(this);
+        replySuccess(result, null);
     }
 
 
@@ -107,7 +108,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         this.hasSetNotificationWillShowInForegroundHandler = true;
     }
 
-    private void completeNotification(MethodCall call, final Result reply) {
+    private void completeNotification(MethodCall call, Result result) {
         String notificationId = call.argument("notificationId");
         boolean shouldDisplay = call.argument("shouldDisplay");
         INotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
@@ -122,6 +123,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         } else {
             notificationReceivedEvent.complete(null);
         }
+        replySuccess(result, null);
     }
 
     @Override

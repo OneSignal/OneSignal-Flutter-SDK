@@ -71,8 +71,7 @@ class OneSignalSerializer {
         if (notification.getActionButtons() != null) {
             hash.put("actionButtons", notification.getActionButtons());
         }
-        // TODO : rawPayload
-        // hash.put("rawPayload", notification.getRawPayload());
+        hash.put("rawPayload", notification.getRawPayload());
         return hash;
     }
 
@@ -105,7 +104,7 @@ class OneSignalSerializer {
     static HashMap<String, Object> convertPermissionChanged(boolean state) {
         HashMap<String, Object> permission = new HashMap<>();
 
-        permission.put("areNotificationsEnabled", state);
+        permission.put("permission", state);
 
         return permission;
     }
@@ -135,7 +134,7 @@ class OneSignalSerializer {
         
 
         hash.put("token", state.getToken());
-        hash.put("pushId", state.getId());
+        hash.put("id", state.getId());
         hash.put("optedIn", state.getOptedIn());
 
         return hash;

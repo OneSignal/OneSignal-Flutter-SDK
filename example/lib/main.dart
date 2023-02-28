@@ -11,7 +11,8 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => new _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
+class _MyAppState extends State<MyApp>
+    with OneSignalPushSubscriptionObserver, OneSignalPermissionObserver {
   String _debugLabelString = "";
   String? _emailAddress;
   String? _smsNumber;
@@ -32,7 +33,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    OneSignal.Debug.setLogLevel(OSLogLevel.none);
+    OneSignal.Debug.setLogLevel(OSLogLevel.debug);
 
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
 
@@ -40,6 +41,7 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     OneSignal.shared.initialize("9c59a2aa-315a-4bf9-9fef-f76d575d3202");
 
     OneSignal.User.pushSubscription.addObserver(this);
+    OneSignal.Notifications.addPermssionObserver(this);
 
     OneSignal.shared.setRequiresPrivacyConsent(_requireConsent);
 
@@ -106,12 +108,15 @@ class _MyAppState extends State<MyApp> with OneSignalPushSubscriptionObserver {
     oneSignalOutcomeExamples();
   }
 
-  void onOSPushSubscriptionChangedWithStateChanges(
-      OSPushSubscriptionStateChanges stateChanges) {
-    print(OneSignal.User.pushSubscription.optedIn());
-    print(OneSignal.User.pushSubscription.id());
-    print(OneSignal.User.pushSubscription.token());
-    print(stateChanges.jsonRepresentation());
+  void onOSPermissionChanged(bool state) {
+    print("Has permission " + state.toString());
+  }
+
+  void onOSPushSubscriptionChangedWithState(OSPushSubscriptionState state) {
+    print(OneSignal.User.pushSubscription.optedIn);
+    print(OneSignal.User.pushSubscription.id);
+    print(OneSignal.User.pushSubscription.token);
+    print(state.jsonRepresentation());
   }
 
   void _handleSendTags() {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/notification.dart';
 import 'package:onesignal_flutter/src/permission.dart';
@@ -26,7 +27,7 @@ class OneSignalNotifications {
   bool _permission = false;
 
   /// Whether this app has push notification permission.
-  bool permission() {
+  bool get permission {
     return _permission;
   }
 
@@ -38,14 +39,18 @@ class OneSignalNotifications {
 
   /// Removes a single notification.
   Future<void> removeNotification(int notificationId) async {
-    return await _channel.invokeMethod(
-        "OneSignal#removeNotification", {'notificationId': notificationId});
+    if (Platform.isAndroid) {
+      return await _channel.invokeMethod(
+          "OneSignal#removeNotification", {'notificationId': notificationId});
+    }
   }
 
   /// Removes a grouped notification.
   Future<void> removeGroupedNotifications(String notificationGroup) async {
-    return await _channel.invokeMethod("OneSignal#removeGroupedNotification",
-        {'notificationGroup': notificationGroup});
+    if (Platform.isAndroid) {
+      return await _channel.invokeMethod("OneSignal#removeGroupedNotification",
+          {'notificationGroup': notificationGroup});
+    }
   }
 
   /// Removes all OneSignal notifications.
@@ -81,7 +86,7 @@ class OneSignalNotifications {
   }
 
   Future<void> lifecycleInit() async {
-    await _channel.invokeMethod(
+    _channel.invokeMethod(
         "OneSignal#initNotificationWillShowInForegroundHandlerParams");
     _permission = await _channel.invokeMethod("OneSignal#permission");
     await _channel
@@ -109,7 +114,7 @@ class OneSignalNotifications {
   Future<void> onOSPermissionChangedHandler(OSPermissionState state) async {
     _permission = state.permission;
     for (var observer in _observers) {
-      observer.onOSPermissionChanged(state);
+      observer.onOSPermissionChanged(_permission);
     }
   }
 
@@ -135,5 +140,5 @@ class OneSignalNotifications {
 }
 
 class OneSignalPermissionObserver {
-  void onOSPermissionChanged(OSPermissionState state) {}
+  void onOSPermissionChanged(bool state) {}
 }

@@ -8,11 +8,11 @@ import 'package:onesignal_flutter/src/session.dart';
 import 'package:onesignal_flutter/src/location.dart';
 import 'package:onesignal_flutter/src/inappmessages.dart';
 
-export 'src/permission.dart';
 export 'src/defines.dart';
 export 'src/pushsubscription.dart';
 export 'src/subscription.dart';
 export 'src/notification.dart';
+export 'src/notifications.dart';
 export 'src/inappmessage.dart';
 
 class OneSignal {
@@ -49,6 +49,17 @@ class OneSignal {
   Future<void> login(String externalId) async {
     return await _channel
         .invokeMethod('OneSignal#login', {'externalId': externalId});
+  }
+
+  /// Login to OneSignal under the user identified by the [externalId] provided.
+  ///
+  /// The act of logging a user into the OneSignal SDK will switch the
+  /// user context to that specific user.
+  Future<void> loginWithJWT(String externalId, String jwt) async {
+    if (Platform.isAndroid) {
+      return await _channel.invokeMethod(
+          'OneSignal#loginWithJWT', {'externalId': externalId, 'jwt': jwt});
+    }
   }
 
   /// Logout the user previously logged in via [login]. The [user] property now
