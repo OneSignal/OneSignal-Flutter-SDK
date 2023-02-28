@@ -48,7 +48,7 @@ class OneSignalNotifications {
   /// Removes a grouped notification.
   Future<void> removeGroupedNotifications(String notificationGroup) async {
     if (Platform.isAndroid) {
-      return await _channel.invokeMethod("OneSignal#removeGroupedNotification",
+      return await _channel.invokeMethod("OneSignal#removeGroupedNotifications",
           {'notificationGroup': notificationGroup});
     }
   }

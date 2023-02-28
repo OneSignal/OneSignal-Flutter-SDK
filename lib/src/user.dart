@@ -33,16 +33,16 @@ class OneSignalUser {
   ///
   /// If any alias already exists, it will be overwritten to the new values.
   Future<void> addAliases(Map<String, dynamic> aliases) async {
-    return await _channel.invokeMethod("OneSignal#addAlias", aliases);
+    return await _channel.invokeMethod("OneSignal#addAliases", aliases);
   }
 
   /// Remove an [alias] from the current user.
-  Future<void> removeAlias(String alias, dynamic id) async {
-    return await this.removeAliases({alias: id});
+  Future<void> removeAlias(String label) async {
+    return await this.removeAliases([label]);
   }
 
   /// Remove [aliases] from the current user.
-  Future<void> removeAliases(Map<String, dynamic> aliases) async {
+  Future<void> removeAliases(List<String> aliases) async {
     return await _channel.invokeMethod("OneSignal#removeAliases", aliases);
   }
 
