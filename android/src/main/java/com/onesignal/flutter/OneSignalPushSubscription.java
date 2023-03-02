@@ -6,6 +6,8 @@ import com.onesignal.user.subscriptions.IPushSubscription;
 import com.onesignal.user.subscriptions.ISubscription;
 import com.onesignal.user.subscriptions.ISubscriptionChangedHandler;
 
+import com.onesignal.debug.internal.logging.Logging;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -22,7 +24,6 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalPushSubscription extends FlutterRegistrarResponder implements MethodCallHandler, ISubscriptionChangedHandler {
-    private MethodChannel channel;
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalPushSubscription controller = new OneSignalPushSubscription();
@@ -58,7 +59,7 @@ public class OneSignalPushSubscription extends FlutterRegistrarResponder impleme
         replySuccess(reply, null);
     }
 
-    public void lifecycleInit() {
+    private void lifecycleInit() {
         OneSignal.getUser().getPushSubscription().addChangeHandler(this);
     }  
 
@@ -66,9 +67,9 @@ public class OneSignalPushSubscription extends FlutterRegistrarResponder impleme
     public void onSubscriptionChanged(ISubscription subscription) { 
     if (!(subscription instanceof IPushSubscription)){
         return;
-        }
+    }
         IPushSubscription pushSubscription = (IPushSubscription) subscription;
-        invokeMethodOnUiThread("OneSignal#onSubscriptionChanged", OneSignalSerializer.convertOnSubscriptionChanged(pushSubscription));
+        invokeMethodOnUiThread("OneSignal#pushSubscriptionChanged", OneSignalSerializer.convertOnSubscriptionChanged(pushSubscription));
     }
 
 } 

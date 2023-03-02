@@ -53,10 +53,8 @@
         [self optIn:call withResult:result];
     else if ([@"OneSignal#optOut" isEqualToString:call.method])
         [self optOut:call withResult:result];
-    else if ([@"OneSignal#addObserver" isEqualToString:call.method])
-        [self addObserver:call withResult:result];
-    else if ([@"OneSignal#removeObserver" isEqualToString:call.method])
-        [self removeObserver:call withResult:result];
+    else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
+        [self lifecycleInit:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -71,19 +69,13 @@
     result(nil);
 }
 
-- (void)addObserver:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+- (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal.User.pushSubscription addObserver:self];
     result(nil);
 }
 
-// TODO: possibly don't need
-- (void)removeObserver:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.User.pushSubscription removeObserver:self];
-    result(nil);
-}
-
 - (void)onOSPushSubscriptionChangedWithStateChanges:(OSPushSubscriptionStateChanges*)stateChanges {
-    [self.channel invokeMethod:@"OneSignal#pushSubscriptionChanged" arguments:stateChanges.jsonRepresentation];
+    [self.channel invokeMethod:@"OneSignal#pushSubscriptionChanged" arguments:stateChanges.to.jsonRepresentation];
 }
 
 @end

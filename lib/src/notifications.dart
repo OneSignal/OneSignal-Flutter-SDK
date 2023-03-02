@@ -1,7 +1,6 @@
 import 'dart:async';
-import 'dart:io' show Platform;
+import 'dart:io';
 import 'package:flutter/services.dart';
-import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/notification.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 
@@ -25,9 +24,11 @@ class OneSignalNotifications {
     this._channel.setMethodCallHandler(_handleMethod);
   }
 
+  bool _permission = false;
+
   /// Whether this app has push notification permission.
-  Future<bool> permission() async {
-    return await _channel.invokeMethod("OneSignal#permission");
+  bool get permission {
+    return _permission;
   }
 
   /// Whether attempting to request notification permission will show a prompt.
@@ -38,14 +39,18 @@ class OneSignalNotifications {
 
   /// Removes a single notification.
   Future<void> removeNotification(int notificationId) async {
-    return await _channel.invokeMethod(
-        "OneSignal#removeNotification", {'notificationId': notificationId});
+    if (Platform.isAndroid) {
+      return await _channel.invokeMethod(
+          "OneSignal#removeNotification", {'notificationId': notificationId});
+    }
   }
 
   /// Removes a grouped notification.
   Future<void> removeGroupedNotifications(String notificationGroup) async {
-    return await _channel.invokeMethod("OneSignal#removeGroupedNotification",
-        {'notificationGroup': notificationGroup});
+    if (Platform.isAndroid) {
+      return await _channel.invokeMethod("OneSignal#removeGroupedNotifications",
+          {'notificationGroup': notificationGroup});
+    }
   }
 
   /// Removes all OneSignal notifications.
@@ -80,7 +85,12 @@ class OneSignalNotifications {
     _observers.remove(observer);
   }
 
-  Future<bool> lifecycleInit() async {
+  Future<void> lifecycleInit() async {
+    _channel.invokeMethod(
+        "OneSignal#initNotificationWillShowInForegroundHandlerParams");
+    _permission = await _channel.invokeMethod("OneSignal#permission");
+    await _channel
+        .invokeMethod("OneSignal#initNotificationOpenedHandlerParams");
     return await _channel.invokeMethod("OneSignal#lifecycleInit");
   }
 
@@ -102,8 +112,9 @@ class OneSignalNotifications {
   }
 
   Future<void> onOSPermissionChangedHandler(OSPermissionState state) async {
+    _permission = state.permission;
     for (var observer in _observers) {
-      observer.onOSPermissionChanged(state);
+      observer.onOSPermissionChanged(_permission);
     }
   }
 
@@ -112,8 +123,6 @@ class OneSignalNotifications {
   void setNotificationWillShowInForegroundHandler(
       NotificationWillShowInForegroundHandler handler) {
     _onNotificationWillShowInForegroundHandler = handler;
-    _channel.invokeMethod(
-        "OneSignal#initNotificationWillShowInForegroundHandlerParams");
   }
 
   /// The notification foreground handler is called whenever a notification arrives
@@ -127,10 +136,9 @@ class OneSignalNotifications {
   /// OneSignal push notification, or taps an action button on a notification.
   void setNotificationOpenedHandler(OpenedNotificationHandler handler) {
     _onOpenedNotification = handler;
-    _channel.invokeMethod("OneSignal#initNotificationOpenedHandlerParams");
   }
 }
 
 class OneSignalPermissionObserver {
-  void onOSPermissionChanged(OSPermissionState state) {}
+  void onOSPermissionChanged(bool state) {}
 }

@@ -51,7 +51,6 @@
         result(FlutterMethodNotImplemented);
 }
 
-
 - (void)setLocationShared:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     BOOL locationShared = [call.arguments boolValue];
     [OneSignal.Location setShared:locationShared];

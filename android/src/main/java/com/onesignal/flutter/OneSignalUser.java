@@ -42,7 +42,7 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
             this.removeEmail(call, result);
         else if (call.method.contentEquals("OneSignal#addSms"))
             this.addSms(call, result);
-        else if (call.method.contentEquals("OneSignal#removeSMS"))
+        else if (call.method.contentEquals("OneSignal#removeSms"))
             this.removeSms(call, result);
         else if (call.method.contentEquals("OneSignal#addTags"))
             this.addTags(call, result);
@@ -52,7 +52,7 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
             replyNotImplemented(result);
     }
 
-    private void setLanguage(MethodCall call, final Result result) {
+    private void setLanguage(MethodCall call, Result result) {
         String language = call.argument("language");
         if (language != null && language.length() == 0)
           language = null;

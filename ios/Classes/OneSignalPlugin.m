@@ -39,15 +39,6 @@
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 
-/*
-    Will be true if the SDK is waiting for the
-    user's consent before initializing.
-    This is important because if the plugin
-    doesn't know the SDK is waiting for consent,
-    it will add the observers (ie. subscription)
-*/
-@property (atomic) BOOL waitingForUserConsent;
-
 @end
 
 @implementation OneSignalPlugin
@@ -57,7 +48,6 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [OneSignalPlugin new];
-        sharedInstance.waitingForUserConsent = false;
     });
     return sharedInstance;
 }
@@ -65,8 +55,9 @@
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
 
-    [OneSignal setMSDKType:@"flutter"];
-
+    OneSignalWrapper.sdkType = @"flutter";
+    OneSignalWrapper.sdkVersion = @"050000";
+    
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
                                      methodChannelWithName:@"OneSignal"
                                      binaryMessenger:[registrar messenger]];
@@ -108,18 +99,10 @@
 
 #pragma mark Init
 
-- (void)initialize:(FlutterMethodCall *)call {
+- (void)initialize:(FlutterMethodCall *)call withResult:(FlutterResult)result{
 
     [OneSignal initialize:call.arguments[@"appId"] withLaunchOptions:nil];
-    // If the user has required privacy consent, the SDK will not
-    // add these observers. So we should delay adding the observers
-    // until consent has been provided.
-    // if (OneSignal.requiresUserPrivacyConsent) {
-    //     self.waitingForUserConsent = true;
-    // } else {
-    //     [self addObservers];
-    // }
-   // result(nil);
+    result(nil);
 }
 
 #pragma mark Login Logout
