@@ -1,5 +1,6 @@
 package com.onesignal.flutter;
 
+import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.OneSignal;
 import com.onesignal.Continue;
 
@@ -37,11 +38,8 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickHandler, INotificationWillShowInForegroundHandler, IPermissionChangedHandler {
-    // private MethodChannel channel;
-
     private boolean hasSetNotificationWillShowInForegroundHandler = false;
     private final HashMap<String, INotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
-
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalNotifications controller = new OneSignalNotifications();
@@ -52,7 +50,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
-    if (call.method.contentEquals("OneSignal#getPermission"))
+    if (call.method.contentEquals("OneSignal#permission"))
         replySuccess(result, OneSignal.getNotifications().getPermission());
     else if (call.method.contentEquals("OneSignal#requestPermission"))
         this.requestPermission(call, result);
@@ -63,11 +61,11 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     else if (call.method.contentEquals("OneSignal#clearAll"))
         this.clearAll(call, result);
     else if (call.method.contentEquals("OneSignal#initNotificationOpenedHandlerParams"))
-        this.initNotificationOpenedHandlerParams();
+        this.initNotificationOpenedHandlerParams(call, result);
     else if (call.method.contentEquals("OneSignal#initNotificationWillShowInForegroundHandlerParams"))
         this.initNotificationWillShowInForegroundHandlerParams();
     else if (call.method.contentEquals("OneSignal#completeNotification"))
-        this.initNotificationWillShowInForegroundHandlerParams();
+        this.completeNotification(call, result);
     else if (call.method.contentEquals("OneSignal#lifecycleInit"))
         this.lifecycleInit();
     else
@@ -99,8 +97,9 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     }
     
     
-    private void initNotificationOpenedHandlerParams() {
+    private void initNotificationOpenedHandlerParams(MethodCall call, Result result) {
         OneSignal.getNotifications().setNotificationClickHandler(this);
+        replySuccess(result, null);
     }
 
 
@@ -108,13 +107,13 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         this.hasSetNotificationWillShowInForegroundHandler = true;
     }
 
-    private void completeNotification(MethodCall call, final Result reply) {
+    private void completeNotification(MethodCall call, Result result) {
         String notificationId = call.argument("notificationId");
         boolean shouldDisplay = call.argument("shouldDisplay");
         INotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
 
         if (notificationReceivedEvent == null) {
-            //OneSignal.onesignalLog(OneSignal.LOG_LEVEL.ERROR, "Could not find notification completion block with id: " + notificationId);
+            Logging.error("Could not find notification completion block with id: " + notificationId, null);
             return;
         }
 
@@ -123,6 +122,13 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         } else {
             notificationReceivedEvent.complete(null);
         }
+
+        synchronized (notificationReceivedEvent) {
+            notificationReceivedEventCache.remove(notificationId);
+            notificationReceivedEvent.notify();
+        }
+       
+        replySuccess(result, null);
     }
 
     @Override
@@ -131,7 +137,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
             invokeMethodOnUiThread("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationClickResultToMap(result));
         } catch (JSONException e) {
             e.getStackTrace();
-            android.util.Log.w("TestHenryTest ", e.toString());
+            Logging.error("Encountered an error attempting to convert INotificationClickResult object to hash map:" + e.toString(), null);
         }
     }
 
@@ -160,18 +166,28 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         try {
             HashMap<String, Object>  receivedMap = OneSignalSerializer.convertNotificationToMap(notification);
             invokeMethodOnUiThread("OneSignal#handleNotificationWillShowInForeground", receivedMap);
+            try {
+            
+                synchronized (notificationReceivedEvent) {
+                    while(notificationReceivedEventCache.containsKey(notification.getNotificationId()))
+                        notificationReceivedEvent.wait();
+                }
+            } catch(InterruptedException e){
+                Logging.error("InterruptedException" + e.toString(), null);
+            }
+           
         } catch (JSONException e) {
             e.getStackTrace();
+            Logging.error("Encountered an error attempting to convert INotification object to hash map:" + e.toString(), null);
         }
     }
 
     @Override
     public void onPermissionChanged(boolean permission)  { 
-
         invokeMethodOnUiThread("OneSignal#OSPermissionChanged", OneSignalSerializer.convertPermissionChanged(permission));
     }
 
-    public void lifecycleInit() {
+    private void lifecycleInit() {
         OneSignal.getNotifications().setNotificationWillShowInForegroundHandler(this);
         OneSignal.getNotifications().addPermissionChangedHandler(this);
     }

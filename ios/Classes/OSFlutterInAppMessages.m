@@ -48,34 +48,30 @@
                         binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:OSFlutterInAppMessages.sharedInstance channel:OSFlutterInAppMessages.sharedInstance.channel];
-
-    [OneSignal.InAppMessages setClickHandler:^(OSInAppMessageAction *action) {
-         [OSFlutterInAppMessages.sharedInstance handleInAppMessageClicked:action];
-     }];
-     [OneSignal.InAppMessages setLifecycleHandler:OSFlutterInAppMessages.sharedInstance];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([@"OneSignal#addTrigger" isEqualToString:call.method]) {
+    if ([@"OneSignal#addTrigger" isEqualToString:call.method]) 
         [self addTriggers:call withResult:result];
-    } else if ([@"OneSignal#addTriggers" isEqualToString:call.method]) {
+    else if ([@"OneSignal#addTriggers" isEqualToString:call.method]) 
         [self addTriggers:call withResult:result];
-    } else if ([@"OneSignal#removeTrigger" isEqualToString:call.method]) {
+    else if ([@"OneSignal#removeTrigger" isEqualToString:call.method]) 
         [self removeTrigger:call withResult:result];
-    } else if ([@"OneSignal#removeTriggers" isEqualToString:call.method]) {
+    else if ([@"OneSignal#removeTriggers" isEqualToString:call.method]) 
         [self removeTriggers:call withResult:result];
-    } else if ([@"OneSignal#clearTriggers" isEqualToString:call.method]) {
+    else if ([@"OneSignal#clearTriggers" isEqualToString:call.method]) 
           [self clearTriggers:call withResult:result];
-    } else if ([@"OneSignal#paused" isEqualToString:call.method]) {
+    else if ([@"OneSignal#paused" isEqualToString:call.method]) 
         [self paused:call withResult:result];
-    } else if ([@"OneSignal#arePaused" isEqualToString:call.method]) {
+    else if ([@"OneSignal#arePaused" isEqualToString:call.method]) 
         result(@([OneSignal.InAppMessages paused]));
-    } else if ([@"OneSignal#initInAppMessageClickedHandlerParams" isEqualToString:call.method]) {
+    else if ([@"OneSignal#initInAppMessageClickedHandlerParams" isEqualToString:call.method]) 
         [self initInAppMessageClickedHandlerParams];
-    }
-    else{
+    else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
+        [self lifecycleInit:call withResult:result];
+    else 
         result(FlutterMethodNotImplemented);
-    }
+    
 }
 
 - (void)addTriggers:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -106,6 +102,14 @@
     [OneSignal.InAppMessages paused:pause];
     result(nil);
 }
+
+- (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+   [OneSignal.InAppMessages setClickHandler:^(OSInAppMessageAction *action) {
+         [OSFlutterInAppMessages.sharedInstance handleInAppMessageClicked:action];
+     }];
+    [OneSignal.InAppMessages setLifecycleHandler:OSFlutterInAppMessages.sharedInstance];
+}
+
 
 
 #pragma mark In App Message Click

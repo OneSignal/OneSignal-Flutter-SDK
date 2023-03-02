@@ -1,14 +1,11 @@
 import 'dart:async';
-import 'dart:io' show Platform;
 import 'package:flutter/services.dart';
-import 'package:onesignal_flutter/src/defines.dart';
 
 class OneSignalLocation {
-
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal#location');
 
-   /// Allows you to prompt the user for permission to use location services
+  /// Allows you to prompt the user for permission to use location services
   Future<void> requestPermission() async {
     return await _channel.invokeMethod("OneSignal#requestPermission");
   }
@@ -18,7 +15,7 @@ class OneSignalLocation {
   Future<void> setShared(bool shared) async {
     return await _channel.invokeMethod("OneSignal#setShared", shared);
   }
-  
+
   /// Set whether location is currently shared with OneSignal.
   Future<bool> isShared() async {
     return await _channel.invokeMethod("OneSignal#isShared");

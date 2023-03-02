@@ -19,9 +19,8 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalDebug extends FlutterRegistrarResponder implements MethodCallHandler {
-    private MethodChannel channel;
-
-    static void registerWith(BinaryMessenger messenger) {
+    
+   static void registerWith(BinaryMessenger messenger) {
         OneSignalDebug controller = new OneSignalDebug();
         controller.messenger = messenger;
         controller.channel = new MethodChannel(messenger, "OneSignal#debug");

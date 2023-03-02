@@ -17,15 +17,14 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalInAppMessages extends FlutterRegistrarResponder implements MethodCallHandler, 
-IInAppMessageClickHandler{
-    private MethodChannel channel;
-
+IInAppMessageClickHandler, IInAppMessageLifecycleHandler{
+  
     private IInAppMessageClickResult inAppMessageClickedResult;
     private boolean hasSetInAppMessageClickedHandler = false;
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalInAppMessages sharedInstance = new OneSignalInAppMessages();
-       
+
         sharedInstance.messenger = messenger;
         sharedInstance.channel = new MethodChannel(messenger, "OneSignal#inappmessages");
         sharedInstance.channel.setMethodCallHandler(sharedInstance);   
@@ -109,26 +108,26 @@ IInAppMessageClickHandler{
 
     /* in app message lifecycle */
     public void setInAppMessageLifecycleHandler() {
-        OneSignal.getInAppMessages().setInAppMessageLifecycleHandler(new IInAppMessageLifecycleHandler() {
-            @Override
-            public void onWillDisplayInAppMessage(IInAppMessage message) { 
-                invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
-            }
+        OneSignal.getInAppMessages().setInAppMessageLifecycleHandler(this);
+    }
+    
+    @Override
+    public void onWillDisplayInAppMessage(IInAppMessage message) { 
+        invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+    }
 
-            @Override
-            public void onDidDisplayInAppMessage(IInAppMessage message) {
-                invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
-            }
+    @Override
+    public void onDidDisplayInAppMessage(IInAppMessage message) {
+        invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+    }
 
-            @Override
-            public void onWillDismissInAppMessage(IInAppMessage message) {
-                invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
-            }
+    @Override
+    public void onWillDismissInAppMessage(IInAppMessage message) {
+        invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+    }
 
-            @Override
-            public void onDidDismissInAppMessage(IInAppMessage message) {
-                invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
-            }
-        });
-  }
+    @Override
+    public void onDidDismissInAppMessage(IInAppMessage message) {
+        invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+    }
 }

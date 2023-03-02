@@ -8,6 +8,7 @@ import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 
 import com.onesignal.OneSignal;
 import com.onesignal.Continue;
+import com.onesignal.common.OneSignalWrapper;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -30,9 +31,6 @@ import io.flutter.view.FlutterNativeView;
 /** OnesignalPlugin */
 public class OneSignalPlugin extends FlutterRegistrarResponder implements FlutterPlugin, MethodCallHandler, ActivityAware {
 
-  private boolean hasSetRequiresPrivacyConsent = false;
-  private boolean waitingForUserPrivacyConsent = false;
-
   public OneSignalPlugin() {
   }
 
@@ -40,10 +38,10 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
   { 
     this.context = context;
     this.messenger = messenger;
-
-    // OneSignal.sdkType = "flutter";
-
-    waitingForUserPrivacyConsent = false;
+    OneSignalWrapper.setSdkType("flutter");  
+    // For 5.0.0-beta, hard code to reflect SDK version
+    OneSignalWrapper.setSdkVersion("050000");
+    
     channel = new MethodChannel(messenger, "OneSignal");
     channel.setMethodCallHandler(this);
 
@@ -54,9 +52,6 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
     OneSignalUser.registerWith(messenger);
     OneSignalPushSubscription.registerWith(messenger);
     OneSignalNotifications.registerWith(messenger);
-    // OneSignalTagsController.registerWith(messenger);
-    // OneSignalInAppMessagingController.registerWith(messenger);
-    // OneSignalOutcomeEventsController.registerWith(messenger);
   }
 
   @Override
@@ -73,8 +68,6 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
   }
 
   private void onDetachedFromEngine() {
-    // OneSignal.setNotificationOpenedHandler(null);
-    // OneSignal.setInAppMessageClickHandler(null);
   }
 
   @Override
@@ -116,7 +109,7 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
   public void onMethodCall(MethodCall call, Result result) {
     if (call.method.contentEquals("OneSignal#initialize"))
       this.initWithContext(call, result);
-    else if (call.method.contentEquals("OneSignal#getRequiresPrivacyConsent"))
+    else if (call.method.contentEquals("OneSignal#requiresPrivacyConsent"))
       replySuccess(result, OneSignal.getRequiresPrivacyConsent());
     else if (call.method.contentEquals("OneSignal#setRequiresPrivacyConsent"))
       this.setRequiresPrivacyConsent(call, result);
@@ -126,6 +119,8 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
       this.setPrivacyConsent(call, result);
     else if (call.method.contentEquals("OneSignal#login"))
       this.login(call, result);
+      else if (call.method.contentEquals("OneSignal#loginWithJWT"))
+      this.loginWithJWT(call, result);
     else if (call.method.contentEquals("OneSignal#logout"))
       this.logout(call, result);
     else
@@ -135,26 +130,18 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
   private void initWithContext(MethodCall call, Result reply) {
     String appId = call.argument("appId");
     OneSignal.initWithContext(context, appId);
-    // if (hasSetRequiresPrivacyConsent && !OneSignal.userProvidedPrivacyConsent())
-    //   this.waitingForUserPrivacyConsent = true;
-    // else
-    //   this.addObservers();
-
     replySuccess(reply, null);
   }
 
   private void setRequiresPrivacyConsent(MethodCall call, Result reply) {
     boolean required = call.argument("required");
-    
     OneSignal.setRequiresPrivacyConsent(required);
-
     replySuccess(reply, null);
   }
 
   private void setPrivacyConsent(MethodCall call, Result reply) {
     boolean granted = call.argument("granted");
     OneSignal.setPrivacyConsent(granted);
-
     replySuccess(reply, null);
   }
 
@@ -162,21 +149,13 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
     OneSignal.login((String) call.argument("externalId"));
     replySuccess(result, null);
   }
+
+  private void loginWithJWT(MethodCall call, Result result) {
+    OneSignal.login((String) call.argument("externalId"), (String) call.argument("jwt"));
+    replySuccess(result, null);
+  }
   private void logout(MethodCall call, Result result) {
     OneSignal.logout();
     replySuccess(result, null);
-  }
-
-  static class OSFlutterHandler extends FlutterRegistrarResponder {
-    protected final Result result;
-    protected final String methodName;
-    protected final AtomicBoolean replySubmitted = new AtomicBoolean(false);
-
-    OSFlutterHandler(BinaryMessenger messenger, MethodChannel channel, Result res, String methodName) {
-      this.messenger = messenger;
-      this.channel = channel;
-      this.result = res;
-      this.methodName = methodName;
-    }
   }
 }
