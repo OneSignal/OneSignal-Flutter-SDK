@@ -48,7 +48,6 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [OneSignalPlugin new];
-        sharedInstance.waitingForUserConsent = false;
     });
     return sharedInstance;
 }
@@ -56,9 +55,8 @@
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
 
-    // TODO version
-    [OneSignal setMSDKType:@"flutter"];
-    [OneSignal sdkVersion: @"050000"];
+    OneSignalWrapper.sdkType = @"flutter";
+    OneSignalWrapper.sdkVersion = @"050000";
     
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
                                      methodChannelWithName:@"OneSignal"

@@ -59,7 +59,7 @@ public class OneSignalPushSubscription extends FlutterRegistrarResponder impleme
         replySuccess(reply, null);
     }
 
-    public void lifecycleInit() {
+    private void lifecycleInit() {
         OneSignal.getUser().getPushSubscription().addChangeHandler(this);
     }  
 

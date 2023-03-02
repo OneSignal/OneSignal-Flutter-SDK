@@ -51,10 +51,6 @@
                         binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:OSFlutterNotifications.sharedInstance channel:OSFlutterNotifications.sharedInstance.channel];
-    
-    [OneSignal.Notifications setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
-        [OSFlutterNotifications.sharedInstance handleNotificationWillShowInForeground:notification completion:completion];
-    }];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result { 
@@ -68,16 +64,14 @@
         [self requestPermission:call withResult:result];
     else  if ([@"OneSignal#registerForProvisionalAuthorization" isEqualToString:call.method])
         [self registerForProvisionalAuthorization:call withResult:result];
-     else if ([@"OneSignal#addPermissionObserver" isEqualToString:call.method])
-        [self addPermissionObserver:call withResult:result];
-    else if ([@"OneSignal#removePermissionObserver" isEqualToString:call.method])
-        [self removePermissionObserver:call withResult:result];
     else if ([@"OneSignal#initNotificationWillShowInForegroundHandlerParams" isEqualToString:call.method])
         [self initNotificationWillShowInForegroundHandlerParams];
     else if ([@"OneSignal#completeNotification" isEqualToString:call.method])
         [self completeNotification:call withResult:result];
     else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method])
-        [self initNotificationOpenedHandlerParams];
+        [self initNotificationOpenedHandlerParams:call withResult:result];
+     else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
+        [self lifecycleInit:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -88,6 +82,7 @@
 }
 
 - (void)requestPermission:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+     NSLog(@"henryhenryhenryrequestPermission");
     BOOL fallbackToSettings = [call.arguments[@"fallbackToSettings"] boolValue];
     
     [OneSignal.Notifications requestPermission:^(BOOL accepted) {
@@ -101,13 +96,18 @@
     }];
 }
 
-- (void)onOSPermissionChanged:(OSPermissionState*)state {
-    [self.channel invokeMethod:@"OneSignal#OSPermissionChanged" arguments:state.jsonRepresentation];
-}
-
-- (void)addPermissionObserver:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+- (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal.Notifications setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
+        [OSFlutterNotifications.sharedInstance handleNotificationWillShowInForeground:notification completion:completion];
+    }];
     [OneSignal.Notifications addPermissionObserver:self];
     result(nil);
+}
+
+ 
+
+- (void)onOSPermissionChanged:(OSPermissionState*)state {
+    [self.channel invokeMethod:@"OneSignal#OSPermissionChanged" arguments:state.jsonRepresentation];
 }
 
 #pragma mark Received in Foreground Notification 
@@ -150,10 +150,11 @@
 
 #pragma mark Opened Notification
 
-- (void)initNotificationOpenedHandlerParams {
+- (void)initNotificationOpenedHandlerParams:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal.Notifications setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
         [OSFlutterNotifications.sharedInstance handleNotificationOpened:result];
     }];
+    result(nil);
 }
 
 - (void)handleNotificationOpened:(OSNotificationOpenedResult *)result {

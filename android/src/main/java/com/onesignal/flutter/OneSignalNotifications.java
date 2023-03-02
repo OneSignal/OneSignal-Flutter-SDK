@@ -41,7 +41,6 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     private boolean hasSetNotificationWillShowInForegroundHandler = false;
     private final HashMap<String, INotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
-
     static void registerWith(BinaryMessenger messenger) {
         OneSignalNotifications controller = new OneSignalNotifications();
         controller.messenger = messenger;
@@ -123,6 +122,12 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         } else {
             notificationReceivedEvent.complete(null);
         }
+
+        synchronized (notificationReceivedEvent) {
+            notificationReceivedEventCache.remove(notificationId);
+            notificationReceivedEvent.notify();
+        }
+       
         replySuccess(result, null);
     }
 
@@ -161,6 +166,16 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         try {
             HashMap<String, Object>  receivedMap = OneSignalSerializer.convertNotificationToMap(notification);
             invokeMethodOnUiThread("OneSignal#handleNotificationWillShowInForeground", receivedMap);
+            try {
+            
+                synchronized (notificationReceivedEvent) {
+                    while(notificationReceivedEventCache.containsKey(notification.getNotificationId()))
+                        notificationReceivedEvent.wait();
+                }
+            } catch(InterruptedException e){
+                Logging.error("InterruptedException" + e.toString(), null);
+            }
+           
         } catch (JSONException e) {
             e.getStackTrace();
             Logging.error("Encountered an error attempting to convert INotification object to hash map:" + e.toString(), null);
@@ -172,7 +187,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         invokeMethodOnUiThread("OneSignal#OSPermissionChanged", OneSignalSerializer.convertPermissionChanged(permission));
     }
 
-    public void lifecycleInit() {
+    private void lifecycleInit() {
         OneSignal.getNotifications().setNotificationWillShowInForegroundHandler(this);
         OneSignal.getNotifications().addPermissionChangedHandler(this);
     }

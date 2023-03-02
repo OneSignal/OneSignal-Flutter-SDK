@@ -1,31 +1,23 @@
 import 'package:onesignal_flutter/src/utils.dart';
 
-
 /// Represents the current user's subscription state with OneSignal
 class OSPushSubscriptionState extends JSONStringRepresentable {
-
   String? id;
 
   /// The APNS (iOS), GCM/FCM (Android) push token
   String? token;
 
   bool optedIn = false;
-  
-  OSPushSubscriptionState(Map<String, dynamic> json) {
 
-    if (json.containsKey('id'))
-      this.id = json['id'] as String?;
+  OSPushSubscriptionState(Map<String, dynamic> json) {
+    if (json.containsKey('id')) this.id = json['id'] as String?;
     if (json.containsKey('token')) this.token = json['token'] as String?;
     this.optedIn = json['optedIn'] as bool;
-    
   }
 
   String jsonRepresentation() {
-    return convertToJsonString({
-      'id': this.id,
-      'token': this.token,
-      'optedIn': this.optedIn
-    });
+    return convertToJsonString(
+        {'id': this.id, 'token': this.token, 'optedIn': this.optedIn});
   }
 }
 

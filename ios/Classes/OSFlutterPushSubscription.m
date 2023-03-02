@@ -53,8 +53,8 @@
         [self optIn:call withResult:result];
     else if ([@"OneSignal#optOut" isEqualToString:call.method])
         [self optOut:call withResult:result];
-     else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
-        [self removeObserver:call withResult:result];
+    else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
+        [self lifecycleInit:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -75,7 +75,7 @@
 }
 
 - (void)onOSPushSubscriptionChangedWithStateChanges:(OSPushSubscriptionStateChanges*)stateChanges {
-    [self.channel invokeMethod:@"OneSignal#pushSubscriptionChanged" arguments:stateChanges.jsonRepresentation];
+    [self.channel invokeMethod:@"OneSignal#pushSubscriptionChanged" arguments:stateChanges.to.jsonRepresentation];
 }
 
 @end

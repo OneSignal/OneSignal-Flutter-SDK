@@ -32,6 +32,7 @@
 
 @interface OSFlutterPushSubscription : NSObject<FlutterPlugin, OSPushSubscriptionObserver>
 
++ (instancetype)sharedInstance;
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 
 @end
