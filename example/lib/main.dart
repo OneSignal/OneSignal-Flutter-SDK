@@ -33,9 +33,10 @@ class _MyAppState extends State<MyApp>
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    OneSignal.Debug.setLogLevel(OSLogLevel.debug);
+    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
 
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
+    OneSignal.shared.setRequiresPrivacyConsent(_requireConsent);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     OneSignal.shared.initialize("77e32082-ea27-42e3-a898-c72e141824ef");
@@ -48,8 +49,6 @@ class _MyAppState extends State<MyApp>
 
     OneSignal.User.pushSubscription.addObserver(this);
     OneSignal.Notifications.addPermssionObserver(this);
-
-    OneSignal.shared.setRequiresPrivacyConsent(_requireConsent);
 
     OneSignal.Notifications.setNotificationOpenedHandler(
         (OSNotificationOpenedResult result) {
