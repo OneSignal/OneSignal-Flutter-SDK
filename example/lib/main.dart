@@ -63,7 +63,7 @@ class _MyAppState extends State<MyApp>
     OneSignal.Notifications.setNotificationWillShowInForegroundHandler(
         (OSNotificationReceivedEvent event) {
       print(
-          'FOREGROUND HANDLER CALLED WITH1: ${event.notification.jsonRepresentation()}');
+          'FOREGROUND HANDLER CALLED WITH: ${event.notification.jsonRepresentation()}');
 
       /// Display Notification, send null to not display
       event.complete(null);
@@ -239,7 +239,7 @@ class _MyAppState extends State<MyApp>
     OneSignal.InAppMessages.removeTriggers(keys);
 
     // Toggle pausing (displaying or not) of IAMs
-    OneSignal.InAppMessages.paused(true);
+    OneSignal.InAppMessages.paused(false);
     var arePaused = await OneSignal.InAppMessages.arePaused();
     print('Notifications paused ${arePaused}');
   }

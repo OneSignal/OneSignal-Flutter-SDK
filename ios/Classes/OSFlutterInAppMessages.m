@@ -48,11 +48,6 @@
                         binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:OSFlutterInAppMessages.sharedInstance channel:OSFlutterInAppMessages.sharedInstance.channel];
-
-    [OneSignal.InAppMessages setClickHandler:^(OSInAppMessageAction *action) {
-         [OSFlutterInAppMessages.sharedInstance handleInAppMessageClicked:action];
-     }];
-     [OneSignal.InAppMessages setLifecycleHandler:OSFlutterInAppMessages.sharedInstance];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
@@ -72,6 +67,8 @@
         result(@([OneSignal.InAppMessages paused]));
     else if ([@"OneSignal#initInAppMessageClickedHandlerParams" isEqualToString:call.method]) 
         [self initInAppMessageClickedHandlerParams];
+    else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
+        [self lifecycleInit:call withResult:result];
     else 
         result(FlutterMethodNotImplemented);
     
@@ -105,6 +102,14 @@
     [OneSignal.InAppMessages paused:pause];
     result(nil);
 }
+
+- (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+   [OneSignal.InAppMessages setClickHandler:^(OSInAppMessageAction *action) {
+         [OSFlutterInAppMessages.sharedInstance handleInAppMessageClicked:action];
+     }];
+    [OneSignal.InAppMessages setLifecycleHandler:OSFlutterInAppMessages.sharedInstance];
+}
+
 
 
 #pragma mark In App Message Click
