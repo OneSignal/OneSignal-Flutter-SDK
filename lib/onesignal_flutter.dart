@@ -45,7 +45,7 @@ class OneSignal {
   /// Login to OneSignal under the user identified by the [externalId] provided.
   ///
   /// The act of logging a user into the OneSignal SDK will switch the
-  /// [user] context to that specific user.
+  /// user context to that specific user.
   Future<void> login(String externalId) async {
     return await _channel
         .invokeMethod('OneSignal#login', {'externalId': externalId});
@@ -62,7 +62,7 @@ class OneSignal {
     }
   }
 
-  /// Logout the user previously logged in via [login]. The [user] property now
+  /// Logout the user previously logged in via [login]. The user property now
   ///
   /// references a new device-scoped user. A device-scoped user has no user identity
   /// that can later be retrieved, except through this device as long as the app

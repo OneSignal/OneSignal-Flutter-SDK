@@ -104,8 +104,6 @@
     result(nil);
 }
 
- 
-
 - (void)onOSPermissionChanged:(OSPermissionState*)state {
     [self.channel invokeMethod:@"OneSignal#OSPermissionChanged" arguments:state.jsonRepresentation];
 }

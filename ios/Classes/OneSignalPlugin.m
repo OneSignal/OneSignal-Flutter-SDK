@@ -100,7 +100,6 @@
 #pragma mark Init
 
 - (void)initialize:(FlutterMethodCall *)call withResult:(FlutterResult)result{
-
     [OneSignal initialize:call.arguments[@"appId"] withLaunchOptions:nil];
     result(nil);
 }
