@@ -154,6 +154,7 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
     OneSignal.login((String) call.argument("externalId"), (String) call.argument("jwt"));
     replySuccess(result, null);
   }
+  
   private void logout(MethodCall call, Result result) {
     OneSignal.logout();
     replySuccess(result, null);

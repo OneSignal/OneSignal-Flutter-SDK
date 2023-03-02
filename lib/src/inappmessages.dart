@@ -48,7 +48,7 @@ class OneSignalInAppMessages {
   }
 
   /// Get the trigger value associated with the key provided
-  Future<Object?> clearTriggers() async {
+  Future<void> clearTriggers() async {
     return await _channel.invokeMethod("OneSignal#clearTriggers");
   }
 
