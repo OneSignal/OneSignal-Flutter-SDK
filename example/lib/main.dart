@@ -48,7 +48,7 @@ class _MyAppState extends State<MyApp>
     OneSignal.Notifications.clearAll();
 
     OneSignal.User.pushSubscription.addObserver(this);
-    OneSignal.Notifications.addPermssionObserver(this);
+    OneSignal.Notifications.addPermissionObserver(this);
 
     OneSignal.Notifications.setNotificationOpenedHandler(
         (OSNotificationOpenedResult result) {

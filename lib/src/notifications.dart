@@ -34,7 +34,11 @@ class OneSignalNotifications {
   /// Whether attempting to request notification permission will show a prompt.
   /// Returns true if the device has not been prompted for push notification permission already.
   Future<bool> canRequest() async {
-    return await _channel.invokeMethod("OneSignal#canRequest");
+    if (Platform.isIOS) {
+      return await _channel.invokeMethod("OneSignal#canRequest");
+    } else {
+      return false;
+    }
   }
 
   /// Removes a single notification.
@@ -80,7 +84,7 @@ class OneSignalNotifications {
   /// The OSPermissionObserver.onOSPermissionChanged method will be fired on the passed-in object
   /// when a notification permission setting changes. This happens when the user enables or disables
   /// notifications for your app from the system settings outside of your app.
-  void addPermssionObserver(OneSignalPermissionObserver observer) {
+  void addPermissionObserver(OneSignalPermissionObserver observer) {
     _observers.add(observer);
   }
 
