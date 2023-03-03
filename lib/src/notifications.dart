@@ -69,8 +69,12 @@ class OneSignalNotifications {
   /// your app can request provisional authorization.
   Future<bool> registerForProvisionalAuthorization(
       bool fallbackToSettings) async {
-    return await _channel
-        .invokeMethod("OneSignal#registerForProvisionalAuthorization");
+    if (Platform.isIOS) {
+      return await _channel
+          .invokeMethod("OneSignal#registerForProvisionalAuthorization");
+    } else {
+      return false;
+    }
   }
 
   /// The OSPermissionObserver.onOSPermissionChanged method will be fired on the passed-in object
