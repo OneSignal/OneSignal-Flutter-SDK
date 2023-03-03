@@ -25,12 +25,21 @@
  * THE SOFTWARE.
  */
 
+
+#import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
 #import <OneSignalFramework/OneSignalFramework.h>
 
-@interface OneSignalPlugin : NSObject<FlutterPlugin>
+@interface OSFlutterInAppMessages : NSObject<FlutterPlugin, OSInAppMessageLifecycleHandler>
 
-// Do NOT initialize instances of this class.
-// You must only reference the shared instance.
+@property (strong, nonatomic) FlutterMethodChannel *channel;
 + (instancetype)sharedInstance;
+
+@property (atomic) BOOL hasSetInAppMessageClickedHandler;
+/*
+    Holds reference to any in app messages received before any click action
+    occurs on the body, button or image elements of the in app message
+*/
+@property (strong, nonatomic) OSInAppMessageAction *inAppMessageClickedResult;
+
 @end

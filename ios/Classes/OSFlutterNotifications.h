@@ -25,12 +25,18 @@
  * THE SOFTWARE.
  */
 
+
+#import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
-#import <OneSignalFramework/OneSignalFramework.h>
+#import <OneSignalNotifications/OneSignalNotifications.h>
 
-@interface OneSignalPlugin : NSObject<FlutterPlugin>
+@interface OSFlutterNotifications : NSObject<FlutterPlugin, OSPermissionObserver>
 
-// Do NOT initialize instances of this class.
-// You must only reference the shared instance.
+@property (strong, nonatomic) FlutterMethodChannel *channel;
 + (instancetype)sharedInstance;
+@property (atomic) BOOL hasSetNotificationWillShowInForegroundHandler;
+@property (strong, nonatomic) NSMutableDictionary* notificationCompletionCache;
+@property (strong, nonatomic) NSMutableDictionary* receivedNotificationCache;
+
+
 @end

@@ -25,10 +25,11 @@
  * THE SOFTWARE.
  */
 
+
 #import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
 
-@interface OSFlutterTagsController : NSObject<FlutterPlugin>
+@interface OSFlutterDebug : NSObject<FlutterPlugin>
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 

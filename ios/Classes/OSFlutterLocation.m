@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  *
- * Copyright 2017 OneSignal
+ * Copyright 2023 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,57 +25,43 @@
  * THE SOFTWARE.
  */
 
-#import "OSFlutterTagsController.h"
-#import <OneSignal/OneSignal.h>
+#import "OSFlutterLocation.h"
+#import <OneSignalFramework/OneSignalFramework.h>
 #import "OSFlutterCategories.h"
 
-@implementation OSFlutterTagsController
+@implementation OSFlutterLocation
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    OSFlutterTagsController *instance = [OSFlutterTagsController new];
+    OSFlutterLocation *instance = [OSFlutterLocation new];
 
     instance.channel = [FlutterMethodChannel
-                        methodChannelWithName:@"OneSignal#tags"
+                        methodChannelWithName:@"OneSignal#location"
                         binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:instance channel:instance.channel];
 }
 
-- (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([@"OneSignal#sendTags" isEqualToString:call.method]) {
-        [self sendTags:call withResult:result];
-    } else if ([@"OneSignal#getTags" isEqualToString:call.method]) {
-        [self getTags:call withResult:result];
-    } else if ([@"OneSignal#deleteTags" isEqualToString:call.method]) {
-        [self deleteTags:call withResult:result];
-    } else {
+- (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
+    if ([@"OneSignal#requestPermission" isEqualToString:call.method])
+        [self requestPermission:call withResult:result];
+    else if ([@"OneSignal#setShared" isEqualToString:call.method])
+        [self setLocationShared:call withResult:result];
+    else if ([@"OneSignal#isShared" isEqualToString:call.method])
+        result(@([OneSignal.Location isShared]));
+    else
         result(FlutterMethodNotImplemented);
-    }
 }
 
-- (void)sendTags:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSDictionary *tags = call.arguments;
-    [OneSignal sendTags:tags onSuccess:^(NSDictionary *tags) {
-        result(tags);
-    } onFailure:^(NSError *error) {
-        result(error.flutterError);
-    }];
+- (void)setLocationShared:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    BOOL locationShared = [call.arguments boolValue];
+    [OneSignal.Location setShared:locationShared];
+    result(nil);
 }
 
-- (void)getTags:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal getTags:^(NSDictionary *tags) {
-        result(tags);
-    } onFailure:^(NSError *error) {
-        result(error.flutterError);
-    }];
+- (void)requestPermission:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal.Location requestPermission];
+    result(nil);
 }
 
-- (void)deleteTags:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSArray *tags = call.arguments;
-    [OneSignal deleteTags:tags onSuccess:^(NSDictionary *response) {
-        result(response);
-    } onFailure:^(NSError *error) {
-        result(error.flutterError);
-    }];
-}
+
 
 @end
