@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  *
- * Copyright 2019 OneSignal
+ * Copyright 2023 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,53 +25,51 @@
  * THE SOFTWARE.
  */
 
-#import "OSFlutterOutcomeEventsController.h"
-#import <OneSignal/OneSignal.h>
+#import "OSFlutterSession.h"
+#import <OneSignalFramework/OneSignalFramework.h>
 #import "OSFlutterCategories.h"
 
-@implementation OSFlutterOutcomeEventsController
+@implementation OSFlutterSession
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    OSFlutterOutcomeEventsController *instance = [OSFlutterOutcomeEventsController new];
+    OSFlutterSession *instance = [OSFlutterSession new];
 
     instance.channel = [FlutterMethodChannel
-                        methodChannelWithName:@"OneSignal#outcomes"
+                        methodChannelWithName:@"OneSignal#session"
                         binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:instance channel:instance.channel];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([@"OneSignal#sendOutcome" isEqualToString:call.method]) {
-        [self sendOutcome:call withResult:result];
-    } else if ([@"OneSignal#sendUniqueOutcome" isEqualToString:call.method]) {
-        [self sendUniqueOutcome:call withResult:result];
-    } else if ([@"OneSignal#sendOutcomeWithValue" isEqualToString:call.method]) {
-        [self sendOutcomeWithValue:call withResult:result];
+    if ([@"OneSignal#addOutcome" isEqualToString:call.method]) {
+        [self addOutcome:call withResult:result];
+    } else if ([@"OneSignal#addUniqueOutcome" isEqualToString:call.method]) {
+        [self addUniqueOutcome:call withResult:result];
+    } else if ([@"OneSignal#addOutcomeWithValue" isEqualToString:call.method]) {
+        [self addOutcomeWithValue:call withResult:result];
     } else {
         result(FlutterMethodNotImplemented);
     }
 }
 
-- (void)sendOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+- (void)addOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString *name = call.arguments;
-    [OneSignal sendOutcome:name onSuccess:^(OSOutcomeEvent *outcome) {
-        result(outcome.jsonRepresentation);
-    }];
+    [OneSignal.Session addOutcome:name];
+    result(nil);
 }
 
-- (void)sendUniqueOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+- (void)addUniqueOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString *name = call.arguments;
-    [OneSignal sendUniqueOutcome:name onSuccess:^(OSOutcomeEvent *outcome) {
-        result(outcome.jsonRepresentation);
-    }];
+    [OneSignal.Session addUniqueOutcome:name];
+    result(nil);
 }
 
-- (void)sendOutcomeWithValue:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+- (void)addOutcomeWithValue:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString *name = call.arguments[@"outcome_name"];
     NSNumber *value = call.arguments[@"outcome_value"];
-    [OneSignal sendOutcomeWithValue:name value:value onSuccess:^(OSOutcomeEvent *outcome) {
-        result(outcome.jsonRepresentation);
-    }];
+    [OneSignal.Session addOutcomeWithValue:name value:value];
+    result(nil);
 }
+
 
 @end

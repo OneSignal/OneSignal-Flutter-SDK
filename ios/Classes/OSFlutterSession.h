@@ -1,7 +1,7 @@
 /**
  * Modified MIT License
  *
- * Copyright 2019 OneSignal
+ * Copyright 2017 OneSignal
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -25,10 +25,11 @@
  * THE SOFTWARE.
  */
 
+
 #import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
 
-@interface OSFlutterOutcomeEventsController : NSObject<FlutterPlugin>
+@interface OSFlutterSession : NSObject<FlutterPlugin>
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 

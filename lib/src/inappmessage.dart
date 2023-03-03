@@ -4,6 +4,7 @@ import 'package:onesignal_flutter/src/utils.dart';
 /// the handler returns an OSInAppMessageAction object so the Dart code can act accordingly
 /// This allows for custom action events within Dart
 class OSInAppMessageAction extends JSONStringRepresentable {
+
   // Name of the action event defined for the IAM element
   String? clickName;
 
@@ -31,6 +32,7 @@ class OSInAppMessageAction extends JSONStringRepresentable {
       'closes_message': this.closesMessage,
     });
   }
+
 }
 
 class OSInAppMessage extends JSONStringRepresentable {
@@ -38,9 +40,11 @@ class OSInAppMessage extends JSONStringRepresentable {
 
   OSInAppMessage(Map<String, dynamic> json) {
     this.messageId = json["message_id"];
-  }
+  } 
 
   String jsonRepresentation() {
-    return convertToJsonString({'message_id': this.messageId});
+    return convertToJsonString({
+      'message_id': this.messageId
+    });
   }
 }

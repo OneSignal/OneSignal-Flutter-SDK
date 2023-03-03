@@ -383,13 +383,15 @@ class OSNotificationReceivedEvent extends JSONStringRepresentable {
   }
 
   void complete(OSNotification? notification) {
-    print(
-        'OSNotificationReceivedEvent complete with notification: $notification');
     if (notification != null) {
-      OneSignal.shared.completeNotification(notification.notificationId, true);
+      OneSignal.Notifications.completeNotification(
+          notification.notificationId, true);
     } else {
-      OneSignal.shared
-          .completeNotification(this.notification.notificationId, false);
+      print(
+          'OSNotificationReceivedEvent complete not nill with notification: ' +
+              this.notification.notificationId);
+      OneSignal.Notifications.completeNotification(
+          this.notification.notificationId, false);
     }
   }
 
