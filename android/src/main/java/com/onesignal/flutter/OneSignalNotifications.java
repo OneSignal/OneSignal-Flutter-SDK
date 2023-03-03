@@ -75,6 +75,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     private void requestPermission(MethodCall call, Result result) {
         boolean fallback = (boolean) call.argument("fallbackToSettings");
         OneSignal.getNotifications().requestPermission(fallback, Continue.none());
+        replySuccess(result, null);
     }
 
     private void removeNotification(MethodCall call, Result result) {
