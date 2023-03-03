@@ -82,7 +82,6 @@
 }
 
 - (void)requestPermission:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-     NSLog(@"henryhenryhenryrequestPermission");
     BOOL fallbackToSettings = [call.arguments[@"fallbackToSettings"] boolValue];
     
     [OneSignal.Notifications requestPermission:^(BOOL accepted) {
