@@ -80,7 +80,7 @@ class OneSignalNotifications {
   /// The OSPermissionObserver.onOSPermissionChanged method will be fired on the passed-in object
   /// when a notification permission setting changes. This happens when the user enables or disables
   /// notifications for your app from the system settings outside of your app.
-  void addPermssionObserver(OneSignalPermissionObserver observer) {
+  void addPermissionObserver(OneSignalPermissionObserver observer) {
     _observers.add(observer);
   }
 
