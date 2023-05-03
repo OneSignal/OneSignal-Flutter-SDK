@@ -110,8 +110,8 @@
     result(nil);
 }
 
-- (void)onOSPermissionChanged:(OSPermissionState*)state {
-    [self.channel invokeMethod:@"OneSignal#OSPermissionChanged" arguments:state.jsonRepresentation];
+- (void)onNotificationPermissionDidChange:(BOOL*)permission {
+    [self.channel invokeMethod:@"OneSignal#onNotificationPermissionDidChange" arguments:permission];
 }
 
 #pragma mark Received in Foreground Notification 

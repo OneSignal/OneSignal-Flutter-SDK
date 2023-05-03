@@ -100,7 +100,7 @@ class OneSignalNotifications {
     }
   }
 
-  /// The OSPermissionObserver.onOSPermissionChanged method will be fired on the passed-in object
+  /// The OSNotificationPermissionObserver.onNotificationPermissionDidChange method will be fired on the passed-in object
   /// when a notification permission setting changes. This happens when the user enables or disables
   /// notifications for your app from the system settings outside of your app.
   void addPermissionObserver(OneSignalPermissionObserver observer) {
@@ -131,17 +131,15 @@ class OneSignalNotifications {
         this._onNotificationWillShowInForegroundHandler != null) {
       this._onNotificationWillShowInForegroundHandler!(
           OSNotificationReceivedEvent(call.arguments.cast<String, dynamic>()));
-    } else if (call.method == 'OneSignal#OSPermissionChanged') {
-      this.onOSPermissionChangedHandler(
-          OSPermissionState(call.arguments.cast<String, dynamic>()));
+    } else if (call.method == 'OneSignal#onNotificationPermissionDidChange') {
+      this.onNotificationPermissionDidChange(call.arguments.cast<bool>());
     }
     return null;
   }
 
-  Future<void> onOSPermissionChangedHandler(OSPermissionState state) async {
-    _permission = state.permission;
+  Future<void> onNotificationPermissionDidChange(bool permission) async {
     for (var observer in _observers) {
-      observer.onOSPermissionChanged(_permission);
+      observer.onNotificationPermissionDidChange(permission);
     }
   }
 
@@ -167,5 +165,5 @@ class OneSignalNotifications {
 }
 
 class OneSignalPermissionObserver {
-  void onOSPermissionChanged(bool state) {}
+  void onNotificationPermissionDidChange(bool permission) {}
 }
