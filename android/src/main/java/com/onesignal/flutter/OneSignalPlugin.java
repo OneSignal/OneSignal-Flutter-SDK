@@ -109,14 +109,10 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
   public void onMethodCall(MethodCall call, Result result) {
     if (call.method.contentEquals("OneSignal#initialize"))
       this.initWithContext(call, result);
-    else if (call.method.contentEquals("OneSignal#requiresPrivacyConsent"))
-      replySuccess(result, OneSignal.getRequiresPrivacyConsent());
-    else if (call.method.contentEquals("OneSignal#setRequiresPrivacyConsent"))
-      this.setRequiresPrivacyConsent(call, result);
-    else if (call.method.contentEquals("OneSignal#getPrivacyConsent"))
-      replySuccess(result, OneSignal.getPrivacyConsent());
-    else if (call.method.contentEquals("OneSignal#setPrivacyConsent"))
-      this.setPrivacyConsent(call, result);
+    else if (call.method.contentEquals("OneSignal#consentRequired"))
+      this.setConsentRequired(call, result);
+    else if (call.method.contentEquals("OneSignal#consentGiven"))
+      this.setConsentGiven(call, result);
     else if (call.method.contentEquals("OneSignal#login"))
       this.login(call, result);
       else if (call.method.contentEquals("OneSignal#loginWithJWT"))
@@ -133,13 +129,13 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
     replySuccess(reply, null);
   }
 
-  private void setRequiresPrivacyConsent(MethodCall call, Result reply) {
+  private void setConsentRequired(MethodCall call, Result reply) {
     boolean required = call.argument("required");
     OneSignal.setRequiresPrivacyConsent(required);
     replySuccess(reply, null);
   }
 
-  private void setPrivacyConsent(MethodCall call, Result reply) {
+  private void setConsentGiven(MethodCall call, Result reply) {
     boolean granted = call.argument("granted");
     OneSignal.setPrivacyConsent(granted);
     replySuccess(reply, null);

@@ -36,7 +36,7 @@ class _MyAppState extends State<MyApp>
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
 
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
-    OneSignal.shared.setRequiresPrivacyConsent(_requireConsent);
+    OneSignal.shared.consentRequired(_requireConsent);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     OneSignal.shared.initialize("9c59a2aa-315a-4bf9-9fef-f76d575d3202");
@@ -100,10 +100,8 @@ class _MyAppState extends State<MyApp>
     // iOS-only method to open launch URLs in Safari when set to false
     OneSignal.shared.setLaunchURLsInApp(false);
 
-    bool requiresConsent = await OneSignal.shared.requiresPrivacyConsent();
-
     this.setState(() {
-      _enableConsentButton = requiresConsent;
+      _enableConsentButton = _requireConsent;
     });
 
     // Some examples of how to use In App Messaging public methods with OneSignal SDK
@@ -190,7 +188,7 @@ class _MyAppState extends State<MyApp>
 
   void _handleConsent() {
     print("Setting consent to true");
-    OneSignal.shared.setPrivacyConsent(true);
+    OneSignal.shared.consentGiven(true);
 
     print("Setting state");
     this.setState(() {
