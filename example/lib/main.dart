@@ -214,7 +214,7 @@ class _MyAppState extends State<MyApp>
     /// Example addTriggers call for IAM
     /// This will add 2 triggers so if there are any IAM satisfying these, they
     /// will be shown to the user
-    Map<String, Object> triggers = new Map<String, Object>();
+    Map<String, String> triggers = new Map<String, String>();
     triggers["trigger_2"] = "two";
     triggers["trigger_3"] = "three";
     OneSignal.InAppMessages.addTriggers(triggers);
