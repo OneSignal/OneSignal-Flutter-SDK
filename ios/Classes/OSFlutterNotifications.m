@@ -79,7 +79,7 @@
 }
 
 - (void)permissionNative:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    OSNotificationPermission *permission = [OneSignal.Notifications permissionNative];
+    OSNotificationPermission permission = [OneSignal.Notifications permissionNative];
     result(@((int)permission));
 }
 
@@ -110,8 +110,8 @@
     result(nil);
 }
 
-- (void)onOSPermissionChanged:(OSPermissionState*)state {
-    [self.channel invokeMethod:@"OneSignal#OSPermissionChanged" arguments:state.jsonRepresentation];
+- (void)onNotificationPermissionDidChange:(BOOL)permission {
+    [self.channel invokeMethod:@"OneSignal#onNotificationPermissionDidChange" arguments:@{@"permission" : @(permission)}];
 }
 
 #pragma mark Received in Foreground Notification 

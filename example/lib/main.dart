@@ -21,7 +21,7 @@ class _MyAppState extends State<MyApp>
   bool _enableConsentButton = false;
 
   // CHANGE THIS parameter to true if you want to test GDPR privacy consent
-  bool _requireConsent = true;
+  bool _requireConsent = false;
 
   @override
   void initState() {
@@ -111,7 +111,7 @@ class _MyAppState extends State<MyApp>
     oneSignalOutcomeExamples();
   }
 
-  void onOSPermissionChanged(bool state) {
+  void onNotificationPermissionDidChange(bool state) {
     print("Has permission " + state.toString());
   }
 
