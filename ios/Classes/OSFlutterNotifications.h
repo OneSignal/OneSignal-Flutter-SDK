@@ -30,7 +30,7 @@
 #import <Flutter/Flutter.h>
 #import <OneSignalNotifications/OneSignalNotifications.h>
 
-@interface OSFlutterNotifications : NSObject<FlutterPlugin, OSPermissionObserver>
+@interface OSFlutterNotifications : NSObject<FlutterPlugin, OSNotificationPermissionObserver>
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 + (instancetype)sharedInstance;

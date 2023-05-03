@@ -101,15 +101,6 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertPermissionChanged(boolean state) {
-        HashMap<String, Object> permission = new HashMap<>();
-
-        permission.put("permission", state);
-
-        return permission;
-    }
-
-
     static HashMap<String, Object> convertInAppMessageClickedActionToMap(IInAppMessageClickResult result) {
         HashMap<String, Object> hash = new HashMap<>();
 

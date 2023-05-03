@@ -37,7 +37,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickHandler, INotificationWillShowInForegroundHandler, IPermissionChangedHandler {
+public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickHandler, INotificationWillShowInForegroundHandler, IPermissionObserver {
     private boolean hasSetNotificationWillShowInForegroundHandler = false;
     private final HashMap<String, INotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
 
@@ -184,8 +184,8 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     }
 
     @Override
-    public void onPermissionChanged(boolean permission)  { 
-        invokeMethodOnUiThread("OneSignal#OSPermissionChanged", OneSignalSerializer.convertPermissionChanged(permission));
+    public void onNotificationPermissionChange(boolean permission)  { 
+        invokeMethodOnUiThread("OneSignal#onNotificationPermissionDidChange", permission);
     }
 
     private void lifecycleInit() {
