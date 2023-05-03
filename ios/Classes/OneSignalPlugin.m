@@ -85,10 +85,6 @@
         [self setConsentGiven:call withResult:result];
     else if ([@"OneSignal#setLaunchURLsInApp" isEqualToString:call.method])
         [self setLaunchURLsInApp:call withResult:result];
-     else if ([@"OneSignal#enterLiveActivity" isEqualToString:call.method])
-        [self enterLiveActivity:call withResult:result];
-    else if ([@"OneSignal#exitLiveActivity" isEqualToString:call.method])
-        [self exitLiveActivity:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -132,29 +128,6 @@
     BOOL launchUrlsInApp = [call.arguments[@"launchUrlsInApp"] boolValue];
     [OneSignal setLaunchURLsInApp:launchUrlsInApp];
     result(nil);
-}
-
-#pragma mark Live Activity
-
-- (void)enterLiveActivity:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSString *activityId = call.arguments[@"activityId"];
-    NSString *token = call.arguments[@"token"];
-
-    [OneSignal enterLiveActivity:activityId withToken:token withSuccess:^(NSDictionary *results) {
-        result(results);
-    } withFailure:^(NSError *error) {
-        result(error.flutterError);
-    }];
-}
-
-- (void)exitLiveActivity:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSString *activityId = call.arguments[@"activityId"];
-
-    [OneSignal exitLiveActivity:activityId withSuccess:^(NSDictionary *results) {
-        result(results);
-    } withFailure:^(NSError *error) {
-        result(error.flutterError);
-    }];
 }
 
 @end

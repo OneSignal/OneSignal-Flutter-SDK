@@ -7,6 +7,7 @@ import 'package:onesignal_flutter/src/notifications.dart';
 import 'package:onesignal_flutter/src/session.dart';
 import 'package:onesignal_flutter/src/location.dart';
 import 'package:onesignal_flutter/src/inappmessages.dart';
+import 'package:onesignal_flutter/src/liveactivities.dart';
 
 export 'src/defines.dart';
 export 'src/pushsubscription.dart';
@@ -14,6 +15,7 @@ export 'src/subscription.dart';
 export 'src/notification.dart';
 export 'src/notifications.dart';
 export 'src/inappmessage.dart';
+export 'src/liveactivities.dart';
 
 class OneSignal {
   /// A singleton representing the OneSignal SDK.
@@ -27,6 +29,7 @@ class OneSignal {
   static OneSignalSession Session = new OneSignalSession();
   static OneSignalLocation Location = new OneSignalLocation();
   static OneSignalInAppMessages InAppMessages = new OneSignalInAppMessages();
+  static OneSignalLiveActivities LiveActivities = new OneSignalLiveActivities();
 
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal');
@@ -96,24 +99,6 @@ class OneSignal {
     if (Platform.isIOS) {
       return await _channel.invokeMethod(
           'OneSignal#setLaunchURLsInApp', {'launchUrlsInApp': launchUrlsInApp});
-    }
-  }
-
-  /// Only applies to iOS
-  /// Associates a temporary push token with an Activity ID on the OneSignal server.
-  Future<void> enterLiveActivity(String activityId, String token) async {
-    if (Platform.isIOS) {
-      return await _channel.invokeMethod("OneSignal#enterLiveActivity",
-          {'activityId': activityId, 'token': token});
-    }
-  }
-
-  /// Only applies to iOS
-  /// Deletes activityId associated temporary push token on the OneSignal server.
-  Future<void> exitLiveActivity(String activityId) async {
-    if (Platform.isIOS) {
-      return await _channel.invokeMethod(
-          "OneSignal#exitLiveActivity", {'activityId': activityId});
     }
   }
 }
