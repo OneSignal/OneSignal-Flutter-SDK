@@ -56,6 +56,8 @@
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result { 
     if ([@"OneSignal#permission" isEqualToString:call.method])
         result(@([OneSignal.Notifications permission]));
+    else if ([@"OneSignal#permissionNative" isEqualToString:call.method])
+        [self permissionNative:call withResult:result];
     else if ([@"OneSignal#canRequest" isEqualToString:call.method])
         result(@([OneSignal.Notifications canRequestPermission]));
     else if ([@"OneSignal#clearAll" isEqualToString:call.method])
@@ -74,6 +76,11 @@
         [self lifecycleInit:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
+}
+
+- (void)permissionNative:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    OSNotificationPermission *permission = [OneSignal.Notifications permissionNative];
+    result(@((int)permission));
 }
 
 - (void)clearAll:(FlutterMethodCall *)call  withResult:(FlutterResult)result {

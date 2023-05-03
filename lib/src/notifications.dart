@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/notification.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 
@@ -29,6 +30,24 @@ class OneSignalNotifications {
   /// Whether this app has push notification permission.
   bool get permission {
     return _permission;
+  }
+
+  /// iOS only
+  /// enum OSNotificationPermission {
+  /// notDetermined,
+  /// denied,
+  /// authorized,
+  /// provisional, // only available in iOS 12
+  /// ephemeral, // only available in iOS 14
+  Future<OSNotificationPermission> permissionNative() async {
+    if (Platform.isIOS) {
+      return OSNotificationPermission
+          .values[await _channel.invokeMethod("OneSignal#permissionNative")];
+    } else {
+      return _permission
+          ? OSNotificationPermission.authorized
+          : OSNotificationPermission.denied;
+    }
   }
 
   /// Whether attempting to request notification permission will show a prompt.
