@@ -56,7 +56,7 @@ IInAppMessageClickHandler, IInAppMessageLifecycleHandler{
         // call.arguments is being casted to a Map<String, Object> so a try-catch with
         //  a ClassCastException will be thrown
         try {
-            OneSignal.getInAppMessages().addTriggers((Map<String, Object>) call.arguments);
+            OneSignal.getInAppMessages().addTriggers((Map<String, String>) call.arguments);
             replySuccess(result, null);
         } catch (ClassCastException e) {
             replyError(result, "OneSignal", "Add triggers failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);

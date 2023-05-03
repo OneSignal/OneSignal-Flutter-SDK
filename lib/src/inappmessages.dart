@@ -25,13 +25,13 @@ class OneSignalInAppMessages {
 
   /// Adds a single key, value trigger, which will trigger an in app message
   /// if one exists matching the specific trigger added
-  Future<void> addTrigger(String key, Object value) async {
+  Future<void> addTrigger(String key, String value) async {
     return await _channel.invokeMethod("OneSignal#addTrigger", {key: value});
   }
 
   /// Adds one or more key, value triggers, which will trigger in app messages
   /// (one at a time) if any exist matching the specific triggers added
-  Future<void> addTriggers(Map<String, Object> triggers) async {
+  Future<void> addTriggers(Map<String, String> triggers) async {
     return await _channel.invokeMethod("OneSignal#addTriggers", triggers);
   }
 
