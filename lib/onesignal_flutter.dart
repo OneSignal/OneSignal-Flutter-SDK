@@ -15,6 +15,7 @@ export 'src/subscription.dart';
 export 'src/notification.dart';
 export 'src/notifications.dart';
 export 'src/inappmessage.dart';
+export 'src/inappmessages.dart';
 export 'src/liveactivities.dart';
 
 class OneSignal {

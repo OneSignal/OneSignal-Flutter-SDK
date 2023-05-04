@@ -104,10 +104,10 @@
 }
 
 - (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-   [OneSignal.InAppMessages setClickHandler:^(OSInAppMessageAction *action) {
+    [OneSignal.InAppMessages setClickHandler:^(OSInAppMessageAction *action) {
          [OSFlutterInAppMessages.sharedInstance handleInAppMessageClicked:action];
      }];
-    [OneSignal.InAppMessages setLifecycleHandler:OSFlutterInAppMessages.sharedInstance];
+    [OneSignal.InAppMessages addLifecycleListener:OSFlutterInAppMessages.sharedInstance];
 }
 
 
@@ -131,21 +131,21 @@
     [self.channel invokeMethod:@"OneSignal#handleClickedInAppMessage" arguments:action.toJson];
 }
 
-#pragma mark OSInAppMessageLifeCycleHandler
-- (void)onWillDisplayInAppMessage:(OSInAppMessage *) result {
-    [self.channel invokeMethod:@"OneSignal#onWillDisplayInAppMessage" arguments:result.toJson];
+#pragma mark OSInAppMessageLifecycleListener
+- (void)onWillDisplayInAppMessage:(OSInAppMessageWillDisplayEvent *) event {
+    [self.channel invokeMethod:@"OneSignal#onWillDisplayInAppMessage" arguments:event.toJson];
 }
 
-- (void)onDidDisplayInAppMessage:(OSInAppMessage *) result {
-    [self.channel invokeMethod:@"OneSignal#onDidDisplayInAppMessage" arguments:result.toJson];
+- (void)onDidDisplayInAppMessage:(OSInAppMessageDidDisplayEvent *) event {
+    [self.channel invokeMethod:@"OneSignal#onDidDisplayInAppMessage" arguments:event.toJson];
 }
 
-- (void)onWillDismissInAppMessage:(OSInAppMessage *) result {
-    [self.channel invokeMethod:@"OneSignal#onWillDismissInAppMessage" arguments:result.toJson];
+- (void)onWillDismissInAppMessage:(OSInAppMessageWillDismissEvent *) event {
+    [self.channel invokeMethod:@"OneSignal#onWillDismissInAppMessage" arguments:event.toJson];
 }
 
-- (void)onDidDismissInAppMessage:(OSInAppMessage *) result {
-    [self.channel invokeMethod:@"OneSignal#onDidDismissInAppMessage" arguments:result.toJson];
+- (void)onDidDismissInAppMessage:(OSInAppMessageDidDismissEvent *) event {
+    [self.channel invokeMethod:@"OneSignal#onDidDismissInAppMessage" arguments:event.toJson];
 }
 
 @end

@@ -112,6 +112,38 @@ class OneSignalSerializer {
         return hash;
     }
 
+    static HashMap<String, Object> convertInAppMessageWillDisplayEventToMap(IInAppMessageWillDisplayEvent event) {
+        HashMap<String, Object> hash = new HashMap<>();
+
+        hash.put("message", convertInAppMessageToMap(event.message));
+
+        return hash;
+    }
+
+    static HashMap<String, Object> convertInAppMessageDidDisplayEventToMap(IInAppMessageDidDisplayEvent event) {
+        HashMap<String, Object> hash = new HashMap<>();
+
+        hash.put("message", convertInAppMessageToMap(event.message));
+
+        return hash;
+    }
+
+    static HashMap<String, Object> convertInAppMessageWillDismissEventToMap(IInAppMessageWillDismissEvent event) {
+        HashMap<String, Object> hash = new HashMap<>();
+
+        hash.put("message", convertInAppMessageToMap(event.message));
+
+        return hash;
+    }
+
+    static HashMap<String, Object> convertInAppMessageDidDismissEventToMap(IInAppMessageDidDismissEvent event) {
+        HashMap<String, Object> hash = new HashMap<>();
+
+        hash.put("message", convertInAppMessageToMap(event.message));
+
+        return hash;
+    }
+
     static HashMap<String, Object> convertInAppMessageToMap(IInAppMessage message) {
         HashMap<String, Object> hash = new HashMap<>();
 
