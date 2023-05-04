@@ -30,7 +30,7 @@
 #import <Flutter/Flutter.h>
 #import <OneSignalFramework/OneSignalFramework.h>
 
-@interface OSFlutterInAppMessages : NSObject<FlutterPlugin, OSInAppMessageLifecycleHandler>
+@interface OSFlutterInAppMessages : NSObject<FlutterPlugin, OSInAppMessageLifecycleListener>
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 + (instancetype)sharedInstance;

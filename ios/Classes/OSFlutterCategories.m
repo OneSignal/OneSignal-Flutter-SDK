@@ -84,6 +84,46 @@
 }
 @end
 
+@implementation OSInAppMessageWillDisplayEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"message"] = self.message.toJson;
+
+    return json;
+}
+@end
+
+@implementation OSInAppMessageDidDisplayEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"message"] = self.message.toJson;
+
+    return json;
+}
+@end
+
+@implementation OSInAppMessageWillDismissEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"message"] = self.message.toJson;
+
+    return json;
+}
+@end
+
+@implementation OSInAppMessageDidDismissEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"message"] = self.message.toJson;
+
+    return json;
+}
+@end
+
 @implementation OSInAppMessageAction (Flutter)
 - (NSDictionary *)toJson {
     NSMutableDictionary *json = [NSMutableDictionary new];

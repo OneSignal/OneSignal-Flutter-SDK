@@ -3,10 +3,13 @@ import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/inappmessage.dart';
 
 typedef void InAppMessageClickedHandler(OSInAppMessageAction action);
-typedef void OnWillDisplayInAppMessageHandler(OSInAppMessage message);
-typedef void OnDidDisplayInAppMessageHandler(OSInAppMessage message);
-typedef void OnWillDismissInAppMessageHandler(OSInAppMessage message);
-typedef void OnDidDismissInAppMessageHandler(OSInAppMessage message);
+
+class OneSignalInAppMessageLifecycleListener {
+  void onWillDisplayInAppMessage(OSInAppMessageWillDisplayEvent event) {}
+  void onDidDisplayInAppMessage(OSInAppMessageDidDisplayEvent event) {}
+  void onWillDismissInAppMessage(OSInAppMessageWillDismissEvent event) {}
+  void onDidDismissInAppMessage(OSInAppMessageDidDismissEvent event) {}
+}
 
 class OneSignalInAppMessages {
   // private channels used to bridge to ObjC/Java
@@ -18,10 +21,8 @@ class OneSignalInAppMessages {
   }
 
   InAppMessageClickedHandler? _onInAppMessageClickedHandler;
-  OnWillDisplayInAppMessageHandler? _onWillDisplayInAppMessageHandler;
-  OnDidDisplayInAppMessageHandler? _onDidDisplayInAppMessageHandler;
-  OnWillDismissInAppMessageHandler? _onWillDismissInAppMessageHandler;
-  OnDidDismissInAppMessageHandler? _onDidDismissInAppMessageHandler;
+  List<OneSignalInAppMessageLifecycleListener> _lifecycleListeners =
+      <OneSignalInAppMessageLifecycleListener>[];
 
   /// Adds a single key, value trigger, which will trigger an in app message
   /// if one exists matching the specific trigger added
@@ -72,22 +73,26 @@ class OneSignalInAppMessages {
         this._onInAppMessageClickedHandler != null) {
       this._onInAppMessageClickedHandler!(
           OSInAppMessageAction(call.arguments.cast<String, dynamic>()));
-    } else if (call.method == 'OneSignal#onWillDisplayInAppMessage' &&
-        this._onWillDisplayInAppMessageHandler != null) {
-      this._onWillDisplayInAppMessageHandler!(
-          OSInAppMessage(call.arguments.cast<String, dynamic>()));
-    } else if (call.method == 'OneSignal#onDidDisplayInAppMessage' &&
-        this._onDidDisplayInAppMessageHandler != null) {
-      this._onDidDisplayInAppMessageHandler!(
-          OSInAppMessage(call.arguments.cast<String, dynamic>()));
-    } else if (call.method == 'OneSignal#onWillDismissInAppMessage' &&
-        this._onWillDismissInAppMessageHandler != null) {
-      this._onWillDismissInAppMessageHandler!(
-          OSInAppMessage(call.arguments.cast<String, dynamic>()));
-    } else if (call.method == 'OneSignal#onDidDismissInAppMessage' &&
-        this._onDidDismissInAppMessageHandler != null) {
-      this._onDidDismissInAppMessageHandler!(
-          OSInAppMessage(call.arguments.cast<String, dynamic>()));
+    } else if (call.method == 'OneSignal#onWillDisplayInAppMessage') {
+      for (var listener in _lifecycleListeners) {
+        listener.onWillDisplayInAppMessage(OSInAppMessageWillDisplayEvent(
+            call.arguments.cast<String, dynamic>()));
+      }
+    } else if (call.method == 'OneSignal#onDidDisplayInAppMessage') {
+      for (var listener in _lifecycleListeners) {
+        listener.onDidDisplayInAppMessage(OSInAppMessageDidDisplayEvent(
+            call.arguments.cast<String, dynamic>()));
+      }
+    } else if (call.method == 'OneSignal#onWillDismissInAppMessage') {
+      for (var listener in _lifecycleListeners) {
+        listener.onWillDismissInAppMessage(OSInAppMessageWillDismissEvent(
+            call.arguments.cast<String, dynamic>()));
+      }
+    } else if (call.method == 'OneSignal#onDidDismissInAppMessage') {
+      for (var listener in _lifecycleListeners) {
+        listener.onDidDismissInAppMessage(OSInAppMessageDidDismissEvent(
+            call.arguments.cast<String, dynamic>()));
+      }
     }
     return null;
   }
@@ -99,31 +104,13 @@ class OneSignalInAppMessages {
     _channel.invokeMethod("OneSignal#initInAppMessageClickedHandlerParams");
   }
 
-  /// The in app message will display handler is called whenever the in app message
-  /// is about to be displayed
-  void setOnWillDisplayInAppMessageHandler(
-      OnWillDisplayInAppMessageHandler handler) {
-    _onWillDisplayInAppMessageHandler = handler;
+  void addInAppMessageLifecycleListener(
+      OneSignalInAppMessageLifecycleListener listener) {
+    _lifecycleListeners.add(listener);
   }
 
-  /// The in app message did display handler is called whenever the in app message
-  /// is displayed
-  void setOnDidDisplayInAppMessageHandler(
-      OnDidDisplayInAppMessageHandler handler) {
-    _onDidDisplayInAppMessageHandler = handler;
-  }
-
-  /// The in app message will dismiss handler is called whenever the in app message
-  /// is about to be dismissed
-  void setOnWillDismissInAppMessageHandler(
-      OnWillDismissInAppMessageHandler handler) {
-    _onWillDismissInAppMessageHandler = handler;
-  }
-
-  /// The in app message did dismiss handler is called whenever the in app message
-  /// is dismissed
-  void setOnDidDismissInAppMessageHandler(
-      OnDidDismissInAppMessageHandler handler) {
-    _onDidDismissInAppMessageHandler = handler;
+  void removeInAppMessageLifecycleListener(
+      OneSignalInAppMessageLifecycleListener listener) {
+    _lifecycleListeners.remove(listener);
   }
 }
