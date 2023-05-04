@@ -15,7 +15,8 @@ class _MyAppState extends State<MyApp>
     with
         OneSignalPushSubscriptionObserver,
         OneSignalPermissionObserver,
-        OneSignalInAppMessageLifecycleListener {
+        OneSignalInAppMessageLifecycleListener,
+        OneSignalInAppMessageClickListener {
   String _debugLabelString = "";
   String? _emailAddress;
   String? _smsNumber;
@@ -76,15 +77,9 @@ class _MyAppState extends State<MyApp>
       });
     });
 
-    OneSignal.InAppMessages.setInAppMessageClickedHandler(
-        (OSInAppMessageAction action) {
-      this.setState(() {
-        _debugLabelString =
-            "In App Message Clicked: \n${action.jsonRepresentation().replaceAll("\\n", "\n")}";
-      });
-    });
+    OneSignal.InAppMessages.addClickListener(this);
 
-    OneSignal.InAppMessages.addInAppMessageLifecycleListener(this);
+    OneSignal.InAppMessages.addLifecycleListener(this);
 
     // iOS-only method to open launch URLs in Safari when set to false
     OneSignal.shared.setLaunchURLsInApp(false);
@@ -109,6 +104,13 @@ class _MyAppState extends State<MyApp>
     print(OneSignal.User.pushSubscription.id);
     print(OneSignal.User.pushSubscription.token);
     print(state.jsonRepresentation());
+  }
+
+  void onClickInAppMessage(OSInAppMessageClickEvent event) {
+    this.setState(() {
+      _debugLabelString =
+          "In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}";
+    });
   }
 
   void onWillDisplayInAppMessage(OSInAppMessageWillDisplayEvent event) {

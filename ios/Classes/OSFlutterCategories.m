@@ -124,14 +124,24 @@
 }
 @end
 
-@implementation OSInAppMessageAction (Flutter)
+@implementation OSInAppMessageClickEvent (Flutter)
 - (NSDictionary *)toJson {
     NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"click_name"] = self.clickName;
-    json[@"click_url"] = self.clickUrl.absoluteString;
-    json[@"first_click"] = @(self.firstClick);
-    json[@"closes_message"] = @(self.closesMessage);
+    json[@"message"] = self.message.toJson;
+    json[@"result"] = self.result.toJson;
+
+    return json;
+}
+@end
+
+@implementation OSInAppMessageClickResult (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"action_id"] = self.actionId;
+    json[@"url"] = self.url;
+    json[@"closing_message"] = @(self.closingMessage);
 
     return json;
 }

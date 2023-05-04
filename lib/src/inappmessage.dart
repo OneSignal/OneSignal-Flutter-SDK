@@ -2,34 +2,51 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:onesignal_flutter/src/utils.dart';
 
 /// When a click action is defined on an In App Message form the dashboard,
-/// the handler returns an OSInAppMessageAction object so the Dart code can act accordingly
-/// This allows for custom action events within Dart
-class OSInAppMessageAction extends JSONStringRepresentable {
-  // Name of the action event defined for the IAM element
-  String? clickName;
+/// the handler returns an OSInAppMessageClickEvent object so the Dart code can act accordingly
+/// This event includes the message and the result of the click
+class OSInAppMessageClickEvent extends JSONStringRepresentable {
+  late OSInAppMessage message;
 
-  // URL given to the IAM element defined in the dashboard
-  String? clickUrl;
+  late OSInAppMessageClickResult result;
 
-  // Determines if a first click has occurred or not on the IAM element
-  bool firstClick = false;
-
-  // Whether or not the click action should dismiss the IAM
-  bool closesMessage = false;
-
-  OSInAppMessageAction(Map<String, dynamic> json) {
-    this.clickName = json["click_name"];
-    this.clickUrl = json["click_url"];
-    this.firstClick = json["first_click"] as bool;
-    this.closesMessage = json["closes_message"] as bool;
+  OSInAppMessageClickEvent(Map<String, dynamic> json) {
+    this.message = OSInAppMessage(json["message"].cast<String, dynamic>());
+    this.result =
+        OSInAppMessageClickResult(json["result"].cast<String, dynamic>());
   }
 
   String jsonRepresentation() {
     return convertToJsonString({
-      'click_name': this.clickName,
-      'click_url': this.clickUrl,
-      'first_click': this.firstClick,
-      'closes_message': this.closesMessage,
+      'message': this.message,
+      'result': this.result,
+    });
+  }
+}
+
+/// When a click action is defined on an In App Message form the dashboard,
+/// the handler returns an OSInAppMessageAction object so the Dart code can act accordingly
+/// This allows for custom action events within Dart
+class OSInAppMessageClickResult extends JSONStringRepresentable {
+  // Name of the action event defined for the IAM element
+  String? actionId;
+
+  // URL given to the IAM element defined in the dashboard
+  String? url;
+
+  // Whether or not the click action should dismiss the IAM
+  bool closingMessage = false;
+
+  OSInAppMessageClickResult(Map<String, dynamic> json) {
+    this.actionId = json["action_id"];
+    this.url = json["url"];
+    this.closingMessage = json["closingMessage"] as bool;
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString({
+      'action_id': this.actionId,
+      'url': this.url,
+      'closingMessage': this.closingMessage,
     });
   }
 }
@@ -50,7 +67,7 @@ class OSInAppMessageWillDisplayEvent extends JSONStringRepresentable {
   late OSInAppMessage message;
 
   OSInAppMessageWillDisplayEvent(Map<String, dynamic> json) {
-    this.message = json["message"];
+    this.message = OSInAppMessage(json["message"].cast<String, dynamic>());
   }
 
   String jsonRepresentation() {
@@ -62,7 +79,7 @@ class OSInAppMessageDidDisplayEvent extends JSONStringRepresentable {
   late OSInAppMessage message;
 
   OSInAppMessageDidDisplayEvent(Map<String, dynamic> json) {
-    this.message = json["message"];
+    this.message = OSInAppMessage(json["message"].cast<String, dynamic>());
   }
 
   String jsonRepresentation() {
@@ -74,7 +91,7 @@ class OSInAppMessageWillDismissEvent extends JSONStringRepresentable {
   late OSInAppMessage message;
 
   OSInAppMessageWillDismissEvent(Map<String, dynamic> json) {
-    this.message = json["message"];
+    this.message = OSInAppMessage(json["message"].cast<String, dynamic>());
   }
 
   String jsonRepresentation() {
@@ -86,7 +103,7 @@ class OSInAppMessageDidDismissEvent extends JSONStringRepresentable {
   late OSInAppMessage message;
 
   OSInAppMessageDidDismissEvent(Map<String, dynamic> json) {
-    this.message = json["message"];
+    this.message = OSInAppMessage(json["message"].cast<String, dynamic>());
   }
 
   String jsonRepresentation() {

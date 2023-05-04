@@ -17,10 +17,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalInAppMessages extends FlutterRegistrarResponder implements MethodCallHandler, 
-IInAppMessageClickHandler, IInAppMessageLifecycleListener{
-  
-    private IInAppMessageClickResult inAppMessageClickedResult;
-    private boolean hasSetInAppMessageClickedHandler = false;
+IInAppMessageClickListener, IInAppMessageLifecycleListener{
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalInAppMessages sharedInstance = new OneSignalInAppMessages();
@@ -44,8 +41,6 @@ IInAppMessageClickHandler, IInAppMessageLifecycleListener{
             replySuccess(result, OneSignal.getInAppMessages().getPaused());
         else if (call.method.contentEquals("OneSignal#paused"))
             this.paused(call, result);
-        else if (call.method.contentEquals("OneSignal#initInAppMessageClickedHandlerParams"))
-            this.initInAppMessageClickedHandlerParams();
         else if (call.method.contentEquals("OneSignal#lifecycleInit"))
             this.lifecycleInit();
         else
@@ -84,33 +79,16 @@ IInAppMessageClickHandler, IInAppMessageLifecycleListener{
         replySuccess(result, null);
     }
 
-    private void initInAppMessageClickedHandlerParams() {
-        this.hasSetInAppMessageClickedHandler = true;
-        if (this.inAppMessageClickedResult != null) {
-          this.inAppMessageClicked(this.inAppMessageClickedResult);
-          this.inAppMessageClickedResult = null;
-        }
-      }
-
     public void lifecycleInit() {
-        this.setInAppMessageLifecycleHandler();
         OneSignal.getInAppMessages().addLifecycleListener(this);
+        OneSignal.getInAppMessages().addClickListener(this);
     }
 
-    public void inAppMessageClicked(IInAppMessageClickResult action) {
-        if (!this.hasSetInAppMessageClickedHandler) {
-            this.inAppMessageClickedResult = action;
-        return;
-        }
-
-        invokeMethodOnUiThread("OneSignal#handleClickedInAppMessage", OneSignalSerializer.convertInAppMessageClickedActionToMap(action));
+    @Override
+    public void onClick(IInAppMessageClickEvent event) {
+        invokeMethodOnUiThread("OneSignal#onClickInAppMessage", OneSignalSerializer.convertInAppMessageClickEventToMap(action));
     }
 
-    /* in app message lifecycle */
-    public void setInAppMessageLifecycleHandler() {
-        OneSignal.getInAppMessages().addInAppMessageLifecycleListener(this);
-    }
-    
     @Override
     public void onWillDisplay(IInAppMessageWillDisplayEvent event) { 
         invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", 
