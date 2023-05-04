@@ -36,7 +36,6 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [OSFlutterInAppMessages new];
-        sharedInstance.hasSetInAppMessageClickedHandler = false;
     });
     return sharedInstance;
 }
@@ -65,8 +64,6 @@
         [self paused:call withResult:result];
     else if ([@"OneSignal#arePaused" isEqualToString:call.method]) 
         result(@([OneSignal.InAppMessages paused]));
-    else if ([@"OneSignal#initInAppMessageClickedHandlerParams" isEqualToString:call.method]) 
-        [self initInAppMessageClickedHandlerParams];
     else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
         [self lifecycleInit:call withResult:result];
     else 
@@ -104,31 +101,16 @@
 }
 
 - (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.InAppMessages setClickHandler:^(OSInAppMessageAction *action) {
-         [OSFlutterInAppMessages.sharedInstance handleInAppMessageClicked:action];
-     }];
+    [OneSignal.InAppMessages addClickListener:OSFlutterInAppMessages.sharedInstance]
     [OneSignal.InAppMessages addLifecycleListener:OSFlutterInAppMessages.sharedInstance];
 }
 
 
 
 #pragma mark In App Message Click
-- (void)initInAppMessageClickedHandlerParams {
-    _hasSetInAppMessageClickedHandler = true;
 
-    if (self.inAppMessageClickedResult) {
-        [self handleInAppMessageClicked:self.inAppMessageClickedResult];
-        self.inAppMessageClickedResult = nil;
-    }
-}
-
-- (void)handleInAppMessageClicked:(OSInAppMessageAction *)action {
-    if (!self.hasSetInAppMessageClickedHandler) {
-        _inAppMessageClickedResult = action;
-        return;
-    }
-
-    [self.channel invokeMethod:@"OneSignal#handleClickedInAppMessage" arguments:action.toJson];
+- (void)onClickInAppMessage:(OSInAppMessageClickEvent * _Nonnull)event {
+    [self.channel invokeMethod:@"OneSignal#onClickInAppMessage" arguments:event.toJson];
 }
 
 #pragma mark OSInAppMessageLifecycleListener

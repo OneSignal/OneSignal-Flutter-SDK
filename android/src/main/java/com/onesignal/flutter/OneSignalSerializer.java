@@ -101,13 +101,21 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertInAppMessageClickedActionToMap(IInAppMessageClickResult result) {
+    static HashMap<String, Object> convertInAppMessageClickEventToMap(IInAppMessageClickEvent event) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("click_name", result.getAction().getClickName());
-        hash.put("click_url", result.getAction().getClickUrl());
-        hash.put("first_click", result.getAction().isFirstClick());
-        hash.put("closes_message", result.getAction().getClosesMessage());
+        hash.put("message", convertInAppMessageToMap(event.getMessage()));
+        hash.put("result", convertInAppMessageClickResultToMap(event.getResult()));
+
+        return hash;
+    }
+
+    static HashMap<String, Object> convertInAppMessageClicResultToMap(IInAppMessageClickResult result) {
+        HashMap<String, Object> hash = new HashMap<>();
+
+        hash.put("action_id", result.getActionId());
+        hash.put("url", result.getUrl());
+        hash.put("closingMessage", result.getClosingMessage());
 
         return hash;
     }
@@ -115,7 +123,7 @@ class OneSignalSerializer {
     static HashMap<String, Object> convertInAppMessageWillDisplayEventToMap(IInAppMessageWillDisplayEvent event) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("message", convertInAppMessageToMap(event.message));
+        hash.put("message", convertInAppMessageToMap(event.getMessage()));
 
         return hash;
     }
@@ -123,7 +131,7 @@ class OneSignalSerializer {
     static HashMap<String, Object> convertInAppMessageDidDisplayEventToMap(IInAppMessageDidDisplayEvent event) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("message", convertInAppMessageToMap(event.message));
+        hash.put("message", convertInAppMessageToMap(event.getMessage()));
 
         return hash;
     }
@@ -131,7 +139,7 @@ class OneSignalSerializer {
     static HashMap<String, Object> convertInAppMessageWillDismissEventToMap(IInAppMessageWillDismissEvent event) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("message", convertInAppMessageToMap(event.message));
+        hash.put("message", convertInAppMessageToMap(event.getMessage()));
 
         return hash;
     }
@@ -139,7 +147,7 @@ class OneSignalSerializer {
     static HashMap<String, Object> convertInAppMessageDidDismissEventToMap(IInAppMessageDidDismissEvent event) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("message", convertInAppMessageToMap(event.message));
+        hash.put("message", convertInAppMessageToMap(event.getMessage()));
 
         return hash;
     }

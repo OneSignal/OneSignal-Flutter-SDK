@@ -2,7 +2,9 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/inappmessage.dart';
 
-typedef void InAppMessageClickedHandler(OSInAppMessageAction action);
+class OneSignalInAppMessageClickListener {
+  void onClickInAppMessage(OSInAppMessageClickEvent event) {}
+}
 
 class OneSignalInAppMessageLifecycleListener {
   void onWillDisplayInAppMessage(OSInAppMessageWillDisplayEvent event) {}
@@ -20,7 +22,8 @@ class OneSignalInAppMessages {
     this._channel.setMethodCallHandler(_handleMethod);
   }
 
-  InAppMessageClickedHandler? _onInAppMessageClickedHandler;
+  List<OneSignalInAppMessageClickListener> _clickListeners =
+      <OneSignalInAppMessageClickListener>[];
   List<OneSignalInAppMessageLifecycleListener> _lifecycleListeners =
       <OneSignalInAppMessageLifecycleListener>[];
 
@@ -69,10 +72,11 @@ class OneSignalInAppMessages {
 
   // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
-    if (call.method == 'OneSignal#handleClickedInAppMessage' &&
-        this._onInAppMessageClickedHandler != null) {
-      this._onInAppMessageClickedHandler!(
-          OSInAppMessageAction(call.arguments.cast<String, dynamic>()));
+    if (call.method == 'OneSignal#onClickInAppMessage') {
+      for (var listener in _clickListeners) {
+        listener.onClickInAppMessage(
+            OSInAppMessageClickEvent(call.arguments.cast<String, dynamic>()));
+      }
     } else if (call.method == 'OneSignal#onWillDisplayInAppMessage') {
       for (var listener in _lifecycleListeners) {
         listener.onWillDisplayInAppMessage(OSInAppMessageWillDisplayEvent(
@@ -99,17 +103,19 @@ class OneSignalInAppMessages {
 
   /// The in app message clicked handler is called whenever the user clicks a
   /// OneSignal IAM button or image with an action event attacthed to it
-  void setInAppMessageClickedHandler(InAppMessageClickedHandler handler) {
-    _onInAppMessageClickedHandler = handler;
-    _channel.invokeMethod("OneSignal#initInAppMessageClickedHandlerParams");
+  void addClickListener(OneSignalInAppMessageClickListener listener) {
+    _clickListeners.add(listener);
   }
 
-  void addInAppMessageLifecycleListener(
-      OneSignalInAppMessageLifecycleListener listener) {
+  void removeClickListener(OneSignalInAppMessageLifecycleListener listener) {
+    _clickListeners.remove(listener);
+  }
+
+  void addLifecycleListener(OneSignalInAppMessageLifecycleListener listener) {
     _lifecycleListeners.add(listener);
   }
 
-  void removeInAppMessageLifecycleListener(
+  void removeLifecycleListener(
       OneSignalInAppMessageLifecycleListener listener) {
     _lifecycleListeners.remove(listener);
   }
