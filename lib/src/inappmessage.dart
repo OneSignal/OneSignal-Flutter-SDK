@@ -1,10 +1,10 @@
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:onesignal_flutter/src/utils.dart';
 
 /// When a click action is defined on an In App Message form the dashboard,
 /// the handler returns an OSInAppMessageAction object so the Dart code can act accordingly
 /// This allows for custom action events within Dart
 class OSInAppMessageAction extends JSONStringRepresentable {
-
   // Name of the action event defined for the IAM element
   String? clickName;
 
@@ -32,7 +32,6 @@ class OSInAppMessageAction extends JSONStringRepresentable {
       'closes_message': this.closesMessage,
     });
   }
-
 }
 
 class OSInAppMessage extends JSONStringRepresentable {
@@ -40,11 +39,57 @@ class OSInAppMessage extends JSONStringRepresentable {
 
   OSInAppMessage(Map<String, dynamic> json) {
     this.messageId = json["message_id"];
-  } 
+  }
 
   String jsonRepresentation() {
-    return convertToJsonString({
-      'message_id': this.messageId
-    });
+    return convertToJsonString({'message_id': this.messageId});
+  }
+}
+
+class OSInAppMessageWillDisplayEvent extends JSONStringRepresentable {
+  late OSInAppMessage message;
+
+  OSInAppMessageWillDisplayEvent(Map<String, dynamic> json) {
+    this.message = json["message"];
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString({'message': this.message.jsonRepresentation()});
+  }
+}
+
+class OSInAppMessageDidDisplayEvent extends JSONStringRepresentable {
+  late OSInAppMessage message;
+
+  OSInAppMessageDidDisplayEvent(Map<String, dynamic> json) {
+    this.message = json["message"];
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString({'message': this.message.jsonRepresentation()});
+  }
+}
+
+class OSInAppMessageWillDismissEvent extends JSONStringRepresentable {
+  late OSInAppMessage message;
+
+  OSInAppMessageWillDismissEvent(Map<String, dynamic> json) {
+    this.message = json["message"];
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString({'message': this.message.jsonRepresentation()});
+  }
+}
+
+class OSInAppMessageDidDismissEvent extends JSONStringRepresentable {
+  late OSInAppMessage message;
+
+  OSInAppMessageDidDismissEvent(Map<String, dynamic> json) {
+    this.message = json["message"];
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString({'message': this.message.jsonRepresentation()});
   }
 }

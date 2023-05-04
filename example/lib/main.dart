@@ -12,7 +12,10 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp>
-    with OneSignalPushSubscriptionObserver, OneSignalPermissionObserver {
+    with
+        OneSignalPushSubscriptionObserver,
+        OneSignalPermissionObserver,
+        OneSignalInAppMessageLifecycleListener {
   String _debugLabelString = "";
   String? _emailAddress;
   String? _smsNumber;
@@ -81,21 +84,7 @@ class _MyAppState extends State<MyApp>
       });
     });
 
-    OneSignal.InAppMessages.setOnWillDisplayInAppMessageHandler((message) {
-      print("ON WILL DISPLAY IN APP MESSAGE ${message.messageId}");
-    });
-
-    OneSignal.InAppMessages.setOnDidDisplayInAppMessageHandler((message) {
-      print("ON DID DISPLAY IN APP MESSAGE ${message.messageId}");
-    });
-
-    OneSignal.InAppMessages.setOnWillDismissInAppMessageHandler((message) {
-      print("ON WILL DISMISS IN APP MESSAGE ${message.messageId}");
-    });
-
-    OneSignal.InAppMessages.setOnDidDismissInAppMessageHandler((message) {
-      print("ON DID DISMISS IN APP MESSAGE ${message.messageId}");
-    });
+    OneSignal.InAppMessages.addInAppMessageLifecycleListener(this);
 
     // iOS-only method to open launch URLs in Safari when set to false
     OneSignal.shared.setLaunchURLsInApp(false);
@@ -120,6 +109,22 @@ class _MyAppState extends State<MyApp>
     print(OneSignal.User.pushSubscription.id);
     print(OneSignal.User.pushSubscription.token);
     print(state.jsonRepresentation());
+  }
+
+  void onWillDisplayInAppMessage(OSInAppMessageWillDisplayEvent event) {
+    print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
+  }
+
+  void onDidDisplayInAppMessage(OSInAppMessageDidDisplayEvent event) {
+    print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
+  }
+
+  void onWillDismissInAppMessage(OSInAppMessageWillDismissEvent event) {
+    print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
+  }
+
+  void onDidDismissInAppMessage(OSInAppMessageDidDismissEvent event) {
+    print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
   }
 
   void _handleSendTags() {

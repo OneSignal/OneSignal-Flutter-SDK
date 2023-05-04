@@ -17,7 +17,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalInAppMessages extends FlutterRegistrarResponder implements MethodCallHandler, 
-IInAppMessageClickHandler, IInAppMessageLifecycleHandler{
+IInAppMessageClickHandler, IInAppMessageLifecycleListener{
   
     private IInAppMessageClickResult inAppMessageClickedResult;
     private boolean hasSetInAppMessageClickedHandler = false;
@@ -94,7 +94,7 @@ IInAppMessageClickHandler, IInAppMessageLifecycleHandler{
 
     public void lifecycleInit() {
         this.setInAppMessageLifecycleHandler();
-        OneSignal.getInAppMessages().setInAppMessageClickHandler(this);
+        OneSignal.getInAppMessages().addLifecycleListener(this);
     }
 
     public void inAppMessageClicked(IInAppMessageClickResult action) {
@@ -108,26 +108,30 @@ IInAppMessageClickHandler, IInAppMessageLifecycleHandler{
 
     /* in app message lifecycle */
     public void setInAppMessageLifecycleHandler() {
-        OneSignal.getInAppMessages().setInAppMessageLifecycleHandler(this);
+        OneSignal.getInAppMessages().addInAppMessageLifecycleListener(this);
     }
     
     @Override
-    public void onWillDisplayInAppMessage(IInAppMessage message) { 
-        invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+    public void onWillDisplay(IInAppMessageWillDisplayEvent event) { 
+        invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", 
+            OneSignalSerializer.convertInAppMessageWillDisplayEventToMap(event));
     }
 
     @Override
-    public void onDidDisplayInAppMessage(IInAppMessage message) {
-        invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+    public void onDidDisplay(IInAppMessageDidDisplayEvent event) {
+        invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage", 
+            OneSignalSerializer.convertInAppMessageDidDisplayEventToMap(event));
     }
 
     @Override
-    public void onWillDismissInAppMessage(IInAppMessage message) {
-        invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+    public void onWillDismiss(IInAppMessageWillDismissEvent event) {
+        invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage", 
+            OneSignalSerializer.convertInAppMessageWillDismissEventToMap(event));
     }
 
     @Override
-    public void onDidDismissInAppMessage(IInAppMessage message) {
-        invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage", OneSignalSerializer.convertInAppMessageToMap(message));
+    public void onDidDismiss(IInAppMessageDidDismissEvent event) {
+        invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage", 
+            OneSignalSerializer.convertInAppMessageDidDismissEventToMap(event));
     }
 }
