@@ -75,6 +75,12 @@ class OneSignalSerializer {
         return hash;
     }
 
+    static HashMap<String, Object> convertNotificationWillDisplayEventToMap(INotificationWillDisplayEvent event) {
+        HashMap<String, Object> hash = new HashMap<>();
+        hash.put("notification", convertNotificationToMap(event.getNotification()));  
+        return hash;
+    }
+
     static HashMap<String, Object> convertNotificationClickResultToMap(INotificationClickResult openResult) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 

@@ -6,14 +6,16 @@ import 'package:onesignal_flutter/src/notification.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 
 typedef void OpenedNotificationHandler(OSNotificationOpenedResult openedResult);
-typedef void NotificationWillShowInForegroundHandler(
-    OSNotificationReceivedEvent event);
+
+class OneSignalNotificationLifecycleListener {
+  void onWillDisplayNotification(OSNotificationWillDisplayEvent event) {}
+}
 
 class OneSignalNotifications {
   // event handlers
   OpenedNotificationHandler? _onOpenedNotification;
-  NotificationWillShowInForegroundHandler?
-      _onNotificationWillShowInForegroundHandler;
+  List<OneSignalNotificationLifecycleListener> _lifecycleListeners =
+      <OneSignalNotificationLifecycleListener>[];
 
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal#notifications');
@@ -113,8 +115,6 @@ class OneSignalNotifications {
   }
 
   Future<void> lifecycleInit() async {
-    _channel.invokeMethod(
-        "OneSignal#initNotificationWillShowInForegroundHandlerParams");
     _permission = await _channel.invokeMethod("OneSignal#permission");
     await _channel
         .invokeMethod("OneSignal#initNotificationOpenedHandlerParams");
@@ -126,11 +126,11 @@ class OneSignalNotifications {
         this._onOpenedNotification != null) {
       this._onOpenedNotification!(
           OSNotificationOpenedResult(call.arguments.cast<String, dynamic>()));
-    } else if (call.method ==
-            'OneSignal#handleNotificationWillShowInForeground' &&
-        this._onNotificationWillShowInForegroundHandler != null) {
-      this._onNotificationWillShowInForegroundHandler!(
-          OSNotificationReceivedEvent(call.arguments.cast<String, dynamic>()));
+    } else if (call.method == 'OneSignal#onWillDisplayNotification') {
+      for (var listener in _lifecycleListeners) {
+        listener.onWillDisplayNotification(OSNotificationWillDisplayEvent(
+            call.arguments.cast<String, dynamic>()));
+      }
     } else if (call.method == 'OneSignal#onNotificationPermissionDidChange') {
       this.onNotificationPermissionDidChange(call.arguments.cast<bool>());
     }
@@ -143,18 +143,25 @@ class OneSignalNotifications {
     }
   }
 
-  /// The notification foreground handler is called whenever a notification arrives
-  /// and the application is in foreground
-  void setNotificationWillShowInForegroundHandler(
-      NotificationWillShowInForegroundHandler handler) {
-    _onNotificationWillShowInForegroundHandler = handler;
+  void addLifecycleListener(OneSignalNotificationLifecycleListener listener) {
+    _lifecycleListeners.add(listener);
   }
 
-  /// The notification foreground handler is called whenever a notification arrives
+  void removeLifecycleListener(
+      OneSignalNotificationLifecycleListener listener) {
+    _lifecycleListeners.remove(listener);
+  }
+
+  /// The notification willDisplay listener is called whenever a notification arrives
   /// and the application is in foreground
-  void completeNotification(String notificationId, bool shouldDisplay) {
-    _channel.invokeMethod("OneSignal#completeNotification",
-        {'notificationId': notificationId, 'shouldDisplay': shouldDisplay});
+  void preventDefault(String notificationId) {
+    _channel.invokeMethod(
+        "OneSignal#preventDefault", {'notificationId': notificationId});
+  }
+
+  void displayNotification(String notificationId) {
+    _channel.invokeMethod(
+        "OneSignal#displayNotification", {'notificationId': notificationId});
   }
 
   /// The notification opened handler is called whenever the user opens a

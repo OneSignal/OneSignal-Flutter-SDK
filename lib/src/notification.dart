@@ -375,23 +375,22 @@ class OSAndroidBackgroundImageLayout extends JSONStringRepresentable {
   }
 }
 
-class OSNotificationReceivedEvent extends JSONStringRepresentable {
+extension OSDisplayNotification on OSNotification {
+  void display() {
+    OneSignal.Notifications.displayNotification(this.notificationId);
+  }
+}
+
+class OSNotificationWillDisplayEvent extends JSONStringRepresentable {
   late OSNotification notification;
 
-  OSNotificationReceivedEvent(Map<String, dynamic> json) {
+  OSNotificationWillDisplayEvent(Map<String, dynamic> json) {
     notification = OSNotification(json);
   }
 
-  void complete(OSNotification? notification) {
+  void preventDefault() {
     if (notification != null) {
-      OneSignal.Notifications.completeNotification(
-          notification.notificationId, true);
-    } else {
-      print(
-          'OSNotificationReceivedEvent complete not nill with notification: ' +
-              this.notification.notificationId);
-      OneSignal.Notifications.completeNotification(
-          this.notification.notificationId, false);
+      OneSignal.Notifications.preventDefault(notification.notificationId);
     }
   }
 
