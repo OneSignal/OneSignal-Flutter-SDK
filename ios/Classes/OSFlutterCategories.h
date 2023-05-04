@@ -35,6 +35,10 @@
 - (NSDictionary *)toJson;
 @end
 
+@interface OSNotificationWillDisplayEvent (Flutter)
+- (NSDictionary *)toJson;
+@end
+
 @interface OSNotificationOpenedResult (Flutter)
 - (NSDictionary *)toJson;
 @end
@@ -49,6 +53,22 @@
 
 @interface NSError (Flutter)
 - (FlutterError *)flutterError;
+@end
+
+@interface OSInAppMessageWillDismissEvent (Flutter)
+- (NSDictionary *)toJson;
+@end
+
+@interface OSInAppMessageDidDismissEvent (Flutter)
+- (NSDictionary *)toJson;
+@end
+
+@interface OSInAppMessageClickEvent (Flutter)
+- (NSDictionary *)toJson;
+@end
+
+@interface OSInAppMessageClickResult (Flutter)
+- (NSDictionary *)toJson;
 @end
 
 #endif

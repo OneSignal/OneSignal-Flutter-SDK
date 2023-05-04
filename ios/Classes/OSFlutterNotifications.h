@@ -30,13 +30,11 @@
 #import <Flutter/Flutter.h>
 #import <OneSignalNotifications/OneSignalNotifications.h>
 
-@interface OSFlutterNotifications : NSObject<FlutterPlugin, OSNotificationPermissionObserver>
+@interface OSFlutterNotifications : NSObject<FlutterPlugin, OSNotificationPermissionObserver, OSNotificationLifecycleListener>
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 + (instancetype)sharedInstance;
-@property (atomic) BOOL hasSetNotificationWillShowInForegroundHandler;
-@property (strong, nonatomic) NSMutableDictionary* notificationCompletionCache;
-@property (strong, nonatomic) NSMutableDictionary* receivedNotificationCache;
+@property (strong, nonatomic) NSMutableDictionary* onWillDisplayEventCache;
 
 
 @end
