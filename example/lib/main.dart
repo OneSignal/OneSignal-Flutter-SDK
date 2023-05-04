@@ -16,7 +16,8 @@ class _MyAppState extends State<MyApp>
         OneSignalPushSubscriptionObserver,
         OneSignalPermissionObserver,
         OneSignalInAppMessageLifecycleListener,
-        OneSignalInAppMessageClickListener {
+        OneSignalInAppMessageClickListener,
+        OneSignalNotificationLifecycleListener {
   String _debugLabelString = "";
   String? _emailAddress;
   String? _smsNumber;
@@ -63,19 +64,7 @@ class _MyAppState extends State<MyApp>
       });
     });
 
-    OneSignal.Notifications.setNotificationWillShowInForegroundHandler(
-        (OSNotificationReceivedEvent event) {
-      print(
-          'FOREGROUND HANDLER CALLED WITH: ${event.notification.jsonRepresentation()}');
-
-      /// Display Notification, send null to not display
-      event.complete(null);
-
-      this.setState(() {
-        _debugLabelString =
-            "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-      });
-    });
+    OneSignal.Notifications.addLifecycleListener(this);
 
     OneSignal.InAppMessages.addClickListener(this);
 
@@ -127,6 +116,24 @@ class _MyAppState extends State<MyApp>
 
   void onDidDismissInAppMessage(OSInAppMessageDidDismissEvent event) {
     print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
+  }
+
+  void onWillDisplayNotification(OSNotificationWillDisplayEvent event) {
+    print(
+        'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
+
+    /// Display Notification, preventDefault to not display
+    event.preventDefault();
+
+    /// Do async work
+
+    /// notification.display() to display after preventing default
+    event.notification.display();
+
+    this.setState(() {
+      _debugLabelString =
+          "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+    });
   }
 
   void _handleSendTags() {

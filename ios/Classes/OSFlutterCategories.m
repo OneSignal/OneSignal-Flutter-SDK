@@ -84,6 +84,16 @@
 }
 @end
 
+@implementation OSNotificationWillDisplayEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"notification"] = self.notification.toJson;
+
+    return json;
+}
+@end
+
 @implementation OSInAppMessageWillDisplayEvent (Flutter)
 - (NSDictionary *)toJson {
     NSMutableDictionary *json = [NSMutableDictionary new];

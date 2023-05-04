@@ -37,9 +37,7 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [OSFlutterNotifications new];
-        sharedInstance.hasSetNotificationWillShowInForegroundHandler = false;
-        sharedInstance.receivedNotificationCache = [NSMutableDictionary new];
-        sharedInstance.notificationCompletionCache = [NSMutableDictionary new];
+        sharedInstance.onWillDisplayEventCache = [NSMutableDictionary new];
     });
     return sharedInstance;
 }
@@ -66,10 +64,10 @@
         [self requestPermission:call withResult:result];
     else  if ([@"OneSignal#registerForProvisionalAuthorization" isEqualToString:call.method])
         [self registerForProvisionalAuthorization:call withResult:result];
-    else if ([@"OneSignal#initNotificationWillShowInForegroundHandlerParams" isEqualToString:call.method])
-        [self initNotificationWillShowInForegroundHandlerParams];
-    else if ([@"OneSignal#completeNotification" isEqualToString:call.method])
-        [self completeNotification:call withResult:result];
+    else if ([@"OneSignal#displayNotification" isEqualToString:call.method])
+        [self displayNotification:call withResult:result];
+    else if ([@"OneSignal#preventDefault" isEqualToString:call.method])
+        [self preventDefault:call withResult:result];
     else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method])
         [self initNotificationOpenedHandlerParams:call withResult:result];
      else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
@@ -103,10 +101,8 @@
 }
 
 - (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.Notifications setNotificationWillShowInForegroundHandler:^(OSNotification *notification, OSNotificationDisplayResponse completion) {
-        [OSFlutterNotifications.sharedInstance handleNotificationWillShowInForeground:notification completion:completion];
-    }];
     [OneSignal.Notifications addPermissionObserver:self];
+    [OneSignal.Notifications addLifecycleListener:self];
     result(nil);
 }
 
@@ -114,42 +110,33 @@
     [self.channel invokeMethod:@"OneSignal#onNotificationPermissionDidChange" arguments:@{@"permission" : @(permission)}];
 }
 
-#pragma mark Received in Foreground Notification 
+#pragma mark Received in Notification Lifecycle Event
 
-- (void)initNotificationWillShowInForegroundHandlerParams {
-    self.hasSetNotificationWillShowInForegroundHandler = YES;
+- (void)onWillDisplayNotification:(OSNotificationWillDisplayEvent *)event {
+    self.onWillDisplayEventCache[event.notification.notificationId] = event;
+    [self.channel invokeMethod:@"OneSignal#onWillDisplayNotification" arguments:event.toJson];
 }
 
-- (void)handleNotificationWillShowInForeground:(OSNotification *)notification completion:(OSNotificationDisplayResponse)completion {
-   
-    if (!self.hasSetNotificationWillShowInForegroundHandler) {
-        completion(notification);
-        return;
-    }
-    self.receivedNotificationCache[notification.notificationId] = notification;
-    self.notificationCompletionCache[notification.notificationId] = completion;
-    [self.channel invokeMethod:@"OneSignal#handleNotificationWillShowInForeground" arguments:notification.toJson];
-}
-
-- (void)completeNotification:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+- (void)preventDefault:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString *notificationId = call.arguments[@"notificationId"];
-    BOOL shouldDisplay = [call.arguments[@"shouldDisplay"] boolValue];
-    OSNotificationDisplayResponse completion = self.notificationCompletionCache[notificationId];
+    OSNotificationWillDisplayEvent *event = self.onWillDisplayEventCache[notificationId];
     
-    if (!completion) {
-        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification completion block with id: %@", notificationId]];
+    if (!event) {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification will display event for notification with id: %@", notificationId]];
         return;
     }
+    [event preventDefault];
+}
 
-    if (shouldDisplay) {
-        OSNotification *notification = self.receivedNotificationCache[notificationId];
-        completion(notification);
-    } else {
-        completion(nil);
+- (void)displayNotification:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *notificationId = call.arguments[@"notificationId"];
+    OSNotificationWillDisplayEvent *event = self.onWillDisplayEventCache[notificationId];
+    
+    if (!event) {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification will display event for notification with id: %@", notificationId]];
+        return;
     }
-
-    [self.notificationCompletionCache removeObjectForKey:notificationId];
-    [self.receivedNotificationCache removeObjectForKey:notificationId];
+    [event.notification display];
 }
 
 #pragma mark Opened Notification
