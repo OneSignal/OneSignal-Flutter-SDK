@@ -53,7 +53,7 @@
     NSString *activityId = call.arguments[@"activityId"];
     NSString *token = call.arguments[@"token"];
 
-    [OneSignal enterLiveActivity:activityId withToken:token withSuccess:^(NSDictionary *results) {
+    [OneSignal.LiveActivities enter:activityId withToken:token withSuccess:^(NSDictionary *results) {
         result(results);
     } withFailure:^(NSError *error) {
         result(error.flutterError);
@@ -63,7 +63,7 @@
 - (void)exitLiveActivity:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString *activityId = call.arguments[@"activityId"];
 
-    [OneSignal exitLiveActivity:activityId withSuccess:^(NSDictionary *results) {
+    [OneSignal.LiveActivities exit:activityId withSuccess:^(NSDictionary *results) {
         result(results);
     } withFailure:^(NSError *error) {
         result(error.flutterError);

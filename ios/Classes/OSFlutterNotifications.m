@@ -99,14 +99,14 @@
 }
 
 - (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.Notifications addLifecycleListener:self];
+    [OneSignal.Notifications addForegroundLifecycleListener:self];
     [OneSignal.Notifications addClickListener:self];
     [OneSignal.Notifications addPermissionObserver:self];
     result(nil);
 }
 
-- (void)onNotificationPermissionDidChange:(BOOL*)permission {
-    [self.channel invokeMethod:@"OneSignal#onNotificationPermissionDidChange" arguments:permission];
+- (void)onNotificationPermissionDidChange:(BOOL)permission {
+    [self.channel invokeMethod:@"OneSignal#onNotificationPermissionDidChange" arguments:@(permission)];
 }
 
 #pragma mark Received in Notification Lifecycle Event
