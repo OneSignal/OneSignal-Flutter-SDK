@@ -17,7 +17,8 @@ class _MyAppState extends State<MyApp>
         OneSignalPermissionObserver,
         OneSignalInAppMessageLifecycleListener,
         OneSignalInAppMessageClickListener,
-        OneSignalNotificationLifecycleListener {
+        OneSignalNotificationLifecycleListener,
+        OneSignalNotificationClickListener {
   String _debugLabelString = "";
   String? _emailAddress;
   String? _smsNumber;
@@ -55,14 +56,7 @@ class _MyAppState extends State<MyApp>
     OneSignal.User.pushSubscription.addObserver(this);
     OneSignal.Notifications.addPermissionObserver(this);
 
-    OneSignal.Notifications.setNotificationOpenedHandler(
-        (OSNotificationOpenedResult result) {
-      print('NOTIFICATION OPENED HANDLER CALLED WITH: ${result}');
-      this.setState(() {
-        _debugLabelString =
-            "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-      });
-    });
+    OneSignal.Notifications.addClickListener(this);
 
     OneSignal.Notifications.addLifecycleListener(this);
 
@@ -116,6 +110,14 @@ class _MyAppState extends State<MyApp>
 
   void onDidDismissInAppMessage(OSInAppMessageDidDismissEvent event) {
     print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
+  }
+
+  void onClickNotification(OSNotificationClickEvent event) {
+    print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
+    this.setState(() {
+      _debugLabelString =
+          "Clicked notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+    });
   }
 
   void onWillDisplayNotification(OSNotificationWillDisplayEvent event) {

@@ -81,28 +81,20 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertNotificationClickResultToMap(INotificationClickResult openResult) throws JSONException {
+    private static HashMap<String, Object> convertNotificationClickResultToMap(INotificationClickResult result) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("notification", convertNotificationToMap(openResult.getNotification()));
-        hash.put("action", convertNotificationActionToMap(openResult.getAction()));
+        hash.put("action_id", result.getActionId());
+        hash.put("url", result.getUrl());
 
         return hash;
     }
 
-    
-    private static HashMap<String, Object> convertNotificationActionToMap(INotificationAction action) {
+    static HashMap<String, Object> convertNotificationClickEventToMap(INotificationClickEvent event) {
         HashMap<String, Object> hash = new HashMap<>();
 
-        hash.put("id", action.getActionId());
-
-        switch (action.getType()) {
-            case Opened:
-                hash.put("type", 0);
-                break;
-            case ActionTaken:
-                hash.put("type", 1);
-        }
+        hash.put("notification", convertNotificationToMap(event.getNotification()));
+        hash.put("result", convertNotificationClickResultToMap(event.getResult()));
 
         return hash;
     }

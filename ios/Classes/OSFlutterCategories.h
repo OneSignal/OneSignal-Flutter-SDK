@@ -39,6 +39,14 @@
 - (NSDictionary *)toJson;
 @end
 
+@interface OSNotificationClickEvent (Flutter)
+- (NSDictionary *)toJson;
+@end
+
+@interface OSNotificationClickResult (Flutter)
+- (NSDictionary *)toJson;
+@end
+
 @interface OSNotificationOpenedResult (Flutter)
 - (NSDictionary *)toJson;
 @end

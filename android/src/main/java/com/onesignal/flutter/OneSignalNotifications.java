@@ -37,7 +37,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickHandler, INotificationLifecycleListener, IPermissionObserver {
+public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
     private final HashMap<String, INotificationReceivedEvent> notificationOnWillDisplayEventCache = new HashMap<>();
 
     static void registerWith(BinaryMessenger messenger) {
@@ -59,8 +59,6 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         this.removeGroupedNotifications(call, result);
     else if (call.method.contentEquals("OneSignal#clearAll"))
         this.clearAll(call, result);
-    else if (call.method.contentEquals("OneSignal#initNotificationOpenedHandlerParams"))
-        this.initNotificationOpenedHandlerParams(call, result);
     else if (call.method.contentEquals("OneSignal#displayNotification"))
         this.displayNotification(call, result);
     else if (call.method.contentEquals("OneSignal#preventDefault"))
@@ -95,12 +93,6 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         OneSignal.getNotifications().clearAllNotifications();
         replySuccess(result, null);
     }
-    
-    
-    private void initNotificationOpenedHandlerParams(MethodCall call, Result result) {
-        OneSignal.getNotifications().setNotificationClickHandler(this);
-        replySuccess(result, null);
-    }
 
     private void displayNotification(MethodCall call, Result result) {
         String notificationId = call.argument("notificationId");
@@ -125,12 +117,12 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     }
 
     @Override
-    public void notificationClicked(INotificationClickResult result) {
+    public void onClick(INotificationClickEvent event) {
         try {
-            invokeMethodOnUiThread("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationClickResultToMap(result));
+            invokeMethodOnUiThread("OneSignal#onClickNotification", OneSignalSerializer.convertNotificationClickEventToMap(event));
         } catch (JSONException e) {
             e.getStackTrace();
-            Logging.error("Encountered an error attempting to convert INotificationClickResult object to hash map:" + e.toString(), null);
+            Logging.error("Encountered an error attempting to convert INotificationClickEvent object to hash map:" + e.toString(), null);
         }
     }
 
@@ -165,6 +157,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
 
     private void lifecycleInit() {
         OneSignal.getNotifications().addLifecycleListener(this);
+        OneSignal.getNotification().addClickListener(this);
         OneSignal.getNotifications().addPermissionChangedHandler(this);
     }
 } 
