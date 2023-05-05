@@ -82,11 +82,12 @@ class _MyAppState extends State<MyApp>
     print("Has permission " + state.toString());
   }
 
-  void onOSPushSubscriptionChangedWithState(OSPushSubscriptionState state) {
+  void onOSPushSubscriptionChangedWithState(
+      OSPushSubscriptionChangedState state) {
     print(OneSignal.User.pushSubscription.optedIn);
     print(OneSignal.User.pushSubscription.id);
     print(OneSignal.User.pushSubscription.token);
-    print(state.jsonRepresentation());
+    print(state.current.jsonRepresentation());
   }
 
   void onClickInAppMessage(OSInAppMessageClickEvent event) {

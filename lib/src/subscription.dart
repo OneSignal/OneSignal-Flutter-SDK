@@ -24,21 +24,23 @@ class OSPushSubscriptionState extends JSONStringRepresentable {
 /// An instance of this class describes a change in the user's OneSignal
 /// push notification subscription state, ie. the user subscribed to
 /// push notifications with your app.
-class OSPushSubscriptionStateChanges extends JSONStringRepresentable {
-  late OSPushSubscriptionState from;
-  late OSPushSubscriptionState to;
+class OSPushSubscriptionChangedState extends JSONStringRepresentable {
+  late OSPushSubscriptionState current;
+  late OSPushSubscriptionState previous;
 
-  OSPushSubscriptionStateChanges(Map<String, dynamic> json) {
-    if (json.containsKey('from'))
-      this.from = OSPushSubscriptionState(json['from'].cast<String, dynamic>());
-    if (json.containsKey('to'))
-      this.to = OSPushSubscriptionState(json['to'].cast<String, dynamic>());
+  OSPushSubscriptionChangedState(Map<String, dynamic> json) {
+    if (json.containsKey('current'))
+      this.current =
+          OSPushSubscriptionState(json['current'].cast<String, dynamic>());
+    if (json.containsKey('previous'))
+      this.previous =
+          OSPushSubscriptionState(json['previous'].cast<String, dynamic>());
   }
 
   String jsonRepresentation() {
     return convertToJsonString(<String, dynamic>{
-      'from': from.jsonRepresentation(),
-      'to': to.jsonRepresentation()
+      'current': current.jsonRepresentation(),
+      'previous': previous.jsonRepresentation()
     });
   }
 }

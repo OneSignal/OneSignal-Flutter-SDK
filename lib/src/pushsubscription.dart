@@ -67,27 +67,26 @@ class OneSignalPushSubscription {
 
   // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
-    if (call.method == 'OneSignal#pushSubscriptionChanged') {
-      this._onSubscriptionChangedHandler(
-          OSPushSubscriptionState(call.arguments.cast<String, dynamic>()));
+    if (call.method == 'OneSignal#onPushSubscriptionChange') {
+      this._onPushSubscriptionChange(OSPushSubscriptionChangedState(
+          call.arguments.cast<String, dynamic>()));
     }
     return null;
   }
 
-  void _onSubscriptionChangedHandler(
-      OSPushSubscriptionState stateChanges) async {
-    print(stateChanges.jsonRepresentation());
-    this._id = stateChanges.id;
-    this._token = stateChanges.token;
-    this._optedIn = stateChanges.optedIn;
+  void _onPushSubscriptionChange(
+      OSPushSubscriptionChangedState stateChanges) async {
+    this._id = stateChanges.current.id;
+    this._token = stateChanges.current.token;
+    this._optedIn = stateChanges.current.optedIn;
 
     for (var observer in _observers) {
-      observer.onOSPushSubscriptionChangedWithState(stateChanges);
+      observer.onOSPushSubscriptionChange(stateChanges);
     }
   }
 }
 
 class OneSignalPushSubscriptionObserver {
-  void onOSPushSubscriptionChangedWithState(
-      OSPushSubscriptionState stateChanges) {}
+  void onOSPushSubscriptionChange(
+      OSPushSubscriptionChangedState stateChanges) {}
 }
