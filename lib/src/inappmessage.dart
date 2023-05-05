@@ -38,14 +38,14 @@ class OSInAppMessageClickResult extends JSONStringRepresentable {
   OSInAppMessageClickResult(Map<String, dynamic> json) {
     this.actionId = json["action_id"];
     this.url = json["url"];
-    this.closingMessage = json["closingMessage"] as bool;
+    this.closingMessage = json["closing_message"] as bool;
   }
 
   String jsonRepresentation() {
     return convertToJsonString({
       'action_id': this.actionId,
       'url': this.url,
-      'closingMessage': this.closingMessage,
+      'closing_message': this.closingMessage,
     });
   }
 }
