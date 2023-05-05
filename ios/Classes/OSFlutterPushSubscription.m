@@ -74,8 +74,8 @@
     result(nil);
 }
 
-- (void)onOSPushSubscriptionChangedWithStateChanges:(OSPushSubscriptionStateChanges*)stateChanges {
-    [self.channel invokeMethod:@"OneSignal#pushSubscriptionChanged" arguments:stateChanges.to.jsonRepresentation];
+- (void)onPushSubscriptionDidChangeWithState:(OSPushSubscriptionChangedState *)state {
+    [self.channel invokeMethod:@"OneSignal#onPushSubscriptionChange" arguments:state.jsonRepresentation];
 }
 
 @end
