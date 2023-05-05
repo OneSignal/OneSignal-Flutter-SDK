@@ -5,15 +5,18 @@ import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/notification.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 
-typedef void OpenedNotificationHandler(OSNotificationOpenedResult openedResult);
-
 class OneSignalNotificationLifecycleListener {
   void onWillDisplayNotification(OSNotificationWillDisplayEvent event) {}
 }
 
+class OneSignalNotificationClickListener {
+  void onClickNotification(OSNotificationClickEvent event) {}
+}
+
 class OneSignalNotifications {
-  // event handlers
-  OpenedNotificationHandler? _onOpenedNotification;
+  // event listeners
+  List<OneSignalNotificationClickListener> _clickListeners =
+      <OneSignalNotificationClickListener>[];
   List<OneSignalNotificationLifecycleListener> _lifecycleListeners =
       <OneSignalNotificationLifecycleListener>[];
 
@@ -116,16 +119,15 @@ class OneSignalNotifications {
 
   Future<void> lifecycleInit() async {
     _permission = await _channel.invokeMethod("OneSignal#permission");
-    await _channel
-        .invokeMethod("OneSignal#initNotificationOpenedHandlerParams");
     return await _channel.invokeMethod("OneSignal#lifecycleInit");
   }
 
   Future<Null> _handleMethod(MethodCall call) async {
-    if (call.method == 'OneSignal#handleOpenedNotification' &&
-        this._onOpenedNotification != null) {
-      this._onOpenedNotification!(
-          OSNotificationOpenedResult(call.arguments.cast<String, dynamic>()));
+    if (call.method == 'OneSignal#onClickNotification') {
+      for (var listener in _clickListeners) {
+        listener.onClickNotification(
+            OSNotificationClickEvent(call.arguments.cast<String, dynamic>()));
+      }
     } else if (call.method == 'OneSignal#onWillDisplayNotification') {
       for (var listener in _lifecycleListeners) {
         listener.onWillDisplayNotification(OSNotificationWillDisplayEvent(
@@ -164,10 +166,14 @@ class OneSignalNotifications {
         "OneSignal#displayNotification", {'notificationId': notificationId});
   }
 
-  /// The notification opened handler is called whenever the user opens a
+  /// The notification click listener is called whenever the user opens a
   /// OneSignal push notification, or taps an action button on a notification.
-  void setNotificationOpenedHandler(OpenedNotificationHandler handler) {
-    _onOpenedNotification = handler;
+  void addClickListener(OneSignalNotificationClickListener listener) {
+    _clickListeners.add(listener);
+  }
+
+  void removeClickListener(OneSignalNotificationClickListener listener) {
+    _clickListeners.remove(listener);
   }
 }
 

@@ -68,8 +68,6 @@
         [self displayNotification:call withResult:result];
     else if ([@"OneSignal#preventDefault" isEqualToString:call.method])
         [self preventDefault:call withResult:result];
-    else if ([@"OneSignal#initNotificationOpenedHandlerParams" isEqualToString:call.method])
-        [self initNotificationOpenedHandlerParams:call withResult:result];
      else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
         [self lifecycleInit:call withResult:result];
     else
@@ -101,8 +99,9 @@
 }
 
 - (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.Notifications addPermissionObserver:self];
     [OneSignal.Notifications addLifecycleListener:self];
+    [OneSignal.Notifications addClickListener:self];
+    [OneSignal.Notifications addPermissionObserver:self];
     result(nil);
 }
 
@@ -139,17 +138,10 @@
     [event.notification display];
 }
 
-#pragma mark Opened Notification
+#pragma mark Notification Click
 
-- (void)initNotificationOpenedHandlerParams:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.Notifications setNotificationOpenedHandler:^(OSNotificationOpenedResult * _Nonnull result) {
-        [OSFlutterNotifications.sharedInstance handleNotificationOpened:result];
-    }];
-    result(nil);
-}
-
-- (void)handleNotificationOpened:(OSNotificationOpenedResult *)result {
-    [self.channel invokeMethod:@"OneSignal#handleOpenedNotification" arguments:result.toJson];
+- (void)onClickNotification:(OSNotificationClickEvent * _Nonnull)event {
+    [self.channel invokeMethod:@"OneSignal#onClickNotification" arguments:event.toJson];
 }
 
 
