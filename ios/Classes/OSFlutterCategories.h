@@ -47,20 +47,20 @@
 - (NSDictionary *)toJson;
 @end
 
-@interface OSNotificationOpenedResult (Flutter)
-- (NSDictionary *)toJson;
-@end
-
-@interface OSInAppMessageAction (Flutter)
-- (NSDictionary *)toJson;
-@end
-
 @interface OSInAppMessage (Flutter)
 - (NSDictionary *)toJson;
 @end
 
 @interface NSError (Flutter)
 - (FlutterError *)flutterError;
+@end
+
+@interface OSInAppMessageWillDisplayEvent (Flutter)
+- (NSDictionary *)toJson;
+@end
+
+@interface OSInAppMessageDidDisplayEvent (Flutter)
+- (NSDictionary *)toJson;
 @end
 
 @interface OSInAppMessageWillDismissEvent (Flutter)

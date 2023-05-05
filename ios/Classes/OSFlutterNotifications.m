@@ -99,7 +99,7 @@
 }
 
 - (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.Notifications addLifecycleListener:self];
+    [OneSignal.Notifications addForegroundLifecycleListener:self];
     [OneSignal.Notifications addClickListener:self];
     [OneSignal.Notifications addPermissionObserver:self];
     result(nil);

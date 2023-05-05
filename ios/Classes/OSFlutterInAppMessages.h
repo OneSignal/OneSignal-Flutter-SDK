@@ -35,11 +35,4 @@
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 + (instancetype)sharedInstance;
 
-@property (atomic) BOOL hasSetInAppMessageClickedHandler;
-/*
-    Holds reference to any in app messages received before any click action
-    occurs on the body, button or image elements of the in app message
-*/
-@property (strong, nonatomic) OSInAppMessageAction *inAppMessageClickedResult;
-
 @end
