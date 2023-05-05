@@ -158,13 +158,23 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertOnSubscriptionChanged(IPushSubscription state) {
+    static HashMap<String, Object> convertPushSubscriptionState(PushSubscriptionState state) {
         HashMap<String, Object> hash = new HashMap<>();
         
 
         hash.put("token", state.getToken());
         hash.put("id", state.getId());
         hash.put("optedIn", state.getOptedIn());
+
+        return hash;
+    }
+
+    static HashMap<String, Object> convertOnPushSubscriptionChange(PushSubscriptionChangedState changedState) {
+        HashMap<String, Object> hash = new HashMap<>();
+        
+
+        hash.put("current", convertPushSubscriptionState(changedState.getCurrent()));
+        hash.put("previous", convertPushSubscriptionState(changedState.getPrevious()));
 
         return hash;
     }

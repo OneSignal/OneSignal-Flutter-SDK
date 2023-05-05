@@ -39,7 +39,7 @@ class _MyAppState extends State<MyApp>
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+    OneSignal.Debug.setLogLevel(OSLogLevel.none);
 
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
     OneSignal.shared.consentRequired(_requireConsent);
@@ -82,11 +82,11 @@ class _MyAppState extends State<MyApp>
     print("Has permission " + state.toString());
   }
 
-  void onOSPushSubscriptionChangedWithState(OSPushSubscriptionState state) {
+  void onOSPushSubscriptionChange(OSPushSubscriptionChangedState state) {
     print(OneSignal.User.pushSubscription.optedIn);
     print(OneSignal.User.pushSubscription.id);
     print(OneSignal.User.pushSubscription.token);
-    print(state.jsonRepresentation());
+    print(state.current.jsonRepresentation());
   }
 
   void onClickInAppMessage(OSInAppMessageClickEvent event) {
@@ -252,7 +252,7 @@ class _MyAppState extends State<MyApp>
     OneSignal.InAppMessages.removeTriggers(keys);
 
     // Toggle pausing (displaying or not) of IAMs
-    OneSignal.InAppMessages.paused(false);
+    OneSignal.InAppMessages.paused(true);
     var arePaused = await OneSignal.InAppMessages.arePaused();
     print('Notifications paused ${arePaused}');
   }
