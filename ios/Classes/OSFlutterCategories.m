@@ -84,6 +84,28 @@
 }
 @end
 
+@implementation OSNotificationClickEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"notification"] = self.notification.toJson;
+    json[@"result"] = self.result.toJson;
+
+    return json;
+}
+@end
+
+@implementation OSNotificationClickResult (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"action_id"] = self.actionId;
+    json[@"url"] = self.url;
+
+    return json;
+}
+@end
+
 @implementation OSNotificationWillDisplayEvent (Flutter)
 - (NSDictionary *)toJson {
     NSMutableDictionary *json = [NSMutableDictionary new];
