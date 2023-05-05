@@ -73,17 +73,6 @@
 }
 @end
 
-@implementation OSNotificationOpenedResult (Flutter)
-- (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
-
-    if (self.notification) json[@"notification"] = self.notification.toJson;
-    if (self.action.actionId) json[@"action"] = @{@"type" : @((int)self.action.type), @"id" : self.action.actionId};
-
-    return json;
-}
-@end
-
 @implementation OSNotificationClickEvent (Flutter)
 - (NSDictionary *)toJson {
     NSMutableDictionary *json = [NSMutableDictionary new];

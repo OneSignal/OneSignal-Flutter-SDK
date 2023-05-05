@@ -101,7 +101,7 @@
 }
 
 - (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.InAppMessages addClickListener:OSFlutterInAppMessages.sharedInstance]
+    [OneSignal.InAppMessages addClickListener:OSFlutterInAppMessages.sharedInstance];
     [OneSignal.InAppMessages addLifecycleListener:OSFlutterInAppMessages.sharedInstance];
 }
 
