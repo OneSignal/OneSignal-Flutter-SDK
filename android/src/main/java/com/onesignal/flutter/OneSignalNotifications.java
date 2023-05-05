@@ -4,19 +4,18 @@ import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.OneSignal;
 import com.onesignal.Continue;
 
+
 import com.onesignal.notifications.INotification;
-import com.onesignal.notifications.INotificationClickHandler;
+import com.onesignal.notifications.INotificationClickEvent;
+import com.onesignal.notifications.INotificationWillDisplayEvent;
 import com.onesignal.notifications.INotificationClickResult;
 import com.onesignal.notifications.INotificationReceivedEvent;
-import com.onesignal.notifications.IRemoteNotificationReceivedHandler;
-
-import com.onesignal.notifications.INotificationWillShowInForegroundHandler;
-import com.onesignal.notifications.INotificationReceivedEvent;
-import com.onesignal.notifications.IRemoteNotificationReceivedHandler;
+import com.onesignal.notifications.INotificationClickListener;
+import com.onesignal.notifications.INotificationLifecycleListener;
+import com.onesignal.notifications.IPermissionObserver;
 
 import com.onesignal.user.subscriptions.ISubscription;
 import com.onesignal.user.subscriptions.IPushSubscription;
-import com.onesignal.notifications.IPermissionChangedHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -38,7 +37,7 @@ import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
-    private final HashMap<String, INotificationReceivedEvent> notificationOnWillDisplayEventCache = new HashMap<>();
+    private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalNotifications controller = new OneSignalNotifications();
@@ -101,7 +100,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
             Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
             return;
         }
-        event.notification.display();
+        event.getNotification().display();
         replySuccess(result, null);
     }
 
@@ -140,10 +139,10 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
 
     @Override
     public void onWillDisplay(INotificationWillDisplayEvent event) {
-        INotification notification = notificationReceivedEvent.getNotification();
-        notificationLifecycleEventCache.put(notification.getNotificationId(), event);
+        INotification notification = event.getNotification();
+        notificationOnWillDisplayEventCache.put(notification.getNotificationId(), event);
         try {
-            invokeMethodOnUiThread("OneSignal#onWillDisplayNotification", OneSignalSerializer.convertNotificationWillDisplayEventToMap(result));
+            invokeMethodOnUiThread("OneSignal#onWillDisplayNotification", OneSignalSerializer.convertNotificationWillDisplayEventToMap(event));
         } catch (JSONException e) {
             e.getStackTrace();
             Logging.error("Encountered an error attempting to convert INotificationWillDisplayEvent object to hash map:" + e.toString(), null);
@@ -152,12 +151,14 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
 
     @Override
     public void onNotificationPermissionChange(boolean permission)  { 
-        invokeMethodOnUiThread("OneSignal#onNotificationPermissionDidChange", permission);
+        HashMap<String, Object> hash = new HashMap<>();
+        hash.put("permission", permission);
+        invokeMethodOnUiThread("OneSignal#onNotificationPermissionDidChange", hash);
     }
 
     private void lifecycleInit() {
-        OneSignal.getNotifications().addLifecycleListener(this);
-        OneSignal.getNotification().addClickListener(this);
-        OneSignal.getNotifications().addPermissionChangedHandler(this);
+        OneSignal.getNotifications().addForegroundLifecycleListener(this);
+        OneSignal.getNotifications().addClickListener(this);
+        OneSignal.getNotifications().addPermissionObserver(this);
     }
 } 
