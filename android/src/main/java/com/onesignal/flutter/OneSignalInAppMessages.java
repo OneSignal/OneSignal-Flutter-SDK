@@ -1,11 +1,18 @@
 package com.onesignal.flutter;
 
 import com.onesignal.OneSignal;
+import com.onesignal.debug.internal.logging.Logging;
+import org.json.JSONException;
+import org.json.JSONObject;
 import com.onesignal.inAppMessages.IInAppMessage;
-import com.onesignal.inAppMessages.IInAppMessageClickHandler;
+import com.onesignal.inAppMessages.IInAppMessageClickListener;
+import com.onesignal.inAppMessages.IInAppMessageClickEvent;
 import com.onesignal.inAppMessages.IInAppMessageClickResult;
-import com.onesignal.inAppMessages.IInAppMessageLifecycleHandler;
-
+import com.onesignal.inAppMessages.IInAppMessageLifecycleListener;
+import com.onesignal.inAppMessages.IInAppMessageWillDisplayEvent;
+import com.onesignal.inAppMessages.IInAppMessageDidDisplayEvent;
+import com.onesignal.inAppMessages.IInAppMessageWillDismissEvent;
+import com.onesignal.inAppMessages.IInAppMessageDidDismissEvent;
 import java.util.Collection;
 import java.util.Map;
 
@@ -86,30 +93,57 @@ IInAppMessageClickListener, IInAppMessageLifecycleListener{
 
     @Override
     public void onClick(IInAppMessageClickEvent event) {
-        invokeMethodOnUiThread("OneSignal#onClickInAppMessage", OneSignalSerializer.convertInAppMessageClickEventToMap(action));
+        try {
+            invokeMethodOnUiThread("OneSignal#onClickInAppMessage", OneSignalSerializer.convertInAppMessageClickEventToMap(event));
+        } catch (JSONException e) {
+            e.getStackTrace();
+            Logging.error("Encountered an error attempting to convert IInAppMessageClickEvent object to hash map:" + e.toString(), null);
+        }  
     }
 
     @Override
     public void onWillDisplay(IInAppMessageWillDisplayEvent event) { 
-        invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", 
+        try {
+            invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage", 
             OneSignalSerializer.convertInAppMessageWillDisplayEventToMap(event));
+        } catch (JSONException e) {
+            e.getStackTrace();
+            Logging.error("Encountered an error attempting to convert IInAppMessageWillDisplayEvent object to hash map:" + e.toString(), null);
+        } 
+
     }
 
     @Override
     public void onDidDisplay(IInAppMessageDidDisplayEvent event) {
-        invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage", 
+        try {
+            invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage", 
             OneSignalSerializer.convertInAppMessageDidDisplayEventToMap(event));
+        } catch (JSONException e) {
+            e.getStackTrace();
+            Logging.error("Encountered an error attempting to convert IInAppMessageDidDisplayEvent object to hash map:" + e.toString(), null);
+        }
     }
 
     @Override
     public void onWillDismiss(IInAppMessageWillDismissEvent event) {
-        invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage", 
+        try {
+            invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage", 
             OneSignalSerializer.convertInAppMessageWillDismissEventToMap(event));
+        } catch (JSONException e) {
+            e.getStackTrace();
+            Logging.error("Encountered an error attempting to convert IInAppMessageWillDismissEvent object to hash map:" + e.toString(), null);
+        }
     }
 
     @Override
     public void onDidDismiss(IInAppMessageDidDismissEvent event) {
-        invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage", 
+        try {
+            invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage", 
             OneSignalSerializer.convertInAppMessageDidDismissEventToMap(event));
+        } catch (JSONException e) {
+            e.getStackTrace();
+            Logging.error("Encountered an error attempting to convert IInAppMessageDidDismissEvent object to hash map:" + e.toString(), null);
+        }
+        
     }
 }

@@ -4,15 +4,19 @@ import android.util.Log;
 
 import com.onesignal.user.subscriptions.ISubscription;
 import com.onesignal.user.subscriptions.IPushSubscription;
-
+import com.onesignal.user.subscriptions.PushSubscriptionChangedState;
+import com.onesignal.user.subscriptions.PushSubscriptionState;
 import com.onesignal.inAppMessages.IInAppMessage;
 import com.onesignal.inAppMessages.IInAppMessageClickResult;
-
+import com.onesignal.inAppMessages.IInAppMessageClickEvent;
+import com.onesignal.inAppMessages.IInAppMessageWillDisplayEvent;
+import com.onesignal.inAppMessages.IInAppMessageDidDisplayEvent;
+import com.onesignal.inAppMessages.IInAppMessageWillDismissEvent;
+import com.onesignal.inAppMessages.IInAppMessageDidDismissEvent;
 import com.onesignal.notifications.INotification;
-
-import com.onesignal.notifications.INotificationAction;
- import com.onesignal.notifications.INotificationClickResult;
- import com.onesignal.notifications.INotificationReceivedEvent;
+import com.onesignal.notifications.INotificationWillDisplayEvent;
+import com.onesignal.notifications.INotificationClickResult;
+import com.onesignal.notifications.INotificationClickEvent;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -75,7 +79,7 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertNotificationWillDisplayEventToMap(INotificationWillDisplayEvent event) {
+    static HashMap<String, Object> convertNotificationWillDisplayEventToMap(INotificationWillDisplayEvent event) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
         hash.put("notification", convertNotificationToMap(event.getNotification()));  
         return hash;
@@ -90,7 +94,7 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertNotificationClickEventToMap(INotificationClickEvent event) {
+    static HashMap<String, Object> convertNotificationClickEventToMap(INotificationClickEvent event) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("notification", convertNotificationToMap(event.getNotification()));
@@ -99,7 +103,7 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertInAppMessageClickEventToMap(IInAppMessageClickEvent event) {
+    static HashMap<String, Object> convertInAppMessageClickEventToMap(IInAppMessageClickEvent event) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("message", convertInAppMessageToMap(event.getMessage()));
@@ -108,17 +112,17 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertInAppMessageClicResultToMap(IInAppMessageClickResult result) {
+    static HashMap<String, Object> convertInAppMessageClickResultToMap(IInAppMessageClickResult result) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("action_id", result.getActionId());
         hash.put("url", result.getUrl());
-        hash.put("closingMessage", result.getClosingMessage());
+        hash.put("closing_message", result.getClosingMessage());
 
         return hash;
     }
 
-    static HashMap<String, Object> convertInAppMessageWillDisplayEventToMap(IInAppMessageWillDisplayEvent event) {
+    static HashMap<String, Object> convertInAppMessageWillDisplayEventToMap(IInAppMessageWillDisplayEvent event) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("message", convertInAppMessageToMap(event.getMessage()));
@@ -126,7 +130,7 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertInAppMessageDidDisplayEventToMap(IInAppMessageDidDisplayEvent event) {
+    static HashMap<String, Object> convertInAppMessageDidDisplayEventToMap(IInAppMessageDidDisplayEvent event) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("message", convertInAppMessageToMap(event.getMessage()));
@@ -134,7 +138,7 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertInAppMessageWillDismissEventToMap(IInAppMessageWillDismissEvent event) {
+    static HashMap<String, Object> convertInAppMessageWillDismissEventToMap(IInAppMessageWillDismissEvent event) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("message", convertInAppMessageToMap(event.getMessage()));
@@ -142,7 +146,7 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertInAppMessageDidDismissEventToMap(IInAppMessageDidDismissEvent event) {
+    static HashMap<String, Object> convertInAppMessageDidDismissEventToMap(IInAppMessageDidDismissEvent event) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
 
         hash.put("message", convertInAppMessageToMap(event.getMessage()));
@@ -158,7 +162,7 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertPushSubscriptionState(PushSubscriptionState state) {
+    static HashMap<String, Object> convertPushSubscriptionState(PushSubscriptionState state) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
         
 
@@ -169,7 +173,7 @@ class OneSignalSerializer {
         return hash;
     }
 
-    static HashMap<String, Object> convertOnPushSubscriptionChange(PushSubscriptionChangedState changedState) {
+    static HashMap<String, Object> convertOnPushSubscriptionChange(PushSubscriptionChangedState changedState) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
         
 

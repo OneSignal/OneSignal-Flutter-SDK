@@ -4,8 +4,9 @@ import com.onesignal.OneSignal;
 
 import com.onesignal.user.subscriptions.IPushSubscription;
 import com.onesignal.user.subscriptions.ISubscription;
-import com.onesignal.user.subscriptions.ISubscriptionChangedHandler;
-
+import com.onesignal.user.subscriptions.IPushSubscriptionObserver;
+import com.onesignal.user.subscriptions.PushSubscriptionChangedState;
+import com.onesignal.user.subscriptions.PushSubscriptionState;
 import com.onesignal.debug.internal.logging.Logging;
 
 import org.json.JSONException;
@@ -64,8 +65,13 @@ public class OneSignalPushSubscription extends FlutterRegistrarResponder impleme
     }  
 
     @Override
-    public void onPushSubscriptionChange(PushSubscriptionChangedState changeState) { 
-        invokeMethodOnUiThread("OneSignal#onPushSubscriptionChange", OneSignalSerializer.convertOnPushSubscriptionChange(changeState));
+    public void onPushSubscriptionChange(PushSubscriptionChangedState changeState) {
+        try {
+            invokeMethodOnUiThread("OneSignal#onPushSubscriptionChange", OneSignalSerializer.convertOnPushSubscriptionChange(changeState));
+        } catch (JSONException e) {
+            e.getStackTrace();
+            Logging.error("Encountered an error attempting to convert PushSubscriptionChangedState object to hash map:" + e.toString(), null);
+        }         
     }
 
 } 
