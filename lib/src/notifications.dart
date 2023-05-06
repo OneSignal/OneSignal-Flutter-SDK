@@ -133,6 +133,10 @@ class OneSignalNotifications {
         listener.onWillDisplayNotification(OSNotificationWillDisplayEvent(
             call.arguments.cast<String, dynamic>()));
       }
+      var event = OSNotificationWillDisplayEvent(
+          call.arguments.cast<String, dynamic>());
+      _channel.invokeMethod("OneSignal#proceedWithWillDisplay",
+          {'notificationId': event.notification.notificationId});
     } else if (call.method == 'OneSignal#onNotificationPermissionDidChange') {
       this.onNotificationPermissionDidChange(call.arguments["permission"]);
     }
