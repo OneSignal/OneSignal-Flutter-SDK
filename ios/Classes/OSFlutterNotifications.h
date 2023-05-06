@@ -35,6 +35,6 @@
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 + (instancetype)sharedInstance;
 @property (strong, nonatomic) NSMutableDictionary* onWillDisplayEventCache;
-
+@property (strong, nonatomic) NSMutableDictionary* preventedDefaultCache;
 
 @end

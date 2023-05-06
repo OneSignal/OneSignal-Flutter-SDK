@@ -38,6 +38,7 @@
     dispatch_once(&onceToken, ^{
         sharedInstance = [OSFlutterNotifications new];
         sharedInstance.onWillDisplayEventCache = [NSMutableDictionary new];
+        sharedInstance.preventedDefaultCache = [NSMutableDictionary new];
     });
     return sharedInstance;
 }
@@ -70,6 +71,8 @@
         [self preventDefault:call withResult:result];
      else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
         [self lifecycleInit:call withResult:result];
+    else if ([@"OneSignal#proceedWithWillDisplay" isEqualToString:call.method])
+        [self proceedWithWillDisplay:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -113,7 +116,26 @@
 
 - (void)onWillDisplayNotification:(OSNotificationWillDisplayEvent *)event {
     self.onWillDisplayEventCache[event.notification.notificationId] = event;
+    /// Our bridge layer needs to preventDefault so that the Flutter listener has time to preventDefault before the notification is displayed
+    [event preventDefault];
     [self.channel invokeMethod:@"OneSignal#onWillDisplayNotification" arguments:event.toJson];
+}
+
+    /// Our bridge layer needs to preventDefault so that the Flutter listener has time to preventDefault before the notification is displayed
+    /// This function is called after all of the flutter listeners have responded to the willDisplay event. 
+    /// If any of them have called preventDefault we will not call display(). Otherwise we will display.
+- (void)proceedWithWillDisplay:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *notificationId = call.arguments[@"notificationId"];
+    OSNotificationWillDisplayEvent *event = self.onWillDisplayEventCache[notificationId];
+    if (!event) {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"OneSignal (objc): could not find notification will display event for notification with id: %@", notificationId]];
+        return;
+    }
+    if (self.preventedDefaultCache[notificationId]) {
+        return;
+    }
+    [event.notification display];
+    result(nil);
 }
 
 - (void)preventDefault:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -125,6 +147,8 @@
         return;
     }
     [event preventDefault];
+    self.preventedDefaultCache[event.notification.notificationId] = event;
+    result(nil);
 }
 
 - (void)displayNotification:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -136,6 +160,7 @@
         return;
     }
     [event.notification display];
+    result(nil);
 }
 
 #pragma mark Notification Click

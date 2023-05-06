@@ -38,6 +38,8 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
 
 public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
     private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
+    private final HashMap<String, INotificationWillDisplayEvent> preventedDefaultCache = new HashMap<>();
+
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalNotifications controller = new OneSignalNotifications();
@@ -64,14 +66,17 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         this.preventDefault(call, result);
     else if (call.method.contentEquals("OneSignal#lifecycleInit"))
         this.lifecycleInit();
+    else if (call.method.contentEquals("OneSignal#proceedWithWillDisplay"))
+        this.proceedWithWillDisplay(call, result);
     else
         replyNotImplemented(result);
     }
 
     private void requestPermission(MethodCall call, Result result) {
         boolean fallback = (boolean) call.argument("fallbackToSettings");
-        OneSignal.getNotifications().requestPermission(fallback, Continue.none());
-        replySuccess(result, null);
+        OneSignal.getNotifications().requestPermission(fallback, Continue.with(permissionResult -> {
+            replySuccess(result, permissionResult.getData());
+        }));
     }
 
     private void removeNotification(MethodCall call, Result result) {
@@ -90,6 +95,24 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
 
     private void clearAll(MethodCall call, Result result) {
         OneSignal.getNotifications().clearAllNotifications();
+        replySuccess(result, null);
+    }
+
+    /// Our bridge layer needs to preventDefault() so that the Flutter listener has time to preventDefault() before the notification is displayed
+    /// This function is called after all of the flutter listeners have responded to the willDisplay event. 
+    /// If any of them have called preventDefault() we will not call display(). Otherwise we will display.
+    private void proceedWithWillDisplay(MethodCall call, Result result) {
+        String notificationId = call.argument("notificationId");
+        INotificationWillDisplayEvent event = notificationOnWillDisplayEventCache.get(notificationId);
+        if (event == null) {
+            Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
+            return;
+        }
+        if (this.preventedDefaultCache.containsKey(notificationId)) {
+            replySuccess(result, null);
+            return;
+        }
+        event.getNotification().display();
         replySuccess(result, null);
     }
 
@@ -112,6 +135,7 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
             return;
         }
         event.preventDefault();
+        this.preventedDefaultCache.put(notificationId, event);
         replySuccess(result, null);
     }
 
@@ -141,6 +165,8 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     public void onWillDisplay(INotificationWillDisplayEvent event) {
         INotification notification = event.getNotification();
         notificationOnWillDisplayEventCache.put(notification.getNotificationId(), event);
+        /// Our bridge layer needs to preventDefault() so that the Flutter listener has time to preventDefault() before the notification is displayed
+        event.preventDefault();
         try {
             invokeMethodOnUiThread("OneSignal#onWillDisplayNotification", OneSignalSerializer.convertNotificationWillDisplayEventToMap(event));
         } catch (JSONException e) {
