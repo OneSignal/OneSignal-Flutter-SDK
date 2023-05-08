@@ -131,13 +131,13 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
 
   private void setConsentRequired(MethodCall call, Result reply) {
     boolean required = call.argument("required");
-    OneSignal.setRequiresPrivacyConsent(required);
+    OneSignal.setConsentRequired(required);
     replySuccess(reply, null);
   }
 
   private void setConsentGiven(MethodCall call, Result reply) {
     boolean granted = call.argument("granted");
-    OneSignal.setPrivacyConsent(granted);
+    OneSignal.setConsentGiven(granted);
     replySuccess(reply, null);
   }
 
