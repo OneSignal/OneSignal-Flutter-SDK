@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/subscription.dart';
 
+typedef void OnPushSubscriptionChangeObserver(
+    OSPushSubscriptionChangedState stateChanges);
+
 class OneSignalPushSubscription {
   MethodChannel _channel = const MethodChannel('OneSignal#pushsubscription');
 
@@ -9,8 +12,8 @@ class OneSignalPushSubscription {
   String? _token;
   bool? _optedIn;
 
-  List<OneSignalPushSubscriptionObserver> _observers =
-      <OneSignalPushSubscriptionObserver>[];
+  List<OnPushSubscriptionChangeObserver> _observers =
+      <OnPushSubscriptionChangeObserver>[];
   // constructor method
   OneSignalPushSubscription() {
     this._channel.setMethodCallHandler(_handleMethod);
@@ -49,12 +52,12 @@ class OneSignalPushSubscription {
   /// The OSPushSubscriptionObserver.onOSPushSubscriptionChanged method will be fired on the passed-in
   // object when the push subscription changes. This method returns the current OSPushSubscriptionState
   // at the time of adding this observer.
-  void addObserver(OneSignalPushSubscriptionObserver observer) {
+  void addObserver(OnPushSubscriptionChangeObserver observer) {
     _observers.add(observer);
   }
 
   // Remove a push subscription observer that has been previously added.
-  void removeObserver(OneSignalPushSubscriptionObserver observer) {
+  void removeObserver(OnPushSubscriptionChangeObserver observer) {
     _observers.remove(observer);
   }
 
@@ -81,12 +84,7 @@ class OneSignalPushSubscription {
     this._optedIn = stateChanges.current.optedIn;
 
     for (var observer in _observers) {
-      observer.onOSPushSubscriptionChange(stateChanges);
+      observer(stateChanges);
     }
   }
-}
-
-class OneSignalPushSubscriptionObserver {
-  void onOSPushSubscriptionChange(
-      OSPushSubscriptionChangedState stateChanges) {}
 }
