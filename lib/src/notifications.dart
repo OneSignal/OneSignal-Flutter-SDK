@@ -10,14 +10,12 @@ typedef void OnNotificationPermissionChangeObserver(bool permission);
 typedef void OnNotificationWillDisplayListener(
     OSNotificationWillDisplayEvent event);
 
-class OneSignalNotificationClickListener {
-  void onClickNotification(OSNotificationClickEvent event) {}
-}
+typedef void OnNotificationClickListener(OSNotificationClickEvent event);
 
 class OneSignalNotifications {
   // event listeners
-  List<OneSignalNotificationClickListener> _clickListeners =
-      <OneSignalNotificationClickListener>[];
+  List<OnNotificationClickListener> _clickListeners =
+      <OnNotificationClickListener>[];
   List<OnNotificationWillDisplayListener> _willDisplayListeners =
       <OnNotificationWillDisplayListener>[];
 
@@ -127,7 +125,7 @@ class OneSignalNotifications {
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#onClickNotification') {
       for (var listener in _clickListeners) {
-        listener.onClickNotification(
+        listener(
             OSNotificationClickEvent(call.arguments.cast<String, dynamic>()));
       }
     } else if (call.method == 'OneSignal#onWillDisplayNotification') {
@@ -175,11 +173,11 @@ class OneSignalNotifications {
 
   /// The notification click listener is called whenever the user opens a
   /// OneSignal push notification, or taps an action button on a notification.
-  void addClickListener(OneSignalNotificationClickListener listener) {
+  void addClickListener(OnNotificationClickListener listener) {
     _clickListeners.add(listener);
   }
 
-  void removeClickListener(OneSignalNotificationClickListener listener) {
+  void removeClickListener(OnNotificationClickListener listener) {
     _clickListeners.remove(listener);
   }
 }
