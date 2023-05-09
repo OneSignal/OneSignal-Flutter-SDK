@@ -11,7 +11,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => new _MyAppState();
 }
 
-class _MyAppState extends State<MyApp> with OneSignalNotificationClickListener {
+class _MyAppState extends State<MyApp> {
   String _debugLabelString = "";
   String? _emailAddress;
   String? _smsNumber;
@@ -57,7 +57,13 @@ class _MyAppState extends State<MyApp> with OneSignalNotificationClickListener {
       print("Has permission " + state.toString());
     });
 
-    OneSignal.Notifications.addClickListener(this);
+    OneSignal.Notifications.addClickListener((event) {
+      print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
+      this.setState(() {
+        _debugLabelString =
+            "Clicked notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });
 
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
       print(
@@ -110,14 +116,6 @@ class _MyAppState extends State<MyApp> with OneSignalNotificationClickListener {
     oneSignalOutcomeExamples();
 
     OneSignal.InAppMessages.paused(true);
-  }
-
-  void onClickNotification(OSNotificationClickEvent event) {
-    print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
-    this.setState(() {
-      _debugLabelString =
-          "Clicked notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-    });
   }
 
   void _handleSendTags() {
