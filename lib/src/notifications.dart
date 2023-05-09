@@ -7,9 +7,8 @@ import 'package:onesignal_flutter/src/permission.dart';
 
 typedef void OnNotificationPermissionChangeObserver(bool permission);
 
-class OneSignalNotificationLifecycleListener {
-  void onWillDisplayNotification(OSNotificationWillDisplayEvent event) {}
-}
+typedef void OnNotificationWillDisplayListener(
+    OSNotificationWillDisplayEvent event);
 
 class OneSignalNotificationClickListener {
   void onClickNotification(OSNotificationClickEvent event) {}
@@ -19,8 +18,8 @@ class OneSignalNotifications {
   // event listeners
   List<OneSignalNotificationClickListener> _clickListeners =
       <OneSignalNotificationClickListener>[];
-  List<OneSignalNotificationLifecycleListener> _lifecycleListeners =
-      <OneSignalNotificationLifecycleListener>[];
+  List<OnNotificationWillDisplayListener> _willDisplayListeners =
+      <OnNotificationWillDisplayListener>[];
 
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal#notifications');
@@ -132,8 +131,8 @@ class OneSignalNotifications {
             OSNotificationClickEvent(call.arguments.cast<String, dynamic>()));
       }
     } else if (call.method == 'OneSignal#onWillDisplayNotification') {
-      for (var listener in _lifecycleListeners) {
-        listener.onWillDisplayNotification(OSNotificationWillDisplayEvent(
+      for (var listener in _willDisplayListeners) {
+        listener(OSNotificationWillDisplayEvent(
             call.arguments.cast<String, dynamic>()));
       }
       var event = OSNotificationWillDisplayEvent(
@@ -152,13 +151,14 @@ class OneSignalNotifications {
     }
   }
 
-  void addLifecycleListener(OneSignalNotificationLifecycleListener listener) {
-    _lifecycleListeners.add(listener);
+  void addForegroundWillDisplayListener(
+      OnNotificationWillDisplayListener listener) {
+    _willDisplayListeners.add(listener);
   }
 
-  void removeLifecycleListener(
-      OneSignalNotificationLifecycleListener listener) {
-    _lifecycleListeners.remove(listener);
+  void removeForegroundWillDisplayListener(
+      OnNotificationWillDisplayListener listener) {
+    _willDisplayListeners.remove(listener);
   }
 
   /// The notification willDisplay listener is called whenever a notification arrives
