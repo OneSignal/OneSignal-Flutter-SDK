@@ -3,9 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:onesignal_flutter/src/inappmessage.dart';
 
-class OneSignalInAppMessageClickListener {
-  void onClickInAppMessage(OSInAppMessageClickEvent event) {}
-}
+typedef void OnClickInAppMessageListener(OSInAppMessageClickEvent event);
 
 typedef void OnWillDisplayInAppMessageListener(
     OSInAppMessageWillDisplayEvent event);
@@ -25,8 +23,8 @@ class OneSignalInAppMessages {
     this._channel.setMethodCallHandler(_handleMethod);
   }
 
-  List<OneSignalInAppMessageClickListener> _clickListeners =
-      <OneSignalInAppMessageClickListener>[];
+  List<OnClickInAppMessageListener> _clickListeners =
+      <OnClickInAppMessageListener>[];
   List<OnWillDisplayInAppMessageListener> _willDisplayListeners =
       <OnWillDisplayInAppMessageListener>[];
   List<OnDidDisplayInAppMessageListener> _didDisplayListeners =
@@ -83,7 +81,7 @@ class OneSignalInAppMessages {
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#onClickInAppMessage') {
       for (var listener in _clickListeners) {
-        listener.onClickInAppMessage(
+        listener(
             OSInAppMessageClickEvent(call.arguments.cast<String, dynamic>()));
       }
     } else if (call.method == 'OneSignal#onWillDisplayInAppMessage') {
@@ -112,11 +110,11 @@ class OneSignalInAppMessages {
 
   /// The in app message clicked handler is called whenever the user clicks a
   /// OneSignal IAM button or image with an action event attacthed to it
-  void addClickListener(OneSignalInAppMessageClickListener listener) {
+  void addClickListener(OnClickInAppMessageListener listener) {
     _clickListeners.add(listener);
   }
 
-  void removeClickListener(OneSignalInAppMessageClickListener listener) {
+  void removeClickListener(OnClickInAppMessageListener listener) {
     _clickListeners.remove(listener);
   }
 
