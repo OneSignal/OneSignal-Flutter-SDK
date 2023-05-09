@@ -11,10 +11,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => new _MyAppState();
 }
 
-class _MyAppState extends State<MyApp>
-    with
-        OneSignalNotificationLifecycleListener,
-        OneSignalNotificationClickListener {
+class _MyAppState extends State<MyApp> with OneSignalNotificationClickListener {
   String _debugLabelString = "";
   String? _emailAddress;
   String? _smsNumber;
@@ -61,7 +58,25 @@ class _MyAppState extends State<MyApp>
     });
 
     OneSignal.Notifications.addClickListener(this);
-    OneSignal.Notifications.addLifecycleListener(this);
+
+    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+      print(
+          'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
+
+      /// Display Notification, preventDefault to not display
+      event.preventDefault();
+
+      /// Do async work
+
+      /// notification.display() to display after preventing default
+      event.notification.display();
+
+      this.setState(() {
+        _debugLabelString =
+            "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });
+
     OneSignal.InAppMessages.addClickListener((event) {
       this.setState(() {
         _debugLabelString =
@@ -94,7 +109,7 @@ class _MyAppState extends State<MyApp>
     // Some examples of how to use Outcome Events public methods with OneSignal SDK
     oneSignalOutcomeExamples();
 
-    OneSignal.InAppMessages.paused(false);
+    OneSignal.InAppMessages.paused(true);
   }
 
   void onClickNotification(OSNotificationClickEvent event) {
@@ -102,24 +117,6 @@ class _MyAppState extends State<MyApp>
     this.setState(() {
       _debugLabelString =
           "Clicked notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-    });
-  }
-
-  void onWillDisplayNotification(OSNotificationWillDisplayEvent event) {
-    print(
-        'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
-
-    /// Display Notification, preventDefault to not display
-    event.preventDefault();
-
-    /// Do async work
-
-    /// notification.display() to display after preventing default
-    event.notification.display();
-
-    this.setState(() {
-      _debugLabelString =
-          "Notification received in foreground notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
     });
   }
 
