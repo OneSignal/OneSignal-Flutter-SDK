@@ -15,7 +15,6 @@ class _MyAppState extends State<MyApp>
     with
         OneSignalPushSubscriptionObserver,
         OneSignalPermissionObserver,
-        OneSignalInAppMessageClickListener,
         OneSignalNotificationLifecycleListener,
         OneSignalNotificationClickListener {
   String _debugLabelString = "";
@@ -56,7 +55,12 @@ class _MyAppState extends State<MyApp>
     OneSignal.Notifications.addPermissionObserver(this);
     OneSignal.Notifications.addClickListener(this);
     OneSignal.Notifications.addLifecycleListener(this);
-    OneSignal.InAppMessages.addClickListener(this);
+    OneSignal.InAppMessages.addClickListener((event) {
+      this.setState(() {
+        _debugLabelString =
+            "In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}";
+      });
+    });
     OneSignal.InAppMessages.addWillDisplayListener((event) {
       print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
     });
@@ -95,13 +99,6 @@ class _MyAppState extends State<MyApp>
     print(OneSignal.User.pushSubscription.id);
     print(OneSignal.User.pushSubscription.token);
     print(state.current.jsonRepresentation());
-  }
-
-  void onClickInAppMessage(OSInAppMessageClickEvent event) {
-    this.setState(() {
-      _debugLabelString =
-          "In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}";
-    });
   }
 
   void onClickNotification(OSNotificationClickEvent event) {
