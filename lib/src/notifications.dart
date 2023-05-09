@@ -5,6 +5,8 @@ import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/notification.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 
+typedef void OnNotificationPermissionChangeObserver(bool permission);
+
 class OneSignalNotificationLifecycleListener {
   void onWillDisplayNotification(OSNotificationWillDisplayEvent event) {}
 }
@@ -23,8 +25,8 @@ class OneSignalNotifications {
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal#notifications');
 
-  List<OneSignalPermissionObserver> _observers =
-      <OneSignalPermissionObserver>[];
+  List<OnNotificationPermissionChangeObserver> _observers =
+      <OnNotificationPermissionChangeObserver>[];
   // constructor method
   OneSignalNotifications() {
     this._channel.setMethodCallHandler(_handleMethod);
@@ -108,12 +110,13 @@ class OneSignalNotifications {
   /// The OSNotificationPermissionObserver.onNotificationPermissionDidChange method will be fired on the passed-in object
   /// when a notification permission setting changes. This happens when the user enables or disables
   /// notifications for your app from the system settings outside of your app.
-  void addPermissionObserver(OneSignalPermissionObserver observer) {
+  void addPermissionObserver(OnNotificationPermissionChangeObserver observer) {
     _observers.add(observer);
   }
 
   // Remove a push subscription observer that has been previously added.
-  void removePermissionObserver(OneSignalPermissionObserver observer) {
+  void removePermissionObserver(
+      OnNotificationPermissionChangeObserver observer) {
     _observers.remove(observer);
   }
 
@@ -145,7 +148,7 @@ class OneSignalNotifications {
 
   void onNotificationPermissionDidChange(bool permission) {
     for (var observer in _observers) {
-      observer.onNotificationPermissionDidChange(permission);
+      observer(permission);
     }
   }
 
@@ -179,8 +182,4 @@ class OneSignalNotifications {
   void removeClickListener(OneSignalNotificationClickListener listener) {
     _clickListeners.remove(listener);
   }
-}
-
-class OneSignalPermissionObserver {
-  void onNotificationPermissionDidChange(bool permission) {}
 }

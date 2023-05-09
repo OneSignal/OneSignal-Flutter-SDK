@@ -14,7 +14,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp>
     with
         OneSignalPushSubscriptionObserver,
-        OneSignalPermissionObserver,
         OneSignalNotificationLifecycleListener,
         OneSignalNotificationClickListener {
   String _debugLabelString = "";
@@ -52,7 +51,11 @@ class _MyAppState extends State<MyApp>
     OneSignal.Notifications.clearAll();
 
     OneSignal.User.pushSubscription.addObserver(this);
-    OneSignal.Notifications.addPermissionObserver(this);
+
+    OneSignal.Notifications.addPermissionObserver((state) {
+      print("Has permission " + state.toString());
+    });
+
     OneSignal.Notifications.addClickListener(this);
     OneSignal.Notifications.addLifecycleListener(this);
     OneSignal.InAppMessages.addClickListener((event) {
@@ -88,10 +91,6 @@ class _MyAppState extends State<MyApp>
     oneSignalOutcomeExamples();
 
     OneSignal.InAppMessages.paused(false);
-  }
-
-  void onNotificationPermissionDidChange(bool state) {
-    print("Has permission " + state.toString());
   }
 
   void onOSPushSubscriptionChange(OSPushSubscriptionChangedState state) {
