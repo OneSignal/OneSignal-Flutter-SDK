@@ -32,9 +32,9 @@ class OneSignalMockChannelController {
       case "OneSignal#setLogLevel":
         this.state.setLogLevel(call.arguments);
         break;
-      case "OneSignal#consentGranted":
-        this.state.consentGranted =
-            (call.arguments as Map<dynamic, dynamic>)['granted'] as bool?;
+      case "OneSignal#consentGiven":
+        this.state.consentGiven =
+            (call.arguments as Map<dynamic, dynamic>)['given'] as bool?;
         break;
       case "OneSignal#promptPermission":
         this.state.calledPromptPermission = true;
@@ -92,7 +92,7 @@ class OneSignalState {
   bool? requiresPrivacyConsent = false;
   late OSLogLevel logLevel;
   late OSLogLevel visualLevel;
-  bool? consentGranted = false;
+  bool? consentGiven = false;
   bool? calledPromptPermission;
   bool? locationShared;
   OSNotificationDisplayType? inFocusDisplayType;
@@ -124,7 +124,7 @@ class OneSignalState {
     if (visual != null) this.visualLevel = OSLogLevel.values[visual];
   }
 
-  void setRequiresPrivacyConsent(Map<dynamic, dynamic> params) {
+  void consentRequired(Map<dynamic, dynamic> params) {
     this.requiresPrivacyConsent = params['required'] as bool?;
   }
 

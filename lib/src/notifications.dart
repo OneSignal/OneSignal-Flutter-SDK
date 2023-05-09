@@ -1,24 +1,29 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/services.dart';
+import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/notification.dart';
 import 'package:onesignal_flutter/src/permission.dart';
 
-typedef void OpenedNotificationHandler(OSNotificationOpenedResult openedResult);
-typedef void NotificationWillShowInForegroundHandler(
-    OSNotificationReceivedEvent event);
+typedef void OnNotificationPermissionChangeObserver(bool permission);
+
+typedef void OnNotificationWillDisplayListener(
+    OSNotificationWillDisplayEvent event);
+
+typedef void OnNotificationClickListener(OSNotificationClickEvent event);
 
 class OneSignalNotifications {
-  // event handlers
-  OpenedNotificationHandler? _onOpenedNotification;
-  NotificationWillShowInForegroundHandler?
-      _onNotificationWillShowInForegroundHandler;
+  // event listeners
+  List<OnNotificationClickListener> _clickListeners =
+      <OnNotificationClickListener>[];
+  List<OnNotificationWillDisplayListener> _willDisplayListeners =
+      <OnNotificationWillDisplayListener>[];
 
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal#notifications');
 
-  List<OneSignalPermissionObserver> _observers =
-      <OneSignalPermissionObserver>[];
+  List<OnNotificationPermissionChangeObserver> _observers =
+      <OnNotificationPermissionChangeObserver>[];
   // constructor method
   OneSignalNotifications() {
     this._channel.setMethodCallHandler(_handleMethod);
@@ -29,6 +34,24 @@ class OneSignalNotifications {
   /// Whether this app has push notification permission.
   bool get permission {
     return _permission;
+  }
+
+  /// iOS only
+  /// enum OSNotificationPermission {
+  /// notDetermined,
+  /// denied,
+  /// authorized,
+  /// provisional, // only available in iOS 12
+  /// ephemeral, // only available in iOS 14
+  Future<OSNotificationPermission> permissionNative() async {
+    if (Platform.isIOS) {
+      return OSNotificationPermission
+          .values[await _channel.invokeMethod("OneSignal#permissionNative")];
+    } else {
+      return _permission
+          ? OSNotificationPermission.authorized
+          : OSNotificationPermission.denied;
+    }
   }
 
   /// Whether attempting to request notification permission will show a prompt.
@@ -81,72 +104,80 @@ class OneSignalNotifications {
     }
   }
 
-  /// The OSPermissionObserver.onOSPermissionChanged method will be fired on the passed-in object
+  /// The OSNotificationPermissionObserver.onNotificationPermissionDidChange method will be fired on the passed-in object
   /// when a notification permission setting changes. This happens when the user enables or disables
   /// notifications for your app from the system settings outside of your app.
-  void addPermissionObserver(OneSignalPermissionObserver observer) {
+  void addPermissionObserver(OnNotificationPermissionChangeObserver observer) {
     _observers.add(observer);
   }
 
   // Remove a push subscription observer that has been previously added.
-  void removePermissionObserver(OneSignalPermissionObserver observer) {
+  void removePermissionObserver(
+      OnNotificationPermissionChangeObserver observer) {
     _observers.remove(observer);
   }
 
   Future<void> lifecycleInit() async {
-    _channel.invokeMethod(
-        "OneSignal#initNotificationWillShowInForegroundHandlerParams");
     _permission = await _channel.invokeMethod("OneSignal#permission");
-    await _channel
-        .invokeMethod("OneSignal#initNotificationOpenedHandlerParams");
     return await _channel.invokeMethod("OneSignal#lifecycleInit");
   }
 
   Future<Null> _handleMethod(MethodCall call) async {
-    if (call.method == 'OneSignal#handleOpenedNotification' &&
-        this._onOpenedNotification != null) {
-      this._onOpenedNotification!(
-          OSNotificationOpenedResult(call.arguments.cast<String, dynamic>()));
-    } else if (call.method ==
-            'OneSignal#handleNotificationWillShowInForeground' &&
-        this._onNotificationWillShowInForegroundHandler != null) {
-      this._onNotificationWillShowInForegroundHandler!(
-          OSNotificationReceivedEvent(call.arguments.cast<String, dynamic>()));
-    } else if (call.method == 'OneSignal#OSPermissionChanged') {
-      this.onOSPermissionChangedHandler(
-          OSPermissionState(call.arguments.cast<String, dynamic>()));
+    if (call.method == 'OneSignal#onClickNotification') {
+      for (var listener in _clickListeners) {
+        listener(
+            OSNotificationClickEvent(call.arguments.cast<String, dynamic>()));
+      }
+    } else if (call.method == 'OneSignal#onWillDisplayNotification') {
+      for (var listener in _willDisplayListeners) {
+        listener(OSNotificationWillDisplayEvent(
+            call.arguments.cast<String, dynamic>()));
+      }
+      var event = OSNotificationWillDisplayEvent(
+          call.arguments.cast<String, dynamic>());
+      _channel.invokeMethod("OneSignal#proceedWithWillDisplay",
+          {'notificationId': event.notification.notificationId});
+    } else if (call.method == 'OneSignal#onNotificationPermissionDidChange') {
+      this.onNotificationPermissionDidChange(call.arguments["permission"]);
     }
     return null;
   }
 
-  Future<void> onOSPermissionChangedHandler(OSPermissionState state) async {
-    _permission = state.permission;
+  void onNotificationPermissionDidChange(bool permission) {
     for (var observer in _observers) {
-      observer.onOSPermissionChanged(_permission);
+      observer(permission);
     }
   }
 
-  /// The notification foreground handler is called whenever a notification arrives
-  /// and the application is in foreground
-  void setNotificationWillShowInForegroundHandler(
-      NotificationWillShowInForegroundHandler handler) {
-    _onNotificationWillShowInForegroundHandler = handler;
+  void addForegroundWillDisplayListener(
+      OnNotificationWillDisplayListener listener) {
+    _willDisplayListeners.add(listener);
   }
 
-  /// The notification foreground handler is called whenever a notification arrives
-  /// and the application is in foreground
-  void completeNotification(String notificationId, bool shouldDisplay) {
-    _channel.invokeMethod("OneSignal#completeNotification",
-        {'notificationId': notificationId, 'shouldDisplay': shouldDisplay});
+  void removeForegroundWillDisplayListener(
+      OnNotificationWillDisplayListener listener) {
+    _willDisplayListeners.remove(listener);
   }
 
-  /// The notification opened handler is called whenever the user opens a
+  /// The notification willDisplay listener is called whenever a notification arrives
+  /// and the application is in foreground
+  void preventDefault(String notificationId) {
+    _channel.invokeMethod(
+        "OneSignal#preventDefault", {'notificationId': notificationId});
+  }
+
+  void displayNotification(String notificationId) {
+    _channel.invokeMethod(
+        "OneSignal#displayNotification", {'notificationId': notificationId});
+  }
+
+  /// The notification click listener is called whenever the user opens a
   /// OneSignal push notification, or taps an action button on a notification.
-  void setNotificationOpenedHandler(OpenedNotificationHandler handler) {
-    _onOpenedNotification = handler;
+  void addClickListener(OnNotificationClickListener listener) {
+    _clickListeners.add(listener);
   }
-}
 
-class OneSignalPermissionObserver {
-  void onOSPermissionChanged(bool state) {}
+  void removeClickListener(OnNotificationClickListener listener) {
+    _clickListeners.remove(listener);
+  }
 }

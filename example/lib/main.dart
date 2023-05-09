@@ -11,8 +11,7 @@ class MyApp extends StatefulWidget {
   _MyAppState createState() => new _MyAppState();
 }
 
-class _MyAppState extends State<MyApp>
-    with OneSignalPushSubscriptionObserver, OneSignalPermissionObserver {
+class _MyAppState extends State<MyApp> {
   String _debugLabelString = "";
   String? _emailAddress;
   String? _smsNumber;
@@ -21,7 +20,7 @@ class _MyAppState extends State<MyApp>
   bool _enableConsentButton = false;
 
   // CHANGE THIS parameter to true if you want to test GDPR privacy consent
-  bool _requireConsent = true;
+  bool _requireConsent = false;
 
   @override
   void initState() {
@@ -36,7 +35,7 @@ class _MyAppState extends State<MyApp>
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
 
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
-    OneSignal.shared.setRequiresPrivacyConsent(_requireConsent);
+    OneSignal.shared.consentRequired(_requireConsent);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
     OneSignal.shared.initialize("77e32082-ea27-42e3-a898-c72e141824ef");
@@ -47,25 +46,36 @@ class _MyAppState extends State<MyApp>
 
     OneSignal.Notifications.clearAll();
 
-    OneSignal.User.pushSubscription.addObserver(this);
-    OneSignal.Notifications.addPermissionObserver(this);
+    OneSignal.User.pushSubscription.addObserver((state) {
+      print(OneSignal.User.pushSubscription.optedIn);
+      print(OneSignal.User.pushSubscription.id);
+      print(OneSignal.User.pushSubscription.token);
+      print(state.current.jsonRepresentation());
+    });
 
-    OneSignal.Notifications.setNotificationOpenedHandler(
-        (OSNotificationOpenedResult result) {
-      print('NOTIFICATION OPENED HANDLER CALLED WITH: ${result}');
+    OneSignal.Notifications.addPermissionObserver((state) {
+      print("Has permission " + state.toString());
+    });
+
+    OneSignal.Notifications.addClickListener((event) {
+      print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
       this.setState(() {
         _debugLabelString =
-            "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+            "Clicked notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
     });
 
-    OneSignal.Notifications.setNotificationWillShowInForegroundHandler(
-        (OSNotificationReceivedEvent event) {
+    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
       print(
-          'FOREGROUND HANDLER CALLED WITH: ${event.notification.jsonRepresentation()}');
+          'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
 
-      /// Display Notification, send null to not display
-      event.complete(null);
+      /// Display Notification, preventDefault to not display
+      event.preventDefault();
+
+      /// Do async work
+
+      /// notification.display() to display after preventing default
+      event.notification.display();
 
       this.setState(() {
         _debugLabelString =
@@ -73,37 +83,30 @@ class _MyAppState extends State<MyApp>
       });
     });
 
-    OneSignal.InAppMessages.setInAppMessageClickedHandler(
-        (OSInAppMessageAction action) {
+    OneSignal.InAppMessages.addClickListener((event) {
       this.setState(() {
         _debugLabelString =
-            "In App Message Clicked: \n${action.jsonRepresentation().replaceAll("\\n", "\n")}";
+            "In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
     });
-
-    OneSignal.InAppMessages.setOnWillDisplayInAppMessageHandler((message) {
-      print("ON WILL DISPLAY IN APP MESSAGE ${message.messageId}");
+    OneSignal.InAppMessages.addWillDisplayListener((event) {
+      print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
     });
-
-    OneSignal.InAppMessages.setOnDidDisplayInAppMessageHandler((message) {
-      print("ON DID DISPLAY IN APP MESSAGE ${message.messageId}");
+    OneSignal.InAppMessages.addDidDisplayListener((event) {
+      print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
     });
-
-    OneSignal.InAppMessages.setOnWillDismissInAppMessageHandler((message) {
-      print("ON WILL DISMISS IN APP MESSAGE ${message.messageId}");
+    OneSignal.InAppMessages.addWillDismissListener((event) {
+      print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
     });
-
-    OneSignal.InAppMessages.setOnDidDismissInAppMessageHandler((message) {
-      print("ON DID DISMISS IN APP MESSAGE ${message.messageId}");
+    OneSignal.InAppMessages.addDidDismissListener((event) {
+      print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
     });
 
     // iOS-only method to open launch URLs in Safari when set to false
     OneSignal.shared.setLaunchURLsInApp(false);
 
-    bool requiresConsent = await OneSignal.shared.requiresPrivacyConsent();
-
     this.setState(() {
-      _enableConsentButton = requiresConsent;
+      _enableConsentButton = _requireConsent;
     });
 
     // Some examples of how to use In App Messaging public methods with OneSignal SDK
@@ -111,17 +114,8 @@ class _MyAppState extends State<MyApp>
 
     // Some examples of how to use Outcome Events public methods with OneSignal SDK
     oneSignalOutcomeExamples();
-  }
 
-  void onOSPermissionChanged(bool state) {
-    print("Has permission " + state.toString());
-  }
-
-  void onOSPushSubscriptionChangedWithState(OSPushSubscriptionState state) {
-    print(OneSignal.User.pushSubscription.optedIn);
-    print(OneSignal.User.pushSubscription.id);
-    print(OneSignal.User.pushSubscription.token);
-    print(state.jsonRepresentation());
+    OneSignal.InAppMessages.paused(true);
   }
 
   void _handleSendTags() {
@@ -182,7 +176,7 @@ class _MyAppState extends State<MyApp>
 
   void _handleConsent() {
     print("Setting consent to true");
-    OneSignal.shared.setPrivacyConsent(true);
+    OneSignal.shared.consentGiven(true);
 
     print("Setting state");
     this.setState(() {
@@ -216,7 +210,7 @@ class _MyAppState extends State<MyApp>
     /// Example addTriggers call for IAM
     /// This will add 2 triggers so if there are any IAM satisfying these, they
     /// will be shown to the user
-    Map<String, Object> triggers = new Map<String, Object>();
+    Map<String, String> triggers = new Map<String, String>();
     triggers["trigger_2"] = "two";
     triggers["trigger_3"] = "three";
     OneSignal.InAppMessages.addTriggers(triggers);
@@ -230,7 +224,7 @@ class _MyAppState extends State<MyApp>
     OneSignal.InAppMessages.removeTriggers(keys);
 
     // Toggle pausing (displaying or not) of IAMs
-    OneSignal.InAppMessages.paused(false);
+    OneSignal.InAppMessages.paused(true);
     var arePaused = await OneSignal.InAppMessages.arePaused();
     print('Notifications paused ${arePaused}');
   }

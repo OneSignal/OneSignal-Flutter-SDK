@@ -4,8 +4,9 @@ import com.onesignal.OneSignal;
 
 import com.onesignal.user.subscriptions.IPushSubscription;
 import com.onesignal.user.subscriptions.ISubscription;
-import com.onesignal.user.subscriptions.ISubscriptionChangedHandler;
-
+import com.onesignal.user.subscriptions.IPushSubscriptionObserver;
+import com.onesignal.user.subscriptions.PushSubscriptionChangedState;
+import com.onesignal.user.subscriptions.PushSubscriptionState;
 import com.onesignal.debug.internal.logging.Logging;
 
 import org.json.JSONException;
@@ -23,7 +24,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-public class OneSignalPushSubscription extends FlutterRegistrarResponder implements MethodCallHandler, ISubscriptionChangedHandler {
+public class OneSignalPushSubscription extends FlutterRegistrarResponder implements MethodCallHandler, IPushSubscriptionObserver {
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalPushSubscription controller = new OneSignalPushSubscription();
@@ -60,16 +61,17 @@ public class OneSignalPushSubscription extends FlutterRegistrarResponder impleme
     }
 
     private void lifecycleInit() {
-        OneSignal.getUser().getPushSubscription().addChangeHandler(this);
+        OneSignal.getUser().getPushSubscription().addObserver(this);
     }  
 
     @Override
-    public void onSubscriptionChanged(ISubscription subscription) { 
-    if (!(subscription instanceof IPushSubscription)){
-        return;
-    }
-        IPushSubscription pushSubscription = (IPushSubscription) subscription;
-        invokeMethodOnUiThread("OneSignal#pushSubscriptionChanged", OneSignalSerializer.convertOnSubscriptionChanged(pushSubscription));
+    public void onPushSubscriptionChange(PushSubscriptionChangedState changeState) {
+        try {
+            invokeMethodOnUiThread("OneSignal#onPushSubscriptionChange", OneSignalSerializer.convertOnPushSubscriptionChange(changeState));
+        } catch (JSONException e) {
+            e.getStackTrace();
+            Logging.error("Encountered an error attempting to convert PushSubscriptionChangedState object to hash map:" + e.toString(), null);
+        }         
     }
 
 } 
