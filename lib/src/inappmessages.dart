@@ -1,17 +1,20 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:onesignal_flutter/src/inappmessage.dart';
 
 class OneSignalInAppMessageClickListener {
   void onClickInAppMessage(OSInAppMessageClickEvent event) {}
 }
 
-class OneSignalInAppMessageLifecycleListener {
-  void onWillDisplayInAppMessage(OSInAppMessageWillDisplayEvent event) {}
-  void onDidDisplayInAppMessage(OSInAppMessageDidDisplayEvent event) {}
-  void onWillDismissInAppMessage(OSInAppMessageWillDismissEvent event) {}
-  void onDidDismissInAppMessage(OSInAppMessageDidDismissEvent event) {}
-}
+typedef void OnWillDisplayInAppMessageListener(
+    OSInAppMessageWillDisplayEvent event);
+typedef void OnDidDisplayInAppMessageListener(
+    OSInAppMessageDidDisplayEvent event);
+typedef void OnWillDismissInAppMessageListener(
+    OSInAppMessageWillDismissEvent event);
+typedef void OnDidDismissInAppMessageListener(
+    OSInAppMessageDidDismissEvent event);
 
 class OneSignalInAppMessages {
   // private channels used to bridge to ObjC/Java
@@ -24,8 +27,14 @@ class OneSignalInAppMessages {
 
   List<OneSignalInAppMessageClickListener> _clickListeners =
       <OneSignalInAppMessageClickListener>[];
-  List<OneSignalInAppMessageLifecycleListener> _lifecycleListeners =
-      <OneSignalInAppMessageLifecycleListener>[];
+  List<OnWillDisplayInAppMessageListener> _willDisplayListeners =
+      <OnWillDisplayInAppMessageListener>[];
+  List<OnDidDisplayInAppMessageListener> _didDisplayListeners =
+      <OnDidDisplayInAppMessageListener>[];
+  List<OnWillDismissInAppMessageListener> _willDismissListeners =
+      <OnWillDismissInAppMessageListener>[];
+  List<OnDidDismissInAppMessageListener> _didDismissListeners =
+      <OnDidDismissInAppMessageListener>[];
 
   /// Adds a single key, value trigger, which will trigger an in app message
   /// if one exists matching the specific trigger added
@@ -78,23 +87,23 @@ class OneSignalInAppMessages {
             OSInAppMessageClickEvent(call.arguments.cast<String, dynamic>()));
       }
     } else if (call.method == 'OneSignal#onWillDisplayInAppMessage') {
-      for (var listener in _lifecycleListeners) {
-        listener.onWillDisplayInAppMessage(OSInAppMessageWillDisplayEvent(
+      for (var listener in _willDisplayListeners) {
+        listener(OSInAppMessageWillDisplayEvent(
             call.arguments.cast<String, dynamic>()));
       }
     } else if (call.method == 'OneSignal#onDidDisplayInAppMessage') {
-      for (var listener in _lifecycleListeners) {
-        listener.onDidDisplayInAppMessage(OSInAppMessageDidDisplayEvent(
+      for (var listener in _didDisplayListeners) {
+        listener(OSInAppMessageDidDisplayEvent(
             call.arguments.cast<String, dynamic>()));
       }
     } else if (call.method == 'OneSignal#onWillDismissInAppMessage') {
-      for (var listener in _lifecycleListeners) {
-        listener.onWillDismissInAppMessage(OSInAppMessageWillDismissEvent(
+      for (var listener in _willDismissListeners) {
+        listener(OSInAppMessageWillDismissEvent(
             call.arguments.cast<String, dynamic>()));
       }
     } else if (call.method == 'OneSignal#onDidDismissInAppMessage') {
-      for (var listener in _lifecycleListeners) {
-        listener.onDidDismissInAppMessage(OSInAppMessageDidDismissEvent(
+      for (var listener in _didDismissListeners) {
+        listener(OSInAppMessageDidDismissEvent(
             call.arguments.cast<String, dynamic>()));
       }
     }
@@ -107,16 +116,39 @@ class OneSignalInAppMessages {
     _clickListeners.add(listener);
   }
 
-  void removeClickListener(OneSignalInAppMessageLifecycleListener listener) {
+  void removeClickListener(OneSignalInAppMessageClickListener listener) {
     _clickListeners.remove(listener);
   }
 
-  void addLifecycleListener(OneSignalInAppMessageLifecycleListener listener) {
-    _lifecycleListeners.add(listener);
+  void addWillDisplayListener(OnWillDisplayInAppMessageListener listener) {
+    _willDisplayListeners.add(listener);
   }
 
-  void removeLifecycleListener(
-      OneSignalInAppMessageLifecycleListener listener) {
-    _lifecycleListeners.remove(listener);
+  void removeWillDisplayListener(OnWillDisplayInAppMessageListener listener) {
+    _willDisplayListeners.remove(listener);
+  }
+
+  void addDidDisplayListener(OnDidDisplayInAppMessageListener listener) {
+    _didDisplayListeners.add(listener);
+  }
+
+  void removeDidDisplayListener(OnDidDisplayInAppMessageListener listener) {
+    _didDisplayListeners.remove(listener);
+  }
+
+  void addWillDismissListener(OnWillDismissInAppMessageListener listener) {
+    _willDismissListeners.add(listener);
+  }
+
+  void removeWillDismissListener(OnWillDismissInAppMessageListener listener) {
+    _willDismissListeners.remove(listener);
+  }
+
+  void addDidDismissListener(OnDidDismissInAppMessageListener listener) {
+    _didDismissListeners.add(listener);
+  }
+
+  void removeDidDismissListener(OnDidDismissInAppMessageListener listener) {
+    _didDismissListeners.remove(listener);
   }
 }
