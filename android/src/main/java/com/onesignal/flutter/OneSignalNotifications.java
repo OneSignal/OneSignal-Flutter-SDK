@@ -4,19 +4,18 @@ import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.OneSignal;
 import com.onesignal.Continue;
 
+
 import com.onesignal.notifications.INotification;
-import com.onesignal.notifications.INotificationClickHandler;
+import com.onesignal.notifications.INotificationClickEvent;
+import com.onesignal.notifications.INotificationWillDisplayEvent;
 import com.onesignal.notifications.INotificationClickResult;
 import com.onesignal.notifications.INotificationReceivedEvent;
-import com.onesignal.notifications.IRemoteNotificationReceivedHandler;
-
-import com.onesignal.notifications.INotificationWillShowInForegroundHandler;
-import com.onesignal.notifications.INotificationReceivedEvent;
-import com.onesignal.notifications.IRemoteNotificationReceivedHandler;
+import com.onesignal.notifications.INotificationClickListener;
+import com.onesignal.notifications.INotificationLifecycleListener;
+import com.onesignal.notifications.IPermissionObserver;
 
 import com.onesignal.user.subscriptions.ISubscription;
 import com.onesignal.user.subscriptions.IPushSubscription;
-import com.onesignal.notifications.IPermissionChangedHandler;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -37,9 +36,10 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickHandler, INotificationWillShowInForegroundHandler, IPermissionChangedHandler {
-    private boolean hasSetNotificationWillShowInForegroundHandler = false;
-    private final HashMap<String, INotificationReceivedEvent> notificationReceivedEventCache = new HashMap<>();
+public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
+    private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
+    private final HashMap<String, INotificationWillDisplayEvent> preventedDefaultCache = new HashMap<>();
+
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalNotifications controller = new OneSignalNotifications();
@@ -60,22 +60,23 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         this.removeGroupedNotifications(call, result);
     else if (call.method.contentEquals("OneSignal#clearAll"))
         this.clearAll(call, result);
-    else if (call.method.contentEquals("OneSignal#initNotificationOpenedHandlerParams"))
-        this.initNotificationOpenedHandlerParams(call, result);
-    else if (call.method.contentEquals("OneSignal#initNotificationWillShowInForegroundHandlerParams"))
-        this.initNotificationWillShowInForegroundHandlerParams();
-    else if (call.method.contentEquals("OneSignal#completeNotification"))
-        this.completeNotification(call, result);
+    else if (call.method.contentEquals("OneSignal#displayNotification"))
+        this.displayNotification(call, result);
+    else if (call.method.contentEquals("OneSignal#preventDefault"))
+        this.preventDefault(call, result);
     else if (call.method.contentEquals("OneSignal#lifecycleInit"))
         this.lifecycleInit();
+    else if (call.method.contentEquals("OneSignal#proceedWithWillDisplay"))
+        this.proceedWithWillDisplay(call, result);
     else
         replyNotImplemented(result);
     }
 
     private void requestPermission(MethodCall call, Result result) {
         boolean fallback = (boolean) call.argument("fallbackToSettings");
-        OneSignal.getNotifications().requestPermission(fallback, Continue.none());
-        replySuccess(result, null);
+        OneSignal.getNotifications().requestPermission(fallback, Continue.with(permissionResult -> {
+            replySuccess(result, permissionResult.getData());
+        }));
     }
 
     private void removeNotification(MethodCall call, Result result) {
@@ -96,49 +97,55 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         OneSignal.getNotifications().clearAllNotifications();
         replySuccess(result, null);
     }
-    
-    
-    private void initNotificationOpenedHandlerParams(MethodCall call, Result result) {
-        OneSignal.getNotifications().setNotificationClickHandler(this);
+
+    /// Our bridge layer needs to preventDefault() so that the Flutter listener has time to preventDefault() before the notification is displayed
+    /// This function is called after all of the flutter listeners have responded to the willDisplay event. 
+    /// If any of them have called preventDefault() we will not call display(). Otherwise we will display.
+    private void proceedWithWillDisplay(MethodCall call, Result result) {
+        String notificationId = call.argument("notificationId");
+        INotificationWillDisplayEvent event = notificationOnWillDisplayEventCache.get(notificationId);
+        if (event == null) {
+            Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
+            return;
+        }
+        if (this.preventedDefaultCache.containsKey(notificationId)) {
+            replySuccess(result, null);
+            return;
+        }
+        event.getNotification().display();
         replySuccess(result, null);
     }
 
-
-    private void initNotificationWillShowInForegroundHandlerParams() {
-        this.hasSetNotificationWillShowInForegroundHandler = true;
-    }
-
-    private void completeNotification(MethodCall call, Result result) {
+    private void displayNotification(MethodCall call, Result result) {
         String notificationId = call.argument("notificationId");
-        boolean shouldDisplay = call.argument("shouldDisplay");
-        INotificationReceivedEvent notificationReceivedEvent = notificationReceivedEventCache.get(notificationId);
-
-        if (notificationReceivedEvent == null) {
-            Logging.error("Could not find notification completion block with id: " + notificationId, null);
+        INotificationWillDisplayEvent event = notificationOnWillDisplayEventCache.get(notificationId);
+        if (event == null) {
+            Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
             return;
         }
+        event.getNotification().display();
+        replySuccess(result, null);
+    }
 
-        if (shouldDisplay) {
-            notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
-        } else {
-            notificationReceivedEvent.complete(null);
+    private void preventDefault(MethodCall call, Result result) {
+        String notificationId = call.argument("notificationId");
+        INotificationWillDisplayEvent event = notificationOnWillDisplayEventCache.get(notificationId);
+        if (event == null) {
+            Logging.error("Could not find onWillDisplayNotification event for notification with id: " + notificationId, null);
+            return;
         }
-
-        synchronized (notificationReceivedEvent) {
-            notificationReceivedEventCache.remove(notificationId);
-            notificationReceivedEvent.notify();
-        }
-       
+        event.preventDefault();
+        this.preventedDefaultCache.put(notificationId, event);
         replySuccess(result, null);
     }
 
     @Override
-    public void notificationClicked(INotificationClickResult result) {
+    public void onClick(INotificationClickEvent event) {
         try {
-            invokeMethodOnUiThread("OneSignal#handleOpenedNotification", OneSignalSerializer.convertNotificationClickResultToMap(result));
+            invokeMethodOnUiThread("OneSignal#onClickNotification", OneSignalSerializer.convertNotificationClickEventToMap(event));
         } catch (JSONException e) {
             e.getStackTrace();
-            Logging.error("Encountered an error attempting to convert INotificationClickResult object to hash map:" + e.toString(), null);
+            Logging.error("Encountered an error attempting to convert INotificationClickEvent object to hash map:" + e.toString(), null);
         }
     }
 
@@ -155,43 +162,29 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     }
 
     @Override
-    public void notificationWillShowInForeground(INotificationReceivedEvent notificationReceivedEvent) {
-        if (!this.hasSetNotificationWillShowInForegroundHandler) {
-            notificationReceivedEvent.complete(notificationReceivedEvent.getNotification());
-            return;
-        }
-
-        INotification notification = notificationReceivedEvent.getNotification();
-        notificationReceivedEventCache.put(notification.getNotificationId(), notificationReceivedEvent);
-
+    public void onWillDisplay(INotificationWillDisplayEvent event) {
+        INotification notification = event.getNotification();
+        notificationOnWillDisplayEventCache.put(notification.getNotificationId(), event);
+        /// Our bridge layer needs to preventDefault() so that the Flutter listener has time to preventDefault() before the notification is displayed
+        event.preventDefault();
         try {
-            HashMap<String, Object>  receivedMap = OneSignalSerializer.convertNotificationToMap(notification);
-            invokeMethodOnUiThread("OneSignal#handleNotificationWillShowInForeground", receivedMap);
-            try {
-            
-                synchronized (notificationReceivedEvent) {
-                    while(notificationReceivedEventCache.containsKey(notification.getNotificationId()))
-                        notificationReceivedEvent.wait();
-                }
-            } catch(InterruptedException e){
-                Logging.error("InterruptedException" + e.toString(), null);
-            }
-           
+            invokeMethodOnUiThread("OneSignal#onWillDisplayNotification", OneSignalSerializer.convertNotificationWillDisplayEventToMap(event));
         } catch (JSONException e) {
             e.getStackTrace();
-            Logging.error("Encountered an error attempting to convert INotification object to hash map:" + e.toString(), null);
+            Logging.error("Encountered an error attempting to convert INotificationWillDisplayEvent object to hash map:" + e.toString(), null);
         }
     }
 
     @Override
-    public void onPermissionChanged(boolean permission)  { 
-        invokeMethodOnUiThread("OneSignal#OSPermissionChanged", OneSignalSerializer.convertPermissionChanged(permission));
+    public void onNotificationPermissionChange(boolean permission)  { 
+        HashMap<String, Object> hash = new HashMap<>();
+        hash.put("permission", permission);
+        invokeMethodOnUiThread("OneSignal#onNotificationPermissionDidChange", hash);
     }
 
     private void lifecycleInit() {
-        OneSignal.getNotifications().setNotificationWillShowInForegroundHandler(this);
-        OneSignal.getNotifications().addPermissionChangedHandler(this);
+        OneSignal.getNotifications().addForegroundLifecycleListener(this);
+        OneSignal.getNotifications().addClickListener(this);
+        OneSignal.getNotifications().addPermissionObserver(this);
     }
-
-    
 } 

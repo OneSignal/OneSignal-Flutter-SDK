@@ -25,58 +25,49 @@
  * THE SOFTWARE.
  */
 
-#import "OSFlutterPushSubscription.h"
+#import "OSFlutterLiveActivities.h"
 #import <OneSignalFramework/OneSignalFramework.h>
-#import <OneSignalUser/OneSignalUser.h>
 #import "OSFlutterCategories.h"
 
-@implementation OSFlutterPushSubscription
-
+@implementation OSFlutterLiveActivities
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    OSFlutterPushSubscription *instance = [OSFlutterPushSubscription new];
+    OSFlutterLiveActivities *instance = [OSFlutterLiveActivities new];
 
     instance.channel = [FlutterMethodChannel
-                        methodChannelWithName:@"OneSignal#pushsubscription"
+                        methodChannelWithName:@"OneSignal#liveactivities"
                         binaryMessenger:[registrar messenger]];
 
     [registrar addMethodCallDelegate:instance channel:instance.channel];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-    if ([@"OneSignal#pushSubscriptionId" isEqualToString:call.method])
-        result(OneSignal.User.pushSubscription.id);
-    else if ([@"OneSignal#pushSubscriptionToken" isEqualToString:call.method])
-        result(OneSignal.User.pushSubscription.token);
-    else if ([@"OneSignal#pushSubscriptionOptedIn" isEqualToString:call.method])
-        result(@(OneSignal.User.pushSubscription.optedIn));
-    else if ([@"OneSignal#optIn" isEqualToString:call.method])
-        [self optIn:call withResult:result];
-    else if ([@"OneSignal#optOut" isEqualToString:call.method])
-        [self optOut:call withResult:result];
-    else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
-        [self lifecycleInit:call withResult:result];
-    else
+    if ([@"OneSignal#enterLiveActivity" isEqualToString:call.method])
+        [self enterLiveActivity:call withResult:result];
+    else if ([@"OneSignal#exitLiveActivity" isEqualToString:call.method])
+        [self exitLiveActivity:call withResult:result];
+    else 
         result(FlutterMethodNotImplemented);
 }
 
-- (void)optIn:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.User.pushSubscription optIn];
-    result(nil);
+- (void)enterLiveActivity:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *activityId = call.arguments[@"activityId"];
+    NSString *token = call.arguments[@"token"];
+
+    [OneSignal.LiveActivities enter:activityId withToken:token withSuccess:^(NSDictionary *results) {
+        result(results);
+    } withFailure:^(NSError *error) {
+        result(error.flutterError);
+    }];
 }
 
-- (void)optOut:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.User.pushSubscription optOut];
-    result(nil);
-}
+- (void)exitLiveActivity:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *activityId = call.arguments[@"activityId"];
 
-- (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.User.pushSubscription addObserver:self];
-    result(nil);
-}
-
-- (void)onPushSubscriptionDidChangeWithState:(OSPushSubscriptionChangedState *)state {
-    [self.channel invokeMethod:@"OneSignal#onPushSubscriptionChange" arguments:state.jsonRepresentation];
+    [OneSignal.LiveActivities exit:activityId withSuccess:^(NSDictionary *results) {
+        result(results);
+    } withFailure:^(NSError *error) {
+        result(error.flutterError);
+    }];
 }
 
 @end
-

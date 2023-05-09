@@ -7,6 +7,7 @@ import 'package:onesignal_flutter/src/notifications.dart';
 import 'package:onesignal_flutter/src/session.dart';
 import 'package:onesignal_flutter/src/location.dart';
 import 'package:onesignal_flutter/src/inappmessages.dart';
+import 'package:onesignal_flutter/src/liveactivities.dart';
 
 export 'src/defines.dart';
 export 'src/pushsubscription.dart';
@@ -14,6 +15,8 @@ export 'src/subscription.dart';
 export 'src/notification.dart';
 export 'src/notifications.dart';
 export 'src/inappmessage.dart';
+export 'src/inappmessages.dart';
+export 'src/liveactivities.dart';
 
 class OneSignal {
   /// A singleton representing the OneSignal SDK.
@@ -27,6 +30,7 @@ class OneSignal {
   static OneSignalSession Session = new OneSignalSession();
   static OneSignalLocation Location = new OneSignalLocation();
   static OneSignalInAppMessages InAppMessages = new OneSignalInAppMessages();
+  static OneSignalLiveActivities LiveActivities = new OneSignalLiveActivities();
 
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal');
@@ -71,40 +75,21 @@ class OneSignal {
     return await _channel.invokeMethod('OneSignal#logout');
   }
 
-  /// Indicates whether privacy consent has been granted.
-  ///
-  /// This field is only relevant when the application has
-  /// opted into data privacy protections. See [requiresPrivacyConsent].
-  Future<bool> getPrivacyConsent() async {
-    var val = await _channel.invokeMethod("OneSignal#getPrivacyConsent");
-
-    return val as bool;
-  }
-
   /// Sets the whether or not privacy consent has been [granted]
   ///
   /// This field is only relevant when the application has
-  /// opted into data privacy protections. See [requiresPrivacyConsent].
-  Future<void> setPrivacyConsent(bool granted) async {
+  /// opted into data privacy protections. See [consentRequired].
+  Future<void> consentGiven(bool granted) async {
     return await _channel
-        .invokeMethod("OneSignal#setPrivacyConsent", {'granted': granted});
-  }
-
-  /// A boolean value indicating if the OneSignal SDK is waiting for the
-  /// user's consent before it can initialize (if you set the app to
-  /// require the user's consent)
-  Future<bool> requiresPrivacyConsent() async {
-    var val = await _channel.invokeMethod("OneSignal#requiresPrivacyConsent");
-
-    return val as bool;
+        .invokeMethod("OneSignal#consentGiven", {'granted': granted});
   }
 
   /// Allows you to completely disable the SDK until your app calls the
-  /// OneSignal.setPrivacyConsent(true) function. This is useful if you want
+  /// OneSignal.consentGiven(true) function. This is useful if you want
   /// to show a Terms and Conditions or privacy popup for GDPR.
-  Future<void> setRequiresPrivacyConsent(bool require) async {
-    return await _channel.invokeMethod(
-        "OneSignal#setRequiresPrivacyConsent", {'required': require});
+  Future<void> consentRequired(bool require) async {
+    return await _channel
+        .invokeMethod("OneSignal#consentRequired", {'required': require});
   }
 
   /// This method can be used to set if launch URLs should be opened in safari or
@@ -115,24 +100,6 @@ class OneSignal {
     if (Platform.isIOS) {
       return await _channel.invokeMethod(
           'OneSignal#setLaunchURLsInApp', {'launchUrlsInApp': launchUrlsInApp});
-    }
-  }
-
-  /// Only applies to iOS
-  /// Associates a temporary push token with an Activity ID on the OneSignal server.
-  Future<void> enterLiveActivity(String activityId, String token) async {
-    if (Platform.isIOS) {
-      return await _channel.invokeMethod("OneSignal#enterLiveActivity",
-          {'activityId': activityId, 'token': token});
-    }
-  }
-
-  /// Only applies to iOS
-  /// Deletes activityId associated temporary push token on the OneSignal server.
-  Future<void> exitLiveActivity(String activityId) async {
-    if (Platform.isIOS) {
-      return await _channel.invokeMethod(
-          "OneSignal#exitLiveActivity", {'activityId': activityId});
     }
   }
 }

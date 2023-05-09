@@ -39,9 +39,6 @@ class OSNotification extends JSONStringRepresentable {
   Map<String, dynamic>? additionalData;
 
   /// Any buttons you want to add to the notification.
-  /// The notificationOpened handler will provide an
-  /// OSNotificationAction object, which will contain
-  /// the ID of the Action the user tapped.
   List<OSActionButton>? buttons;
 
   /// A hashmap object representing the raw key/value
@@ -271,43 +268,19 @@ class OSNotification extends JSONStringRepresentable {
 
 /// An instance of this class represents a user interaction with
 /// your push notification, ie. if they tap a button
-class OSNotificationOpenedResult {
+class OSNotificationClickResult extends JSONStringRepresentable {
   //instance properties
-  late OSNotification notification;
-  OSNotificationAction? action;
+  String? actionId;
+  String? url;
 
   //constructor
-  OSNotificationOpenedResult(Map<String, dynamic> json) {
-    this.notification =
-        OSNotification(json['notification'].cast<String, dynamic>());
-
-    if (json.containsKey('action')) {
-      this.action =
-          OSNotificationAction(json['action'].cast<String, dynamic>());
-    }
+  OSNotificationClickResult(Map<String, dynamic> json) {
+    this.actionId = json['action_id'];
+    this.url = json['url'];
   }
-}
 
-/// Represents an action taken on a push notification, such as
-/// tapping the notification (or a button on the notification),
-/// or if your `inFocusDisplayType` is set to true - if they
-/// tapped 'close'.
-class OSNotificationAction {
-  /// An enum that represents whether the user `opened` or
-  /// took a more specific `action` (such as tapping a button
-  /// on the notification)
-  late OSNotificationActionType type;
-
-  /// The ID of the button on your notification
-  /// that the user tapped
-  String? actionId;
-
-  OSNotificationAction(Map<String, dynamic> json) {
-    this.type = OSNotificationActionType.opened;
-    this.actionId = json['id'] as String?;
-
-    if (json.containsKey('type'))
-      this.type = OSNotificationActionType.values[json['type'] as int];
+  String jsonRepresentation() {
+    return convertToJsonString({'action_id': this.actionId, 'url': this.url});
   }
 }
 
@@ -375,28 +348,50 @@ class OSAndroidBackgroundImageLayout extends JSONStringRepresentable {
   }
 }
 
-class OSNotificationReceivedEvent extends JSONStringRepresentable {
+extension OSDisplayNotification on OSNotification {
+  void display() {
+    OneSignal.Notifications.displayNotification(this.notificationId);
+  }
+}
+
+class OSNotificationWillDisplayEvent extends JSONStringRepresentable {
   late OSNotification notification;
 
-  OSNotificationReceivedEvent(Map<String, dynamic> json) {
-    notification = OSNotification(json);
+  OSNotificationWillDisplayEvent(Map<String, dynamic> json) {
+    notification = OSNotification(json["notification"].cast<String, dynamic>());
   }
 
-  void complete(OSNotification? notification) {
+  void preventDefault() {
     if (notification != null) {
-      OneSignal.Notifications.completeNotification(
-          notification.notificationId, true);
-    } else {
-      print(
-          'OSNotificationReceivedEvent complete not nill with notification: ' +
-              this.notification.notificationId);
-      OneSignal.Notifications.completeNotification(
-          this.notification.notificationId, false);
+      OneSignal.Notifications.preventDefault(notification.notificationId);
     }
   }
 
   String jsonRepresentation() {
     return convertToJsonString(
         {'notification': this.notification.jsonRepresentation()});
+  }
+}
+
+class OSNotificationClickEvent extends JSONStringRepresentable {
+  late OSNotification notification;
+  late OSNotificationClickResult result;
+
+  OSNotificationClickEvent(Map<String, dynamic> json) {
+    notification = OSNotification(json["notification"].cast<String, dynamic>());
+    result = OSNotificationClickResult(json["result"].cast<String, dynamic>());
+  }
+
+  void preventDefault() {
+    if (notification != null) {
+      OneSignal.Notifications.preventDefault(notification.notificationId);
+    }
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString({
+      'notification': this.notification.jsonRepresentation(),
+      'result': this.result.jsonRepresentation()
+    });
   }
 }

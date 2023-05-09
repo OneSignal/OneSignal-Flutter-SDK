@@ -36,7 +36,6 @@
     static dispatch_once_t onceToken;
     dispatch_once(&onceToken, ^{
         sharedInstance = [OSFlutterInAppMessages new];
-        sharedInstance.hasSetInAppMessageClickedHandler = false;
     });
     return sharedInstance;
 }
@@ -65,8 +64,6 @@
         [self paused:call withResult:result];
     else if ([@"OneSignal#arePaused" isEqualToString:call.method]) 
         result(@([OneSignal.InAppMessages paused]));
-    else if ([@"OneSignal#initInAppMessageClickedHandlerParams" isEqualToString:call.method]) 
-        [self initInAppMessageClickedHandlerParams];
     else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
         [self lifecycleInit:call withResult:result];
     else 
@@ -104,48 +101,33 @@
 }
 
 - (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-   [OneSignal.InAppMessages setClickHandler:^(OSInAppMessageAction *action) {
-         [OSFlutterInAppMessages.sharedInstance handleInAppMessageClicked:action];
-     }];
-    [OneSignal.InAppMessages setLifecycleHandler:OSFlutterInAppMessages.sharedInstance];
+    [OneSignal.InAppMessages addClickListener:OSFlutterInAppMessages.sharedInstance];
+    [OneSignal.InAppMessages addLifecycleListener:OSFlutterInAppMessages.sharedInstance];
 }
 
 
 
 #pragma mark In App Message Click
-- (void)initInAppMessageClickedHandlerParams {
-    _hasSetInAppMessageClickedHandler = true;
 
-    if (self.inAppMessageClickedResult) {
-        [self handleInAppMessageClicked:self.inAppMessageClickedResult];
-        self.inAppMessageClickedResult = nil;
-    }
+- (void)onClickInAppMessage:(OSInAppMessageClickEvent * _Nonnull)event {
+    [self.channel invokeMethod:@"OneSignal#onClickInAppMessage" arguments:event.toJson];
 }
 
-- (void)handleInAppMessageClicked:(OSInAppMessageAction *)action {
-    if (!self.hasSetInAppMessageClickedHandler) {
-        _inAppMessageClickedResult = action;
-        return;
-    }
-
-    [self.channel invokeMethod:@"OneSignal#handleClickedInAppMessage" arguments:action.toJson];
+#pragma mark OSInAppMessageLifecycleListener
+- (void)onWillDisplayInAppMessage:(OSInAppMessageWillDisplayEvent *) event {
+    [self.channel invokeMethod:@"OneSignal#onWillDisplayInAppMessage" arguments:event.toJson];
 }
 
-#pragma mark OSInAppMessageLifeCycleHandler
-- (void)onWillDisplayInAppMessage:(OSInAppMessage *) result {
-    [self.channel invokeMethod:@"OneSignal#onWillDisplayInAppMessage" arguments:result.toJson];
+- (void)onDidDisplayInAppMessage:(OSInAppMessageDidDisplayEvent *) event {
+    [self.channel invokeMethod:@"OneSignal#onDidDisplayInAppMessage" arguments:event.toJson];
 }
 
-- (void)onDidDisplayInAppMessage:(OSInAppMessage *) result {
-    [self.channel invokeMethod:@"OneSignal#onDidDisplayInAppMessage" arguments:result.toJson];
+- (void)onWillDismissInAppMessage:(OSInAppMessageWillDismissEvent *) event {
+    [self.channel invokeMethod:@"OneSignal#onWillDismissInAppMessage" arguments:event.toJson];
 }
 
-- (void)onWillDismissInAppMessage:(OSInAppMessage *) result {
-    [self.channel invokeMethod:@"OneSignal#onWillDismissInAppMessage" arguments:result.toJson];
-}
-
-- (void)onDidDismissInAppMessage:(OSInAppMessage *) result {
-    [self.channel invokeMethod:@"OneSignal#onDidDismissInAppMessage" arguments:result.toJson];
+- (void)onDidDismissInAppMessage:(OSInAppMessageDidDismissEvent *) event {
+    [self.channel invokeMethod:@"OneSignal#onDidDismissInAppMessage" arguments:event.toJson];
 }
 
 @end

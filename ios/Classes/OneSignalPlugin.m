@@ -79,20 +79,12 @@
         [self login:call withResult:result];
     else if ([@"OneSignal#login" isEqualToString:call.method])
         [self logout:call withResult:result];
-    else if ([@"OneSignal#getPrivacyConsent" isEqualToString:call.method])
-        result(@(OneSignal.getPrivacyConsent));
-    else if ([@"OneSignal#setPrivacyConsent" isEqualToString:call.method])
-        [self setPrivacyConsent:call withResult:result];
-    else if ([@"OneSignal#requiresPrivacyConsent" isEqualToString:call.method])
-        result(@(OneSignal.requiresPrivacyConsent));
-    else if ([@"OneSignal#setRequiresPrivacyConsent" isEqualToString:call.method])
-        [self setRequiresPrivacyConsent:call withResult:result];
+    else if ([@"OneSignal#consentRequired" isEqualToString:call.method])
+        [self setConsentRequired:call withResult:result];
+    else if ([@"OneSignal#consentGiven" isEqualToString:call.method])
+        [self setConsentGiven:call withResult:result];
     else if ([@"OneSignal#setLaunchURLsInApp" isEqualToString:call.method])
         [self setLaunchURLsInApp:call withResult:result];
-     else if ([@"OneSignal#enterLiveActivity" isEqualToString:call.method])
-        [self enterLiveActivity:call withResult:result];
-    else if ([@"OneSignal#exitLiveActivity" isEqualToString:call.method])
-        [self exitLiveActivity:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -118,15 +110,15 @@
 
 #pragma mark Privacy Consent
 
-- (void)setPrivacyConsent:(FlutterMethodCall *)call withResult:(FlutterResult)result{
+- (void)setConsentGiven:(FlutterMethodCall *)call withResult:(FlutterResult)result{
     BOOL granted = [call.arguments[@"granted"] boolValue];
-    [OneSignal setPrivacyConsent:granted];
+    [OneSignal setConsentGiven:granted];
     result(nil);
 }
 
-- (void)setRequiresPrivacyConsent:(FlutterMethodCall *)call withResult:(FlutterResult)result{
+- (void)setConsentRequired:(FlutterMethodCall *)call withResult:(FlutterResult)result{
     BOOL required = [call.arguments[@"required"] boolValue];
-    [OneSignal setRequiresPrivacyConsent:required];  
+    [OneSignal setConsentRequired:required];  
     result(nil);
 }
 
@@ -136,29 +128,6 @@
     BOOL launchUrlsInApp = [call.arguments[@"launchUrlsInApp"] boolValue];
     [OneSignal setLaunchURLsInApp:launchUrlsInApp];
     result(nil);
-}
-
-#pragma mark Live Activity
-
-- (void)enterLiveActivity:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSString *activityId = call.arguments[@"activityId"];
-    NSString *token = call.arguments[@"token"];
-
-    [OneSignal enterLiveActivity:activityId withToken:token withSuccess:^(NSDictionary *results) {
-        result(results);
-    } withFailure:^(NSError *error) {
-        result(error.flutterError);
-    }];
-}
-
-- (void)exitLiveActivity:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSString *activityId = call.arguments[@"activityId"];
-
-    [OneSignal exitLiveActivity:activityId withSuccess:^(NSDictionary *results) {
-        result(results);
-    } withFailure:^(NSError *error) {
-        result(error.flutterError);
-    }];
 }
 
 @end
