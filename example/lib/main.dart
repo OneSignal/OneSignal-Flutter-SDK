@@ -15,7 +15,6 @@ class _MyAppState extends State<MyApp>
     with
         OneSignalPushSubscriptionObserver,
         OneSignalPermissionObserver,
-        OneSignalInAppMessageLifecycleListener,
         OneSignalInAppMessageClickListener,
         OneSignalNotificationLifecycleListener,
         OneSignalNotificationClickListener {
@@ -39,7 +38,7 @@ class _MyAppState extends State<MyApp>
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    OneSignal.Debug.setLogLevel(OSLogLevel.none);
+    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
 
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
     OneSignal.shared.consentRequired(_requireConsent);
@@ -55,14 +54,21 @@ class _MyAppState extends State<MyApp>
 
     OneSignal.User.pushSubscription.addObserver(this);
     OneSignal.Notifications.addPermissionObserver(this);
-
     OneSignal.Notifications.addClickListener(this);
-
     OneSignal.Notifications.addLifecycleListener(this);
-
     OneSignal.InAppMessages.addClickListener(this);
-
-    OneSignal.InAppMessages.addLifecycleListener(this);
+    OneSignal.InAppMessages.addWillDisplayListener((event) {
+      print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
+    });
+    OneSignal.InAppMessages.addDidDisplayListener((event) {
+      print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
+    });
+    OneSignal.InAppMessages.addWillDismissListener((event) {
+      print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
+    });
+    OneSignal.InAppMessages.addDidDismissListener((event) {
+      print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
+    });
 
     // iOS-only method to open launch URLs in Safari when set to false
     OneSignal.shared.setLaunchURLsInApp(false);
@@ -76,6 +82,8 @@ class _MyAppState extends State<MyApp>
 
     // Some examples of how to use Outcome Events public methods with OneSignal SDK
     oneSignalOutcomeExamples();
+
+    OneSignal.InAppMessages.paused(false);
   }
 
   void onNotificationPermissionDidChange(bool state) {
@@ -94,22 +102,6 @@ class _MyAppState extends State<MyApp>
       _debugLabelString =
           "In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}";
     });
-  }
-
-  void onWillDisplayInAppMessage(OSInAppMessageWillDisplayEvent event) {
-    print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
-  }
-
-  void onDidDisplayInAppMessage(OSInAppMessageDidDisplayEvent event) {
-    print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
-  }
-
-  void onWillDismissInAppMessage(OSInAppMessageWillDismissEvent event) {
-    print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
-  }
-
-  void onDidDismissInAppMessage(OSInAppMessageDidDismissEvent event) {
-    print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
   }
 
   void onClickNotification(OSNotificationClickEvent event) {
