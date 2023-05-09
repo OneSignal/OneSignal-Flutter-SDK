@@ -1,5 +1,5 @@
+# Flutter v5.0.0-beta2 Migration Guide
 
-# Flutter v5.0.0-beta1 Migration Guide
 
 # Intro
 
@@ -19,32 +19,44 @@ A user is a new concept which is meant to represent your end-user. A user has ze
 
 ## Subscription
 
-A subscription refers to the method in which an end-user can receive various communications sent by OneSignal, including push notifications, SMS, and email.  In previous versions of the OneSignal platform, each of these channels was referred to as a “player”. A subscription is in fact identical to the legacy “player” concept.  Each subscription has a **subscription_id** (previously, player_id) to uniquely identify that communication channel.
+A subscription refers to the method in which an end-user can receive various communications sent by OneSignal, including push notifications, SMS, and email. In previous versions of the OneSignal platform, each of these channels was referred to as a “player”. A subscription is in fact identical to the legacy “player” concept. Each subscription has a **subscription_id** (previously, player_id) to uniquely identify that communication channel.
 
 ## Aliases
 
-Aliases are a concept evolved from [external user ids](https://documentation.onesignal.com/docs/external-user-ids) which allows the unique identification of a user within a OneSignal application.  Aliases are a key-value pair made up of an **alias label** (the key) and an **alias id** (the value). The **alias label** can be thought of as a consistent keyword across all users, while the **alias id** is a value specific to each user for that particular label. The combined **alias label** and **alias id** provide uniqueness to successfully identify a user. 
+Aliases are a concept evolved from [external user ids](https://documentation.onesignal.com/docs/external-user-ids) which allows the unique identification of a user within a OneSignal application. Aliases are a key-value pair made up of an **alias label** (the key) and an **alias id** (the value). The **alias label** can be thought of as a consistent keyword across all users, while the **alias id** is a value specific to each user for that particular label. The combined **alias label** and **alias id** provide uniqueness to successfully identify a user.
 
-OneSignal uses a built-in **alias label** called `external_id` which supports existing use of [external user ids](https://documentation.onesignal.com/docs/external-user-ids). `external_id` is also used as the identification method when a user identifies themselves to the OneSignal SDK via `OneSignal.login`.  Multiple aliases can be created for each user to allow for your own application's unique identifier as well as identifiers from other integrated applications.
+OneSignal uses a built-in **alias label** called `external_id` which supports existing use of [external user ids](https://documentation.onesignal.com/docs/external-user-ids). `external_id` is also used as the identification method when a user identifies themselves to the OneSignal SDK via `OneSignal.login`. Multiple aliases can be created for each user to allow for your own application's unique identifier as well as identifiers from other integrated applications.
+
 
 # Migration Guide (v3 to v5)
 
 The Flutter SDK accesses the OneSignal native iOS and Android SDKs. For this update, all SDK versions are aligning across OneSignal’s suite of client SDKs. As such, the Flutter SDK is making the jump from `v3` to `v5`.
 
 # API Changes
+
 ## Namespaces
 
 The OneSignal SDK has been updated to be more modular in nature. The SDK has been split into namespaces, and functionality previously in the static `OneSignal` class has been moved to the appropriate namespace. The namespaces and how to access them in code are as follows:
 
-| **Namespace** | **Access Pattern**            |
+| **Namespace** | **Access Pattern** |
+
 | ------------- | ----------------------------- |
-| Debug         | `OneSignal.Debug`         |
+
+| Debug | `OneSignal.Debug` |
+
 | InAppMessages | `OneSignal.InAppMessages` |
-| Location      | `OneSignal.Location`      |
+
+| Location | `OneSignal.Location` |
+
 | Notifications | `OneSignal.Notifications` |
-| Session       | `OneSignal.Session`       |
-| User          | `OneSignal.User`          |
-| OneSignal          | `OneSignal.shared`          |
+
+| Session | `OneSignal.Session` |
+
+| User | `OneSignal.User` |
+
+|LiveActivities | `OneSignal.LiveActivities` |
+
+| OneSignal | `OneSignal` |
 
 ## Initialization
 
@@ -56,35 +68,33 @@ Replace the following:
 
 **Flutter**
 ```dart
-    OneSignal.shared.setAppId("YOUR_ONESIGNAL_APP_ID");
+OneSignal.shared.setAppId("YOUR_ONESIGNAL_APP_ID");
 ```
 
 To the match the new initialization:
 
-
+  
 **Flutter**
 ```dart
-	OneSignal.shared.initialize("YOUR_ONESIGNAL_APP_ID");
+OneSignal.initialize("YOUR_ONESIGNAL_APP_ID");
 ```
 
 If your integration is **not** user-centric, there is no additional startup code required. A device-scoped user *(please see definition of “**device-scoped user**” below in Glossary)* is automatically created as part of the push subscription creation, both of which are only accessible from the current device or through the OneSignal dashboard.
 
 If your integration is user-centric, or you want the ability to identify the user beyond the current device, the `login` method should be called to identify the user:
 
-
 **Flutter**
 ```dart
-    OneSignal.shared.login("USER_EXTERNAL_ID");
+OneSignal.login("EXTERNAL_ID");
 ```
 
-The `login` method will associate the device’s push subscription to the user that can be identified via the alias `externalId=USER_EXTERNAL_ID`. If that user doesn’t already exist, it will be created. If the user does already exist, the user will be updated to own the device’s push subscription. Note that the push subscription for the device will always be transferred to the newly logged in user, as that user is the current owner of that push subscription.
+The `login` method will associate the device’s push subscription to the user that can be identified via the alias `externalId=EXTERNAL_ID`. If that user doesn’t already exist, it will be created. If the user does already exist, the user will be updated to own the device’s push subscription. Note that the push subscription for the device will always be transferred to the newly logged in user, as that user is the current owner of that push subscription.
 
 Once (or if) the user is no longer identifiable in your app (i.e. they logged out), the `logout` method should be called:
 
-
 **Flutter**
 ```dart
-    OneSignal.shared.logout();
+OneSignal.logout();
 ```
 
 Logging out has the affect of reverting to a device-scoped user, which is the new owner of the device’s push subscription.
@@ -96,22 +106,21 @@ In previous versions of the SDK, a “player” could have up to one email addre
 ### **Push Subscription**
 The current device’s push subscription can be retrieved via:
 
-
 **Flutter**
 ```dart
-    var id = OneSignal.User.pushSubscription.id;
-    var token = OneSignal.User.pushSubscription.token;
-    var optedIn = OneSignal.User.pushSubscription.optedIn; 
+var id = OneSignal.User.pushSubscription.id;
+var token = OneSignal.User.pushSubscription.token;
+var optedIn = OneSignal.User.pushSubscription.optedIn;
 ```
 
 ### **Opting In and Out of Push Notifications**
 
-To receive push notifications on the device, call the push subscription’s `optIn` method. If needed, this method will prompt the user for push notifications permission. 
+To receive push notifications on the device, call the push subscription’s `optIn` method. If needed, this method will prompt the user for push notifications permission.
 
 
 **Flutter**
 ```dart
-    OneSignal.User.pushSubscription.optIn();
+OneSignal.User.pushSubscription.optIn();
 ```
 
 If at any point you want the user to stop receiving push notifications on the current device (regardless of system-level permission status), you can use the push subscription to opt out:
@@ -119,7 +128,7 @@ If at any point you want the user to stop receiving push notifications on the cu
 
 **Flutter**
 ```dart
-    OneSignal.User.pushSubscription.optOut();
+OneSignal.User.pushSubscription.optOut();
 ```
 
 To resume receiving of push notifications (driving the native permission prompt if permissions are not available), you can opt back in with the `optIn` method from above.
@@ -131,82 +140,86 @@ Email and/or SMS subscriptions can be added or removed via the following methods
 
 **Flutter**
 ```dart
-    // Add email subscription
-    OneSignal.User.addEmail("customer@company.com");
-    // Remove previously added email subscription
-    OneSignal.User.removeEmail("customer@company.com");
-    
-    // Add SMS subscription
-    OneSignal.User.addSms("+15558675309");
-    // Remove previously added SMS subscription
-    OneSignal.User.removeSms("+15558675309");
+// Add email subscription
+OneSignal.User.addEmail("customer@company.com");
+// Remove previously added email subscription
+OneSignal.User.removeEmail("customer@company.com");
+// Add SMS subscription
+OneSignal.User.addSms("+15558675309");
+// Remove previously added SMS subscription
+OneSignal.User.removeSms("+15558675309");
 ```
 
 # API Reference
 
-Below is a comprehensive reference to the `5.0.0-beta1` OneSignal Flutter SDK.
+Below is a comprehensive reference to the `5.0.0-beta2` OneSignal Flutter SDK.
 
 ## OneSignal
 
 The SDK is still accessible via a `OneSignal` static class. It provides access to higher level functionality and is a gateway to each subspace of the SDK.
 
-| **Flutter**                                                                                          | **Description**                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          |
+| **Flutter** | **Description** |
 | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `OneSignal.shared.initialize("YOUR_ONESIGNAL_APP_ID");`                    | *Initializes the OneSignal SDK. This should be called during startup of the application.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        |
-| `OneSignal.shared.login("USER_EXTERNAL_ID");`                                                              | *Login to OneSignal under the user identified by the [externalId] provided. The act of logging a user into the OneSignal SDK will switch the [user] context to that specific user.<br><br> - If the [externalId] exists, the user will be retrieved and the context will be set from that user information. If operations have already been performed under a device-scoped user, they ***will not*** be applied to the now logged in user (they will be lost).<br> - If the [externalId] does not exist the user, the user will be created and the context set from the current local state. If operations have already been performed under a device-scoped user, those operations ***will*** be applied to the newly created user.<br><br>***Push Notifications and In App Messaging***<br>Logging in a new user will automatically transfer the push notification and in app messaging subscription from the current user (if there is one) to the newly logged in user. This is because both push notifications and in- app messages are owned by the device.* |
-| `OneSignal.shared.logout();`                                                                                     | *Logout the user previously logged in via [login]. The [user] property now references a new device-scoped user. A device-scoped user has no user identity that can later be retrieved, except through this device as long as the app remains installed and the app data is not cleared.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         |
-| `OneSignal.shared.setConsentRequired(true);` | *Determines whether a user must consent to privacy prior to their user data being sent up to OneSignal.  This should be set to `true` prior to the invocation of `initialize` to ensure compliance.*     
-                                            |
-| `OneSignal.shared.setConsentGiven(true);` | *Sets whether a user has consented to privacy prior to their user data being sent up to OneSignal. *                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `OneSignal.shared.setLaunchURLsInApp(true);`                                                                    | *(iOS only)  This method can be used to set if launch URLs should be opened in safari or within the application. Set to `true` to launch all notifications with a URL in the app instead of the default web browser. Make sure to call `setLaunchURLsInApp` before the `initialize` call.*                                                                                                                                                                                                                                                                   |                                                      
-| `OneSignal.shared.enterLiveActivity("ACTIVITY_ID", "TOKEN");`<br><br>***See below for usage of callbacks***|*(iOS only) Entering a Live Activity associates an `activityId` with a live activity temporary push `token` on OneSignal's server. The activityId is then used with the OneSignal REST API to update one or multiple Live Activities at one time.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                |
-| `OneSignal.shared.exitLiveActivity("ACTIVITY_ID");`<br><br>***See below for usage of callbacks***  |*(iOS only) Exiting a Live activity deletes the association between a customer defined `activityId` with a Live Activity temporary push `token` on OneSignal's server.*                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           |
 
+| `OneSignal.initialize("YOUR_ONESIGNAL_APP_ID");` | *Initializes the OneSignal SDK. This should be called during startup of the application.* |
 
+| `OneSignal.login("USER_EXTERNAL_ID");` | *Login to OneSignal under the user identified by the [externalId] provided. The act of logging a user into the OneSignal SDK will switch the [user] context to that specific user.<br><br> - If the [externalId] exists, the user will be retrieved and the context will be set from that user information. If operations have already been performed under a device-scoped user, they ***will not*** be applied to the now logged in user (they will be lost).<br> - If the [externalId] does not exist the user, the user will be created and the context set from the current local state. If operations have already been performed under a device-scoped user, those operations ***will*** be applied to the newly created user.<br><br>***Push Notifications and In App Messaging***<br>Logging in a new user will automatically transfer the push notification and in app messaging subscription from the current user (if there is one) to the newly logged in user. This is because both push notifications and in- app messages are owned by the device.* |
+
+| `OneSignal.logout();` | *Logout the user previously logged in via [login]. The [user] property now references a new device-scoped user. A device-scoped user has no user identity that can later be retrieved, except through this device as long as the app remains installed and the app data is not cleared.* | |
+
+| `OneSignal.consentRequired(true);` | *Determines whether a user must consent to privacy prior to their user data being sent up to OneSignal. This should be set to `true` prior to the invocation of `initialize` to ensure compliance.*
+
+| `OneSignal.consentGiven(true);` | *Sets whether a user has consented to privacy prior to their user data being sent up to OneSignal. * |
+
+| `OneSignal.setLaunchURLsInApp(true);` | *(iOS only) This method can be used to set if launch URLs should be opened in safari or within the application. Set to `true` to launch all notifications with a URL in the app instead of the default web browser. Make sure to call `setLaunchURLsInApp` before the `initialize` call.* |  
+  
 
 ## Live Activities
 
 Live Activities are a type of interactive push notification. Apple introduced them in October 2022 to enable iOS apps to provide real-time updates to their users that are visible from the lock screen and the dynamic island.
 
-Please refer to OneSignal’s guide on [Live Activities](https://documentation.onesignal.com/docs/live-activities), the [Live Activities Quickstart](https://documentation.onesignal.com/docs/live-activities-quickstart) tutorial, and the [existing SDK reference](https://documentation.onesignal.com/docs/sdk-reference#live-activities) on Live Activities. 
+  | `OneSignal.LiveActivities.enterLiveActivity("ACTIVITY_ID", "TOKEN");`<br><br>***See below for usage of callbacks***|*(iOS only) Entering a Live Activity associates an `activityId` with a live activity temporary push `token` on OneSignal's server. The activityId is then used with the OneSignal REST API to update one or multiple Live Activities at one time.* |
 
-**Flutter**
-```dart
-    // Enter a Live Activity
-    OneSignal.shared.enterLiveActivity("activity_id",  token).then((v)  { 
-	    print("Successfully enter live activity"); 
-    }).catchError((error)  { 
-	    print("Failed to enter live activity with error: $error"); 
-    });
-    
-    // Exit a Live Activity
-    OneSignal.shared.exitLiveActivity("activity_id").then((v)  { 
-	    print("Successfully exit live activity"); 
-	}).catchError((error)  { 
-	    print("Failed to exit live activity: $error"); 
-	});
-```
+| `OneSignal.LiveActivities.exitLiveActivity("ACTIVITY_ID");`<br><br>***See below for usage of callbacks*** |*(iOS only) Exiting a Live activity deletes the association between a customer defined `activityId` with a Live Activity temporary push `token` on OneSignal's server.* |
+
+
+Please refer to OneSignal’s guide on [Live Activities](https://documentation.onesignal.com/docs/live-activities), the [Live Activities Quickstart](https://documentation.onesignal.com/docs/live-activities-quickstart) tutorial, and the [existing SDK reference](https://documentation.onesignal.com/docs/sdk-reference#live-activities) on Live Activities.
+
 
 ## User Namespace
 
 The User name space is accessible via `OneSignal.User` and provides access to user-scoped functionality.
 
 
-| **Flutter**                                                                                       | **Description**                                                                                                                                                                                                                          |
+| **Flutter** | **Description** |
+
 | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `OneSignal.User.setLanguage("en");`                                                                  | *Set the 2-character language  for this user.*                                                                                                                                                                                                   |
-| `OneSignal.User.addAlias("ALIAS_LABEL", "ALIAS_ID");`                                    | *Set an alias for the current user.  If this alias label already exists on this user, it will be overwritten with the new alias id.*                                                                                         |
-| `OneSignal.User.addAliases({ALIAS_LABEL_01: "ALIAS_ID_01", ALIAS_LABEL_02: "ALIAS_ID_02"});` | *Set aliases for the current user. If any alias already exists, it will be overwritten to the new values.*                                                                                                                       |
-| `OneSignal.User.removeAlias("ALIAS_LABEL");`                                                         | *Remove an alias from the current user.*                                                                                                                                                                                                 |
-| `OneSignal.User.removeAliases(["ALIAS_LABEL_01", "ALIAS_LABEL_02"]]`                              | *Remove aliases from the current user.*                                                                                                                                                                                              |
-| `OneSignal.User.addEmail("customer@company.com");`                                               | *Add a new email subscription to the current user.*                                                                                                                                                                                      |
-| `OneSignal.User.removeEmail("customer@company.com");`                             | *Results in a no-op if the specified email does not exist on the user within the SDK, and no request will be made.*                                                               |
-| `OneSignal.User.addSms("+15558675309");`                                                   | *Add a new SMS subscription to the current user.*                                                                                                                                                                                        |
-| `OneSignal.User.removeSms("+15558675309");`                                 | *Results in a no-op if the specified phone number does not exist on the user within the SDK, and no request will be made..*                                                            |
-| `OneSignal.User.addTag("KEY", "VALUE");`                                                | *Add a tag for the current user.  Tags are key:value pairs used as building blocks for targeting specific users and/or personalizing messages. If the tag key already exists, it will be replaced with the value provided here.*         |
-| `OneSignal.User.addTags({"KEY_01": "VALUE_01", "KEY_02": "VALUE_02"});`                          | *Add multiple tags for the current user.  Tags are key:value pairs used as building blocks for targeting specific users and/or personalizing messages. If the tag key already exists, it will be replaced with the value provided here.* |
-| `OneSignal.User.removeTag("KEY");`                                                                   | *Remove the data tag with the provided key from the current user.*                                                                                                                                                                       |
-| `OneSignal.User.removeTags(["KEY_01", "KEY_02"]);`                                                 | *Remove multiple tags with the provided keys from the current user.*                                                                                                                                                             |
+
+| `OneSignal.User.setLanguage("en");` | *Set the 2-character language for this user.* |
+
+| `OneSignal.User.addAlias("ALIAS_LABEL", "ALIAS_ID");` | *Set an alias for the current user. If this alias label already exists on this user, it will be overwritten with the new alias id.* |
+
+| `OneSignal.User.addAliases({ALIAS_LABEL_01: "ALIAS_ID_01", ALIAS_LABEL_02: "ALIAS_ID_02"});` | *Set aliases for the current user. If any alias already exists, it will be overwritten to the new values.* |
+
+| `OneSignal.User.removeAlias("ALIAS_LABEL");` | *Remove an alias from the current user.* |
+
+| `OneSignal.User.removeAliases(["ALIAS_LABEL_01", "ALIAS_LABEL_02"]]` | *Remove aliases from the current user.* |
+
+| `OneSignal.User.addEmail("customer@company.com");` | *Add a new email subscription to the current user.* |
+
+| `OneSignal.User.removeEmail("customer@company.com");` | *Results in a no-op if the specified email does not exist on the user within the SDK, and no request will be made.* |
+
+| `OneSignal.User.addSms("+15558675309");` | *Add a new SMS subscription to the current user.* |
+
+| `OneSignal.User.removeSms("+15558675309");` | *Results in a no-op if the specified phone number does not exist on the user within the SDK, and no request will be made..* |
+
+| `OneSignal.User.addTag("KEY", "VALUE");` | *Add a tag for the current user. Tags are key:value pairs used as building blocks for targeting specific users and/or personalizing messages. If the tag key already exists, it will be replaced with the value provided here.* |
+
+| `OneSignal.User.addTags({"KEY_01": "VALUE_01", "KEY_02": "VALUE_02"});` | *Add multiple tags for the current user. Tags are key:value pairs used as building blocks for targeting specific users and/or personalizing messages. If the tag key already exists, it will be replaced with the value provided here.* |
+
+| `OneSignal.User.removeTag("KEY");` | *Remove the data tag with the provided key from the current user.* |
+
+| `OneSignal.User.removeTags(["KEY_01", "KEY_02"]);` | *Remove multiple tags with the provided keys from the current user.* |
 
 
 
@@ -215,38 +228,49 @@ The User name space is accessible via `OneSignal.User` and provides access to us
 The Push Subscription name space is accessible via `OneSignal.User.pushSubscription` and provides access to push subscription-scoped functionality.
 
 
-| **Flutter**                                                                                                                        | **Description**                                                                                                                                                                                                                                                                                                                                                                                    |
-| -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `var id = OneSignal.User.pushSubscription.id`                                    | *The readonly push subscription ID.*                                                                                                                                                                                                                                                                                                                                                               |
-| `var token = OneSignal.User.pushSubscription.token`                                 | *The readonly push token.*                                                                                                                                                                                                                                                                                                                                                                         |
-| `var optedIn = OneSignal.User.pushSubscription.optedIn`                                                                               | *Gets a boolean value indicating whether the current user is opted in to push notifications. This returns `true` when the app has notifications permission and `optedOut` is called. ***Note:*** Does not take into account the existence of the subscription ID and push token. This boolean may return `true` but push notifications may still not be received by the user.* |
-| `OneSignal.User.pushSubscription.optIn();`                                                                                              | *Call this method to receive push notifications on the device or to resume receiving of push notifications after calling `optOut`. If needed, this method will prompt the user for push notifications permission.*                                                                                                                                                                     |
-| `OneSignal.User.pushSubscription.optOut();`                                                                                             | *If at any point you want the user to stop receiving push notifications on the current device (regardless of system-level permission status), you can call this method to opt out.*                                                                                                                                                                                                              |
-| `OneSignal.User.pushSubscription.addObserver(observer);`<br><br>***See below for usage*** | *The `OneSignalPushSubscriptionObserver.onOSPushSubscriptionChangedWithState` method will be fired on the passed-in object when the push subscription changes. This method returns the current `OSPushSubscriptionState` at the time of adding this observer.*                                                                                                                                 |
-| `OneSignal.User.pushSubscription.removeObserver(observer);`<br><br>***See below for usage***                             | *Remove a push subscription observer that has been previously added.*                                                                                                                                                                                                                                                                                                                      |
-
 ### Push Subscription Observer
+| **Flutter** | **Description** |
 
-Any object implementing the `OneSignalPushSubscriptionObserver` protocol can be added as an observer. You can call `removeObserver` to remove any existing listeners.
+| -------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 
-**Flutter**
-```dart
-    class  _MyAppState  extends  State<MyApp> with  OneSignalPushSubscriptionObserver {}
-    OneSignal.User.pushSubscription.addObserver(this);
-    
-    // Remove the observer
-    OneSignal.User.pushSubscription.removeObserver(this);
+| `var id = OneSignal.User.pushSubscription.id` | *The readonly push subscription ID.* |
+
+| `var token = OneSignal.User.pushSubscription.token` | *The readonly push token.* |
+
+| `var optedIn = OneSignal.User.pushSubscription.optedIn` | *Gets a boolean value indicating whether the current user is opted in to push notifications. This returns `true` when the app has notifications permission and `optedOut` is called. ***Note:*** Does not take into account the existence of the subscription ID and push token. This boolean may return `true` but push notifications may still not be received by the user.* |
+
+| `OneSignal.User.pushSubscription.optIn();` | *Call this method to receive push notifications on the device or to resume receiving of push notifications after calling `optOut`. If needed, this method will prompt the user for push notifications permission.* |
+
+| `OneSignal.User.pushSubscription.optOut();` | *If at any point you want the user to stop receiving push notifications on the current device (regardless of system-level permission status), you can call this method to opt out.* |
+
+<br><br> | *The `OnPushSubscriptionChangeObserver`  will be fired when the push subscription changes. This method's parameter is the current `OSPushSubscriptionChangedState` which includes the previous and current state.* |
 ```
+OneSignal.User.pushSubscription.addObserver(((state)) {
+	OSPushSubscriptionChangedState current = state.current;
+	OSPushSubscriptionChangedState previous = state.previous;
+	if (state.current.optedIn) {
+	 /// Respond to new state
+	}
+});
+```
+
+<br><br> | *Remove a push subscription observer that has been previously added.* |
+| `OneSignal.User.pushSubscription.removeObserver(observer);`
+<br><br>
 
 ## Session Namespace
 
 The Session namespace is accessible via `OneSignal.Session` and provides access to session-scoped functionality.
 
 
-| **Flutter**                                         | **Description**                                                                          |
+| **Flutter** | **Description** |
+
 | --------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| `OneSignal.Session.addOutcome("OUTCOME_NAME");`                             | *Add an outcome with the provided name, captured against the current session.*           |
-| `OneSignal.Session.addUniqueOutcome("OUTCOME_NAME");`                       | *Add a unique outcome with the provided name, captured against the current session.*     |
+
+| `OneSignal.Session.addOutcome("OUTCOME_NAME");` | *Add an outcome with the provided name, captured against the current session.* |
+
+| `OneSignal.Session.addUniqueOutcome("OUTCOME_NAME");` | *Add a unique outcome with the provided name, captured against the current session.* |
+
 | `OneSignal.Session.addOutcomeWithValue("OUTCOME_NAME", 1);` | *Add an outcome with the provided name and value, captured against the current session.* |
 
 
@@ -255,126 +279,162 @@ The Session namespace is accessible via `OneSignal.Session` and provides access 
 
 The Notifications namespace is accessible via `OneSignal.Notifications` and provides access to notification-scoped functionality.
 
-| **Flutter**                                                         |                                                                                              **Description** |
+| **Flutter** | **Description** |
+
 |---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
-| `var permission = Notifications.permission`               | *Whether this app has push notification permission.*                                                                                                                                                                                                                                                                                                                                                                        |
-| `var canRequest = await OneSignal.Notifications.canRequest();`  | * (iOS only) Whether attempting to request notification permission will show a prompt. Returns `true` if the device has not been prompted for push notification permission already.*                                                                                                                                                                                                                                                |
-| `OneSignal.Notifications.clearAll();`                                           | *Removes all OneSignal notifications.*|                                                                                                                                                           
-| `OneSignal.Notifications.removeNotification(int x);`                                                                                               | *(Android only) Cancels a single OneSignal notification based on its Android notification integer ID. Use instead of Android's [android.app.NotificationManager.cancel], otherwise the notification will be restored when your app is restarted.*|                                                                                                                                                                                                    
-| `OneSignal.Notifications.removeGroupedNotifications("GROUP_KEY");`                                                                                               | *(Android only) Cancels a group of OneSignal notifications with the provided group key. Grouping notifications is a OneSignal concept, there is no [android.app.NotificationManager] equivalent.*|                                                                                                                                                                                                                                                                                                                        
-| `OneSignal.Notifications.requestPermission();`<br><br>***See below for usage*** | *Prompt the user for permission to receive push notifications. This will display the native system prompt to request push notification permission.* |                                                                                                                                                                                                   
-| `OneSignal.Notifications.registerForProvisionalAuthorization();`                  | *(iOS only) Instead of having to prompt the user for permission to send them push notifications, your app can request provisional authorization.*|                                                                                                                                                                                                    
-| `OneSignal.Notifications.addPermissionObserver(observer);`<br><br>***See below for usage***                   | *This method will fire when a notification permission setting changes. This happens when the user enables or disables notifications for your app from the system settings outside of your app.*|                                        
-| `OneSignal.Notifications.removePermissionObserver(observer;`<br><br>***See below for usage***        | *Remove a push permission observer that has been previously added.*|                                                                                                                                                                                                                         
-| `OneSignal.Notifications.setNotificationWillShowInForegroundHandler(handler);`<br><br>***See below for usage***       | *Sets the handler to run before displaying a notification while the app is in focus. Use this handler to read notification data and change it or decide if the notification ***should*** show or not.<br><br>***Note:*** this runs ***after*** the [Notification Service Extension](https://documentation.onesignal.com/docs/service-extensions) which can be used to modify the notification before showing it.* |
-| `OneSignal.Notifications.setNotificationOpenedHandler(handler);`<br><br>***See below for usage***                   | *Sets a handler that will run whenever a notification is opened by the user.*|                                                                                                                                                                                                                                                                                                                     
+
+| `var permission = Notifications.permission` | *Whether this app has push notification permission.* |
+
+| `var canRequest = await OneSignal.Notifications.canRequest();` | * (iOS only) Whether attempting to request notification permission will show a prompt. Returns `true` if the device has not been prompted for push notification permission already.* |
+
+| `OneSignal.Notifications.clearAll();` | *Removes all OneSignal notifications.*|
+
+| `OneSignal.Notifications.removeNotification(int x);` | *(Android only) Cancels a single OneSignal notification based on its Android notification integer ID. Use instead of Android's [android.app.NotificationManager.cancel], otherwise the notification will be restored when your app is restarted.*|
+
+| `OneSignal.Notifications.removeGroupedNotifications("GROUP_KEY");` | *(Android only) Cancels a group of OneSignal notifications with the provided group key. Grouping notifications is a OneSignal concept, there is no [android.app.NotificationManager] equivalent.*|
+
+<br><br>***See below for usage*** | *Prompt the user for permission to receive push notifications. This will display the native system prompt to request push notification permission.* |
+| `OneSignal.Notifications.requestPermission();`
+
+| `OneSignal.Notifications.registerForProvisionalAuthorization();` | *(iOS only) Instead of having to prompt the user for permission to send them push notifications, your app can request provisional authorization.*|
+
+<br><br>***See below for usage*** | *This method will fire when a notification permission setting changes. This happens when the user enables or disables notifications for your app from the system settings outside of your app.*|
+| `OneSignal.Notifications.addPermissionObserver(observer);`
+
+<br><br>***See below for usage*** | *Remove a push permission observer that has been previously added.*|
+| `OneSignal.Notifications.removePermissionObserver(observer;`
+
+<br><br>
+
+### Notification Will Display Listener
+***See below for usage*** | *Sets the handler to run before displaying a notification while the app is in focus. Use this handler to read notification data and change it or decide if the notification ***should*** show or not.<br><br>***Note:*** this runs ***after*** the [Notification Service Extension](https://documentation.onesignal.com/docs/service-extensions) which can be used to modify the notification before showing it.* |
+| `OneSignal.Notifications.addForegroundWillDisplayListener(listener);`
+```
+OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+	/// preventDefault to not display the notification
+	event.preventDefault();
+
+	/// Do async work
+
+	/// notification.display() to display after preventing default
+	event.notification.display();
+});
+```
+<br><br>
+### Notification Click Listener
+***See below for usage*** | *Sets a listener that will run whenever a notification is opened by the user.*|
+| `OneSignal.Notifications.addClickListener(listener);`
+```
+OneSignal.Notifications.addClickListener((event) {
+	print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
+});
+```
 
 ### Prompt for Push Notification Permission
 
 **Flutter**
 ```dart
-    OneSignal.Notifications.requestPermission();
+OneSignal.Notifications.requestPermission();
 ```
 
 ### Permission Observer
 
 Add an observer when permission status changes. You can call `removePermissionObserver` to remove any existing listeners.
 
-**Flutter**
+
+
 ```dart
-    class  _MyAppState  extends  State<MyApp> with OneSignalPermissionObserver {
-    OneSignal.Notifications.addPermissionObserver(this);
-    
-    // Remove the observer
-    OneSignal.Notifications.removePermissionObserver(this);
-```
-
-### Notification Will Show in Foreground Handler
-
-**Flutter**
-```dart
-    OneSignal.Notifications.setNotificationWillShowInForegroundHandler((OSNotificationReceivedEvent  event) {
-		print('FOREGROUND HANDLER CALLED WITH: ${event.notification.jsonRepresentation()}');
-		/// Display Notification, send null to not display
-		event.complete(null);
-	});
-```
-
-### Notification Opened Handler
-
-**Flutter**
-```dart
-    OneSignal.Notifications.setNotificationOpenedHandler((OSNotificationOpenedResult  result) {
-		print('NOTIFICATION OPENED HANDLER CALLED WITH: ${result}');
-	});
+OneSignal.Notifications.addPermissionObserver((state) {
+	print("Has permission "  +  state.toString());
+});
 ```
 
 ## Location Namespace
 
 The Location namespace is accessible via `OneSignal.Location` and provide access to location-scoped functionality.
 
-| **Flutter**                                         | **Description**                                                                           |
+| **Flutter** | **Description** |
+
 | ----------------------------------------------------------|-------------------------------------------------------------------------------------------|
-| `OneSignal.Location.isShared();`           | *Whether location is currently shared with OneSignal.*|
+
+| `OneSignal.Location.isShared();` | *Whether location is currently shared with OneSignal.*|
+
 | `OneSignal.Location.requestPermission();` | *Use this method to manually prompt the user for location permissions. This allows for geotagging so you send notifications to users based on location.* |
 
 ## InAppMessages Namespace
 
 The In App Messages namespace is accessible via `OneSignal.InAppMessages` and provide access to in app messages-scoped functionality.
 
-| **Flutter**                                            |       **Description**                                                                                             |
+| **Flutter** | **Description** |
 | -------------------------------------------------------------|----------------------------------------------------------------------------------------------------|
-|`var paused = await OneSignal.InAppMessages.arePaused()` `OneSignal.InAppMessages.paused(true);`                           | *Whether in-app messaging is currently paused.  When set to `true`, no IAM will be presented to the user regardless of whether they qualify for them. When set to `false`, any IAMs the user qualifies for will be presented to the user at the appropriate time.*                                                                                                                                                                                                  |
-|`OneSignal.InAppMessages.addTrigger("triggerKey", "triggerValue");` | *Add a trigger for the current user.  Triggers are currently explicitly used to determine whether a specific IAM should be displayed to the user. See [Triggers](https://documentation.onesignal.com/docs/iam-triggers).<br><br>If the trigger key already exists, it will be replaced with the value provided here. Note that triggers are not persisted to the backend. They only exist on the local device and are applicable to the current user.*                    |
-| `OneSignal.InAppMessages.addTriggers({"triggerKey1":"triggerValue", "triggerKey2": "triggerValue"});`                          | *Add multiple triggers for the current user. Triggers are currently explicitly used to determine whether a specific IAM should be displayed to the user. See [Triggers](https://documentation.onesignal.com/docs/iam-triggers).<br><br>If any trigger key already exists, it will be replaced with the value provided here. Note that triggers are not persisted to the backend. They only exist on the local device and are applicable to the current user.* |
-| `OneSignal.InAppMessages.removeTrigger("triggerKey");`                                                                           | *Remove the trigger with the provided key from the current user.*                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `OneSignal.InAppMessages.removeTriggers(["triggerKey1", "triggerKey2"]);`                                                         | *Remove multiple triggers from the current user.*                                                                                                                                                                                                                                                                                                                                                                                                                               |
-| `OneSignal.InAppMessages.clearTriggers();`                                                                                  | *Clear all triggers from the current user.*                                                                                                                                                                                                                                                                                                                                                                                                                                     |
-| `OneSignal.InAppMessages.setOnWillDisplayInAppMessageHandler(handler);`<br>`OneSignal.InAppMessages.setOnDidDisplayInAppMessageHandler(handler);`<br>`OneSignal.InAppMessages.setOnWillDismissInAppMessageHandler(handler);`<br>`OneSignal.InAppMessages.setOnDidDismissInAppMessageHandler(handler);`<br><br>***See below for usage*** | *Set the in-app message lifecycle handler.*                                                                                                                                                                                                                                                                                                                                                                                                                                 |
-| `OneSignal.InAppMessages.setInAppMessageClickedHandler(handler);`<br><br>***See below for usage***                         | *Set the in-app message click handler.*                                                                                                                                                                                                                                                                                                                                                                                                                                     |
+|`var paused = await OneSignal.InAppMessages.arePaused()`  `OneSignal.InAppMessages.paused(true);` | *Whether in-app messaging is currently paused. When set to `true`, no IAM will be presented to the user regardless of whether they qualify for them. When set to `false`, any IAMs the user qualifies for will be presented to the user at the appropriate time.* |
+
+|`OneSignal.InAppMessages.addTrigger("triggerKey", "triggerValue");` | *Add a trigger for the current user. Triggers are currently explicitly used to determine whether a specific IAM should be displayed to the user. See [Triggers](https://documentation.onesignal.com/docs/iam-triggers).<br><br>If the trigger key already exists, it will be replaced with the value provided here. Note that triggers are not persisted to the backend. They only exist on the local device and are applicable to the current user.* |
+
+| `OneSignal.InAppMessages.addTriggers({"triggerKey1":"triggerValue", "triggerKey2": "triggerValue"});` | *Add multiple triggers for the current user. Triggers are currently explicitly used to determine whether a specific IAM should be displayed to the user. See [Triggers](https://documentation.onesignal.com/docs/iam-triggers).<br><br>If any trigger key already exists, it will be replaced with the value provided here. Note that triggers are not persisted to the backend. They only exist on the local device and are applicable to the current user.* |
+
+| `OneSignal.InAppMessages.removeTrigger("triggerKey");` | *Remove the trigger with the provided key from the current user.* |
+
+| `OneSignal.InAppMessages.removeTriggers(["triggerKey1", "triggerKey2"]);` | *Remove multiple triggers from the current user.* |
+
+| `OneSignal.InAppMessages.clearTriggers();` | *Clear all triggers from the current user.* |
 
 
 ### In-App Message Click Handler
 
-**Flutter**
+  | `OneSignal.InAppMessages.addClickListener(listener);`<br><br>***See below for usage*** | *Set the in-app message click handler.* |
+
 ```dart
-    OneSignal.InAppMessages.setInAppMessageClickedHandler((OSInAppMessageAction  action) {
-		print("In App Message Clicked: \n${action.jsonRepresentation().replaceAll("\\n", "\n")}");
-	});
+OneSignal.InAppMessages.addClickListener((event) {
+	print("In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}");
+});
 ```
 
 ### In-App Message Lifecycle Handler
+| `OneSignal.InAppMessages.addWillDisplayListener(listener);`<br>`OneSignal.InAppMessages.addDidDisplayListener(listener);`<br>`OneSignal.InAppMessages.addWillDismissListener(listener);`<br>`OneSignal.addDidDismissListener.setOnDidDismissInAppMessageHandler(listener);`
+<br><br>***See below for usage*** | *Set the in-app message lifecycle listeners.* |
 
-**Flutter**
 ```dart
-	OneSignal.InAppMessages.setOnWillDisplayInAppMessageHandler((message) {
-		print("ON WILL DISPLAY IN APP MESSAGE ${message.messageId}");
-	});
-	OneSignal.InAppMessages.setOnDidDisplayInAppMessageHandler((message) {
-		print("ON DID DISPLAY IN APP MESSAGE ${message.messageId}");
-	});
-	OneSignal.InAppMessages.setOnWillDismissInAppMessageHandler((message) {
-		print("ON WILL DISMISS IN APP MESSAGE ${message.messageId}");
-	});
-	OneSignal.InAppMessages.setOnDidDismissInAppMessageHandler((message) {
-		print("ON DID DISMISS IN APP MESSAGE ${message.messageId}");
-	});
+OneSignal.InAppMessages.addWillDisplayListener((event) {
+	print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
+});
+
+OneSignal.InAppMessages.addDidDisplayListener((event) {
+	print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
+});
+
+OneSignal.InAppMessages.addWillDismissListener((event) {
+	print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
+});
+
+OneSignal.InAppMessages.addDidDismissListener((event) {
+	print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
+});
 ```
 
 ## Debug Namespace
 
 The Debug namespace is accessible via `OneSignal.Debug` and provide access to debug-scoped functionality.
 
-| **Objective-C**                                  | **Description**                                                                    |
+  
+
+| **Objective-C** | **Description** |
+
 | ------------------------------------------------ | ---------------------------------------------------------------------------------- |
 | `OneSignal.Debug.setLogLevel(OSLogLevel.verbose);` | *Sets the log level the OneSignal SDK should be writing to the log.* |
-| `OneSignal.Debug.setAlertLevel(OSLogLevel.none);` | *Sets the logging level to show as alert dialogs.*                                 |
 
+| `OneSignal.Debug.setAlertLevel(OSLogLevel.none);` | *Sets the logging level to show as alert dialogs.* |
+
+  
+  
 
 # Glossary
 
 **device-scoped user**
-> An anonymous user with no aliases that cannot be retrieved except through the current device or OneSignal dashboard. On app install, the OneSignal SDK is initialized with a *device-scoped user*. A *device-scoped user* can be upgraded to an identified user by calling `OneSignal.login("USER_EXTERNAL_ID")`  to identify the user by the specified external user ID. 
+
+> An anonymous user with no aliases that cannot be retrieved except through the current device or OneSignal dashboard. On app install, the OneSignal SDK is initialized with a *device-scoped user*. A *device-scoped user* can be upgraded to an identified user by calling `OneSignal.login("USER_EXTERNAL_ID")` to identify the user by the specified external user ID.
+
+  
 
 # Limitations
 **General**
@@ -385,5 +445,5 @@ The Debug namespace is accessible via `OneSignal.Debug` and provide access to de
 - Any `User` namespace calls must be invoked **after** initialization. Example: `OneSignal.User.addTag("tag", "2")`
 
 # Known issues
-- Identity Verification 
-    - We will be introducing JWT in a follow up release
+- Identity Verification
+- We will be introducing JWT in a follow up release
