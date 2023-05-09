@@ -35,10 +35,10 @@ class _MyAppState extends State<MyApp> {
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
 
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
-    OneSignal.shared.consentRequired(_requireConsent);
+    OneSignal.consentRequired(_requireConsent);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
-    OneSignal.shared.initialize("9c59a2aa-315a-4bf9-9fef-f76d575d3202");
+    OneSignal.initialize("0ba9731b-33bd-43f4-8b59-61172e27447d");
 
     // AndroidOnly stat only
     // OneSignal.Notifications.removeNotification(1);
@@ -103,7 +103,7 @@ class _MyAppState extends State<MyApp> {
     });
 
     // iOS-only method to open launch URLs in Safari when set to false
-    OneSignal.shared.setLaunchURLsInApp(false);
+    OneSignal.setLaunchURLsInApp(false);
 
     this.setState(() {
       _enableConsentButton = _requireConsent;
@@ -184,7 +184,7 @@ class _MyAppState extends State<MyApp> {
 
   void _handleConsent() {
     print("Setting consent to true");
-    OneSignal.shared.consentGiven(true);
+    OneSignal.consentGiven(true);
 
     print("Setting state");
     this.setState(() {
@@ -200,12 +200,12 @@ class _MyAppState extends State<MyApp> {
   void _handleLogin() {
     print("Setting external user ID");
     if (_externalUserId == null) return;
-    OneSignal.shared.login(_externalUserId!);
+    OneSignal.login(_externalUserId!);
     OneSignal.User.addAlias("fb_id", "1341524");
   }
 
   void _handleLogout() {
-    OneSignal.shared.logout();
+    OneSignal.logout();
     OneSignal.User.removeAlias("fb_id");
   }
 
