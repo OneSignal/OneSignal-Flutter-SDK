@@ -1,7 +1,5 @@
-import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/utils.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
-import 'package:flutter/foundation.dart';
 import 'dart:convert';
 
 /// A class representing the notification, including the
@@ -9,7 +7,6 @@ import 'dart:convert';
 /// parameters (such as whether the notification was `shown`
 /// to the user, whether it's `silent`, etc.)
 class OSNotification extends JSONStringRepresentable {
-
   /// The OneSignal notification ID for this notification
   late String notificationId;
 
@@ -188,8 +185,7 @@ class OSNotification extends JSONStringRepresentable {
       this.mutableContent = json['mutableContent'] as bool?;
     if (json.containsKey('category'))
       this.category = json['category'] as String?;
-    if (json.containsKey('badge')) 
-      this.badge = json['badge'] as int?;
+    if (json.containsKey('badge')) this.badge = json['badge'] as int?;
     if (json.containsKey('badgeIncrement'))
       this.badgeIncrement = json['badgeIncrement'] as int?;
     if (json.containsKey('subtitle'))
@@ -222,8 +218,7 @@ class OSNotification extends JSONStringRepresentable {
       this.fromProjectNumber = json['fromProjectNumber'] as String?;
     if (json.containsKey("collapseId"))
       this.collapseId = json['collapseId'] as String?;
-    if (json.containsKey("priority")) 
-      this.priority = json['priority'] as int?;
+    if (json.containsKey("priority")) this.priority = json['priority'] as int?;
     if (json.containsKey("androidNotificationId"))
       this.androidNotificationId = json['androidNotificationId'] as int?;
     if (json.containsKey('backgroundImageLayout')) {
@@ -232,11 +227,13 @@ class OSNotification extends JSONStringRepresentable {
     }
     if (json.containsKey('groupedNotifications')) {
       final dynamic jsonGroupedNotifications = json['groupedNotifications'];
-      final jsonList = jsonDecode(jsonGroupedNotifications.toString()) as List<dynamic>;
-      this.groupedNotifications = jsonList.map((dynamic item) =>
-          OSNotification(item as Map<String, dynamic>)).toList();
+      final jsonList =
+          jsonDecode(jsonGroupedNotifications.toString()) as List<dynamic>;
+      this.groupedNotifications = jsonList
+          .map((dynamic item) => OSNotification(item as Map<String, dynamic>))
+          .toList();
     }
-    
+
     // shared parameters
     this.notificationId = json['notificationId'] as String;
 
@@ -244,12 +241,9 @@ class OSNotification extends JSONStringRepresentable {
       this.templateName = json['templateName'] as String?;
     if (json.containsKey('templateId'))
       this.templateId = json['templateId'] as String?;
-    if (json.containsKey('sound')) 
-      this.sound = json['sound'] as String?;
-    if (json.containsKey('title'))
-      this.title = json['title'] as String?;
-    if (json.containsKey('body')) 
-      this.body = json['body'] as String?;
+    if (json.containsKey('sound')) this.sound = json['sound'] as String?;
+    if (json.containsKey('title')) this.title = json['title'] as String?;
+    if (json.containsKey('body')) this.body = json['body'] as String?;
     if (json.containsKey('launchUrl'))
       this.launchUrl = json['launchUrl'] as String?;
     if (json.containsKey('additionalData'))
@@ -382,7 +376,6 @@ class OSAndroidBackgroundImageLayout extends JSONStringRepresentable {
 }
 
 class OSNotificationReceivedEvent extends JSONStringRepresentable {
-
   late OSNotification notification;
 
   OSNotificationReceivedEvent(Map<String, dynamic> json) {
@@ -390,17 +383,18 @@ class OSNotificationReceivedEvent extends JSONStringRepresentable {
   }
 
   void complete(OSNotification? notification) {
-    print('OSNotificationReceivedEvent complete with notification: $notification');
+    print(
+        'OSNotificationReceivedEvent complete with notification: $notification');
     if (notification != null) {
-        OneSignal.shared.completeNotification(notification.notificationId, true);
+      OneSignal.shared.completeNotification(notification.notificationId, true);
     } else {
-        OneSignal.shared.completeNotification(this.notification.notificationId, false);
+      OneSignal.shared
+          .completeNotification(this.notification.notificationId, false);
     }
   }
 
   String jsonRepresentation() {
-    return convertToJsonString({
-      'notification': this.notification.jsonRepresentation()
-    });
+    return convertToJsonString(
+        {'notification': this.notification.jsonRepresentation()});
   }
 }

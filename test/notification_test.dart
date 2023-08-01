@@ -1,6 +1,5 @@
 import 'package:test/test.dart';
 import 'package:onesignal_flutter/src/notification.dart';
-import 'package:onesignal_flutter/src/defines.dart';
 import 'test_data.dart';
 
 void main() {
@@ -8,8 +7,7 @@ void main() {
   final notification = OSNotification(notificationJson);
 
   test('expect notification ID to be set', () {
-    expect(notification.notificationId,
-        "8e0eeec2-aa42-4ff7-a74b-bce9ca9e588b");
+    expect(notification.notificationId, "8e0eeec2-aa42-4ff7-a74b-bce9ca9e588b");
   });
 
   test('expect buttons to be parsed correctly', () {

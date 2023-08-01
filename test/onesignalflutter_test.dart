@@ -3,7 +3,6 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'mock_channel.dart';
 import 'test_data.dart';
 
-
 void main() {
   TestWidgetsFlutterBinding.ensureInitialized();
 
@@ -55,7 +54,8 @@ void main() {
     }).then(expectAsync1((v) {
       expect(channelController.state.postNotificationJson!['content_available'],
           true);
-      expect(channelController.state.postNotificationJson!['include_player_ids'],
+      expect(
+          channelController.state.postNotificationJson!['include_player_ids'],
           [testPlayerId]);
     }));
   });

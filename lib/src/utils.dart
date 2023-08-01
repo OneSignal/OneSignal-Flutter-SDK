@@ -61,14 +61,14 @@ dynamic convertEnumCaseToValue(dynamic key) {
   }
 
   switch (key) {
-      case OSSession.DIRECT:
-        return "DIRECT";
-      case OSSession.INDIRECT:
-        return "INDIRECT";
-      case OSSession.UNATTRIBUTED:
-        return "UNATTRIBUTED";
-      case OSSession.DISABLED:
-        return "DISABLED";
+    case OSSession.DIRECT:
+      return "DIRECT";
+    case OSSession.INDIRECT:
+      return "INDIRECT";
+    case OSSession.UNATTRIBUTED:
+      return "UNATTRIBUTED";
+    case OSSession.DISABLED:
+      return "DISABLED";
   }
 
   return key;
@@ -78,9 +78,9 @@ dynamic convertEnumCaseToValue(dynamic key) {
 abstract class JSONStringRepresentable {
   String jsonRepresentation();
 
-  String convertToJsonString(Map<String, dynamic>? object) => JsonEncoder
-      .withIndent('  ')
-      .convert(object)
-      .replaceAll("\\n", "\n")
-      .replaceAll("\\", "");
+  String convertToJsonString(Map<String, dynamic>? object) =>
+      JsonEncoder.withIndent('  ')
+          .convert(object)
+          .replaceAll("\\n", "\n")
+          .replaceAll("\\", "");
 }

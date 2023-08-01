@@ -1,4 +1,3 @@
-import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -63,14 +62,16 @@ class OneSignalMockChannelController {
         this.state.deleteTags = call.arguments;
         return {"success": true};
       case "OneSignal#setExternalUserId":
-        this.state.externalId = (call.arguments as Map<dynamic, dynamic>)['externalUserId'] as String?;
-        return {"success" : true};
+        this.state.externalId = (call.arguments
+            as Map<dynamic, dynamic>)['externalUserId'] as String?;
+        return {"success": true};
       case "OneSignal#removeExternalUserId":
         this.state.externalId = null;
-        return {"success" : true};
+        return {"success": true};
       case "OneSignal#setLanguage":
-        this.state.language = (call.arguments as Map<dynamic, dynamic>)['language'] as String?;
-        return {"success" : true};
+        this.state.language =
+            (call.arguments as Map<dynamic, dynamic>)['language'] as String?;
+        return {"success": true};
     }
   }
 }

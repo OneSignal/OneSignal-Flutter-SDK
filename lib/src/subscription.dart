@@ -93,7 +93,8 @@ class OSEmailSubscriptionStateChanges extends JSONStringRepresentable {
 
   OSEmailSubscriptionStateChanges(Map<String, dynamic> json) {
     if (json.containsKey('from'))
-      this.from = OSEmailSubscriptionState(json['from'].cast<String, dynamic>());
+      this.from =
+          OSEmailSubscriptionState(json['from'].cast<String, dynamic>());
     if (json.containsKey('to'))
       this.to = OSEmailSubscriptionState(json['to'].cast<String, dynamic>());
   }
