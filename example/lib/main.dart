@@ -579,12 +579,14 @@ class OneSignalButtonState extends State<OneSignalButton> {
     return new Table(
       children: [
         new TableRow(children: [
-          new FlatButton(
-            disabledColor: Color.fromARGB(180, 212, 86, 83),
-            disabledTextColor: Colors.white,
-            color: Color.fromARGB(255, 212, 86, 83),
-            textColor: Colors.white,
-            padding: EdgeInsets.all(8.0),
+          new TextButton(
+            style: TextButton.styleFrom(
+              foregroundColor:Colors.white,
+              disabledForegroundColor: Colors.white,
+              backgroundColor: Color.fromARGB(255, 212, 86, 83),
+              disabledBackgroundColor:Color.fromARGB(180, 212, 86, 83),
+              padding: EdgeInsets.all(8.0),
+            ),
             child: new Text(widget.title),
             onPressed: widget.enabled ? widget.onPressed : null,
           )
