@@ -83,8 +83,6 @@
         [self setConsentRequired:call withResult:result];
     else if ([@"OneSignal#consentGiven" isEqualToString:call.method])
         [self setConsentGiven:call withResult:result];
-    else if ([@"OneSignal#setLaunchURLsInApp" isEqualToString:call.method])
-        [self setLaunchURLsInApp:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -119,14 +117,6 @@
 - (void)setConsentRequired:(FlutterMethodCall *)call withResult:(FlutterResult)result{
     BOOL required = [call.arguments[@"required"] boolValue];
     [OneSignal setConsentRequired:required];  
-    result(nil);
-}
-
-#pragma mark Launch Urls In App
-
-- (void)setLaunchURLsInApp:(FlutterMethodCall *)call withResult:(FlutterResult)result{
-    BOOL launchUrlsInApp = [call.arguments[@"launchUrlsInApp"] boolValue];
-    [OneSignal setLaunchURLsInApp:launchUrlsInApp];
     result(nil);
 }
 

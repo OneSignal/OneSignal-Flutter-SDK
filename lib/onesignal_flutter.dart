@@ -90,15 +90,4 @@ class OneSignal {
     return await _channel
         .invokeMethod("OneSignal#consentRequired", {'required': require});
   }
-
-  /// This method can be used to set if launch URLs should be opened in safari or
-  /// within the application. Set to true to launch all notifications with a URL
-  /// in the app instead of the default web browser. Make sure to call setLaunchURLsInApp
-  /// before the initialize call.
-  static Future<void> setLaunchURLsInApp(bool launchUrlsInApp) async {
-    if (Platform.isIOS) {
-      return await _channel.invokeMethod(
-          'OneSignal#setLaunchURLsInApp', {'launchUrlsInApp': launchUrlsInApp});
-    }
-  }
 }
