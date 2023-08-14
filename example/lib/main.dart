@@ -102,9 +102,6 @@ class _MyAppState extends State<MyApp> {
       print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
     });
 
-    // iOS-only method to open launch URLs in Safari when set to false
-    OneSignal.setLaunchURLsInApp(false);
-
     this.setState(() {
       _enableConsentButton = _requireConsent;
     });
