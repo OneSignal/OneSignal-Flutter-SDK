@@ -77,7 +77,7 @@
         [self initialize:call withResult:result];
     else if ([@"OneSignal#login" isEqualToString:call.method])
         [self login:call withResult:result];
-    else if ([@"OneSignal#login" isEqualToString:call.method])
+    else if ([@"OneSignal#logout" isEqualToString:call.method])
         [self logout:call withResult:result];
     else if ([@"OneSignal#consentRequired" isEqualToString:call.method])
         [self setConsentRequired:call withResult:result];
