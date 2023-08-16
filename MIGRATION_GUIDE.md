@@ -171,8 +171,6 @@ The SDK is still accessible via a `OneSignal` static class. It provides access t
 
 | `OneSignal.consentGiven(true);` | *Sets whether a user has consented to privacy prior to their user data being sent up to OneSignal. * |
 
-| `OneSignal.setLaunchURLsInApp(true);` | *(iOS only) This method can be used to set if launch URLs should be opened in safari or within the application. Set to `true` to launch all notifications with a URL in the app instead of the default web browser. Make sure to call `setLaunchURLsInApp` before the `initialize` call.* |  
-  
 
 ## Live Activities
 
