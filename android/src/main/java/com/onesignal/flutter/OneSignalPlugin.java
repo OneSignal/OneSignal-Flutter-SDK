@@ -39,7 +39,7 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
     this.context = context;
     this.messenger = messenger;
     OneSignalWrapper.setSdkType("flutter");  
-    // For 5.0.0-beta, hard code to reflect SDK version
+    // For 5.0.0, hard code to reflect SDK version
     OneSignalWrapper.setSdkVersion("050000");
     
     channel = new MethodChannel(messenger, "OneSignal");
