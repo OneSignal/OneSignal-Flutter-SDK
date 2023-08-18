@@ -1,4 +1,4 @@
-# Flutter v5.0.0-beta2 Migration Guide
+# Flutter v5.0.0 Migration Guide
 
 
 # Intro
@@ -154,7 +154,7 @@ OneSignal.User.removeSms("+15558675309");
 
 # API Reference
 
-Below is a comprehensive reference to the `5.0.0-beta2` OneSignal Flutter SDK.
+Below is a comprehensive reference to the `5.0.0` OneSignal Flutter SDK.
 
 ## OneSignal
 
@@ -438,12 +438,11 @@ The Debug namespace is accessible via `OneSignal.Debug` and provide access to de
 
 # Limitations
 **General**
-- This is a Beta release so please test thorougly prior to production use.
-- Aliases will be available in a future release
-- Outcomes will be available in a future release
-- Users are deleted when the last Subscription (push, email, or sms) is removed
+- Changing app IDs is not supported.
+- In the SDK, the user state is only refreshed from the server when a new session is started (cold start or backgrounded for over 30 seconds) or when the user is logged in. This is by design.
 - Any `User` namespace calls must be invoked **after** initialization. Example: `OneSignal.User.addTag("tag", "2")`
+
 
 # Known issues
 - Identity Verification
-- We will be introducing JWT in a follow up release
+  - We will be introducing JWT in a follow up release
