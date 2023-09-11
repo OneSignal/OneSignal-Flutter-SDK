@@ -52,7 +52,8 @@ class OneSignalUser {
   /// specific users and/or personalizing messages. If the tag [key] already
   /// exists, it will be replaced with the [value] provided here.
   Future<void> addTagWithKey(String key, dynamic value) async {
-    return await this.addTags({key: value});
+    var stringValue = value.toString();
+    return await this.addTags({key: stringValue});
   }
 
   /// Add multiple [tags] for the current user.
@@ -61,6 +62,9 @@ class OneSignalUser {
   /// specific users and/or personalizing messages. If the tag key already
   /// exists, it will be replaced with the value provided here.
   Future<void> addTags(Map<String, dynamic> tags) async {
+    tags.forEach((key, value) {
+      tags[key] = value.toString();
+    });
     return await _channel.invokeMethod("OneSignal#addTags", tags);
   }
 
