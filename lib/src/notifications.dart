@@ -119,6 +119,9 @@ class OneSignalNotifications {
 
   Future<void> lifecycleInit() async {
     _permission = await _channel.invokeMethod("OneSignal#permission");
+    addPermissionObserver((permission) {
+      _permission = permission;
+    });
     return await _channel.invokeMethod("OneSignal#lifecycleInit");
   }
 
