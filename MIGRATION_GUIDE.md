@@ -32,6 +32,34 @@ OneSignal uses a built-in **alias label** called `external_id` which supports ex
 
 The Flutter SDK accesses the OneSignal native iOS and Android SDKs. For this update, all SDK versions are aligning across OneSignal’s suite of client SDKs. As such, the Flutter SDK is making the jump from `v3` to `v5`.
 
+### Code Import Changes
+**Objective-C**
+
+```objc
+    // Replace the old import statement
+    #import <OneSignal/OneSignal.h>
+
+    // With the new import statement
+    #import <OneSignalFramework/OneSignalFramework.h>
+```
+**Swift**
+```swift
+    // Replace the old import statement
+    import OneSignal
+
+    // With the new import statement
+    import OneSignalFramework
+```
+
+### CocoaPods
+Update your podfile to use 5.0.0+ of the OneSignalXCFramework pod
+```
+target 'OneSignalNotificationServiceExtension' do
+  use_frameworks!
+  pod 'OneSignalXCFramework', '>= 5.0.0', '< 6.0'
+end
+```
+
 # API Changes
 
 ## Namespaces
