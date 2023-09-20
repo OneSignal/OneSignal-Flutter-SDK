@@ -85,9 +85,9 @@ class OneSignalSerializer {
         List<HashMap<String, Object>> convertedList = new ArrayList<HashMap<String, Object>>();
         for (IActionButton actionButton : actionButtons) {
             HashMap<String, Object> hash = new HashMap<>();
-            hash.put("i", actionButton.getId());
-            hash.put("n", actionButton.getText());
-            hash.put("icon_type", actionButton.getIcon());
+            hash.put("id", actionButton.getId());
+            hash.put("text", actionButton.getText());
+            hash.put("icon", actionButton.getIcon());
             convertedList.add(hash);
         }
         return convertedList;
