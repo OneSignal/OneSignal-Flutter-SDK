@@ -14,6 +14,7 @@ import com.onesignal.inAppMessages.IInAppMessageDidDisplayEvent;
 import com.onesignal.inAppMessages.IInAppMessageWillDismissEvent;
 import com.onesignal.inAppMessages.IInAppMessageDidDismissEvent;
 import com.onesignal.notifications.INotification;
+import com.onesignal.notifications.IActionButton;
 import com.onesignal.notifications.INotificationWillDisplayEvent;
 import com.onesignal.notifications.INotificationClickResult;
 import com.onesignal.notifications.INotificationClickEvent;
@@ -73,10 +74,23 @@ class OneSignalSerializer {
         if (notification.getAdditionalData() != null && notification.getAdditionalData().length() > 0)
             hash.put("additionalData", convertJSONObjectToHashMap(notification.getAdditionalData()));
         if (notification.getActionButtons() != null) {
-            hash.put("actionButtons", notification.getActionButtons());
+            hash.put("buttons", convertActionButtonsToMap
+            (notification.getActionButtons()));
         }
         hash.put("rawPayload", notification.getRawPayload());
         return hash;
+    }
+
+    static List<HashMap<String, Object>> convertActionButtonsToMap(List<IActionButton> actionButtons) {
+        List<HashMap<String, Object>> convertedList = new ArrayList<HashMap<String, Object>>();
+        for (IActionButton actionButton : actionButtons) {
+            HashMap<String, Object> hash = new HashMap<>();
+            hash.put("id", actionButton.getId());
+            hash.put("text", actionButton.getText());
+            hash.put("icon", actionButton.getIcon());
+            convertedList.add(hash);
+        }
+        return convertedList;
     }
 
     static HashMap<String, Object> convertNotificationWillDisplayEventToMap(INotificationWillDisplayEvent event) throws JSONException {
