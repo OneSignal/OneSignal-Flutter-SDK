@@ -68,6 +68,8 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
         this.lifecycleInit();
     else if (call.method.contentEquals("OneSignal#proceedWithWillDisplay"))
         this.proceedWithWillDisplay(call, result);
+    else if (call.method.contentEquals("OneSignal#addNativeClickListener"))
+        this.registerClickListener();
     else
         replyNotImplemented(result);
     }
@@ -184,7 +186,10 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
 
     private void lifecycleInit() {
         OneSignal.getNotifications().addForegroundLifecycleListener(this);
-        OneSignal.getNotifications().addClickListener(this);
         OneSignal.getNotifications().addPermissionObserver(this);
+    }
+
+    private void registerClickListener() {
+        OneSignal.getNotifications().addClickListener(this);
     }
 } 
