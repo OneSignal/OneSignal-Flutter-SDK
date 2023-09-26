@@ -55,6 +55,7 @@
 #pragma mark FlutterPlugin
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
 
+    [OneSignal initialize:nil withLaunchOptions:nil];
     OneSignalWrapper.sdkType = @"flutter";
     OneSignalWrapper.sdkVersion = @"050001";
     
