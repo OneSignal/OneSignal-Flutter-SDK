@@ -52,6 +52,8 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
     public void onMethodCall(MethodCall call, Result result) {
     if (call.method.contentEquals("OneSignal#permission"))
         replySuccess(result, OneSignal.getNotifications().getPermission());
+    else if (call.method.contentEquals("OneSignal#canRequest"))
+        replySuccess(result, OneSignal.getNotifications().getCanRequestPermission());
     else if (call.method.contentEquals("OneSignal#requestPermission"))
         this.requestPermission(call, result);
     else if (call.method.contentEquals("OneSignal#removeNotification"))
