@@ -275,6 +275,7 @@ The Notifications namespace is accessible via `OneSignal.Notifications` and prov
 | **Flutter** | **Description** |
 |---------------------------------------------------------------------------|--------------------------------------------------------------------------------------------------------------|
 | `var permission = OneSignal.Notifications.permission` | *Whether this app has push notification permission.* |
+| `var permissionNative = await OneSignal.Notifications.permissionNative()` | *(ios only) Returns the enum for the native permission of the device. It will be one of: notDetermined, denied, authorized, provisional (only available in iOS 12), ephemeral (only available in iOS 14)* |
 | `var canRequest = await OneSignal.Notifications.canRequest();` | *Whether attempting to request notification permission will show a prompt. Returns `true` if the device has not been prompted for push notification permission already.* |
 | `OneSignal.Notifications.clearAll();` | *Removes all OneSignal notifications.*|
 | `OneSignal.Notifications.removeNotification(int x);` | *(Android only) Cancels a single OneSignal notification based on its Android notification integer ID. Use instead of Android's [android.app.NotificationManager.cancel], otherwise the notification will be restored when your app is restarted.*|
@@ -342,6 +343,7 @@ The Location namespace is accessible via `OneSignal.Location` and provide access
 | **Flutter** | **Description** |
 | ----------------------------------------------------------|-------------------------------------------------------------------------------------------|
 | `OneSignal.Location.isShared();` | *Whether location is currently shared with OneSignal.*|
+| `OneSignal.Location.setShared(true);` | *Enable or disable location sharing.* |
 | `OneSignal.Location.requestPermission();` | *Use this method to manually prompt the user for location permissions. This allows for geotagging so you send notifications to users based on location.* |
 
 ## InAppMessages Namespace
