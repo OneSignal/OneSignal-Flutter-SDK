@@ -59,11 +59,7 @@ class OneSignalNotifications {
   /// Whether attempting to request notification permission will show a prompt.
   /// Returns true if the device has not been prompted for push notification permission already.
   Future<bool> canRequest() async {
-    if (Platform.isIOS) {
-      return await _channel.invokeMethod("OneSignal#canRequest");
-    } else {
-      return false;
-    }
+    return await _channel.invokeMethod("OneSignal#canRequest");
   }
 
   /// Removes a single notification.
