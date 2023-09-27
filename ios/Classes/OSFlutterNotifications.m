@@ -73,6 +73,8 @@
         [self lifecycleInit:call withResult:result];
     else if ([@"OneSignal#proceedWithWillDisplay" isEqualToString:call.method])
         [self proceedWithWillDisplay:call withResult:result];
+    else if ([@"OneSignal#addNativeClickListener" isEqualToString:call.method])
+        [self registerClickListener:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -103,8 +105,12 @@
 
 - (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     [OneSignal.Notifications addForegroundLifecycleListener:self];
-    [OneSignal.Notifications addClickListener:self];
     [OneSignal.Notifications addPermissionObserver:self];
+    result(nil);
+}
+
+- (void)registerClickListener:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal.Notifications addClickListener:self];
     result(nil);
 }
 
