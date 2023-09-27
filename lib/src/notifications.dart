@@ -31,6 +31,8 @@ class OneSignalNotifications {
 
   bool _permission = false;
 
+  bool _clickHandlerRegistered = false;
+
   /// Whether this app has push notification permission.
   bool get permission {
     return _permission;
@@ -177,6 +179,10 @@ class OneSignalNotifications {
   /// The notification click listener is called whenever the user opens a
   /// OneSignal push notification, or taps an action button on a notification.
   void addClickListener(OnNotificationClickListener listener) {
+    if (!_clickHandlerRegistered) {
+      _clickHandlerRegistered = true;
+      _channel.invokeMethod("OneSignal#addNativeClickListener");
+    }
     _clickListeners.add(listener);
   }
 
