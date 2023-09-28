@@ -28,10 +28,11 @@ class OneSignalPushSubscription {
     return this._token;
   }
 
-  /// Gets a boolean value indicating whether the current user is opted in to push notifications.
-  /// This returns true when the app has notifications permission and optedOut is called.
-  /// Note: Does not take into account the existence of the subscription ID and push token.
-  /// This boolean may return true but push notifications may still not be received by the user.
+  /// Gets a boolean value indicating whether the current user is opted in to receive push notifications.
+  /// If the device does not have push permission, optedIn is false.
+  /// If the device has push permission, but no push token or subscription ID yet, optedIn is true.
+  /// If the device has push permission and optOut() was not called, optedIn is true.
+  /// If the device has push permission and optOut() was called, optedIn is false.
   bool? get optedIn {
     return _optedIn;
   }
