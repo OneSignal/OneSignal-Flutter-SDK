@@ -23,6 +23,10 @@ apply plugin: 'com.android.library'
 
 android {
     compileSdkVersion 28
+    // Condition for namespace compatibility in AGP 8
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.onesignal.flutter'
+    }
 
     defaultConfig {
         minSdkVersion 16
