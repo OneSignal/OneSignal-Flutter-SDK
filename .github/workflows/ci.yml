@@ -27,7 +27,7 @@ jobs:
         run: flutter pub get
 
       - name: Static Analysis
-        run: flutter analyze --no-pub --no-fatal-infos
+        run: dart analyze
 
       - name: Ensure the Dart code is formatted correctly
         run: flutter format -o none --set-exit-if-changed .

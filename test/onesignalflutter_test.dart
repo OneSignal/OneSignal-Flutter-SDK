@@ -7,7 +7,6 @@ void main() {
 
   OneSignalMockChannelController channelController =
       OneSignalMockChannelController();
-  OneSignal onesignal = OneSignal();
 
   setUp(() {
     channelController.resetState();
