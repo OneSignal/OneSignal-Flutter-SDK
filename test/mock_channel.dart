@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 class OneSignalMockChannelController {
   MethodChannel _channel = const MethodChannel('OneSignal');
+  MethodChannel _debugChannel = const MethodChannel('OneSignal#debug');
   MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
 
   late OneSignalState state;
@@ -17,6 +18,7 @@ class OneSignalMockChannelController {
   OneSignalMockChannelController() {
     this._channel.setMockMethodCallHandler(_handleMethod);
     this._tagsChannel.setMockMethodCallHandler(_handleMethod);
+    this._debugChannel.setMockMethodCallHandler(_handleMethod);
   }
 
   void resetState() {
@@ -117,7 +119,7 @@ class OneSignalState {
   }
 
   void setLogLevel(Map<dynamic, dynamic> params) {
-    int? level = params['console'] as int?;
+    int? level = params['logLevel'] as int?;
     int? visual = params['visual'] as int?;
 
     if (level != null) this.logLevel = OSLogLevel.values[level];

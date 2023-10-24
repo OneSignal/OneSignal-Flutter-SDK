@@ -12,7 +12,7 @@ void main() {
     channelController.resetState();
   });
 
-  test('set set log level', () {
+  test('set log level', () {
     OneSignal.Debug.setLogLevel(
       OSLogLevel.info,
     ).then(expectAsync1((v) {
