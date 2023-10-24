@@ -23,12 +23,19 @@ class OneSignal {
   /// Note that the iOS and Android native libraries are static,
   /// so if you create multiple instances of OneSignal, they will
   /// mostly share the same state.
+  // ignore: non_constant_identifier_names
   static OneSignalDebug Debug = new OneSignalDebug();
+  // ignore: non_constant_identifier_names
   static OneSignalUser User = new OneSignalUser();
+  // ignore: non_constant_identifier_names
   static OneSignalNotifications Notifications = new OneSignalNotifications();
+  // ignore: non_constant_identifier_names
   static OneSignalSession Session = new OneSignalSession();
+  // ignore: non_constant_identifier_names
   static OneSignalLocation Location = new OneSignalLocation();
+  // ignore: non_constant_identifier_names
   static OneSignalInAppMessages InAppMessages = new OneSignalInAppMessages();
+  // ignore: non_constant_identifier_names
   static OneSignalLiveActivities LiveActivities = new OneSignalLiveActivities();
 
   // private channels used to bridge to ObjC/Java
