@@ -44,6 +44,8 @@ IInAppMessageClickListener, IInAppMessageLifecycleListener{
             this.removeTrigger(call, result);
         else if (call.method.contentEquals("OneSignal#removeTriggers"))
             this.removeTriggers(call, result);
+        else if (call.method.contentEquals("OneSignal#clearTriggers"))
+            this.clearTriggers(call, result);
         else if (call.method.contentEquals("OneSignal#arePaused"))
             replySuccess(result, OneSignal.getInAppMessages().getPaused());
         else if (call.method.contentEquals("OneSignal#paused"))
@@ -79,6 +81,11 @@ IInAppMessageClickListener, IInAppMessageLifecycleListener{
         } catch (ClassCastException e) {
             replyError(result, "OneSignal", "Remove triggers for keys failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
         }
+    }
+
+    private void clearTriggers(MethodCall call, Result result) {
+        OneSignal.getInAppMessages().clearTriggers();
+        replySuccess(result, null);
     }
 
     private void paused(MethodCall call, Result result) {
