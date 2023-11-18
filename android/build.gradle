@@ -22,6 +22,9 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
+    if (project.android.hasProperty("namespace")) {
+        namespace("com.onesignal.flutter") 
+    }
     compileSdkVersion 28
 
     defaultConfig {
