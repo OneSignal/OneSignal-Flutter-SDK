@@ -24,6 +24,10 @@ apply plugin: 'com.android.library'
 android {
     compileSdkVersion 28
 
+    if (project.android.hasProperty("namespace")) {
+         namespace 'com.onesignal.flutter'
+     }
+
     defaultConfig {
         minSdkVersion 16
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
