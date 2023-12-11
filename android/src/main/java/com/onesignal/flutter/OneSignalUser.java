@@ -58,6 +58,7 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
             language = null;
         }
         OneSignal.getUser().setLanguage(language);
+        replySuccess(result, null);
     }
 
     private void addAliases(MethodCall call, Result result) {
@@ -65,6 +66,7 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
         //  a ClassCastException will be thrown
         try {
             OneSignal.getUser().addAliases((Map<String, String>) call.arguments);
+            replySuccess(result, null);
         } catch(ClassCastException e) {
             replyError(result, "OneSignal", "addAliases failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
         }
@@ -75,6 +77,7 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
         //  a ClassCastException will be thrown
         try {
             OneSignal.getUser().removeAliases((List<String>) call.arguments);
+            replySuccess(result, null);
         } catch(ClassCastException e) {
             replyError(result, "OneSignal", "removeAliases failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
         }
@@ -105,6 +108,7 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
         //  a ClassCastException will be thrown
         try {
             OneSignal.getUser().addTags((Map<String, String>) call.arguments);
+            replySuccess(result, null);
         } catch(ClassCastException e) {
             replyError(result, "OneSignal", "addTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
         }
@@ -115,6 +119,7 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
         //  a ClassCastException will be thrown
         try {
             OneSignal.getUser().removeTags((List<String>) call.arguments);
+            replySuccess(result, null);
         } catch(ClassCastException e) {
             replyError(result, "OneSignal", "deleteTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
         }
