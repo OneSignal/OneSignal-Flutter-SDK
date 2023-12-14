@@ -231,7 +231,7 @@ class _MyAppState extends State<MyApp> {
     // Toggle pausing (displaying or not) of IAMs
     OneSignal.InAppMessages.paused(true);
     var arePaused = await OneSignal.InAppMessages.arePaused();
-    print('Notifications paused ${arePaused}');
+    print('Notifications paused $arePaused');
   }
 
   oneSignalOutcomeExamples() async {
