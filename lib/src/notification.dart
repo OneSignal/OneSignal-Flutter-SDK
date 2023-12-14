@@ -362,9 +362,7 @@ class OSNotificationWillDisplayEvent extends JSONStringRepresentable {
   }
 
   void preventDefault() {
-    if (notification != null) {
-      OneSignal.Notifications.preventDefault(notification.notificationId);
-    }
+    OneSignal.Notifications.preventDefault(notification.notificationId);
   }
 
   String jsonRepresentation() {
@@ -383,9 +381,7 @@ class OSNotificationClickEvent extends JSONStringRepresentable {
   }
 
   void preventDefault() {
-    if (notification != null) {
-      OneSignal.Notifications.preventDefault(notification.notificationId);
-    }
+    OneSignal.Notifications.preventDefault(notification.notificationId);
   }
 
   String jsonRepresentation() {

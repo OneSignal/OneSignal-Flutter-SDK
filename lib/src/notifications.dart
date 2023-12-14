@@ -3,7 +3,6 @@ import 'dart:io';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/notification.dart';
-import 'package:onesignal_flutter/src/permission.dart';
 
 typedef void OnNotificationPermissionChangeObserver(bool permission);
 

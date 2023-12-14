@@ -7,13 +7,12 @@ void main() {
 
   OneSignalMockChannelController channelController =
       OneSignalMockChannelController();
-  OneSignal onesignal = OneSignal();
 
   setUp(() {
     channelController.resetState();
   });
 
-  test('set set log level', () {
+  test('set log level', () {
     OneSignal.Debug.setLogLevel(
       OSLogLevel.info,
     ).then(expectAsync1((v) {
