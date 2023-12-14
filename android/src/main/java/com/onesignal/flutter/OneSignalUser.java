@@ -54,10 +54,11 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
 
     private void setLanguage(MethodCall call, Result result) {
         String language = call.argument("language");
-        if (language != null && language.length() == 0)
-          language = null;
-    
-          OneSignal.getUser().setLanguage(language);
+        if (language != null && language.length() == 0) {
+            language = null;
+        }
+        OneSignal.getUser().setLanguage(language);
+        replySuccess(result, null);
     }
 
     private void addAliases(MethodCall call, Result result) {
@@ -65,6 +66,7 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
         //  a ClassCastException will be thrown
         try {
             OneSignal.getUser().addAliases((Map<String, String>) call.arguments);
+            replySuccess(result, null);
         } catch(ClassCastException e) {
             replyError(result, "OneSignal", "addAliases failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
         }
@@ -75,6 +77,7 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
         //  a ClassCastException will be thrown
         try {
             OneSignal.getUser().removeAliases((List<String>) call.arguments);
+            replySuccess(result, null);
         } catch(ClassCastException e) {
             replyError(result, "OneSignal", "removeAliases failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
         }
@@ -83,27 +86,29 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
     private void addEmail(MethodCall call, Result result) {
         OneSignal.getUser().addEmail((String) call.arguments);
         replySuccess(result, null);
-      }
+    }
     
-      private void removeEmail(MethodCall call, Result result) {
+    private void removeEmail(MethodCall call, Result result) {
         OneSignal.getUser().removeEmail((String) call.arguments);
         replySuccess(result, null);
-      }
+    }
     
-      private void addSms(MethodCall call, Result result) {
+    private void addSms(MethodCall call, Result result) {
         OneSignal.getUser().addSms((String) call.arguments);
         replySuccess(result, null);
-      }
+    }
     
-      private void removeSms(MethodCall call, Result result) {
+    private void removeSms(MethodCall call, Result result) {
         OneSignal.getUser().removeSms((String) call.arguments);
         replySuccess(result, null);
-      }
-      private void addTags(MethodCall call, Result result) {
+    }
+
+    private void addTags(MethodCall call, Result result) {
         // call.arguments is being casted to a Map<String, Object> so a try-catch with
         //  a ClassCastException will be thrown
         try {
             OneSignal.getUser().addTags((Map<String, String>) call.arguments);
+            replySuccess(result, null);
         } catch(ClassCastException e) {
             replyError(result, "OneSignal", "addTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
         }
@@ -114,10 +119,9 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
         //  a ClassCastException will be thrown
         try {
             OneSignal.getUser().removeTags((List<String>) call.arguments);
+            replySuccess(result, null);
         } catch(ClassCastException e) {
             replyError(result, "OneSignal", "deleteTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
         }
     }
-    
-     
 }
