@@ -77,6 +77,12 @@ class OneSignalUser {
     return await _channel.invokeMethod("OneSignal#removeTags", tags);
   }
 
+  /// Returns the list of tags on the current user.
+  Future<Map<String, String>> getTags() async {
+    Map<dynamic, dynamic> tags = await _channel.invokeMethod("OneSignal#getTags");
+    return tags.cast<String, String>();
+  }
+
   /// Add a new [email] subscription to the current user.
   Future<void> addEmail(String email) async {
     return await _channel.invokeMethod("OneSignal#addEmail", email);

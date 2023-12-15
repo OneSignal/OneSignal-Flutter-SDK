@@ -48,6 +48,8 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
             this.addTags(call, result);
         else if (call.method.contentEquals("OneSignal#removeTags"))
             this.removeTags(call, result);
+        else if (call.method.contentEquals("OneSignal#getTags"))
+            this.getTags(call, result);
         else
             replyNotImplemented(result);
     }
@@ -123,5 +125,9 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
         } catch(ClassCastException e) {
             replyError(result, "OneSignal", "deleteTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
         }
+    }
+
+    private void getTags(MethodCall call, Result result) {
+        replySuccess(result, OneSignal.getUser().getTags());
     }
 }
