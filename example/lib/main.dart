@@ -132,6 +132,13 @@ class _MyAppState extends State<MyApp> {
     OneSignal.User.removeTags(['test']);
   }
 
+  void _handleGetTags() async {
+    print("Get tags");
+
+    var tags = await OneSignal.User.getTags();
+    print(tags);
+  }
+
   void _handlePromptForPushPermission() {
     print("Prompting for Permission");
     OneSignal.Notifications.requestPermission(true);
@@ -261,6 +268,10 @@ class _MyAppState extends State<MyApp> {
                   new TableRow(children: [
                     new OneSignalButton(
                         "Send Tags", _handleSendTags, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Get Tags", _handleGetTags, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new OneSignalButton("Prompt for Push Permission",
