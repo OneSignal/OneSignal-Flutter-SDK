@@ -221,7 +221,7 @@ The User name space is accessible via `OneSignal.User` and provides access to us
 | `OneSignal.User.addTags({"KEY_01": "VALUE_01", "KEY_02": "VALUE_02"});` | *Add multiple tags for the current user. Tags are key:value pairs used as building blocks for targeting specific users and/or personalizing messages. If the tag key already exists, it will be replaced with the value provided here.* |
 | `OneSignal.User.removeTag("KEY");` | *Remove the data tag with the provided key from the current user.* |
 | `OneSignal.User.removeTags(["KEY_01", "KEY_02"]);` | *Remove multiple tags with the provided keys from the current user.* |
-
+| `OneSignal.User.getTags();` | *Returns the local tags for the current user.* |
 
 
 ## Push Subscription Namespace
