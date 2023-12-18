@@ -87,7 +87,7 @@ class OneSignalUser {
   /// Returns false if the specified [email] does not exist
   /// on the user within the SDK, and no request will be made.
   Future<void> removeEmail(String email) async {
-    return await _channel.invokeMethod("OneSignal#removeEmail");
+    return await _channel.invokeMethod("OneSignal#removeEmail", email);
   }
 
   /// Add a new SMS subscription to the current user.

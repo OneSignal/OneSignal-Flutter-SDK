@@ -109,7 +109,7 @@
 }
 
 - (void)removeEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSString *email = call.arguments[@"email"];
+    NSString *email = call.arguments;
     [OneSignal.User removeEmail:email];
     result(nil);
 }
@@ -121,7 +121,7 @@
 }
 
 - (void)removeSms:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSString *smsNumber = call.arguments[@"smsNumber"];
+    NSString *smsNumber = call.arguments;
     [OneSignal.User removeSms:smsNumber];
     result(nil);
 }
