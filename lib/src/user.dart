@@ -77,7 +77,7 @@ class OneSignalUser {
     return await _channel.invokeMethod("OneSignal#removeTags", tags);
   }
 
-  /// Returns the list of tags on the current user.
+  /// Returns the local tags of the current user.
   Future<Map<String, String>> getTags() async {
     Map<dynamic, dynamic> tags =
         await _channel.invokeMethod("OneSignal#getTags");
