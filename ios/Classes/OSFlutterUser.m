@@ -55,6 +55,8 @@
         [self addTags:call withResult:result];
     else if ([@"OneSignal#removeTags" isEqualToString:call.method])
         [self removeTags:call withResult:result];
+    else if ([@"OneSignal#getTags" isEqualToString:call.method])
+        [self getTags:call withResult:result];
     else if ([@"OneSignal#addEmail" isEqualToString:call.method])
         [self addEmail:call withResult:result];
     else if ([@"OneSignal#removeEmail" isEqualToString:call.method])
@@ -100,6 +102,10 @@
     NSDictionary *tags = call.arguments;
     [OneSignal.User removeTags:tags];
     result(nil);
+}
+
+- (void)getTags:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    result([OneSignal.User getTags]);
 }
 
 - (void)addEmail:(FlutterMethodCall *)call withResult:(FlutterResult)result {
