@@ -78,6 +78,12 @@ public class OneSignalNotifications extends FlutterRegistrarResponder implements
 
     private void requestPermission(MethodCall call, Result result) {
         boolean fallback = (boolean) call.argument("fallbackToSettings");
+        // if permission already exists, return early as the method call will not resolve
+        if (OneSignal.getNotifications().getPermission()) {
+            replySuccess(result, true);
+            return;
+        }
+
         OneSignal.getNotifications().requestPermission(fallback, Continue.with(permissionResult -> {
             replySuccess(result, permissionResult.getData());
         }));
