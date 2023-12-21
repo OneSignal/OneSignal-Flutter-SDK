@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.source_files = 'Classes/**/*'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
-  s.dependency 'OneSignalXCFramework', '5.0.5'
+  s.dependency 'OneSignalXCFramework', '>= 5.0'
   s.ios.deployment_target = '11.0'
   s.static_framework = true
 end
