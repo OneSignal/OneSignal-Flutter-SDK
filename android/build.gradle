@@ -23,7 +23,7 @@ apply plugin: 'com.android.library'
 
 android {
 
-     if (project.android.hasProperty("namespace")) {
+    if (project.android.hasProperty("namespace")) {
         namespace 'com.onesignal.onesignalexample'  
     }
 

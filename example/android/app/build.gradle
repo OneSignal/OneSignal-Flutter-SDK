@@ -16,8 +16,8 @@ apply from: "$flutterRoot/packages/flutter_tools/gradle/flutter.gradle"
 
 android {
 
-     if (project.android.hasProperty("namespace")) {
-        namespace 'com.onesignal.onesignalexample'  
+    if (project.android.hasProperty("namespace")) {
+        namespace 'com.onesignal.onesignalexample'
     }
 
     compileSdkVersion 33
