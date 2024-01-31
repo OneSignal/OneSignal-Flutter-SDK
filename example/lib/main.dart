@@ -117,19 +117,11 @@ class _MyAppState extends State<MyApp> {
 
   void _handleSendTags() {
     print("Sending tags");
-    // OneSignal.shared.sendTag("test2", "val2").then((response) {
-    //   print("Successfully sent tags with response: $response");
-    // }).catchError((error) {
-    //   print("Encountered an error sending tags: $error");
-    // });
+    OneSignal.User.addTagWithKey("test2", "val2");
 
     print("Sending tags array");
-    var sendTags = {'test': 'value'};
-    // OneSignal.shared.sendTags(sendTags).then((response) {
-    //   print("Successfully sent tags with response: $response");
-    // }).catchError((error) {
-    //   print("Encountered an error sending tags: $error");
-    // });
+    var sendTags = {'test': 'value', 'test2': 'value2'};
+    OneSignal.User.addTags(sendTags);
   }
 
   void _handleRemoveTag() {
@@ -159,29 +151,29 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _handleSetEmail() {
-    // if (_emailAddress == null) return;
-
+    if (_emailAddress == null) return;
     print("Setting email");
 
     OneSignal.User.addEmail(_emailAddress!);
   }
 
-  void _handleSetLanguage() {
-    // if (_language == null) return;
+  void _handleRemoveEmail() {
+    if (_emailAddress == null) return;
+    print("Remove email");
 
     OneSignal.User.removeEmail(_emailAddress!);
   }
 
   void _handleSetSMSNumber() {
     if (_smsNumber == null) return;
-
     print("Setting SMS Number");
 
     OneSignal.User.addSms(_smsNumber!);
   }
 
-  void _handleLogoutSMSNumber() {
-    print("Logging out of smsNumber");
+  void _handleRemoveSMSNumber() {
+    if (_smsNumber == null) return;
+    print("Remove smsNumber");
 
     OneSignal.User.removeSms(_smsNumber!);
   }
