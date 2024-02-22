@@ -26,9 +26,9 @@
  */
 
 #import <Flutter/Flutter.h>
-#import <OneSignal/OneSignal.h>
+#import <OneSignalFramework/OneSignalFramework.h>
 
-@interface OneSignalPlugin : NSObject<FlutterPlugin, OSSubscriptionObserver, OSPermissionObserver, OSEmailSubscriptionObserver, OSSMSSubscriptionObserver, OSInAppMessageLifecycleHandler>
+@interface OneSignalPlugin : NSObject<FlutterPlugin>
 
 // Do NOT initialize instances of this class.
 // You must only reference the shared instance.

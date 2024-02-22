@@ -73,25 +73,96 @@
 }
 @end
 
-@implementation OSNotificationOpenedResult (Flutter)
+@implementation OSNotificationClickEvent (Flutter)
 - (NSDictionary *)toJson {
     NSMutableDictionary *json = [NSMutableDictionary new];
 
-    if (self.notification) json[@"notification"] = self.notification.toJson;
-    if (self.action.actionId) json[@"action"] = @{@"type" : @((int)self.action.type), @"id" : self.action.actionId};
+    json[@"notification"] = self.notification.toJson;
+    json[@"result"] = self.result.toJson;
 
     return json;
 }
 @end
 
-@implementation OSInAppMessageAction (Flutter)
+@implementation OSNotificationClickResult (Flutter)
 - (NSDictionary *)toJson {
     NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"click_name"] = self.clickName;
-    json[@"click_url"] = self.clickUrl.absoluteString;
-    json[@"first_click"] = @(self.firstClick);
-    json[@"closes_message"] = @(self.closesMessage);
+    json[@"action_id"] = self.actionId;
+    json[@"url"] = self.url;
+
+    return json;
+}
+@end
+
+@implementation OSNotificationWillDisplayEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"notification"] = self.notification.toJson;
+
+    return json;
+}
+@end
+
+@implementation OSInAppMessageWillDisplayEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"message"] = self.message.toJson;
+
+    return json;
+}
+@end
+
+@implementation OSInAppMessageDidDisplayEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"message"] = self.message.toJson;
+
+    return json;
+}
+@end
+
+@implementation OSInAppMessageWillDismissEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"message"] = self.message.toJson;
+
+    return json;
+}
+@end
+
+@implementation OSInAppMessageDidDismissEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"message"] = self.message.toJson;
+
+    return json;
+}
+@end
+
+@implementation OSInAppMessageClickEvent (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"message"] = self.message.toJson;
+    json[@"result"] = self.result.toJson;
+
+    return json;
+}
+@end
+
+@implementation OSInAppMessageClickResult (Flutter)
+- (NSDictionary *)toJson {
+    NSMutableDictionary *json = [NSMutableDictionary new];
+
+    json[@"action_id"] = self.actionId;
+    json[@"url"] = self.url;
+    json[@"closing_message"] = @(self.closingMessage);
 
     return json;
 }

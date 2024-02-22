@@ -10,6 +10,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 class OneSignalMockChannelController {
   MethodChannel _channel = const MethodChannel('OneSignal');
+  MethodChannel _debugChannel = const MethodChannel('OneSignal#debug');
   MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
 
   late OneSignalState state;
@@ -17,6 +18,7 @@ class OneSignalMockChannelController {
   OneSignalMockChannelController() {
     this._channel.setMockMethodCallHandler(_handleMethod);
     this._tagsChannel.setMockMethodCallHandler(_handleMethod);
+    this._debugChannel.setMockMethodCallHandler(_handleMethod);
   }
 
   void resetState() {
@@ -32,9 +34,9 @@ class OneSignalMockChannelController {
       case "OneSignal#setLogLevel":
         this.state.setLogLevel(call.arguments);
         break;
-      case "OneSignal#consentGranted":
-        this.state.consentGranted =
-            (call.arguments as Map<dynamic, dynamic>)['granted'] as bool?;
+      case "OneSignal#consentGiven":
+        this.state.consentGiven =
+            (call.arguments as Map<dynamic, dynamic>)['given'] as bool?;
         break;
       case "OneSignal#promptPermission":
         this.state.calledPromptPermission = true;
@@ -92,7 +94,7 @@ class OneSignalState {
   bool? requiresPrivacyConsent = false;
   late OSLogLevel logLevel;
   late OSLogLevel visualLevel;
-  bool? consentGranted = false;
+  bool? consentGiven = false;
   bool? calledPromptPermission;
   bool? locationShared;
   OSNotificationDisplayType? inFocusDisplayType;
@@ -117,14 +119,14 @@ class OneSignalState {
   }
 
   void setLogLevel(Map<dynamic, dynamic> params) {
-    int? level = params['console'] as int?;
+    int? level = params['logLevel'] as int?;
     int? visual = params['visual'] as int?;
 
     if (level != null) this.logLevel = OSLogLevel.values[level];
     if (visual != null) this.visualLevel = OSLogLevel.values[visual];
   }
 
-  void setRequiresPrivacyConsent(Map<dynamic, dynamic> params) {
+  void consentRequired(Map<dynamic, dynamic> params) {
     this.requiresPrivacyConsent = params['required'] as bool?;
   }
 

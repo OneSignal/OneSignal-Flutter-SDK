@@ -20,7 +20,7 @@ class _MyAppState extends State<MyApp> {
   bool _enableConsentButton = false;
 
   // CHANGE THIS parameter to true if you want to test GDPR privacy consent
-  bool _requireConsent = true;
+  bool _requireConsent = false;
 
   @override
   void initState() {
@@ -32,25 +32,50 @@ class _MyAppState extends State<MyApp> {
   Future<void> initPlatformState() async {
     if (!mounted) return;
 
-    OneSignal.shared.setLogLevel(OSLogLevel.verbose, OSLogLevel.none);
+    OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
 
-    OneSignal.shared.setRequiresUserPrivacyConsent(_requireConsent);
+    OneSignal.Debug.setAlertLevel(OSLogLevel.none);
+    OneSignal.consentRequired(_requireConsent);
 
-    OneSignal.shared
-        .setNotificationOpenedHandler((OSNotificationOpenedResult result) {
-      print('NOTIFICATION OPENED HANDLER CALLED WITH: $result');
+    // NOTE: Replace with your own app ID from https://www.onesignal.com
+    OneSignal.initialize("0ba9731b-33bd-43f4-8b59-61172e27447d");
+
+    // AndroidOnly stat only
+    // OneSignal.Notifications.removeNotification(1);
+    // OneSignal.Notifications.removeGroupedNotifications("group5");
+
+    OneSignal.Notifications.clearAll();
+
+    OneSignal.User.pushSubscription.addObserver((state) {
+      print(OneSignal.User.pushSubscription.optedIn);
+      print(OneSignal.User.pushSubscription.id);
+      print(OneSignal.User.pushSubscription.token);
+      print(state.current.jsonRepresentation());
+    });
+
+    OneSignal.Notifications.addPermissionObserver((state) {
+      print("Has permission " + state.toString());
+    });
+
+    OneSignal.Notifications.addClickListener((event) {
+      print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
       this.setState(() {
         _debugLabelString =
-            "Opened notification: \n${result.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
+            "Clicked notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
     });
 
-    OneSignal.shared.setNotificationWillShowInForegroundHandler(
-        (OSNotificationReceivedEvent event) {
-      print('FOREGROUND HANDLER CALLED WITH: $event');
+    OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+      print(
+          'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
 
-      /// Display Notification, send null to not display
-      event.complete(null);
+      /// Display Notification, preventDefault to not display
+      event.preventDefault();
+
+      /// Do async work
+
+      /// notification.display() to display after preventing default
+      event.notification.display();
 
       this.setState(() {
         _debugLabelString =
@@ -58,182 +83,104 @@ class _MyAppState extends State<MyApp> {
       });
     });
 
-    OneSignal.shared
-        .setInAppMessageClickedHandler((OSInAppMessageAction action) {
+    OneSignal.InAppMessages.addClickListener((event) {
       this.setState(() {
         _debugLabelString =
-            "In App Message Clicked: \n${action.jsonRepresentation().replaceAll("\\n", "\n")}";
+            "In App Message Clicked: \n${event.result.jsonRepresentation().replaceAll("\\n", "\n")}";
       });
     });
-
-    OneSignal.shared
-        .setSubscriptionObserver((OSSubscriptionStateChanges changes) {
-      print("SUBSCRIPTION STATE CHANGED: ${changes.jsonRepresentation()}");
+    OneSignal.InAppMessages.addWillDisplayListener((event) {
+      print("ON WILL DISPLAY IN APP MESSAGE ${event.message.messageId}");
     });
-
-    OneSignal.shared.setPermissionObserver((OSPermissionStateChanges changes) {
-      print("PERMISSION STATE CHANGED: ${changes.jsonRepresentation()}");
+    OneSignal.InAppMessages.addDidDisplayListener((event) {
+      print("ON DID DISPLAY IN APP MESSAGE ${event.message.messageId}");
     });
-
-    OneSignal.shared.setEmailSubscriptionObserver(
-        (OSEmailSubscriptionStateChanges changes) {
-      print("EMAIL SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
+    OneSignal.InAppMessages.addWillDismissListener((event) {
+      print("ON WILL DISMISS IN APP MESSAGE ${event.message.messageId}");
     });
-
-    OneSignal.shared
-        .setSMSSubscriptionObserver((OSSMSSubscriptionStateChanges changes) {
-      print("SMS SUBSCRIPTION STATE CHANGED ${changes.jsonRepresentation()}");
+    OneSignal.InAppMessages.addDidDismissListener((event) {
+      print("ON DID DISMISS IN APP MESSAGE ${event.message.messageId}");
     });
-
-    OneSignal.shared.setOnWillDisplayInAppMessageHandler((message) {
-      print("ON WILL DISPLAY IN APP MESSAGE ${message.messageId}");
-    });
-
-    OneSignal.shared.setOnDidDisplayInAppMessageHandler((message) {
-      print("ON DID DISPLAY IN APP MESSAGE ${message.messageId}");
-    });
-
-    OneSignal.shared.setOnWillDismissInAppMessageHandler((message) {
-      print("ON WILL DISMISS IN APP MESSAGE ${message.messageId}");
-    });
-
-    OneSignal.shared.setOnDidDismissInAppMessageHandler((message) {
-      print("ON DID DISMISS IN APP MESSAGE ${message.messageId}");
-    });
-
-    // NOTE: Replace with your own app ID from https://www.onesignal.com
-    await OneSignal.shared.setAppId("380dc082-5231-4cc2-ab51-a03da5a0e4c2");
-
-    // iOS-only method to open launch URLs in Safari when set to false
-    OneSignal.shared.setLaunchURLsInApp(false);
-
-    bool requiresConsent = await OneSignal.shared.requiresUserPrivacyConsent();
 
     this.setState(() {
-      _enableConsentButton = requiresConsent;
+      _enableConsentButton = _requireConsent;
     });
 
     // Some examples of how to use In App Messaging public methods with OneSignal SDK
     oneSignalInAppMessagingTriggerExamples();
 
-    OneSignal.shared.disablePush(false);
-
     // Some examples of how to use Outcome Events public methods with OneSignal SDK
-    oneSignalOutcomeEventsExamples();
+    oneSignalOutcomeExamples();
 
-    bool userProvidedPrivacyConsent =
-        await OneSignal.shared.userProvidedPrivacyConsent();
-    print("USER PROVIDED PRIVACY CONSENT: $userProvidedPrivacyConsent");
-  }
-
-  void _handleGetTags() {
-    OneSignal.shared.getTags().then((tags) {
-      if (tags.isEmpty) return;
-
-      setState((() {
-        _debugLabelString = "$tags";
-      }));
-    }).catchError((error) {
-      setState(() {
-        _debugLabelString = "$error";
-      });
-    });
+    OneSignal.InAppMessages.paused(true);
   }
 
   void _handleSendTags() {
     print("Sending tags");
-    OneSignal.shared.sendTag("test2", "val2").then((response) {
-      print("Successfully sent tags with response: $response");
-    }).catchError((error) {
-      print("Encountered an error sending tags: $error");
-    });
+    OneSignal.User.addTagWithKey("test2", "val2");
 
     print("Sending tags array");
-    var sendTags = {'test': 'value'};
-    OneSignal.shared.sendTags(sendTags).then((response) {
-      print("Successfully sent tags with response: $response");
-    }).catchError((error) {
-      print("Encountered an error sending tags: $error");
-    });
+    var sendTags = {'test': 'value', 'test2': 'value2'};
+    OneSignal.User.addTags(sendTags);
+  }
+
+  void _handleRemoveTag() {
+    print("Deleting tag");
+    OneSignal.User.removeTag("test2");
+
+    print("Deleting tags array");
+    OneSignal.User.removeTags(['test']);
+  }
+
+  void _handleGetTags() async {
+    print("Get tags");
+
+    var tags = await OneSignal.User.getTags();
+    print(tags);
   }
 
   void _handlePromptForPushPermission() {
     print("Prompting for Permission");
-    OneSignal.shared.promptUserForPushNotificationPermission().then((accepted) {
-      print("Accepted permission: $accepted");
-    });
-  }
-
-  void _handleGetDeviceState() async {
-    print("Getting DeviceState");
-    OneSignal.shared.getDeviceState().then((deviceState) {
-      print("DeviceState: ${deviceState?.jsonRepresentation()}");
-      this.setState(() {
-        _debugLabelString =
-            deviceState?.jsonRepresentation() ?? "Device state null";
-      });
-    });
-  }
-
-  void _handleSetEmail() {
-    if (_emailAddress == null) return;
-
-    print("Setting email");
-
-    OneSignal.shared.setEmail(email: _emailAddress!).whenComplete(() {
-      print("Successfully set email");
-    }).catchError((error) {
-      print("Failed to set email with error: $error");
-    });
+    OneSignal.Notifications.requestPermission(true);
   }
 
   void _handleSetLanguage() {
     if (_language == null) return;
-
     print("Setting language");
-
-    OneSignal.shared.setLanguage(_language!).then((response) {
-      print("Successfully set language with response: $response");
-    }).catchError((error) {
-      print("Failed to set language with error: $error");
-    });
+    OneSignal.User.setLanguage(_language!);
   }
 
-  void _handleLogoutEmail() {
-    print("Logging out of email");
+  void _handleSetEmail() {
+    if (_emailAddress == null) return;
+    print("Setting email");
 
-    OneSignal.shared.logoutEmail().then((v) {
-      print("Successfully logged out of email");
-    }).catchError((error) {
-      print("Failed to log out of email: $error");
-    });
+    OneSignal.User.addEmail(_emailAddress!);
+  }
+
+  void _handleRemoveEmail() {
+    if (_emailAddress == null) return;
+    print("Remove email");
+
+    OneSignal.User.removeEmail(_emailAddress!);
   }
 
   void _handleSetSMSNumber() {
     if (_smsNumber == null) return;
-
     print("Setting SMS Number");
 
-    OneSignal.shared.setSMSNumber(smsNumber: _smsNumber!).then((response) {
-      print("Successfully set SMSNumber with response $response");
-    }).catchError((error) {
-      print("Failed to set SMS Number with error: $error");
-    });
+    OneSignal.User.addSms(_smsNumber!);
   }
 
-  void _handleLogoutSMSNumber() {
-    print("Logging out of smsNumber");
+  void _handleRemoveSMSNumber() {
+    if (_smsNumber == null) return;
+    print("Remove smsNumber");
 
-    OneSignal.shared.logoutSMSNumber().then((response) {
-      print("Successfully logoutEmail with response $response");
-    }).catchError((error) {
-      print("Failed to log out of SMSNumber: $error");
-    });
+    OneSignal.User.removeSms(_smsNumber!);
   }
 
   void _handleConsent() {
     print("Setting consent to true");
-    OneSignal.shared.consentGranted(true);
+    OneSignal.consentGiven(true);
 
     print("Setting state");
     this.setState(() {
@@ -243,150 +190,66 @@ class _MyAppState extends State<MyApp> {
 
   void _handleSetLocationShared() {
     print("Setting location shared to true");
-    OneSignal.shared.setLocationShared(true);
+    OneSignal.Location.setShared(true);
   }
 
-  void _handleDeleteTag() {
-    print("Deleting tag");
-    OneSignal.shared.deleteTag("test2").then((response) {
-      print("Successfully deleted tags with response $response");
-    }).catchError((error) {
-      print("Encountered error deleting tag: $error");
-    });
-
-    print("Deleting tags array");
-    OneSignal.shared.deleteTags(['test']).then((response) {
-      print("Successfully sent tags with response: $response");
-    }).catchError((error) {
-      print("Encountered an error sending tags: $error");
-    });
-  }
-
-  void _handleSetExternalUserId() {
+  void _handleLogin() {
     print("Setting external user ID");
     if (_externalUserId == null) return;
-
-    OneSignal.shared.setExternalUserId(_externalUserId!).then((results) {
-      if (results.isEmpty) return;
-
-      this.setState(() {
-        _debugLabelString = "External user id set: $results";
-      });
-    });
+    OneSignal.login(_externalUserId!);
+    OneSignal.User.addAlias("fb_id", "1341524");
   }
 
-  void _handleRemoveExternalUserId() {
-    OneSignal.shared.removeExternalUserId().then((results) {
-      if (results.isEmpty) return;
-
-      this.setState(() {
-        _debugLabelString = "External user id removed: $results";
-      });
-    });
-  }
-
-  void _handleSendNotification() async {
-    var deviceState = await OneSignal.shared.getDeviceState();
-
-    if (deviceState == null || deviceState.userId == null) return;
-
-    var playerId = deviceState.userId!;
-
-    var imgUrlString =
-        "http://cdn1-www.dogtime.com/assets/uploads/gallery/30-impossibly-cute-puppies/impossibly-cute-puppy-2.jpg";
-
-    var notification = OSCreateNotification(
-        playerIds: [playerId],
-        content: "this is a test from OneSignal's Flutter SDK",
-        heading: "Test Notification",
-        iosAttachments: {"id1": imgUrlString},
-        bigPicture: imgUrlString,
-        buttons: [
-          OSActionButton(text: "test1", id: "id1"),
-          OSActionButton(text: "test2", id: "id2")
-        ]);
-
-    var response = await OneSignal.shared.postNotification(notification);
-
-    this.setState(() {
-      _debugLabelString = "Sent notification with response: $response";
-    });
-  }
-
-  void _handleSendSilentNotification() async {
-    var deviceState = await OneSignal.shared.getDeviceState();
-
-    if (deviceState == null || deviceState.userId == null) return;
-
-    var playerId = deviceState.userId!;
-
-    var notification = OSCreateNotification.silentNotification(
-        playerIds: [playerId], additionalData: {'test': 'value'});
-
-    var response = await OneSignal.shared.postNotification(notification);
-
-    this.setState(() {
-      _debugLabelString = "Sent notification with response: $response";
-    });
+  void _handleLogout() {
+    OneSignal.logout();
+    OneSignal.User.removeAlias("fb_id");
   }
 
   oneSignalInAppMessagingTriggerExamples() async {
     /// Example addTrigger call for IAM
     /// This will add 1 trigger so if there are any IAM satisfying it, it
     /// will be shown to the user
-    OneSignal.shared.addTrigger("trigger_1", "one");
+    OneSignal.InAppMessages.addTrigger("trigger_1", "one");
 
     /// Example addTriggers call for IAM
     /// This will add 2 triggers so if there are any IAM satisfying these, they
     /// will be shown to the user
-    Map<String, Object> triggers = new Map<String, Object>();
+    Map<String, String> triggers = new Map<String, String>();
     triggers["trigger_2"] = "two";
     triggers["trigger_3"] = "three";
-    OneSignal.shared.addTriggers(triggers);
+    OneSignal.InAppMessages.addTriggers(triggers);
 
     // Removes a trigger by its key so if any future IAM are pulled with
     // these triggers they will not be shown until the trigger is added back
-    OneSignal.shared.removeTriggerForKey("trigger_2");
-
-    // Get the value for a trigger by its key
-    Object? triggerValue =
-        await OneSignal.shared.getTriggerValueForKey("trigger_3");
-    print("'trigger_3' key trigger value: ${triggerValue?.toString()}");
+    OneSignal.InAppMessages.removeTrigger("trigger_2");
 
     // Create a list and bulk remove triggers based on keys supplied
     List<String> keys = ["trigger_1", "trigger_3"];
-    OneSignal.shared.removeTriggersForKeys(keys);
+    OneSignal.InAppMessages.removeTriggers(keys);
 
     // Toggle pausing (displaying or not) of IAMs
-    OneSignal.shared.pauseInAppMessages(false);
+    OneSignal.InAppMessages.paused(true);
+    var arePaused = await OneSignal.InAppMessages.arePaused();
+    print('Notifications paused $arePaused');
   }
 
-  oneSignalOutcomeEventsExamples() async {
-    // Await example for sending outcomes
-    outcomeAwaitExample();
+  oneSignalOutcomeExamples() async {
+    OneSignal.Session.addOutcome("normal_1");
+    OneSignal.Session.addOutcome("normal_2");
 
-    // Send a normal outcome and get a reply with the name of the outcome
-    OneSignal.shared.sendOutcome("normal_1");
-    OneSignal.shared.sendOutcome("normal_2").then((outcomeEvent) {
-      print(outcomeEvent.jsonRepresentation());
-    });
+    OneSignal.Session.addUniqueOutcome("unique_1");
+    OneSignal.Session.addUniqueOutcome("unique_2");
 
-    // Send a unique outcome and get a reply with the name of the outcome
-    OneSignal.shared.sendUniqueOutcome("unique_1");
-    OneSignal.shared.sendUniqueOutcome("unique_2").then((outcomeEvent) {
-      print(outcomeEvent.jsonRepresentation());
-    });
-
-    // Send an outcome with a value and get a reply with the name of the outcome
-    OneSignal.shared.sendOutcomeWithValue("value_1", 3.2);
-    OneSignal.shared.sendOutcomeWithValue("value_2", 3.9).then((outcomeEvent) {
-      print(outcomeEvent.jsonRepresentation());
-    });
+    OneSignal.Session.addOutcomeWithValue("value_1", 3.2);
+    OneSignal.Session.addOutcomeWithValue("value_2", 3.9);
   }
 
-  Future<void> outcomeAwaitExample() async {
-    var outcomeEvent = await OneSignal.shared.sendOutcome("await_normal_1");
-    print(outcomeEvent.jsonRepresentation());
+  void _handleOptIn() {
+    OneSignal.User.pushSubscription.optIn();
+  }
+
+  void _handleOptOut() {
+    OneSignal.User.pushSubscription.optOut();
   }
 
   @override
@@ -404,19 +267,15 @@ class _MyAppState extends State<MyApp> {
                 children: [
                   new TableRow(children: [
                     new OneSignalButton(
-                        "Get Tags", _handleGetTags, !_enableConsentButton)
+                        "Send Tags", _handleSendTags, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new OneSignalButton(
-                        "Send Tags", _handleSendTags, !_enableConsentButton)
+                        "Get Tags", _handleGetTags, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new OneSignalButton("Prompt for Push Permission",
                         _handlePromptForPushPermission, !_enableConsentButton)
-                  ]),
-                  new TableRow(children: [
-                    new OneSignalButton("Print Device State",
-                        _handleGetDeviceState, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new TextField(
@@ -443,7 +302,7 @@ class _MyAppState extends State<MyApp> {
                         "Set Email", _handleSetEmail, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
-                    new OneSignalButton("Logout Email", _handleLogoutEmail,
+                    new OneSignalButton("Logout Email", _handleRemoveEmail,
                         !_enableConsentButton)
                   ]),
                   new TableRow(children: [
@@ -471,8 +330,8 @@ class _MyAppState extends State<MyApp> {
                         !_enableConsentButton)
                   ]),
                   new TableRow(children: [
-                    new OneSignalButton("Logout SMS Number",
-                        _handleLogoutSMSNumber, !_enableConsentButton)
+                    new OneSignalButton("Remove SMS Number",
+                        _handleRemoveSMSNumber, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new OneSignalButton("Provide GDPR Consent", _handleConsent,
@@ -484,15 +343,7 @@ class _MyAppState extends State<MyApp> {
                   ]),
                   new TableRow(children: [
                     new OneSignalButton(
-                        "Delete Tag", _handleDeleteTag, !_enableConsentButton)
-                  ]),
-                  new TableRow(children: [
-                    new OneSignalButton("Post Notification",
-                        _handleSendNotification, !_enableConsentButton)
-                  ]),
-                  new TableRow(children: [
-                    new OneSignalButton("Post Silent Notification",
-                        _handleSendSilentNotification, !_enableConsentButton)
+                        "Remove Tag", _handleRemoveTag, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new TextField(
@@ -515,12 +366,12 @@ class _MyAppState extends State<MyApp> {
                     )
                   ]),
                   new TableRow(children: [
-                    new OneSignalButton("Set External User ID",
-                        _handleSetExternalUserId, !_enableConsentButton)
+                    new OneSignalButton("Set External User ID", _handleLogin,
+                        !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new OneSignalButton("Remove External User ID",
-                        _handleRemoveExternalUserId, !_enableConsentButton)
+                        _handleLogout, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new TextField(
@@ -552,6 +403,14 @@ class _MyAppState extends State<MyApp> {
                       alignment: Alignment.center,
                     )
                   ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Opt In", _handleOptIn, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton(
+                        "Opt Out", _handleOptOut, !_enableConsentButton)
+                  ]),
                 ],
               ),
             ),
@@ -581,10 +440,10 @@ class OneSignalButtonState extends State<OneSignalButton> {
         new TableRow(children: [
           new TextButton(
             style: TextButton.styleFrom(
-              foregroundColor:Colors.white,
+              foregroundColor: Colors.white,
               disabledForegroundColor: Colors.white,
               backgroundColor: Color.fromARGB(255, 212, 86, 83),
-              disabledBackgroundColor:Color.fromARGB(180, 212, 86, 83),
+              disabledBackgroundColor: Color.fromARGB(180, 212, 86, 83),
               padding: EdgeInsets.all(8.0),
             ),
             child: new Text(widget.title),
