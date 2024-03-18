@@ -47,6 +47,10 @@
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
     if ([@"OneSignal#setLanguage" isEqualToString:call.method])
         [self setLanguage:call withResult:result];
+    else if ([@"OneSignal#getOnesignalId" isEqualToString:call.method])
+        [self getOnesignalId:call withResult:result];
+    else if ([@"OneSignal#getExternalId" isEqualToString:call.method])
+        [self getExternalId:call withResult:result];
     else if ([@"OneSignal#addAliases" isEqualToString:call.method])
         [self addAliases:call withResult:result];
     else if ([@"OneSignal#removeAliases" isEqualToString:call.method])
@@ -132,4 +136,11 @@
     result(nil);
 }
 
+- (void)getOnesignalId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    result(OneSignal.User.onesignalId);
+}
+
+- (void)getExternalId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    result(OneSignal.User.externalId);
+}
 @end

@@ -111,4 +111,18 @@ class OneSignalUser {
   Future<void> removeSms(String smsNumber) async {
     return await _channel.invokeMethod("OneSignal#removeSms", smsNumber);
   }
+
+  /// Returns the nullable External ID for the current user.
+  Future<String?> getExternalId() async {
+    final String? externalId =
+        await _channel.invokeMethod("OneSignal#getExternalId");
+    return externalId;
+  }
+
+  /// Returns the nullable OneSignal ID for the current user.
+  Future<String?> getOnesignalId() async {
+    final String? onesignalId =
+        await _channel.invokeMethod("OneSignal#getOnesignalId");
+    return onesignalId;
+  }
 }

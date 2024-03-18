@@ -193,6 +193,11 @@ class _MyAppState extends State<MyApp> {
     OneSignal.Location.setShared(true);
   }
 
+  void _handleGetExternalId() async {
+    var externalId = await OneSignal.User.getExternalId();
+    print('External ID: $externalId');
+  }
+
   void _handleLogin() {
     print("Setting external user ID");
     if (_externalUserId == null) return;
@@ -203,6 +208,11 @@ class _MyAppState extends State<MyApp> {
   void _handleLogout() {
     OneSignal.logout();
     OneSignal.User.removeAlias("fb_id");
+  }
+
+  void _handleGetOnesignalId() async {
+    var onesignalId = await OneSignal.User.getOnesignalId();
+    print('OneSignal ID: $onesignalId');
   }
 
   oneSignalInAppMessagingTriggerExamples() async {
@@ -366,12 +376,20 @@ class _MyAppState extends State<MyApp> {
                     )
                   ]),
                   new TableRow(children: [
+                    new OneSignalButton("Get External User ID",
+                        _handleGetExternalId, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
                     new OneSignalButton("Set External User ID", _handleLogin,
                         !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new OneSignalButton("Remove External User ID",
                         _handleLogout, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Get OneSignal ID",
+                        _handleGetOnesignalId, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new TextField(

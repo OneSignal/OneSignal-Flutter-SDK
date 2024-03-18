@@ -32,6 +32,10 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
     public void onMethodCall(MethodCall call, Result result) {
         if (call.method.contentEquals("OneSignal#setLanguage"))
             this.setLanguage(call, result);
+        else if (call.method.contentEquals("OneSignal#getOnesignalId"))
+            this.getOnesignalId(call, result);
+        else if (call.method.contentEquals("OneSignal#getExternalId"))
+            this.getExternalId(call, result);
         else if (call.method.contentEquals("OneSignal#addAliases"))
             this.addAliases(call, result);
         else if (call.method.contentEquals("OneSignal#removeAliases"))
@@ -63,6 +67,22 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
         replySuccess(result, null);
     }
 
+    private void getOnesignalId(MethodCall call, Result result) {
+        String onesignalId = OneSignal.getUser().getOnesignalId();
+        if (onesignalId.isEmpty()) {
+            onesignalId = null;
+        }
+        replySuccess(result, onesignalId);
+    }      
+
+    private void getExternalId(MethodCall call, Result result) {
+        String externalId = OneSignal.getUser().getExternalId();
+        if (externalId.isEmpty()) {
+            externalId = null;
+        }
+        replySuccess(result, externalId);
+    }
+    
     private void addAliases(MethodCall call, Result result) {
         // call.arguments is being casted to a Map<String, Object> so a try-catch with
         //  a ClassCastException will be thrown
