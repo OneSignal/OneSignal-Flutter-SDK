@@ -209,6 +209,9 @@ The User name space is accessible via `OneSignal.User` and provides access to us
 | **Flutter** | **Description** |
 | ----------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `OneSignal.User.setLanguage("en");` | *Set the 2-character language for this user.* |
+| `OneSignal.User.addObserver(OnUserChangeObserver observer);` <br><br>**_See below for usage_** | *Add a User State observer which contains the nullable onesignalId and externalId. The listener will be fired when these values change.* |
+| `await OneSignal.User.getOnesignalId();` | *Returns the nullable OneSignal ID for the current user.* |
+| `await OneSignal.User.getExternalId();` | *Returns the nullable External ID for the current user.* |
 | `OneSignal.User.addAlias("ALIAS_LABEL", "ALIAS_ID");` | *Set an alias for the current user. If this alias label already exists on this user, it will be overwritten with the new alias id.* |
 | `OneSignal.User.addAliases({ALIAS_LABEL_01: "ALIAS_ID_01", ALIAS_LABEL_02: "ALIAS_ID_02"});` | *Set aliases for the current user. If any alias already exists, it will be overwritten to the new values.* |
 | `OneSignal.User.removeAlias("ALIAS_LABEL");` | *Remove an alias from the current user.* |
@@ -222,6 +225,20 @@ The User name space is accessible via `OneSignal.User` and provides access to us
 | `OneSignal.User.removeTag("KEY");` | *Remove the data tag with the provided key from the current user.* |
 | `OneSignal.User.removeTags(["KEY_01", "KEY_02"]);` | *Remove multiple tags with the provided keys from the current user.* |
 | `OneSignal.User.getTags();` | *Returns the local tags for the current user.* |
+
+### User State Observer
+
+The `OnUserChangeObserver` will be fired when the user changes. This method's parameter is the current `UserChangedState` which includes the current state.
+
+```dart
+OneSignal.User.addObserver((state) {
+	var userState = state.jsonRepresentation();
+    print('OneSignal user changed: $userState');
+});
+
+/// Remove a user state observer that has been previously added.
+OneSignal.User.removeObserver(observer);
+```
 
 
 ## Push Subscription Namespace
