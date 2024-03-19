@@ -1,7 +1,44 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 
+import 'package:onesignal_flutter/src/utils.dart';
 import 'package:onesignal_flutter/src/pushsubscription.dart';
+
+typedef void OnUserChangeObserver(OSUserChangedState stateChanges);
+
+/// Represents the current user state with OneSignal.
+class OSUserState extends JSONStringRepresentable {
+  String? onesignalId;
+  String? externalId;
+
+  OSUserState(Map<String, dynamic> json) {
+    if (json.containsKey('onesignalId'))
+      this.onesignalId = json['onesignalId'] as String?;
+    if (json.containsKey('externalId'))
+      this.externalId = json['externalId'] as String?;
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString(
+        {'onesignalId': this.onesignalId, 'externalId': this.externalId});
+  }
+}
+
+/// An instance of this class describes a change in the user state.
+class OSUserChangedState extends JSONStringRepresentable {
+  late OSUserState current;
+
+  OSUserChangedState(Map<String, dynamic> json) {
+    if (json.containsKey('current'))
+      this.current = OSUserState(json['current'].cast<String, dynamic>());
+  }
+
+  String jsonRepresentation() {
+    return convertToJsonString(<String, dynamic>{
+      'current': current.jsonRepresentation(),
+    });
+  }
+}
 
 class OneSignalUser {
   static OneSignalPushSubscription _pushSubscription =
@@ -11,6 +48,12 @@ class OneSignalUser {
 
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal#user');
+
+  List<OnUserChangeObserver> _observers = <OnUserChangeObserver>[];
+  // constructor method
+  OneSignalUser() {
+    this._channel.setMethodCallHandler(_handleMethod);
+  }
 
   /// Sets the user's language.
   ///
@@ -124,5 +167,36 @@ class OneSignalUser {
     final String? onesignalId =
         await _channel.invokeMethod("OneSignal#getOnesignalId");
     return onesignalId;
+  }
+
+  /// Add an observer that fires when the OneSignal User state changes.
+  /// *Important* When using the observer to retrieve the onesignalId, check the
+  /// externalId as well to confirm the values are associated with the expected user.*
+  void addObserver(OnUserChangeObserver observer) {
+    _observers.add(observer);
+  }
+
+  // Remove a user state observer that has been previously added.
+  void removeObserver(OnUserChangeObserver observer) {
+    _observers.remove(observer);
+  }
+
+  Future<void> lifecycleInit() async {
+    return await _channel.invokeMethod("OneSignal#lifecycleInit");
+  }
+
+  // Private function that gets called by ObjC/Java
+  Future<Null> _handleMethod(MethodCall call) async {
+    if (call.method == 'OneSignal#onUserStateChange') {
+      this._onUserStateChange(
+          OSUserChangedState(call.arguments.cast<String, dynamic>()));
+    }
+    return null;
+  }
+
+  void _onUserStateChange(OSUserChangedState stateChanges) async {
+    for (var observer in _observers) {
+      observer(stateChanges);
+    }
   }
 }

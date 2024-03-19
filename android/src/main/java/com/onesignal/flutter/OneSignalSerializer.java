@@ -2,6 +2,8 @@ package com.onesignal.flutter;
 
 import android.util.Log;
 
+import com.onesignal.user.state.UserChangedState;
+import com.onesignal.user.state.UserState;
 import com.onesignal.user.subscriptions.ISubscription;
 import com.onesignal.user.subscriptions.IPushSubscription;
 import com.onesignal.user.subscriptions.PushSubscriptionChangedState;
@@ -187,6 +189,18 @@ class OneSignalSerializer {
         return hash;
     }
 
+    static HashMap<String, Object> convertUserState(UserState state) throws JSONException {
+        HashMap<String, Object> hash = new HashMap<>();
+    
+        String onesignalId = setNullIfEmpty(state.getOnesignalId());
+        String externalId = setNullIfEmpty(state.getExternalId());
+    
+        hash.put("onesignalId", onesignalId);
+        hash.put("externalId", externalId);
+    
+        return hash;
+    }
+
     static HashMap<String, Object> convertOnPushSubscriptionChange(PushSubscriptionChangedState changedState) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
         
@@ -197,6 +211,14 @@ class OneSignalSerializer {
         return hash;
     }
 
+    static HashMap<String, Object> convertOnUserStateChange(UserChangedState changedState) throws JSONException {
+        HashMap<String, Object> hash = new HashMap<>();
+
+        
+        hash.put("current", convertUserState(changedState.getCurrent()));
+    
+        return hash;
+    }
 
     static HashMap<String, Object> convertJSONObjectToHashMap(JSONObject object) throws JSONException {
         HashMap<String, Object> hash = new HashMap<>();
@@ -241,5 +263,10 @@ class OneSignalSerializer {
         }
 
         return list;
+    }
+
+    /** Helper method to return null value if string is empty **/
+    static String setNullIfEmpty(String value) {
+        return value.isEmpty() ? null : value;
     }
 }

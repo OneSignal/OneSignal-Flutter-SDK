@@ -2,6 +2,9 @@ package com.onesignal.flutter;
 
 import com.onesignal.OneSignal;
 import com.onesignal.debug.LogLevel;
+import com.onesignal.debug.internal.logging.Logging;
+import com.onesignal.user.state.IUserStateObserver;
+import com.onesignal.user.state.UserChangedState;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -18,8 +21,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-public class OneSignalUser extends FlutterRegistrarResponder implements MethodCallHandler {
-    private MethodChannel channel;
+public class OneSignalUser extends FlutterRegistrarResponder implements MethodCallHandler, IUserStateObserver {
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalUser controller = new OneSignalUser();
@@ -54,6 +56,8 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
             this.removeTags(call, result);
         else if (call.method.contentEquals("OneSignal#getTags"))
             this.getTags(call, result);
+        else if (call.method.contentEquals("OneSignal#lifecycleInit"))
+            this.lifecycleInit();
         else
             replyNotImplemented(result);
     }
@@ -65,6 +69,10 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
         }
         OneSignal.getUser().setLanguage(language);
         replySuccess(result, null);
+    }
+
+    private void lifecycleInit() {
+        OneSignal.getUser().addObserver(this);
     }
 
     private void getOnesignalId(MethodCall call, Result result) {
@@ -149,5 +157,15 @@ public class OneSignalUser extends FlutterRegistrarResponder implements MethodCa
 
     private void getTags(MethodCall call, Result result) {
         replySuccess(result, OneSignal.getUser().getTags());
+    }
+
+    @Override
+    public void onUserStateChange(UserChangedState userChangedState) {
+        try {
+            invokeMethodOnUiThread("OneSignal#onUserStateChange", OneSignalSerializer.convertOnUserStateChange(userChangedState));
+        } catch (JSONException e) {
+            e.getStackTrace();
+            Logging.error("Encountered an error attempting to convert UserChangedState object to hash map:" + e.toString(), null);
+        }
     }
 }

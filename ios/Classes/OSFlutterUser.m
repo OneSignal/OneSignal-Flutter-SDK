@@ -69,7 +69,8 @@
         [self addSms:call withResult:result];
     else if ([@"OneSignal#removeSms" isEqualToString:call.method])
         [self removeSms:call withResult:result];
-    
+    else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
+        [self lifecycleInit:call withResult:result];
     else
         result(FlutterMethodNotImplemented);
 }
@@ -136,11 +137,41 @@
     result(nil);
 }
 
+- (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    [OneSignal.User addObserver:self];
+    result(nil);
+}
+
+- (void)onUserStateDidChangeWithState:(OSUserChangedState *)state {
+    NSString *onesignalId = [self getStringOrNSNull:state.current.onesignalId];
+    NSString *externalId = [self getStringOrNSNull:state.current.externalId];
+
+    NSMutableDictionary *result = [NSMutableDictionary new];
+    
+    NSMutableDictionary *currentObject = [NSMutableDictionary new];
+    
+    currentObject[@"onesignalId"] = onesignalId;
+    currentObject[@"externalId"] = externalId;
+    result[@"current"] = currentObject;
+
+    [self.channel invokeMethod:@"OneSignal#onUserStateChange" arguments:result];
+}
+
 - (void)getOnesignalId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     result(OneSignal.User.onesignalId);
 }
 
 - (void)getExternalId:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     result(OneSignal.User.externalId);
+}
+
+/** Helper method to return NSNull if string is empty or nil **/
+- (NSString *)getStringOrNSNull:(NSString *)string {
+    // length method can be used on nil and strings
+    if (string.length > 0) {
+        return string;
+    } else {
+        return [NSNull null];
+    }
 }
 @end
