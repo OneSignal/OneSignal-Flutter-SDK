@@ -53,6 +53,11 @@ class _MyAppState extends State<MyApp> {
       print(state.current.jsonRepresentation());
     });
 
+    OneSignal.User.addObserver((state) {
+      var userState = state.jsonRepresentation();
+      print('OneSignal user changed: $userState');
+    });
+
     OneSignal.Notifications.addPermissionObserver((state) {
       print("Has permission " + state.toString());
     });
