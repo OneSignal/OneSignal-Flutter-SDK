@@ -33,6 +33,7 @@
 #import "OSFlutterSession.h"
 #import "OSFlutterLocation.h"
 #import "OSFlutterInAppMessages.h"
+#import "OSFlutterLiveActivities.h"
 
 
 @interface OneSignalPlugin ()
@@ -70,7 +71,7 @@
     [OSFlutterSession registerWithRegistrar:registrar];
     [OSFlutterLocation registerWithRegistrar:registrar];
     [OSFlutterInAppMessages registerWithRegistrar:registrar];
-    
+    [OSFlutterLiveActivities registerWithRegistrar:registrar];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
