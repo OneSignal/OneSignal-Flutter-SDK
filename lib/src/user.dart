@@ -157,16 +157,12 @@ class OneSignalUser {
 
   /// Returns the nullable External ID for the current user.
   Future<String?> getExternalId() async {
-    final String? externalId =
-        await _channel.invokeMethod("OneSignal#getExternalId");
-    return externalId;
+    return await _channel.invokeMethod("OneSignal#getExternalId");
   }
 
   /// Returns the nullable OneSignal ID for the current user.
   Future<String?> getOnesignalId() async {
-    final String? onesignalId =
-        await _channel.invokeMethod("OneSignal#getOnesignalId");
-    return onesignalId;
+    return await _channel.invokeMethod("OneSignal#getOnesignalId");
   }
 
   /// Add an observer that fires when the OneSignal User state changes.
