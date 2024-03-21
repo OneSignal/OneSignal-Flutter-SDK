@@ -58,7 +58,7 @@
 
     [OneSignal initialize:nil withLaunchOptions:nil];
     OneSignalWrapper.sdkType = @"flutter";
-    OneSignalWrapper.sdkVersion = @"050102";
+    OneSignalWrapper.sdkVersion = @"050103";
     
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
                                      methodChannelWithName:@"OneSignal"
