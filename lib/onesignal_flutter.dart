@@ -48,6 +48,7 @@ class OneSignal {
   static void initialize(String appId) {
     _channel.invokeMethod('OneSignal#initialize', {'appId': appId});
     InAppMessages.lifecycleInit();
+    User.lifecycleInit();
     User.pushSubscription.lifecycleInit();
     Notifications.lifecycleInit();
   }
