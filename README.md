@@ -2,7 +2,8 @@
   <img src="https://media.onesignal.com/cms/Website%20Layout/logo-red.svg"/>
 </p>
 
-### OneSignal Flutter SDK [![Build Status](https://travis-ci.org/OneSignal/OneSignal-Flutter-SDK.svg?branch=master)](https://travis-ci.org/OneSignal/OneSignal-Flutter-SDK)
+### OneSignal Flutter SDK
+[![Build Status](https://travis-ci.org/OneSignal/OneSignal-Flutter-SDK.svg?branch=main)](https://travis-ci.org/OneSignal/OneSignal-Flutter-SDK)
 
 ---
 
