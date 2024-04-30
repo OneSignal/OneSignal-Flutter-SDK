@@ -27,6 +27,7 @@
 
 #import "OSFlutterLiveActivities.h"
 #import <OneSignalFramework/OneSignalFramework.h>
+#import "OneSignalLiveActivities/OneSignalLiveActivities-Swift.h"
 #import "OSFlutterCategories.h"
 
 @implementation OSFlutterLiveActivities
@@ -45,6 +46,14 @@
         [self enterLiveActivity:call withResult:result];
     else if ([@"OneSignal#exitLiveActivity" isEqualToString:call.method])
         [self exitLiveActivity:call withResult:result];
+    else if ([@"OneSignal#setPushToStartToken" isEqualToString:call.method])
+        [self setPushToStartToken:call withResult:result];
+    else if ([@"OneSignal#removePushToStartToken" isEqualToString:call.method])
+        [self removePushToStartToken:call withResult:result];
+    else if ([@"OneSignal#setupDefault" isEqualToString:call.method])
+        [self setupDefault:call withResult:result];
+    else if ([@"OneSignal#startDefault" isEqualToString:call.method])
+        [self startDefault:call withResult:result];
     else 
         result(FlutterMethodNotImplemented);
 }
@@ -68,6 +77,61 @@
     } withFailure:^(NSError *error) {
         result(error.flutterError);
     }];
+}
+
+- (void)setPushToStartToken:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *activityType = call.arguments[@"activityType"];
+    NSString *token = call.arguments[@"token"];
+
+    @autoreleasepool {
+        NSError* err=nil;
+        [OneSignalLiveActivitiesManagerImpl setPushToStartToken:activityType withToken:token error:&err];
+        if (err) {
+            [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"activityType must be the name of your ActivityAttributes struct"]];
+        }
+    }
+}
+
+- (void)removePushToStartToken:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *activityType = call.arguments[@"activityType"];
+
+    @autoreleasepool {
+        NSError* err=nil;
+        [OneSignalLiveActivitiesManagerImpl removePushToStartToken:activityType error:&err];
+        if (err) {
+            [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"activityType must be the name of your ActivityAttributes struct"]];
+        }
+    }
+}
+
+- (void)setupDefault:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSDictionary *options = call.arguments[@"options"];
+
+    LiveActivitySetupOptions *laOptions = nil;
+
+    if (options != [NSNull null]) {
+        laOptions = [LiveActivitySetupOptions alloc];
+        [laOptions setEnablePushToStart:[options[@"enablePushToStart"] boolValue]];
+        [laOptions setEnablePushToUpdate:[options[@"enablePushToUpdate"] boolValue]];
+    }
+
+    if (@available(iOS 16.1, *)) {
+        [OneSignalLiveActivitiesManagerImpl setupDefaultWithOptions:laOptions];
+    } else {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot setupDefault on iOS < 16.1"]];
+    }
+}
+
+- (void)startDefault:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    NSString *activityId = call.arguments[@"activityId"];
+    NSDictionary *attributes = call.arguments[@"attributes"];
+    NSDictionary *content = call.arguments[@"content"];
+
+    if (@available(iOS 16.1, *)) {
+        [OneSignalLiveActivitiesManagerImpl startDefault:activityId attributes:attributes content:content];
+    } else {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot startDefault on iOS < 16.1"]];
+    }
 }
 
 @end

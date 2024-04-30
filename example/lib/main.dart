@@ -17,6 +17,7 @@ class _MyAppState extends State<MyApp> {
   String? _smsNumber;
   String? _externalUserId;
   String? _language;
+  String? _liveActivityId;
   bool _enableConsentButton = false;
 
   // CHANGE THIS parameter to true if you want to test GDPR privacy consent
@@ -38,7 +39,10 @@ class _MyAppState extends State<MyApp> {
     OneSignal.consentRequired(_requireConsent);
 
     // NOTE: Replace with your own app ID from https://www.onesignal.com
-    OneSignal.initialize("0ba9731b-33bd-43f4-8b59-61172e27447d");
+    OneSignal.initialize("77e32082-ea27-42e3-a898-c72e141824ef");
+
+    OneSignal.LiveActivities.setupDefault();
+    // OneSignal.LiveActivities.setupDefault(options: new LiveActivitySetupOptions(enablePushToStart: false, enablePushToUpdate: true));
 
     // AndroidOnly stat only
     // OneSignal.Notifications.removeNotification(1);
@@ -267,6 +271,36 @@ class _MyAppState extends State<MyApp> {
     OneSignal.User.pushSubscription.optOut();
   }
 
+  void _handleStartDefaultLiveActivity() {
+    if (_liveActivityId == null) return;
+    print("Starting default live activity");
+    OneSignal.LiveActivities.startDefault(_liveActivityId!, {"title": "Welcome!"}, { "message": { "en": "Hello World!" }, "intValue": 3, "doubleValue": 3.14, "boolValue": true});
+  }
+
+  void _handleEnterLiveActivity() {
+    if (_liveActivityId == null) return;
+    print("Entering live activity");
+    OneSignal.LiveActivities.enterLiveActivity(_liveActivityId!, "FAKE_TOKEN");
+  }
+
+  void _handleExitLiveActivity() {
+    if (_liveActivityId == null) return;
+    print("Exiting live activity");
+    OneSignal.LiveActivities.exitLiveActivity(_liveActivityId!);
+  }
+
+  void _handleSetPushToStartLiveActivity() {
+    if (_liveActivityId == null) return;
+    print("Setting Push-To-Start live activity");
+    OneSignal.LiveActivities.setPushToStartToken(_liveActivityId!, "FAKE_TOKEN");
+  }
+
+  void _handleRemovePushToStartLiveActivity() {
+    if (_liveActivityId == null) return;
+    print("Setting Push-To-Start live activity");
+    OneSignal.LiveActivities.removePushToStartToken(_liveActivityId!);
+  }
+
   @override
   Widget build(BuildContext context) {
     return new MaterialApp(
@@ -433,6 +467,46 @@ class _MyAppState extends State<MyApp> {
                   new TableRow(children: [
                     new OneSignalButton(
                         "Opt Out", _handleOptOut, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new TextField(
+                      textAlign: TextAlign.center,
+                      decoration: InputDecoration(
+                          hintText: "Live Activity ID",
+                          labelStyle: TextStyle(
+                            color: Color.fromARGB(255, 212, 86, 83),
+                          )),
+                      onChanged: (text) {
+                        this.setState(() {
+                          _liveActivityId = text == "" ? null : text;
+                        });
+                      },
+                    )
+                  ]),
+                  new TableRow(children: [
+                    Container(
+                      height: 8.0,
+                    )
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Start Default Live Activity",
+                        _handleStartDefaultLiveActivity, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Enter Live Activity",
+                        _handleEnterLiveActivity, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Exit Live Activity",
+                        _handleExitLiveActivity, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Set Push-To-Start Live Activity",
+                        _handleSetPushToStartLiveActivity, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Remove Push-To-Start Live Activity",
+                        _handleRemovePushToStartLiveActivity, !_enableConsentButton)
                   ]),
                 ],
               ),
