@@ -29,16 +29,14 @@ flutter_ios_podfile_setup
 
 target 'Runner' do
   flutter_install_all_ios_pods File.dirname(File.realpath(__FILE__))
-
-  pod 'OneSignalXCFramework', :path => '~/Development/OneSignal/onesignal-ios-sdk'
 end
 
 target 'OneSignalNotificationServiceExtension' do
-  pod 'OneSignalXCFramework', :path => '~/Development/OneSignal/onesignal-ios-sdk'
+  pod 'OneSignalXCFramework', '>= 5.0.2', '< 6.0.0'
 end
 
 target 'ExampleWidgetExtension' do
-  pod 'OneSignalXCFramework', :path => '~/Development/OneSignal/onesignal-ios-sdk'
+  pod 'OneSignalXCFramework', '>= 5.0.2', '< 6.0.0'
 end
 
 post_install do |installer|
