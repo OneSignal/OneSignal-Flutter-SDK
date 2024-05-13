@@ -274,7 +274,14 @@ class _MyAppState extends State<MyApp> {
   void _handleStartDefaultLiveActivity() {
     if (_liveActivityId == null) return;
     print("Starting default live activity");
-    OneSignal.LiveActivities.startDefault(_liveActivityId!, {"title": "Welcome!"}, { "message": { "en": "Hello World!" }, "intValue": 3, "doubleValue": 3.14, "boolValue": true});
+    OneSignal.LiveActivities.startDefault(_liveActivityId!, {
+      "title": "Welcome!"
+    }, {
+      "message": {"en": "Hello World!"},
+      "intValue": 3,
+      "doubleValue": 3.14,
+      "boolValue": true
+    });
   }
 
   void _handleEnterLiveActivity() {
@@ -292,7 +299,8 @@ class _MyAppState extends State<MyApp> {
   void _handleSetPushToStartLiveActivity() {
     if (_liveActivityId == null) return;
     print("Setting Push-To-Start live activity");
-    OneSignal.LiveActivities.setPushToStartToken(_liveActivityId!, "FAKE_TOKEN");
+    OneSignal.LiveActivities.setPushToStartToken(
+        _liveActivityId!, "FAKE_TOKEN");
   }
 
   void _handleRemovePushToStartLiveActivity() {
@@ -501,12 +509,16 @@ class _MyAppState extends State<MyApp> {
                         _handleExitLiveActivity, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
-                    new OneSignalButton("Set Push-To-Start Live Activity",
-                        _handleSetPushToStartLiveActivity, !_enableConsentButton)
+                    new OneSignalButton(
+                        "Set Push-To-Start Live Activity",
+                        _handleSetPushToStartLiveActivity,
+                        !_enableConsentButton)
                   ]),
                   new TableRow(children: [
-                    new OneSignalButton("Remove Push-To-Start Live Activity",
-                        _handleRemovePushToStartLiveActivity, !_enableConsentButton)
+                    new OneSignalButton(
+                        "Remove Push-To-Start Live Activity",
+                        _handleRemovePushToStartLiveActivity,
+                        !_enableConsentButton)
                   ]),
                 ],
               ),
