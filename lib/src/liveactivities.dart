@@ -38,9 +38,9 @@ class OneSignalLiveActivities {
   /// parameter can be provided for more granular setup options.
   ///
   /// Only applies to iOS.
-  Future<void> setupDefault({LiveActivitySetupOptions? options=null}) async {
+  Future<void> setupDefault({LiveActivitySetupOptions? options}) async {
     if (Platform.isIOS) {
-      dynamic optionsMap = null;
+      dynamic optionsMap;
       
       if(options != null) {
         optionsMap = {
