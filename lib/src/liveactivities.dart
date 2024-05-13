@@ -19,7 +19,7 @@ class OneSignalLiveActivities {
 
   /// Indicate this device has exited a live activity, identified within OneSignal by the [activityId].
   ///
-  /// Only applies to iOS.   
+  /// Only applies to iOS.
   Future<void> exitLiveActivity(String activityId) async {
     if (Platform.isIOS) {
       return await _channel.invokeMethod(
@@ -41,16 +41,16 @@ class OneSignalLiveActivities {
   Future<void> setupDefault({LiveActivitySetupOptions? options}) async {
     if (Platform.isIOS) {
       dynamic optionsMap;
-      
-      if(options != null) {
+
+      if (options != null) {
         optionsMap = {
           'enablePushToStart': options.enablePushToStart,
           'enablePushToUpdate': options.enablePushToUpdate,
         };
-      } 
+      }
 
-      return await _channel.invokeMethod(
-          "OneSignal#setupDefault", {'options': optionsMap });
+      return await _channel
+          .invokeMethod("OneSignal#setupDefault", {'options': optionsMap});
     }
   }
 
@@ -60,10 +60,14 @@ class OneSignalLiveActivities {
   /// provided.
   ///
   /// Only applies to iOS.
-  Future<void> startDefault(String activityId, dynamic attributes, dynamic content) async {
+  Future<void> startDefault(
+      String activityId, dynamic attributes, dynamic content) async {
     if (Platform.isIOS) {
-      return await _channel.invokeMethod(
-          "OneSignal#startDefault", { 'activityId': activityId, 'attributes': attributes, 'content': content });
+      return await _channel.invokeMethod("OneSignal#startDefault", {
+        'activityId': activityId,
+        'attributes': attributes,
+        'content': content
+      });
     }
   }
 
@@ -98,7 +102,8 @@ class LiveActivitySetupOptions {
   bool _enablePushToStart = true;
   bool _enablePushToUpdate = true;
 
-  LiveActivitySetupOptions({bool enablePushToStart = true, bool enablePushToUpdate = true}) {
+  LiveActivitySetupOptions(
+      {bool enablePushToStart = true, bool enablePushToUpdate = true}) {
     this._enablePushToStart = enablePushToStart;
     this._enablePushToUpdate = enablePushToUpdate;
   }
