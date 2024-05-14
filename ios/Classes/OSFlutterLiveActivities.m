@@ -82,26 +82,34 @@
 - (void)setPushToStartToken:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString *activityType = call.arguments[@"activityType"];
     NSString *token = call.arguments[@"token"];
+    NSError* err=nil;
 
-    @autoreleasepool {
-        NSError* err=nil;
+    if (@available(iOS 17.2, *)) {
         [OneSignalLiveActivitiesManagerImpl setPushToStartToken:activityType withToken:token error:&err];
         if (err) {
             [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"activityType must be the name of your ActivityAttributes struct"]];
         }
+    } else {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot setPushToStartToken on iOS < 17.2"]];
     }
+
+    result(nil);
 }
 
 - (void)removePushToStartToken:(FlutterMethodCall *)call withResult:(FlutterResult)result {
     NSString *activityType = call.arguments[@"activityType"];
+    NSError* err=nil;
 
-    @autoreleasepool {
-        NSError* err=nil;
+    if (@available(iOS 17.2, *)) {
         [OneSignalLiveActivitiesManagerImpl removePushToStartToken:activityType error:&err];
         if (err) {
             [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"activityType must be the name of your ActivityAttributes struct"]];
         }
+    } else {
+        [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot removePushToStartToken on iOS < 17.2"]];
     }
+
+    result(nil);
 }
 
 - (void)setupDefault:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -120,6 +128,8 @@
     } else {
         [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot setupDefault on iOS < 16.1"]];
     }
+
+    result(nil);
 }
 
 - (void)startDefault:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -132,6 +142,8 @@
     } else {
         [OneSignalLog onesignalLog:ONE_S_LL_ERROR message:[NSString stringWithFormat:@"cannot startDefault on iOS < 16.1"]];
     }
+
+    result(nil);
 }
 
 @end
