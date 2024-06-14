@@ -57,10 +57,13 @@ class OneSignal {
   ///
   /// The act of logging a user into the OneSignal SDK will switch the
   /// user context to that specific user.
-  static Future<void> login(String externalId) async {
-    return await _channel
-        .invokeMethod('OneSignal#login', {'externalId': externalId});
-  }
+  /// 
+
+ 
+  static Future<Map<String, String>> login(String externalId) async {
+  await _channel.invokeMethod('OneSignal#login', {'externalId': externalId});
+  return {'externalId': externalId};
+}
 
   /// Login to OneSignal under the user identified by the [externalId] provided.
   ///
