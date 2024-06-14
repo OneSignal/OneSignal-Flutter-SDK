@@ -41,6 +41,8 @@ class OneSignal {
   // private channels used to bridge to ObjC/Java
   static MethodChannel _channel = const MethodChannel('OneSignal');
 
+  static String? _externalId;
+
   /// The initializer for OneSignal.
   ///
   /// The initializer accepts an [appId] which the developer can get
@@ -59,10 +61,19 @@ class OneSignal {
   /// user context to that specific user.
   /// 
 
+ /*   static Future<void> login(String externalId) async {
+     await _channel
+        .invokeMethod('OneSignal#login', {'externalId': externalId});
+      
+  } */
  
-  static Future<Map<String, String>> login(String externalId) async {
-  await _channel.invokeMethod('OneSignal#login', {'externalId': externalId});
-  return {'externalId': externalId};
+static Future<String?> login(String externalId) async {
+  final Map<dynamic, dynamic>? result = await _channel.invokeMethod('OneSignal#login', {'externalId': externalId});
+  if (result != null && result['externalId'] != null) {
+    return result['externalId'];
+  } else {
+    return null;
+  }
 }
 
   /// Login to OneSignal under the user identified by the [externalId] provided.
