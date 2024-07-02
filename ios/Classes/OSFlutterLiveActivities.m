@@ -80,6 +80,7 @@
 }
 
 - (void)setPushToStartToken:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    #if !TARGET_OS_MACCATALYST
     NSString *activityType = call.arguments[@"activityType"];
     NSString *token = call.arguments[@"token"];
     NSError* err=nil;
@@ -94,9 +95,11 @@
     }
 
     result(nil);
+    #endif
 }
 
 - (void)removePushToStartToken:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    #if !TARGET_OS_MACCATALYST
     NSString *activityType = call.arguments[@"activityType"];
     NSError* err=nil;
 
@@ -110,9 +113,11 @@
     }
 
     result(nil);
+    #endif
 }
 
 - (void)setupDefault:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    #if !TARGET_OS_MACCATALYST
     NSDictionary *options = call.arguments[@"options"];
 
     LiveActivitySetupOptions *laOptions = nil;
@@ -130,9 +135,11 @@
     }
 
     result(nil);
+    #endif
 }
 
 - (void)startDefault:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+    #if !TARGET_OS_MACCATALYST
     NSString *activityId = call.arguments[@"activityId"];
     NSDictionary *attributes = call.arguments[@"attributes"];
     NSDictionary *content = call.arguments[@"content"];
@@ -144,6 +151,7 @@
     }
 
     result(nil);
+    #endif
 }
 
 @end
