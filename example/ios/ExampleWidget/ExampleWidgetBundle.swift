@@ -9,9 +9,11 @@
 import WidgetKit
 import SwiftUI
 
+#if !targetEnvironment(macCatalyst)
 @main
 struct ExampleWidgetBundle: WidgetBundle {
     var body: some Widget {
         ExampleWidgetLiveActivity()
     }
 }
+#endif

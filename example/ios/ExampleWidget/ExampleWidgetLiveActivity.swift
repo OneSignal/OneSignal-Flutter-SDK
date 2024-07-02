@@ -6,6 +6,7 @@
 //  Copyright © 2024 The Chromium Authors. All rights reserved.
 //
 
+#if !targetEnvironment(macCatalyst)
 import ActivityKit
 import WidgetKit
 import SwiftUI
@@ -64,3 +65,4 @@ struct ExampleWidgetLiveActivity: Widget {
         }
     }
 }
+#endif
