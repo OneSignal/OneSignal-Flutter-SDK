@@ -132,7 +132,7 @@ Logging out has the affect of reverting to a device-scoped user, which is the ne
 
 ## Subscriptions
 
-In previous versions of the SDK, a “player” could have up to one email address and up to one phone number for SMS. In the user-centered model, a user can own the current device’s **Push Subscription** along with the ability to have **zero or more** email subscriptions and **zero or more** SMS subscriptions. Note: If a new user logs in via the `login` method, the previous user will no longer longer own that push subscription.
+In previous versions of the SDK, a “player” could have up to one email address and up to one phone number for SMS. In the user-centered model, a user can own the current device’s **Push Subscription** along with the ability to have **zero or more** email subscriptions and **zero or more** SMS subscriptions. Note: If a new user logs in via the `login` method, the previous user will no longer own that push subscription.
 
 ### **Push Subscription**
 The current device’s push subscription can be retrieved via:
