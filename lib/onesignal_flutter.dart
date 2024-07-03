@@ -66,6 +66,8 @@ class OneSignal {
   ///
   /// The act of logging a user into the OneSignal SDK will switch the
   /// user context to that specific user.
+  @Deprecated(
+      'Do not use, this method is not implemented. See https://documentation.onesignal.com/docs/identity-verification for updates.')
   static Future<void> loginWithJWT(String externalId, String jwt) async {
     if (Platform.isAndroid) {
       return await _channel.invokeMethod(
