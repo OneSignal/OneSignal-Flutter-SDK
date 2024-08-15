@@ -16,9 +16,9 @@ class OneSignalMockChannelController {
   late OneSignalState state;
 
   OneSignalMockChannelController() {
-    this._channel.setMockMethodCallHandler(_handleMethod);
-    this._tagsChannel.setMockMethodCallHandler(_handleMethod);
-    this._debugChannel.setMockMethodCallHandler(_handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(_channel, _handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(_tagsChannel, _handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger.setMockMethodCallHandler(_debugChannel, _handleMethod);
   }
 
   void resetState() {
@@ -35,8 +35,7 @@ class OneSignalMockChannelController {
         this.state.setLogLevel(call.arguments);
         break;
       case "OneSignal#consentGiven":
-        this.state.consentGiven =
-            (call.arguments as Map<dynamic, dynamic>)['given'] as bool?;
+        this.state.consentGiven = (call.arguments as Map<dynamic, dynamic>)['given'] as bool?;
         break;
       case "OneSignal#promptPermission":
         this.state.calledPromptPermission = true;
@@ -48,8 +47,7 @@ class OneSignalMockChannelController {
         this.state.disablePush = call.arguments as bool?;
         break;
       case "OneSignal#postNotification":
-        this.state.postNotificationJson =
-            call.arguments as Map<dynamic, dynamic>?;
+        this.state.postNotificationJson = call.arguments as Map<dynamic, dynamic>?;
         return {"success": true};
       case "OneSignal#setLocationShared":
         this.state.locationShared = call.arguments as bool?;
@@ -64,15 +62,13 @@ class OneSignalMockChannelController {
         this.state.deleteTags = call.arguments;
         return {"success": true};
       case "OneSignal#setExternalUserId":
-        this.state.externalId = (call.arguments
-            as Map<dynamic, dynamic>)['externalUserId'] as String?;
+        this.state.externalId = (call.arguments as Map<dynamic, dynamic>)['externalUserId'] as String?;
         return {"success": true};
       case "OneSignal#removeExternalUserId":
         this.state.externalId = null;
         return {"success": true};
       case "OneSignal#setLanguage":
-        this.state.language =
-            (call.arguments as Map<dynamic, dynamic>)['language'] as String?;
+        this.state.language = (call.arguments as Map<dynamic, dynamic>)['language'] as String?;
         return {"success": true};
     }
   }
@@ -139,8 +135,7 @@ class OneSignalState {
 
   void setDisplayType(Map<dynamic, dynamic> params) {
     var type = params['displayType'] as int?;
-    if (type != null)
-      this.inFocusDisplayType = OSNotificationDisplayType.values[type];
+    if (type != null) this.inFocusDisplayType = OSNotificationDisplayType.values[type];
   }
 
   void setEmail(Map<dynamic, dynamic> params) {
