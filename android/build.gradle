@@ -22,7 +22,7 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 28
+    compileSdkVersion 34
     // Condition for namespace compatibility in AGP <4.2
     if (project.android.hasProperty("namespace")) {
         namespace 'com.onesignal.flutter'
