@@ -57,7 +57,7 @@
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
 
     OneSignalWrapper.sdkType = @"flutter";
-    OneSignalWrapper.sdkVersion = @"050205";
+    OneSignalWrapper.sdkVersion = @"050206";
     [OneSignal initialize:nil withLaunchOptions:nil];
 
     OneSignalPlugin.sharedInstance.channel = [FlutterMethodChannel
