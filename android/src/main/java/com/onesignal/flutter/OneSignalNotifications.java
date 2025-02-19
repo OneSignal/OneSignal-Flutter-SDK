@@ -1,5 +1,7 @@
 package com.onesignal.flutter;
 
+import android.os.Build;
+
 import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.OneSignal;
 import com.onesignal.Continue;
@@ -67,7 +69,8 @@ public class OneSignalNotifications extends FlutterMessengerResponder implements
     private void requestPermission(MethodCall call, Result result) {
         boolean fallback = (boolean) call.argument("fallbackToSettings");
         // if permission already exists, return early as the method call will not resolve
-        if (OneSignal.getNotifications().getPermission()) {
+        // Continue.with API below requires Android 7
+        if (OneSignal.getNotifications().getPermission() || Build.VERSION.SDK_INT < Build.VERSION_CODES.N) {
             replySuccess(result, true);
             return;
         }
