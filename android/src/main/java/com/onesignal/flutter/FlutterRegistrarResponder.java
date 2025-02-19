@@ -10,7 +10,6 @@ import java.util.HashMap;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry;
 
 abstract class FlutterRegistrarResponder {
    Context context;
