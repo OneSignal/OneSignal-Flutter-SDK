@@ -1,11 +1,7 @@
 package com.onesignal.flutter;
 
-import android.util.Log;
-
 import com.onesignal.user.state.UserChangedState;
 import com.onesignal.user.state.UserState;
-import com.onesignal.user.subscriptions.ISubscription;
-import com.onesignal.user.subscriptions.IPushSubscription;
 import com.onesignal.user.subscriptions.PushSubscriptionChangedState;
 import com.onesignal.user.subscriptions.PushSubscriptionState;
 import com.onesignal.inAppMessages.IInAppMessage;

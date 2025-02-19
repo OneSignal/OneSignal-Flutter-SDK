@@ -3,11 +3,9 @@ package com.onesignal.flutter;
 import com.onesignal.OneSignal;
 import com.onesignal.debug.internal.logging.Logging;
 import org.json.JSONException;
-import org.json.JSONObject;
-import com.onesignal.inAppMessages.IInAppMessage;
+
 import com.onesignal.inAppMessages.IInAppMessageClickListener;
 import com.onesignal.inAppMessages.IInAppMessageClickEvent;
-import com.onesignal.inAppMessages.IInAppMessageClickResult;
 import com.onesignal.inAppMessages.IInAppMessageLifecycleListener;
 import com.onesignal.inAppMessages.IInAppMessageWillDisplayEvent;
 import com.onesignal.inAppMessages.IInAppMessageDidDisplayEvent;

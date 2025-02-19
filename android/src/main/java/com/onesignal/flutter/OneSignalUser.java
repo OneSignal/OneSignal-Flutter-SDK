@@ -1,17 +1,14 @@
 package com.onesignal.flutter;
 
 import com.onesignal.OneSignal;
-import com.onesignal.debug.LogLevel;
 import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.user.state.IUserStateObserver;
 import com.onesignal.user.state.UserChangedState;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;

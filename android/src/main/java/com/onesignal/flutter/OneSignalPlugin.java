@@ -1,21 +1,12 @@
 package com.onesignal.flutter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 
 import com.onesignal.OneSignal;
-import com.onesignal.Continue;
 import com.onesignal.common.OneSignalWrapper;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;

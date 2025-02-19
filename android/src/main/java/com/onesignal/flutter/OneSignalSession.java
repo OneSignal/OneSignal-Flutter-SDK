@@ -2,9 +2,6 @@ package com.onesignal.flutter;
 
 import com.onesignal.OneSignal;
 
-import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;

@@ -4,8 +4,6 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.onesignal.OneSignal;
-
 import java.util.HashMap;
 
 import io.flutter.plugin.common.BinaryMessenger;

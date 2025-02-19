@@ -3,13 +3,6 @@ package com.onesignal.flutter;
 import com.onesignal.OneSignal;
 import com.onesignal.Continue;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
