@@ -22,7 +22,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-public class OneSignalPushSubscription extends FlutterRegistrarResponder implements MethodCallHandler, IPushSubscriptionObserver {
+public class OneSignalPushSubscription extends FlutterMessengerResponder implements MethodCallHandler, IPushSubscriptionObserver {
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalPushSubscription controller = new OneSignalPushSubscription();

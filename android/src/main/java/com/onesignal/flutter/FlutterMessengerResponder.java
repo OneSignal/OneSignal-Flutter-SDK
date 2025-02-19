@@ -11,7 +11,7 @@ import java.util.HashMap;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
 
-abstract class FlutterRegistrarResponder {
+abstract class FlutterMessengerResponder {
    Context context;
    protected MethodChannel channel;
    BinaryMessenger messenger;

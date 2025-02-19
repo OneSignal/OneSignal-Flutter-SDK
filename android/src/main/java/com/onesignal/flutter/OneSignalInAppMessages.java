@@ -22,7 +22,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-public class OneSignalInAppMessages extends FlutterRegistrarResponder implements MethodCallHandler, 
+public class OneSignalInAppMessages extends FlutterMessengerResponder implements MethodCallHandler, 
 IInAppMessageClickListener, IInAppMessageLifecycleListener{
 
     static void registerWith(BinaryMessenger messenger) {

@@ -26,7 +26,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
 /** OnesignalPlugin */
-public class OneSignalPlugin extends FlutterRegistrarResponder implements FlutterPlugin, MethodCallHandler, ActivityAware {
+public class OneSignalPlugin extends FlutterMessengerResponder implements FlutterPlugin, MethodCallHandler, ActivityAware {
 
   public OneSignalPlugin() {
   }

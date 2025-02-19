@@ -19,7 +19,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-public class OneSignalUser extends FlutterRegistrarResponder implements MethodCallHandler, IUserStateObserver {
+public class OneSignalUser extends FlutterMessengerResponder implements MethodCallHandler, IUserStateObserver {
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalUser controller = new OneSignalUser();

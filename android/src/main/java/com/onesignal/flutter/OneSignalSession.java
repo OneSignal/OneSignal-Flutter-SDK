@@ -11,7 +11,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-public class OneSignalSession extends FlutterRegistrarResponder implements MethodCallHandler {
+public class OneSignalSession extends FlutterMessengerResponder implements MethodCallHandler {
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalSession controller = new OneSignalSession();
