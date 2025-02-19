@@ -1,9 +1,9 @@
 package com.onesignal.flutter;
 
+import androidx.annotation.NonNull;
+
 import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.OneSignal;
-import com.onesignal.Continue;
-
 
 import com.onesignal.notifications.INotification;
 import com.onesignal.notifications.INotificationClickEvent;
@@ -23,11 +23,43 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import kotlin.coroutines.Continuation;
+import kotlin.coroutines.CoroutineContext;
+import kotlinx.coroutines.Dispatchers;
 
 public class OneSignalNotifications extends FlutterMessengerResponder implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
     private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
     private final HashMap<String, INotificationWillDisplayEvent> preventedDefaultCache = new HashMap<>();
 
+    /**
+     * A helper class to encapsulate invoking the suspending function [requestPermission] in Java.
+     * To support API level < 24, the SDK cannot use the OneSignal-defined [Continue.with] helper method.
+     */
+    private class RequestPermissionContinuation implements Continuation<Boolean> {
+
+        private final MethodChannel.Result result;
+
+        public RequestPermissionContinuation(MethodChannel.Result result) {
+            this.result = result;
+        }
+
+        @NonNull
+        @Override
+        public CoroutineContext getContext() {
+            return (CoroutineContext) Dispatchers.getMain();
+        }
+
+        @Override
+        public void resumeWith(@NonNull Object o) {
+            if (o instanceof kotlin.Result.Failure) {
+                Throwable e = ((kotlin.Result.Failure) o).exception;
+                replyError(result, "OneSignal", "requestPermission failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
+            }
+            else {
+                replySuccess(result, o);
+            }
+        }
+    }
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalNotifications controller = new OneSignalNotifications();
@@ -72,9 +104,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder implements
             return;
         }
 
-        OneSignal.getNotifications().requestPermission(fallback, Continue.with(permissionResult -> {
-            replySuccess(result, permissionResult.getData());
-        }));
+        OneSignal.getNotifications().requestPermission(fallback, new RequestPermissionContinuation(result));
     }
 
     private void removeNotification(MethodCall call, Result result) {
