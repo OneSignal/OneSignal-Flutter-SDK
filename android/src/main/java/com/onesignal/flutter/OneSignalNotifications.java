@@ -8,35 +8,23 @@ import com.onesignal.Continue;
 import com.onesignal.notifications.INotification;
 import com.onesignal.notifications.INotificationClickEvent;
 import com.onesignal.notifications.INotificationWillDisplayEvent;
-import com.onesignal.notifications.INotificationClickResult;
-import com.onesignal.notifications.INotificationReceivedEvent;
 import com.onesignal.notifications.INotificationClickListener;
 import com.onesignal.notifications.INotificationLifecycleListener;
 import com.onesignal.notifications.IPermissionObserver;
-
-import com.onesignal.user.subscriptions.ISubscription;
-import com.onesignal.user.subscriptions.IPushSubscription;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
-
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-public class OneSignalNotifications extends FlutterRegistrarResponder implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
+public class OneSignalNotifications extends FlutterMessengerResponder implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
     private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
     private final HashMap<String, INotificationWillDisplayEvent> preventedDefaultCache = new HashMap<>();
 

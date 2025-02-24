@@ -4,15 +4,12 @@ import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
 
-import com.onesignal.OneSignal;
-
 import java.util.HashMap;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry;
 
-abstract class FlutterRegistrarResponder {
+abstract class FlutterMessengerResponder {
    Context context;
    protected MethodChannel channel;
    BinaryMessenger messenger;

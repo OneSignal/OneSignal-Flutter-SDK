@@ -1,21 +1,12 @@
 package com.onesignal.flutter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 
 import com.onesignal.OneSignal;
-import com.onesignal.Continue;
 import com.onesignal.common.OneSignalWrapper;
-
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import androidx.annotation.NonNull;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
@@ -24,12 +15,9 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.view.FlutterNativeView;
 
 /** OnesignalPlugin */
-public class OneSignalPlugin extends FlutterRegistrarResponder implements FlutterPlugin, MethodCallHandler, ActivityAware {
+public class OneSignalPlugin extends FlutterMessengerResponder implements FlutterPlugin, MethodCallHandler, ActivityAware {
 
   public OneSignalPlugin() {
   }
@@ -85,24 +73,6 @@ public class OneSignalPlugin extends FlutterRegistrarResponder implements Flutte
 
   @Override
   public void onDetachedFromActivityForConfigChanges() {
-  }
-
-  // This static method is only to remain compatible with apps that don’t use the v2 Android embedding.
-  @Deprecated()
-  @SuppressLint("Registrar")
-  public static void registerWith(Registrar registrar) {
-    final OneSignalPlugin plugin = new OneSignalPlugin();
-    plugin.init(registrar.activeContext(), registrar.messenger());
-
-    // Create a callback for the flutterRegistrar to connect the applications onDestroy
-    registrar.addViewDestroyListener(new PluginRegistry.ViewDestroyListener() {
-      @Override
-      public boolean onViewDestroy(FlutterNativeView flutterNativeView) {
-        // Remove all handlers so they aren't triggered with wrong context
-        plugin.onDetachedFromEngine();
-        return false;
-      }
-    });
   }
 
   @Override

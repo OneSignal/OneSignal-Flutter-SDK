@@ -2,18 +2,13 @@ package com.onesignal.flutter;
 
 import com.onesignal.OneSignal;
 
-import java.util.HashMap;
-import java.util.concurrent.atomic.AtomicBoolean;
-
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-public class OneSignalSession extends FlutterRegistrarResponder implements MethodCallHandler {
+public class OneSignalSession extends FlutterMessengerResponder implements MethodCallHandler {
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalSession controller = new OneSignalSession();

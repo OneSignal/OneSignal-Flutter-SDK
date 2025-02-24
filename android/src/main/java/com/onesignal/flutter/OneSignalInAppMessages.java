@@ -3,11 +3,9 @@ package com.onesignal.flutter;
 import com.onesignal.OneSignal;
 import com.onesignal.debug.internal.logging.Logging;
 import org.json.JSONException;
-import org.json.JSONObject;
-import com.onesignal.inAppMessages.IInAppMessage;
+
 import com.onesignal.inAppMessages.IInAppMessageClickListener;
 import com.onesignal.inAppMessages.IInAppMessageClickEvent;
-import com.onesignal.inAppMessages.IInAppMessageClickResult;
 import com.onesignal.inAppMessages.IInAppMessageLifecycleListener;
 import com.onesignal.inAppMessages.IInAppMessageWillDisplayEvent;
 import com.onesignal.inAppMessages.IInAppMessageDidDisplayEvent;
@@ -21,9 +19,8 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-public class OneSignalInAppMessages extends FlutterRegistrarResponder implements MethodCallHandler, 
+public class OneSignalInAppMessages extends FlutterMessengerResponder implements MethodCallHandler, 
 IInAppMessageClickListener, IInAppMessageLifecycleListener{
 
     static void registerWith(BinaryMessenger messenger) {
