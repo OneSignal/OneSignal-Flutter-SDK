@@ -38,9 +38,6 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
-import io.flutter.view.FlutterNativeView;
 
 /** OnesignalPlugin */
 public class OneSignalPlugin
@@ -118,24 +115,6 @@ public class OneSignalPlugin
 
   @Override
   public void onDetachedFromActivityForConfigChanges() {
-  }
-
-  // This static method is only to remain compatible with apps that don’t use the v2 Android embedding.
-  @Deprecated()
-  @SuppressLint("Registrar")
-  public static void registerWith(Registrar registrar) {
-    final OneSignalPlugin plugin = new OneSignalPlugin();
-    plugin.init(registrar.activeContext(), registrar.messenger());
-
-    // Create a callback for the flutterRegistrar to connect the applications onDestroy
-    registrar.addViewDestroyListener(new PluginRegistry.ViewDestroyListener() {
-      @Override
-      public boolean onViewDestroy(FlutterNativeView flutterNativeView) {
-        // Remove all handlers so they aren't triggered with wrong context
-        plugin.onDetachedFromEngine();
-        return false;
-      }
-    });
   }
 
   @Override
