@@ -97,7 +97,6 @@ class OneSignalState {
   bool? consentGiven = false;
   bool? calledPromptPermission;
   bool? locationShared;
-  OSNotificationDisplayType? inFocusDisplayType;
   bool? disablePush;
   String? externalId;
   String? language;
@@ -135,12 +134,6 @@ class OneSignalState {
 
     if (level != null) this.latestLogLevel = OSLogLevel.values[level];
     this.latestLogStatement = params['message'];
-  }
-
-  void setDisplayType(Map<dynamic, dynamic> params) {
-    var type = params['displayType'] as int?;
-    if (type != null)
-      this.inFocusDisplayType = OSNotificationDisplayType.values[type];
   }
 
   void setEmail(Map<dynamic, dynamic> params) {
