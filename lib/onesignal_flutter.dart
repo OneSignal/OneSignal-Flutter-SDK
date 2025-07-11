@@ -17,6 +17,7 @@ export 'src/notifications.dart';
 export 'src/inappmessage.dart';
 export 'src/inappmessages.dart';
 export 'src/liveactivities.dart';
+export 'src/user.dart';
 
 class OneSignal {
   /// A singleton representing the OneSignal SDK.
