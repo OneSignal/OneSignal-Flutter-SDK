@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 //import OneSignal
@@ -147,20 +146,6 @@ class _MyAppState extends State<MyApp> {
 
     var tags = await OneSignal.User.getTags();
     print(tags);
-  }
-
-  void _handleTrackEvent() {
-    print("Tracking event");
-
-    // Detect platform
-    String platform = Platform.isAndroid
-        ? 'android'
-        : Platform.isIOS
-            ? 'ios'
-            : 'unknown';
-    String eventName = "Flutter-$platform";
-
-    OneSignal.User.trackEvent(eventName, properties: {"ABC": "123"});
   }
 
   void _handlePromptForPushPermission() {
@@ -344,10 +329,6 @@ class _MyAppState extends State<MyApp> {
                   new TableRow(children: [
                     new OneSignalButton(
                         "Get Tags", _handleGetTags, !_enableConsentButton)
-                  ]),
-                  new TableRow(children: [
-                    new OneSignalButton(
-                        "Track Event", _handleTrackEvent, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new OneSignalButton("Prompt for Push Permission",
