@@ -68,6 +68,8 @@
     [self addSms:call withResult:result];
   else if ([@"OneSignal#removeSms" isEqualToString:call.method])
     [self removeSms:call withResult:result];
+  else if ([@"OneSignal#trackEvent" isEqualToString:call.method])
+    [self trackEvent:call withResult:result];
   else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
     [self lifecycleInit:call withResult:result];
   else
@@ -134,6 +136,13 @@
 - (void)removeSms:(FlutterMethodCall *)call withResult:(FlutterResult)result {
   NSString *smsNumber = call.arguments;
   [OneSignal.User removeSms:smsNumber];
+  result(nil);
+}
+
+- (void)trackEvent:(FlutterMethodCall *)call withResult:(FlutterResult)result {
+  NSString *name = call.arguments[@"name"];
+  NSDictionary *properties = call.arguments[@"properties"];
+  [OneSignal.User trackEvent:name withProperties:properties];
   result(nil);
 }
 
