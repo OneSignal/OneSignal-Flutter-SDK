@@ -4,6 +4,7 @@
 .packages
 .pub/
 pubspec.lock
+**/local.properties
 
 build/
 android/.idea

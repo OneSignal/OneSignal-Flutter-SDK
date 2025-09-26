@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-//import OneSignal
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 void main() => runApp(new MyApp());

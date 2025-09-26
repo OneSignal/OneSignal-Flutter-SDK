@@ -42,35 +42,36 @@
   [OSFlutterPushSubscription registerWithRegistrar:registrar];
 }
 
-- (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-    if ([@"OneSignal#setLanguage" isEqualToString:call.method])
-        [self setLanguage:call withResult:result];
-    else if ([@"OneSignal#getOnesignalId" isEqualToString:call.method])
-        [self getOnesignalId:call withResult:result];
-    else if ([@"OneSignal#getExternalId" isEqualToString:call.method])
-        [self getExternalId:call withResult:result];
-    else if ([@"OneSignal#addAliases" isEqualToString:call.method])
-        [self addAliases:call withResult:result];
-    else if ([@"OneSignal#removeAliases" isEqualToString:call.method])
-        [self removeAliases:call withResult:result];
-    else if ([@"OneSignal#addTags" isEqualToString:call.method])
-        [self addTags:call withResult:result];
-    else if ([@"OneSignal#removeTags" isEqualToString:call.method])
-        [self removeTags:call withResult:result];
-    else if ([@"OneSignal#getTags" isEqualToString:call.method])
-        [self getTags:call withResult:result];
-    else if ([@"OneSignal#addEmail" isEqualToString:call.method])
-        [self addEmail:call withResult:result];
-    else if ([@"OneSignal#removeEmail" isEqualToString:call.method])
-        [self removeEmail:call withResult:result];
-    else if ([@"OneSignal#addSms" isEqualToString:call.method])
-        [self addSms:call withResult:result];
-    else if ([@"OneSignal#removeSms" isEqualToString:call.method])
-        [self removeSms:call withResult:result];
-    else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
-        [self lifecycleInit:call withResult:result];
-    else
-        result(FlutterMethodNotImplemented);
+- (void)handleMethodCall:(FlutterMethodCall *)call
+                  result:(FlutterResult)result {
+  if ([@"OneSignal#setLanguage" isEqualToString:call.method])
+    [self setLanguage:call withResult:result];
+  else if ([@"OneSignal#getOnesignalId" isEqualToString:call.method])
+    [self getOnesignalId:call withResult:result];
+  else if ([@"OneSignal#getExternalId" isEqualToString:call.method])
+    [self getExternalId:call withResult:result];
+  else if ([@"OneSignal#addAliases" isEqualToString:call.method])
+    [self addAliases:call withResult:result];
+  else if ([@"OneSignal#removeAliases" isEqualToString:call.method])
+    [self removeAliases:call withResult:result];
+  else if ([@"OneSignal#addTags" isEqualToString:call.method])
+    [self addTags:call withResult:result];
+  else if ([@"OneSignal#removeTags" isEqualToString:call.method])
+    [self removeTags:call withResult:result];
+  else if ([@"OneSignal#getTags" isEqualToString:call.method])
+    [self getTags:call withResult:result];
+  else if ([@"OneSignal#addEmail" isEqualToString:call.method])
+    [self addEmail:call withResult:result];
+  else if ([@"OneSignal#removeEmail" isEqualToString:call.method])
+    [self removeEmail:call withResult:result];
+  else if ([@"OneSignal#addSms" isEqualToString:call.method])
+    [self addSms:call withResult:result];
+  else if ([@"OneSignal#removeSms" isEqualToString:call.method])
+    [self removeSms:call withResult:result];
+  else if ([@"OneSignal#lifecycleInit" isEqualToString:call.method])
+    [self lifecycleInit:call withResult:result];
+  else
+    result(FlutterMethodNotImplemented);
 }
 
 - (void)setLanguage:(FlutterMethodCall *)call withResult:(FlutterResult)result {
@@ -136,9 +137,10 @@
   result(nil);
 }
 
-- (void)lifecycleInit:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.User addObserver:self];
-    result(nil);
+- (void)lifecycleInit:(FlutterMethodCall *)call
+           withResult:(FlutterResult)result {
+  [OneSignal.User addObserver:self];
+  result(nil);
 }
 
 - (void)onUserStateDidChangeWithState:(OSUserChangedState *)state {
