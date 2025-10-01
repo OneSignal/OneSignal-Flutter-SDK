@@ -2,26 +2,22 @@ name: CI
 on:
   pull_request:
     branches:
-      - '**'
+      - "**"
     paths-ignore:
-      - '.github/**'
-      - '.vscode/**'
-      - 'README.md'
+      - ".github/**"
+      - ".vscode/**"
+      - "README.md"
   workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    container:
+      image: ghcr.io/cirruslabs/flutter:3.35.5
 
     steps:
-      - name: Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: '3.3.2'
-          channel: 'stable'
-
       - name: Checkout OneSignal-Flutter-SDK
-        uses: actions/checkout@v3
+        uses: actions/checkout@v5
 
       - name: Install Dependencies 🔗⛓📦
         run: flutter pub get
@@ -30,7 +26,7 @@ jobs:
         run: flutter analyze
 
       - name: Ensure the Dart code is formatted correctly
-        run: flutter format --set-exit-if-changed --dry-run .
+        run: dart format --set-exit-if-changed --output=none .
 
       - name: Run Flutter unit tests
         run: flutter test

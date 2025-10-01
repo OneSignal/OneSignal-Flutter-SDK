@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 /*
   This class mocks an iOS or Android host device
@@ -9,16 +9,19 @@ import 'package:flutter_test/flutter_test.dart';
 */
 
 class OneSignalMockChannelController {
-  MethodChannel _channel = const MethodChannel('OneSignal');
-  MethodChannel _debugChannel = const MethodChannel('OneSignal#debug');
-  MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
+  final MethodChannel _channel = const MethodChannel('OneSignal');
+  final MethodChannel _debugChannel = const MethodChannel('OneSignal#debug');
+  final MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
 
   late OneSignalState state;
 
   OneSignalMockChannelController() {
-    this._channel.setMockMethodCallHandler(_handleMethod);
-    this._tagsChannel.setMockMethodCallHandler(_handleMethod);
-    this._debugChannel.setMockMethodCallHandler(_handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_channel, _handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_tagsChannel, _handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_debugChannel, _handleMethod);
   }
 
   void resetState() {
@@ -29,49 +32,48 @@ class OneSignalMockChannelController {
     print("Mock method called: ${call.method}");
     switch (call.method) {
       case "OneSignal#setAppId":
-        this.state.setAppId(call.arguments);
+        state.setAppId(call.arguments);
         break;
       case "OneSignal#setLogLevel":
-        this.state.setLogLevel(call.arguments);
+        state.setLogLevel(call.arguments);
         break;
       case "OneSignal#consentGiven":
-        this.state.consentGiven =
+        state.consentGiven =
             (call.arguments as Map<dynamic, dynamic>)['given'] as bool?;
         break;
       case "OneSignal#promptPermission":
-        this.state.calledPromptPermission = true;
+        state.calledPromptPermission = true;
         break;
       case "OneSignal#log":
-        this.state.log(call.arguments);
+        state.log(call.arguments);
         break;
       case "OneSignal#disablePush":
-        this.state.disablePush = call.arguments as bool?;
+        state.disablePush = call.arguments as bool?;
         break;
       case "OneSignal#postNotification":
-        this.state.postNotificationJson =
-            call.arguments as Map<dynamic, dynamic>?;
+        state.postNotificationJson = call.arguments as Map<dynamic, dynamic>?;
         return {"success": true};
       case "OneSignal#setLocationShared":
-        this.state.locationShared = call.arguments as bool?;
+        state.locationShared = call.arguments as bool?;
         break;
       case "OneSignal#setEmail":
-        this.state.setEmail(call.arguments);
+        state.setEmail(call.arguments);
         break;
       case "OneSignal#sendTags":
-        this.state.tags = call.arguments;
+        state.tags = call.arguments;
         return {"success": true};
       case "OneSignal#deleteTags":
-        this.state.deleteTags = call.arguments;
+        state.deleteTags = call.arguments;
         return {"success": true};
       case "OneSignal#setExternalUserId":
-        this.state.externalId = (call.arguments
+        state.externalId = (call.arguments
             as Map<dynamic, dynamic>)['externalUserId'] as String?;
         return {"success": true};
       case "OneSignal#removeExternalUserId":
-        this.state.externalId = null;
+        state.externalId = null;
         return {"success": true};
       case "OneSignal#setLanguage":
-        this.state.language =
+        state.language =
             (call.arguments as Map<dynamic, dynamic>)['language'] as String?;
         return {"success": true};
     }
@@ -115,36 +117,36 @@ class OneSignalState {
   */
 
   void setAppId(Map<dynamic, dynamic> params) {
-    this.appId = params['appId'];
+    appId = params['appId'];
   }
 
   void setLogLevel(Map<dynamic, dynamic> params) {
     int? level = params['logLevel'] as int?;
     int? visual = params['visual'] as int?;
 
-    if (level != null) this.logLevel = OSLogLevel.values[level];
-    if (visual != null) this.visualLevel = OSLogLevel.values[visual];
+    if (level != null) logLevel = OSLogLevel.values[level];
+    if (visual != null) visualLevel = OSLogLevel.values[visual];
   }
 
   void consentRequired(Map<dynamic, dynamic> params) {
-    this.requiresPrivacyConsent = params['required'] as bool?;
+    requiresPrivacyConsent = params['required'] as bool?;
   }
 
   void log(Map<dynamic, dynamic> params) {
     var level = params['logLevel'] as int?;
 
-    if (level != null) this.latestLogLevel = OSLogLevel.values[level];
-    this.latestLogStatement = params['message'];
+    if (level != null) latestLogLevel = OSLogLevel.values[level];
+    latestLogStatement = params['message'];
   }
 
   void setDisplayType(Map<dynamic, dynamic> params) {
     var type = params['displayType'] as int?;
     if (type != null)
-      this.inFocusDisplayType = OSNotificationDisplayType.values[type];
+      inFocusDisplayType = OSNotificationDisplayType.values[type];
   }
 
   void setEmail(Map<dynamic, dynamic> params) {
-    this.email = params['email'] as String?;
-    this.emailAuthHashToken = params['emailAuthHashToken'] as String?;
+    email = params['email'] as String?;
+    emailAuthHashToken = params['emailAuthHashToken'] as String?;
   }
 }
