@@ -24,6 +24,8 @@ flutter emulators --launch Medium_Phone_API_35;
 
 And then you can run `flutter run`.
 
+If you are using an older Flutter or Android Studio version, you may see an error about `ndkVersion`. Follow the instructions to update the version in `build.gradle.kts`.
+
 ## Getting Started
 
 For help getting started with Flutter, view our online
