@@ -158,8 +158,11 @@ class _MyAppState extends State<MyApp> {
             ? 'ios'
             : 'unknown';
 
+    // Track event without properties
     OneSignal.User.trackEvent("Flutter-$platform-noprops");
-    OneSignal.User.trackEvent("Flutter-$platform", properties: {
+
+    // Track event with properties
+    OneSignal.User.trackEvent("Flutter-$platform", {
       "someNum": 123,
       "someFloat": 3.14159,
       "someString": "abc",

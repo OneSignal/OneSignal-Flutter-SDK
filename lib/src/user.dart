@@ -174,7 +174,7 @@ class OneSignalUser {
   /// [name] is the event name to track.
   /// [properties] is an optional map of custom properties associated with the event.
   Future<void> trackEvent(String name,
-      {Map<String, dynamic>? properties}) async {
+      [Map<String, dynamic>? properties]) async {
     return await _channel.invokeMethod("OneSignal#trackEvent", {
       'name': name,
       'properties': properties,
