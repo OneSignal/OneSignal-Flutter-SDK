@@ -142,6 +142,11 @@
 - (void)trackEvent:(FlutterMethodCall *)call withResult:(FlutterResult)result {
   NSString *name = call.arguments[@"name"];
   NSDictionary *properties = call.arguments[@"properties"];
+
+  if (properties == (id)[NSNull null]) {
+    properties = nil;
+  }
+
   [OneSignal.User trackEventWithName:name properties:properties];
   result(nil);
 }

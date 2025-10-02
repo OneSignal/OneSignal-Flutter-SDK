@@ -149,7 +149,7 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _handleTrackEvent() {
-    print("Tracking event");
+    print("Tracking events");
 
     // Detect platform
     String platform = Platform.isAndroid
@@ -157,9 +157,27 @@ class _MyAppState extends State<MyApp> {
         : Platform.isIOS
             ? 'ios'
             : 'unknown';
-    String eventName = "Flutter-$platform";
 
-    OneSignal.User.trackEvent(eventName, properties: {"ABC": "123"});
+    OneSignal.User.trackEvent("Flutter-$platform-noprops");
+    OneSignal.User.trackEvent("Flutter-$platform", properties: {
+      "someNum": 123,
+      "someFloat": 3.14159,
+      "someString": "abc",
+      "someBool": true,
+      "someObject": {
+        "abc": "123",
+        "nested": {
+          "def": '456',
+        },
+      },
+      "someArray": [1, 2],
+      "someMixedArray": [
+        1,
+        "2",
+        {"abc": "123"}
+      ],
+      "someNull": null,
+    });
   }
 
   void _handlePromptForPushPermission() {
