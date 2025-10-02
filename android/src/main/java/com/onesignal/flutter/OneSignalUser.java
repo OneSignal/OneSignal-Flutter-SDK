@@ -16,7 +16,8 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-public class OneSignalUser extends FlutterMessengerResponder implements MethodCallHandler, IUserStateObserver {
+public class OneSignalUser extends FlutterMessengerResponder
+        implements MethodCallHandler, IUserStateObserver {
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalUser controller = new OneSignalUser();
@@ -76,7 +77,7 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
             onesignalId = null;
         }
         replySuccess(result, onesignalId);
-    }      
+    }
 
     private void getExternalId(MethodCall call, Result result) {
         String externalId = OneSignal.getUser().getExternalId();
@@ -85,26 +86,30 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
         }
         replySuccess(result, externalId);
     }
-    
+
     private void addAliases(MethodCall call, Result result) {
         // call.arguments is being casted to a Map<String, Object> so a try-catch with
-        //  a ClassCastException will be thrown
+        // a ClassCastException will be thrown
         try {
             OneSignal.getUser().addAliases((Map<String, String>) call.arguments);
             replySuccess(result, null);
-        } catch(ClassCastException e) {
-            replyError(result, "OneSignal", "addAliases failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
+        } catch (ClassCastException e) {
+            replyError(result, "OneSignal",
+                    "addAliases failed with error: " + e.getMessage() + "\n" + e.getStackTrace(),
+                    null);
         }
     }
 
     private void removeAliases(MethodCall call, Result result) {
         // call.arguments is being casted to a List<String> so a try-catch with
-        //  a ClassCastException will be thrown
+        // a ClassCastException will be thrown
         try {
             OneSignal.getUser().removeAliases((List<String>) call.arguments);
             replySuccess(result, null);
-        } catch(ClassCastException e) {
-            replyError(result, "OneSignal", "removeAliases failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
+        } catch (ClassCastException e) {
+            replyError(result, "OneSignal",
+                    "removeAliases failed with error: " + e.getMessage() + "\n" + e.getStackTrace(),
+                    null);
         }
     }
 
@@ -112,17 +117,17 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
         OneSignal.getUser().addEmail((String) call.arguments);
         replySuccess(result, null);
     }
-    
+
     private void removeEmail(MethodCall call, Result result) {
         OneSignal.getUser().removeEmail((String) call.arguments);
         replySuccess(result, null);
     }
-    
+
     private void addSms(MethodCall call, Result result) {
         OneSignal.getUser().addSms((String) call.arguments);
         replySuccess(result, null);
     }
-    
+
     private void removeSms(MethodCall call, Result result) {
         OneSignal.getUser().removeSms((String) call.arguments);
         replySuccess(result, null);
@@ -130,23 +135,27 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
 
     private void addTags(MethodCall call, Result result) {
         // call.arguments is being casted to a Map<String, Object> so a try-catch with
-        //  a ClassCastException will be thrown
+        // a ClassCastException will be thrown
         try {
             OneSignal.getUser().addTags((Map<String, String>) call.arguments);
             replySuccess(result, null);
-        } catch(ClassCastException e) {
-            replyError(result, "OneSignal", "addTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
+        } catch (ClassCastException e) {
+            replyError(result, "OneSignal",
+                    "addTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(),
+                    null);
         }
     }
 
     private void removeTags(MethodCall call, Result result) {
         // call.arguments is being casted to a List<String> so a try-catch with
-        //  a ClassCastException will be thrown
+        // a ClassCastException will be thrown
         try {
             OneSignal.getUser().removeTags((List<String>) call.arguments);
             replySuccess(result, null);
-        } catch(ClassCastException e) {
-            replyError(result, "OneSignal", "deleteTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(), null);
+        } catch (ClassCastException e) {
+            replyError(result, "OneSignal",
+                    "deleteTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(),
+                    null);
         }
     }
 
@@ -157,10 +166,14 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
     @Override
     public void onUserStateChange(UserChangedState userChangedState) {
         try {
-            invokeMethodOnUiThread("OneSignal#onUserStateChange", OneSignalSerializer.convertOnUserStateChange(userChangedState));
+            invokeMethodOnUiThread("OneSignal#onUserStateChange",
+                    OneSignalSerializer.convertOnUserStateChange(userChangedState));
         } catch (JSONException e) {
             e.getStackTrace();
-            Logging.error("Encountered an error attempting to convert UserChangedState object to hash map:" + e.toString(), null);
+            Logging.error(
+                    "Encountered an error attempting to convert UserChangedState object to hash map:"
+                            + e.toString(),
+                    null);
         }
     }
 }
