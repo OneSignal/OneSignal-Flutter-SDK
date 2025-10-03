@@ -52,6 +52,8 @@ public class OneSignalUser extends FlutterMessengerResponder
             this.removeTags(call, result);
         else if (call.method.contentEquals("OneSignal#getTags"))
             this.getTags(call, result);
+        else if (call.method.contentEquals("OneSignal#trackEvent"))
+            this.trackEvent(call, result);
         else if (call.method.contentEquals("OneSignal#lifecycleInit"))
             this.lifecycleInit();
         else
@@ -161,6 +163,13 @@ public class OneSignalUser extends FlutterMessengerResponder
 
     private void getTags(MethodCall call, Result result) {
         replySuccess(result, OneSignal.getUser().getTags());
+    }
+
+    private void trackEvent(MethodCall call, Result result) {
+        String name = call.argument("name");
+        Map<String, Object> properties = call.argument("properties");
+        OneSignal.getUser().trackEvent(name, properties);
+        replySuccess(result, null);
     }
 
     @Override

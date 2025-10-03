@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'package:flutter/services.dart';
 
-import 'package:onesignal_flutter/src/utils.dart';
+import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/pushsubscription.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 
 typedef void OnUserChangeObserver(OSUserChangedState stateChanges);
 
@@ -19,8 +19,10 @@ class OSUserState extends JSONStringRepresentable {
   }
 
   String jsonRepresentation() {
-    return convertToJsonString(
-        {'onesignalId': this.onesignalId, 'externalId': this.externalId});
+    return convertToJsonString({
+      'onesignalId': this.onesignalId,
+      'externalId': this.externalId,
+    });
   }
 }
 
@@ -60,8 +62,9 @@ class OneSignalUser {
   /// Sets the user's language to [language] this also applies to
   /// the email and/or SMS player if those are logged in on the device.
   Future<void> setLanguage(String language) async {
-    return await _channel
-        .invokeMethod("OneSignal#setLanguage", {'language': language});
+    return await _channel.invokeMethod("OneSignal#setLanguage", {
+      'language': language,
+    });
   }
 
   /// Set an [alias] for the current user.
@@ -122,8 +125,9 @@ class OneSignalUser {
 
   /// Returns the local tags of the current user.
   Future<Map<String, String>> getTags() async {
-    Map<dynamic, dynamic> tags =
-        await _channel.invokeMethod("OneSignal#getTags");
+    Map<dynamic, dynamic> tags = await _channel.invokeMethod(
+      "OneSignal#getTags",
+    );
     return tags.cast<String, String>();
   }
 
@@ -165,6 +169,18 @@ class OneSignalUser {
     return await _channel.invokeMethod("OneSignal#getOnesignalId");
   }
 
+  /// Track a custom event for the current user.
+  ///
+  /// [name] is the event name to track.
+  /// [properties] is an optional map of custom properties associated with the event.
+  Future<void> trackEvent(String name,
+      [Map<String, dynamic>? properties]) async {
+    return await _channel.invokeMethod("OneSignal#trackEvent", {
+      'name': name,
+      'properties': properties,
+    });
+  }
+
   /// Add an observer that fires when the OneSignal User state changes.
   /// *Important* When using the observer to retrieve the onesignalId, check the
   /// externalId as well to confirm the values are associated with the expected user.*
@@ -185,7 +201,8 @@ class OneSignalUser {
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#onUserStateChange') {
       this._onUserStateChange(
-          OSUserChangedState(call.arguments.cast<String, dynamic>()));
+        OSUserChangedState(call.arguments.cast<String, dynamic>()),
+      );
     }
     return null;
   }
