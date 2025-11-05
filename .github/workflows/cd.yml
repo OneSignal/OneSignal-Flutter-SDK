@@ -1,0 +1,37 @@
+name: Publish to Pub.dev & Github
+on:
+  pull_request:
+    types:
+      - closed
+    branches:
+      - main
+      - rel/**
+
+jobs:
+  publish:
+    if: |
+      github.event.pull_request.merged == true &&
+      contains(github.event.pull_request.title, 'chore: Release')
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Get version from pubspec.yaml
+        id: version
+        run: |
+          VERSION=$(grep "^version:" pubspec.yaml | sed 's/version: //' | tr -d ' ')
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+          echo "Version: $VERSION"
+
+      - name: Publish to Pub.dev
+        run: |
+          flutter pub publish
+
+  create-release:
+    needs: publish
+    uses: OneSignal/sdk-actions/.github/workflows/github-release.yml@main
+    with:
+      version: ${{ needs.publish.outputs.version }}
