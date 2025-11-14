@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onesignal_flutter/src/inappmessage.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 
 const validMessageJson = {
   'message_id': 'test-message-id-123',
@@ -10,6 +11,32 @@ const validClickResultJson = {
   'url': 'https://example.com',
   'closing_message': true,
 };
+
+void _testMessageEvent<T extends JSONStringRepresentable>(
+  String eventName,
+  T Function(Map<String, dynamic>) constructor,
+) {
+  group(eventName, () {
+    test('creates from valid JSON with message', () {
+      final json = {'message': validMessageJson};
+      final event = constructor(json);
+      expect(event, isNotNull);
+    });
+
+    test('creates from JSON with null message_id', () {
+      final json = {'message': <String, dynamic>{}};
+      final event = constructor(json);
+      expect(event, isNotNull);
+    });
+
+    test('jsonRepresentation returns correct JSON string', () {
+      final json = {'message': validMessageJson};
+      final event = constructor(json);
+      final jsonString = event.jsonRepresentation();
+      expect(jsonString, contains('"message"'));
+    });
+  });
+}
 
 void main() {
   group('OSInAppMessage', () {
@@ -119,130 +146,26 @@ void main() {
       };
       final event = OSInAppMessageClickEvent(json);
       final jsonString = event.jsonRepresentation();
-      print(jsonString);
 
       expect(jsonString, contains('"message"'));
       expect(jsonString, contains('"result"'));
     });
   });
 
-  group('OSInAppMessageWillDisplayEvent', () {
-    test('creates from valid JSON with message', () {
-      final json = {
-        'message': validMessageJson,
-      };
-      final event = OSInAppMessageWillDisplayEvent(json);
-
-      expect(event.message.messageId, 'test-message-id-123');
-    });
-
-    test('creates from JSON with null message_id', () {
-      final json = {
-        'message': <String, dynamic>{},
-      };
-      final event = OSInAppMessageWillDisplayEvent(json);
-
-      expect(event.message.messageId, isNull);
-    });
-
-    test('jsonRepresentation returns correct JSON string', () {
-      final json = {
-        'message': validMessageJson,
-      };
-      final event = OSInAppMessageWillDisplayEvent(json);
-      final jsonString = event.jsonRepresentation();
-
-      expect(jsonString, contains('"message"'));
-    });
-  });
-
-  group('OSInAppMessageDidDisplayEvent', () {
-    test('creates from valid JSON with message', () {
-      final json = {
-        'message': validMessageJson,
-      };
-      final event = OSInAppMessageDidDisplayEvent(json);
-
-      expect(event.message.messageId, 'test-message-id-123');
-    });
-
-    test('creates from JSON with null message_id', () {
-      final json = {
-        'message': <String, dynamic>{},
-      };
-      final event = OSInAppMessageDidDisplayEvent(json);
-
-      expect(event.message.messageId, isNull);
-    });
-
-    test('jsonRepresentation returns correct JSON string', () {
-      final json = {
-        'message': validMessageJson,
-      };
-      final event = OSInAppMessageDidDisplayEvent(json);
-      final jsonString = event.jsonRepresentation();
-
-      expect(jsonString, contains('"message"'));
-    });
-  });
-
-  group('OSInAppMessageWillDismissEvent', () {
-    test('creates from valid JSON with message', () {
-      final json = {
-        'message': validMessageJson,
-      };
-      final event = OSInAppMessageWillDismissEvent(json);
-
-      expect(event.message.messageId, 'test-message-id-123');
-    });
-
-    test('creates from JSON with null message_id', () {
-      final json = {
-        'message': <String, dynamic>{},
-      };
-      final event = OSInAppMessageWillDismissEvent(json);
-
-      expect(event.message.messageId, isNull);
-    });
-
-    test('jsonRepresentation returns correct JSON string', () {
-      final json = {
-        'message': validMessageJson,
-      };
-      final event = OSInAppMessageWillDismissEvent(json);
-      final jsonString = event.jsonRepresentation();
-
-      expect(jsonString, contains('"message"'));
-    });
-  });
-
-  group('OSInAppMessageDidDismissEvent', () {
-    test('creates from valid JSON with message', () {
-      final json = {
-        'message': validMessageJson,
-      };
-      final event = OSInAppMessageDidDismissEvent(json);
-
-      expect(event.message.messageId, 'test-message-id-123');
-    });
-
-    test('creates from JSON with null message_id', () {
-      final json = {
-        'message': <String, dynamic>{},
-      };
-      final event = OSInAppMessageDidDismissEvent(json);
-
-      expect(event.message.messageId, isNull);
-    });
-
-    test('jsonRepresentation returns correct JSON string', () {
-      final json = {
-        'message': validMessageJson,
-      };
-      final event = OSInAppMessageDidDismissEvent(json);
-      final jsonString = event.jsonRepresentation();
-
-      expect(jsonString, contains('"message"'));
-    });
-  });
+  _testMessageEvent(
+    'OSInAppMessageWillDisplayEvent',
+    (json) => OSInAppMessageWillDisplayEvent(json),
+  );
+  _testMessageEvent(
+    'OSInAppMessageDidDisplayEvent',
+    (json) => OSInAppMessageDidDisplayEvent(json),
+  );
+  _testMessageEvent(
+    'OSInAppMessageWillDismissEvent',
+    (json) => OSInAppMessageWillDismissEvent(json),
+  );
+  _testMessageEvent(
+    'OSInAppMessageDidDismissEvent',
+    (json) => OSInAppMessageDidDismissEvent(json),
+  );
 }
