@@ -12,6 +12,11 @@ android/.idea
 flutter_export_environment.sh
 example/ios/Flutter/ephemeral/
 
+# Coverage
+coverage/
+test/dlcov_references_test.dart
+dlcov.log
+
 # IntelliJ related
 *.iml
 *.ipr
