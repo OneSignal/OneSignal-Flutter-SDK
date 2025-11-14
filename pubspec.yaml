@@ -3,6 +3,9 @@ description: OneSignal is a free push notification service for mobile apps. This
 version: 5.3.4
 homepage: https://github.com/OneSignal/OneSignal-Flutter-SDK
 
+scripts:
+  test: dlcov -c 80 --lcov-gen="flutter test --coverage" --include-untested-files=true
+
 flutter:
   plugin:
     platforms:
@@ -21,6 +24,7 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   dlcov: ^4.2.1
+  rps: ^0.9.1
 
 environment:
   sdk: ">=2.12.0 <3.0.0"
