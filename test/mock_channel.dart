@@ -173,6 +173,27 @@ class OneSignalMockChannelController {
         state.preventedNotificationId = (call.arguments
             as Map<dynamic, dynamic>)['notificationId'] as String?;
         break;
+      case "OneSignal#removeNotification":
+        state.removedNotificationId =
+            (call.arguments as Map<dynamic, dynamic>)['notificationId'] as int?;
+        break;
+      case "OneSignal#removeGroupedNotifications":
+        state.removedNotificationGroup = (call.arguments
+            as Map<dynamic, dynamic>)['notificationGroup'] as String?;
+        break;
+      case "OneSignal#clearAll":
+        state.clearedAllNotifications = true;
+        break;
+      case "OneSignal#permission":
+        return state.notificationPermission ?? false;
+      case "OneSignal#canRequest":
+        return state.canRequestPermission ?? false;
+      case "OneSignal#addNativeClickListener":
+        state.nativeClickListenerAdded = true;
+        break;
+      case "OneSignal#proceedWithWillDisplay":
+        state.proceedWithWillDisplayCalled = true;
+        break;
     }
   }
 }
@@ -233,6 +254,13 @@ class OneSignalState {
   Map<dynamic, dynamic>? postNotificationJson;
   String? displayedNotificationId;
   String? preventedNotificationId;
+  int? removedNotificationId;
+  String? removedNotificationGroup;
+  bool? clearedAllNotifications;
+  bool? notificationPermission;
+  bool? canRequestPermission;
+  bool? nativeClickListenerAdded;
+  bool? proceedWithWillDisplayCalled;
 
   /*
     All of the following functions parse the MethodCall
