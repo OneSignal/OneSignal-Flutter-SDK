@@ -12,6 +12,8 @@ class OneSignalMockChannelController {
   final MethodChannel _channel = const MethodChannel('OneSignal');
   final MethodChannel _debugChannel = const MethodChannel('OneSignal#debug');
   final MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
+  final MethodChannel _locationChannel =
+      const MethodChannel('OneSignal#location');
 
   late OneSignalState state;
 
@@ -22,6 +24,8 @@ class OneSignalMockChannelController {
         .setMockMethodCallHandler(_tagsChannel, _handleMethod);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_debugChannel, _handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_locationChannel, _handleMethod);
   }
 
   void resetState() {
@@ -78,6 +82,14 @@ class OneSignalMockChannelController {
         state.language =
             (call.arguments as Map<dynamic, dynamic>)['language'] as String?;
         return {"success": true};
+      case "OneSignal#requestPermission":
+        state.locationPermissionRequested = true;
+        break;
+      case "OneSignal#setShared":
+        state.locationShared = call.arguments as bool?;
+        break;
+      case "OneSignal#isShared":
+        return state.locationShared ?? false;
     }
   }
 }
@@ -101,6 +113,7 @@ class OneSignalState {
   bool? consentGiven = false;
   bool? calledPromptPermission;
   bool? locationShared;
+  bool? locationPermissionRequested;
   OSNotificationDisplayType? inFocusDisplayType;
   bool? disablePush;
   String? externalId;
