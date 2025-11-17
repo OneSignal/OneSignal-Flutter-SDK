@@ -14,6 +14,10 @@ class OneSignalMockChannelController {
   final MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
   final MethodChannel _locationChannel =
       const MethodChannel('OneSignal#location');
+  final MethodChannel _inAppMessagesChannel =
+      const MethodChannel('OneSignal#inappmessages');
+  final MethodChannel _liveActivitiesChannel =
+      const MethodChannel('OneSignal#liveactivities');
 
   late OneSignalState state;
 
@@ -26,6 +30,10 @@ class OneSignalMockChannelController {
         .setMockMethodCallHandler(_debugChannel, _handleMethod);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_locationChannel, _handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_inAppMessagesChannel, _handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_liveActivitiesChannel, _handleMethod);
   }
 
   void resetState() {
@@ -128,6 +136,29 @@ class OneSignalMockChannelController {
         state.liveActivityType = (call.arguments
             as Map<dynamic, dynamic>)['activityType'] as String?;
         break;
+      case "OneSignal#addTrigger":
+        state.addTrigger(call.arguments as Map<dynamic, dynamic>);
+        break;
+      case "OneSignal#addTriggers":
+        state.triggers = call.arguments as Map<dynamic, dynamic>?;
+        return {"success": true};
+      case "OneSignal#removeTrigger":
+        state.removedTrigger = call.arguments as String?;
+        break;
+      case "OneSignal#removeTriggers":
+        state.removedTriggers = call.arguments as List<dynamic>?;
+        return {"success": true};
+      case "OneSignal#clearTriggers":
+        state.clearedTriggers = true;
+        break;
+      case "OneSignal#paused":
+        state.inAppMessagesPaused = call.arguments as bool?;
+        break;
+      case "OneSignal#arePaused":
+        return state.inAppMessagesPaused ?? false;
+      case "OneSignal#lifecycleInit":
+        state.lifecycleInitCalled = true;
+        break;
     }
   }
 }
@@ -171,6 +202,14 @@ class OneSignalState {
   dynamic liveActivityAttributes;
   dynamic liveActivityContent;
   Map<dynamic, dynamic>? liveActivitySetupOptions;
+
+  // in app messages
+  bool? inAppMessagesPaused;
+  bool? lifecycleInitCalled;
+  Map<dynamic, dynamic>? triggers;
+  String? removedTrigger;
+  List<dynamic>? removedTriggers;
+  bool? clearedTriggers;
 
   // tags
   Map<dynamic, dynamic>? tags;
@@ -222,5 +261,9 @@ class OneSignalState {
   void setEmail(Map<dynamic, dynamic> params) {
     email = params['email'] as String?;
     emailAuthHashToken = params['emailAuthHashToken'] as String?;
+  }
+
+  void addTrigger(Map<dynamic, dynamic> params) {
+    triggers = params;
   }
 }
