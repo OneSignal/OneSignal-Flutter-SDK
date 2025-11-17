@@ -1,7 +1,8 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onesignal_flutter/src/liveactivities.dart';
+
+import 'mock_channel.dart';
 
 const activityId = 'test-activity-id';
 const token = 'test-token';
@@ -12,30 +13,17 @@ void main() {
 
   group('OneSignalLiveActivities', () {
     late OneSignalLiveActivities liveActivities;
-    late List<MethodCall> methodCalls;
+    late OneSignalMockChannelController channelController;
 
     setUp(() {
-      methodCalls = [];
+      channelController = OneSignalMockChannelController();
+      channelController.resetState();
       liveActivities = OneSignalLiveActivities();
       debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(
-        const MethodChannel('OneSignal#liveactivities'),
-        (call) async {
-          methodCalls.add(call);
-          return null;
-        },
-      );
     });
 
     tearDown(() {
       debugDefaultTargetPlatformOverride = null;
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(
-        const MethodChannel('OneSignal#liveactivities'),
-        null,
-      );
     });
 
     group('enterLiveActivity', () {
@@ -43,10 +31,9 @@ void main() {
           () async {
         await liveActivities.enterLiveActivity(activityId, token);
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#enterLiveActivity');
-        expect(methodCalls[0].arguments,
-            {'activityId': activityId, 'token': token});
+        expect(channelController.state.liveActivityEntered, true);
+        expect(channelController.state.liveActivityId, activityId);
+        expect(channelController.state.liveActivityToken, token);
       });
     });
 
@@ -54,9 +41,8 @@ void main() {
       test('invokes OneSignal#exitLiveActivity with activityId', () async {
         await liveActivities.exitLiveActivity(activityId);
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#exitLiveActivity');
-        expect(methodCalls[0].arguments, {'activityId': activityId});
+        expect(channelController.state.liveActivityExited, true);
+        expect(channelController.state.liveActivityId, activityId);
       });
     });
 
@@ -64,9 +50,8 @@ void main() {
       test('invokes OneSignal#setupDefault without options', () async {
         await liveActivities.setupDefault();
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#setupDefault');
-        expect(methodCalls[0].arguments['options'], isNull);
+        expect(channelController.state.liveActivitySetupCalled, true);
+        expect(channelController.state.liveActivitySetupOptions, isNull);
       });
 
       test('invokes OneSignal#setupDefault with custom options', () async {
@@ -77,9 +62,8 @@ void main() {
 
         await liveActivities.setupDefault(options: options);
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#setupDefault');
-        expect(methodCalls[0].arguments['options'], {
+        expect(channelController.state.liveActivitySetupCalled, true);
+        expect(channelController.state.liveActivitySetupOptions, {
           'enablePushToStart': false,
           'enablePushToUpdate': false,
         });
@@ -90,7 +74,7 @@ void main() {
 
         await liveActivities.setupDefault(options: options);
 
-        expect(methodCalls[0].arguments['options'], {
+        expect(channelController.state.liveActivitySetupOptions, {
           'enablePushToStart': true,
           'enablePushToUpdate': true,
         });
@@ -104,13 +88,10 @@ void main() {
 
         await liveActivities.startDefault(activityId, attributes, content);
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#startDefault');
-        expect(methodCalls[0].arguments, {
-          'activityId': activityId,
-          'attributes': attributes,
-          'content': content,
-        });
+        expect(channelController.state.liveActivityStarted, true);
+        expect(channelController.state.liveActivityId, activityId);
+        expect(channelController.state.liveActivityAttributes, attributes);
+        expect(channelController.state.liveActivityContent, content);
       });
 
       test('handles complex nested attributes and content', () async {
@@ -126,10 +107,10 @@ void main() {
         await liveActivities.startDefault(
             activityId, complexAttributes, complexContent);
 
-        expect(
-            methodCalls[0].arguments['attributes']['nested']['key'], 'value');
-        expect(
-            methodCalls[0].arguments['content']['data']['status'], 'running');
+        expect(channelController.state.liveActivityAttributes['nested']['key'],
+            'value');
+        expect(channelController.state.liveActivityContent['data']['status'],
+            'running');
       });
     });
 
@@ -138,10 +119,9 @@ void main() {
           () async {
         await liveActivities.setPushToStartToken(activityType, token);
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#setPushToStartToken');
-        expect(methodCalls[0].arguments,
-            {'activityType': activityType, 'token': token});
+        expect(channelController.state.liveActivityPushToStartSet, true);
+        expect(channelController.state.liveActivityType, activityType);
+        expect(channelController.state.liveActivityPushToken, token);
       });
     });
 
@@ -150,9 +130,8 @@ void main() {
           () async {
         await liveActivities.removePushToStartToken(activityType);
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#removePushToStartToken');
-        expect(methodCalls[0].arguments, {'activityType': activityType});
+        expect(channelController.state.liveActivityPushToStartRemoved, true);
+        expect(channelController.state.liveActivityType, activityType);
       });
     });
   });

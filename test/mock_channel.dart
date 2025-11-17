@@ -90,6 +90,44 @@ class OneSignalMockChannelController {
         break;
       case "OneSignal#isShared":
         return state.locationShared ?? false;
+      case "OneSignal#enterLiveActivity":
+        state.liveActivityEntered = true;
+        state.liveActivityId =
+            (call.arguments as Map<dynamic, dynamic>)['activityId'] as String?;
+        state.liveActivityToken =
+            (call.arguments as Map<dynamic, dynamic>)['token'] as String?;
+        break;
+      case "OneSignal#exitLiveActivity":
+        state.liveActivityExited = true;
+        state.liveActivityId =
+            (call.arguments as Map<dynamic, dynamic>)['activityId'] as String?;
+        break;
+      case "OneSignal#setupDefault":
+        state.liveActivitySetupCalled = true;
+        state.liveActivitySetupOptions = (call.arguments
+            as Map<dynamic, dynamic>)['options'] as Map<dynamic, dynamic>?;
+        break;
+      case "OneSignal#startDefault":
+        state.liveActivityStarted = true;
+        state.liveActivityId =
+            (call.arguments as Map<dynamic, dynamic>)['activityId'] as String?;
+        state.liveActivityAttributes =
+            (call.arguments as Map<dynamic, dynamic>)['attributes'];
+        state.liveActivityContent =
+            (call.arguments as Map<dynamic, dynamic>)['content'];
+        break;
+      case "OneSignal#setPushToStartToken":
+        state.liveActivityPushToStartSet = true;
+        state.liveActivityType = (call.arguments
+            as Map<dynamic, dynamic>)['activityType'] as String?;
+        state.liveActivityPushToken =
+            (call.arguments as Map<dynamic, dynamic>)['token'] as String?;
+        break;
+      case "OneSignal#removePushToStartToken":
+        state.liveActivityPushToStartRemoved = true;
+        state.liveActivityType = (call.arguments
+            as Map<dynamic, dynamic>)['activityType'] as String?;
+        break;
     }
   }
 }
@@ -118,6 +156,21 @@ class OneSignalState {
   bool? disablePush;
   String? externalId;
   String? language;
+
+  // live activities
+  bool? liveActivityEntered;
+  bool? liveActivityExited;
+  bool? liveActivityStarted;
+  bool? liveActivitySetupCalled;
+  bool? liveActivityPushToStartSet;
+  bool? liveActivityPushToStartRemoved;
+  String? liveActivityId;
+  String? liveActivityToken;
+  String? liveActivityType;
+  String? liveActivityPushToken;
+  dynamic liveActivityAttributes;
+  dynamic liveActivityContent;
+  Map<dynamic, dynamic>? liveActivitySetupOptions;
 
   // tags
   Map<dynamic, dynamic>? tags;
