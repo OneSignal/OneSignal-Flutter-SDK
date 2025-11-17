@@ -95,8 +95,17 @@ class OneSignalMockChannelController {
             (call.arguments as Map<dynamic, dynamic>)['language'] as String?;
         return {"success": true};
       case "OneSignal#requestPermission":
-        state.locationPermissionRequested = true;
-        break;
+        // Location requestPermission (no arguments)
+        if (call.arguments == null) {
+          state.locationPermissionRequested = true;
+          break;
+        }
+        // Notifications requestPermission (with fallbackToSettings argument)
+        // Falls through to the notifications handler below
+        state.requestPermissionCalled = true;
+        state.requestPermissionFallbackToSettings = (call.arguments
+            as Map<dynamic, dynamic>)['fallbackToSettings'] as bool?;
+        return true;
       case "OneSignal#setShared":
         state.locationShared = call.arguments as bool?;
         break;
@@ -186,10 +195,16 @@ class OneSignalMockChannelController {
         break;
       case "OneSignal#permission":
         return state.notificationPermission ?? false;
+      case "OneSignal#permissionNative":
+        return state.notificationPermissionNative ?? 1; // 1 = denied
       case "OneSignal#canRequest":
         return state.canRequestPermission ?? false;
+      case "OneSignal#registerForProvisionalAuthorization":
+        state.registerForProvisionalAuthorizationCalled = true;
+        return true;
       case "OneSignal#addNativeClickListener":
         state.nativeClickListenerAdded = true;
+        state.nativeClickListenerAddedCount++;
         break;
       case "OneSignal#proceedWithWillDisplay":
         state.proceedWithWillDisplayCalled = true;
@@ -258,8 +273,14 @@ class OneSignalState {
   String? removedNotificationGroup;
   bool? clearedAllNotifications;
   bool? notificationPermission;
+  int?
+      notificationPermissionNative; // 0 = notDetermined, 1 = denied, 2 = authorized, etc.
   bool? canRequestPermission;
+  bool? requestPermissionCalled;
+  bool? requestPermissionFallbackToSettings;
+  bool? registerForProvisionalAuthorizationCalled;
   bool? nativeClickListenerAdded;
+  int nativeClickListenerAddedCount = 0;
   bool? proceedWithWillDisplayCalled;
 
   /*

@@ -26,7 +26,7 @@ class OneSignalNotifications {
       <OnNotificationPermissionChangeObserver>[];
   // constructor method
   OneSignalNotifications() {
-    this._channel.setMethodCallHandler(_handleMethod);
+    this._channel.setMethodCallHandler(handleMethod);
   }
 
   bool _permission = false;
@@ -123,7 +123,7 @@ class OneSignalNotifications {
     return await _channel.invokeMethod("OneSignal#lifecycleInit");
   }
 
-  Future<Null> _handleMethod(MethodCall call) async {
+  Future<Null> handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#onClickNotification') {
       for (var listener in _clickListeners) {
         listener(

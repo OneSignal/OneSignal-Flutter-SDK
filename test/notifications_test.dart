@@ -58,12 +58,38 @@ void main() {
         final permission = await notifications.permissionNative();
         expect(permission, OSNotificationPermission.denied);
       });
+
+      test('returns authorized on iOS when native method returns authorized',
+          () async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        channelController.state.notificationPermissionNative =
+            OSNotificationPermission.authorized.index;
+
+        final permission = await notifications.permissionNative();
+        expect(permission, OSNotificationPermission.authorized);
+      });
+
+      test('returns denied on iOS when native method returns denied', () async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+        channelController.state.notificationPermissionNative =
+            OSNotificationPermission.denied.index;
+
+        final permission = await notifications.permissionNative();
+        expect(permission, OSNotificationPermission.denied);
+      });
     });
 
     group('canRequest', () {
-      test('invokes OneSignal#canRequest method', () async {
+      test('returns true when canRequestPermission is true', () async {
+        channelController.state.canRequestPermission = true;
         final result = await notifications.canRequest();
-        expect(result, isA<bool>());
+        expect(result, true);
+      });
+
+      test('returns false when canRequestPermission is false', () async {
+        channelController.state.canRequestPermission = false;
+        final result = await notifications.canRequest();
+        expect(result, false);
       });
     });
 
@@ -74,13 +100,6 @@ void main() {
         await notifications.removeNotification(notificationId);
         expect(channelController.state.removedNotificationId, notificationId);
       });
-
-      test('does nothing on iOS', () async {
-        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        const notificationId = 123;
-        await notifications.removeNotification(notificationId);
-        expect(true, true);
-      });
     });
 
     group('removeGroupedNotifications', () {
@@ -90,13 +109,6 @@ void main() {
         await notifications.removeGroupedNotifications(notificationGroup);
         expect(channelController.state.removedNotificationGroup,
             notificationGroup);
-      });
-
-      test('does nothing on iOS', () async {
-        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        const notificationGroup = 'test_group';
-        await notifications.removeGroupedNotifications(notificationGroup);
-        expect(true, true);
       });
     });
 
@@ -110,52 +122,30 @@ void main() {
     group('requestPermission', () {
       test('invokes OneSignal#requestPermission with fallbackToSettings true',
           () async {
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(
-                const MethodChannel('OneSignal#notifications'), (call) async {
-          if (call.method == 'OneSignal#requestPermission') {
-            final args = call.arguments as Map<dynamic, dynamic>;
-            expect(args['fallbackToSettings'], true);
-            return true;
-          }
-          return null;
-        });
-
         await notifications.requestPermission(true);
+        expect(channelController.state.requestPermissionCalled, true);
+        expect(
+            channelController.state.requestPermissionFallbackToSettings, true);
       });
 
       test('invokes OneSignal#requestPermission with fallbackToSettings false',
           () async {
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(
-                const MethodChannel('OneSignal#notifications'), (call) async {
-          if (call.method == 'OneSignal#requestPermission') {
-            final args = call.arguments as Map<dynamic, dynamic>;
-            expect(args['fallbackToSettings'], false);
-            return true;
-          }
-          return null;
-        });
-
         await notifications.requestPermission(false);
+        expect(channelController.state.requestPermissionCalled, true);
+        expect(
+            channelController.state.requestPermissionFallbackToSettings, false);
       });
     });
 
     group('registerForProvisionalAuthorization', () {
       test('invokes method on iOS only', () async {
         debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(
-                const MethodChannel('OneSignal#notifications'), (call) async {
-          if (call.method == 'OneSignal#registerForProvisionalAuthorization') {
-            return true;
-          }
-          return null;
-        });
-
         final result =
             await notifications.registerForProvisionalAuthorization(true);
-        expect(result, isA<bool>());
+        expect(result, true);
+        expect(
+            channelController.state.registerForProvisionalAuthorizationCalled,
+            true);
       });
 
       test('returns false on Android', () async {
@@ -246,6 +236,7 @@ void main() {
         notifications.addClickListener(listener2);
 
         expect(channelController.state.nativeClickListenerAdded, true);
+        expect(channelController.state.nativeClickListenerAddedCount, 1);
       });
 
       test('removeClickListener removes listener', () {
@@ -283,28 +274,28 @@ void main() {
     });
 
     group('Will Display Listeners', () {
-      test('addForegroundWillDisplayListener adds listener', () {
+      final notificationData = {
+        'notification': {
+          'notificationId': 'test-id',
+          'title': 'Test',
+          'body': 'Test body'
+        }
+      };
+
+      test('addForegroundWillDisplayListener adds listener', () async {
         var listenerCalled = false;
         void listener(OSNotificationWillDisplayEvent event) {
           listenerCalled = true;
         }
 
         notifications.addForegroundWillDisplayListener(listener);
+        await notifications.handleMethod(MethodCall(
+            'OneSignal#onWillDisplayNotification', notificationData));
 
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(
-                const MethodChannel('OneSignal#notifications'), (call) async {
-          if (call.method == 'OneSignal#onWillDisplayNotification') {
-            listener(OSNotificationWillDisplayEvent(
-                (call.arguments as Map<String, dynamic>)));
-          }
-          return null;
-        });
-
-        expect(listenerCalled, false);
+        expect(listenerCalled, true);
       });
 
-      test('removeForegroundWillDisplayListener removes listener', () {
+      test('removeForegroundWillDisplayListener removes listener', () async {
         var listenerCalled = false;
         void listener(OSNotificationWillDisplayEvent event) {
           listenerCalled = true;
@@ -312,29 +303,53 @@ void main() {
 
         notifications.addForegroundWillDisplayListener(listener);
         notifications.removeForegroundWillDisplayListener(listener);
+        await notifications.handleMethod(MethodCall(
+            'OneSignal#onWillDisplayNotification', notificationData));
 
         expect(listenerCalled, false);
       });
 
-      test('multiple will display listeners can be added', () {
-        void listener1(OSNotificationWillDisplayEvent event) {}
-        void listener2(OSNotificationWillDisplayEvent event) {}
+      test('multiple will display listeners can be added', () async {
+        var listener1Called = false;
+        var listener2Called = false;
+        void listener1(OSNotificationWillDisplayEvent event) {
+          listener1Called = true;
+        }
+
+        void listener2(OSNotificationWillDisplayEvent event) {
+          listener2Called = true;
+        }
 
         notifications.addForegroundWillDisplayListener(listener1);
         notifications.addForegroundWillDisplayListener(listener2);
 
-        expect(true, true);
+        await notifications.handleMethod(MethodCall(
+            'OneSignal#onWillDisplayNotification', notificationData));
+
+        expect(listener1Called, true);
+        expect(listener2Called, true);
       });
 
-      test('can remove specific will display listener', () {
-        void listener1(OSNotificationWillDisplayEvent event) {}
-        void listener2(OSNotificationWillDisplayEvent event) {}
+      test('can remove specific will display listener', () async {
+        var listener1Called = false;
+        var listener2Called = false;
+        void listener1(OSNotificationWillDisplayEvent event) {
+          listener1Called = true;
+        }
+
+        void listener2(OSNotificationWillDisplayEvent event) {
+          listener2Called = true;
+        }
 
         notifications.addForegroundWillDisplayListener(listener1);
         notifications.addForegroundWillDisplayListener(listener2);
         notifications.removeForegroundWillDisplayListener(listener1);
 
-        expect(true, true);
+        await notifications.handleMethod(MethodCall(
+            'OneSignal#onWillDisplayNotification', notificationData));
+
+        expect(listener1Called, false);
+        expect(listener2Called, true);
       });
     });
 
@@ -426,39 +441,6 @@ void main() {
 
         expect(callLog.length, 1);
         expect(callLog[0], false);
-      });
-
-      test('click listener can be added and invoked multiple times', () {
-        void listener(OSNotificationClickEvent event) {}
-
-        notifications.addClickListener(listener);
-        expect(true, true);
-      });
-
-      test('will display listener can be added and invoked multiple times', () {
-        void listener(OSNotificationWillDisplayEvent event) {}
-
-        notifications.addForegroundWillDisplayListener(listener);
-        expect(true, true);
-      });
-
-      test('notification IDs are passed correctly through preventDefault', () {
-        final notificationIds = ['id-1', 'id-2', 'id-3'];
-
-        for (final id in notificationIds) {
-          notifications.preventDefault(id);
-          expect(channelController.state.preventedNotificationId, id);
-        }
-      });
-
-      test('notification IDs are passed correctly through displayNotification',
-          () {
-        final notificationIds = ['id-1', 'id-2', 'id-3'];
-
-        for (final id in notificationIds) {
-          notifications.displayNotification(id);
-          expect(channelController.state.displayedNotificationId, id);
-        }
       });
     });
   });
