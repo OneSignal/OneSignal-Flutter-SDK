@@ -18,6 +18,8 @@ class OneSignalMockChannelController {
       const MethodChannel('OneSignal#inappmessages');
   final MethodChannel _liveActivitiesChannel =
       const MethodChannel('OneSignal#liveactivities');
+  final MethodChannel _notificationsChannel =
+      const MethodChannel('OneSignal#notifications');
 
   late OneSignalState state;
 
@@ -34,6 +36,8 @@ class OneSignalMockChannelController {
         .setMockMethodCallHandler(_inAppMessagesChannel, _handleMethod);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_liveActivitiesChannel, _handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_notificationsChannel, _handleMethod);
   }
 
   void resetState() {
@@ -159,6 +163,16 @@ class OneSignalMockChannelController {
       case "OneSignal#lifecycleInit":
         state.lifecycleInitCalled = true;
         break;
+      case "OneSignal#displayNotification":
+        // This is called on OneSignal#notifications channel
+        state.displayedNotificationId = (call.arguments
+            as Map<dynamic, dynamic>)['notificationId'] as String?;
+        break;
+      case "OneSignal#preventDefault":
+        // This is called on OneSignal#notifications channel
+        state.preventedNotificationId = (call.arguments
+            as Map<dynamic, dynamic>)['notificationId'] as String?;
+        break;
     }
   }
 }
@@ -217,6 +231,8 @@ class OneSignalState {
 
   // notifications
   Map<dynamic, dynamic>? postNotificationJson;
+  String? displayedNotificationId;
+  String? preventedNotificationId;
 
   /*
     All of the following functions parse the MethodCall

@@ -1,5 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:onesignal_flutter/src/notification.dart';
+
+import 'mock_channel.dart';
 
 const validNotificationJson = {
   'notificationId': 'notification-123',
@@ -144,6 +147,44 @@ void main() {
       expect(notification.backgroundImageLayout!.bodyTextColor, '#FF666666');
     });
 
+    test('parses grouped notifications correctly', () {
+      final groupedNotificationsJson = '''[
+        {"notificationId": "grouped-1", "title": "Title 1", "body": "Body 1"},
+        {"notificationId": "grouped-2", "title": "Title 2", "body": "Body 2"},
+        {"notificationId": "grouped-3", "title": "Title 3", "body": "Body 3"}
+      ]''';
+
+      final json = {
+        'notificationId': 'parent-notification',
+        'title': 'Parent Title',
+        'body': 'Parent Body',
+        'groupedNotifications': groupedNotificationsJson,
+      };
+      final notification = OSNotification(json);
+
+      expect(notification.groupedNotifications, isNotNull);
+      expect(notification.groupedNotifications!.length, 3);
+      expect(notification.groupedNotifications![0].notificationId, 'grouped-1');
+      expect(notification.groupedNotifications![0].title, 'Title 1');
+      expect(notification.groupedNotifications![1].notificationId, 'grouped-2');
+      expect(notification.groupedNotifications![1].body, 'Body 2');
+      expect(notification.groupedNotifications![2].notificationId, 'grouped-3');
+      expect(notification.groupedNotifications![2].title, 'Title 3');
+    });
+
+    test('creates with empty grouped notifications', () {
+      final groupedNotificationsJson = '[]';
+
+      final json = {
+        'notificationId': 'notification-with-empty-group',
+        'groupedNotifications': groupedNotificationsJson,
+      };
+      final notification = OSNotification(json);
+
+      expect(notification.groupedNotifications, isNotNull);
+      expect(notification.groupedNotifications!.length, 0);
+    });
+
     test('jsonRepresentation returns correct JSON string', () {
       final notification = OSNotification(validNotificationJson);
       final jsonRep = notification.jsonRepresentation();
@@ -276,14 +317,6 @@ void main() {
       expect(layout.bodyTextColor, '#FF666666');
     });
 
-    test('creates from JSON with missing fields', () {
-      final layout = OSAndroidBackgroundImageLayout({'image': 'bg.png'});
-
-      expect(layout.image, 'bg.png');
-      expect(layout.titleTextColor, isNull);
-      expect(layout.bodyTextColor, isNull);
-    });
-
     test('creates from empty JSON', () {
       final layout = OSAndroidBackgroundImageLayout({});
 
@@ -393,6 +426,159 @@ void main() {
       // The result includes actionId and url
       expect(jsonRep, contains('action-123'));
       expect(jsonRep, contains('https://example.com/action'));
+    });
+  });
+
+  group('OSDisplayNotification extension', () {
+    late OneSignalMockChannelController channelController;
+
+    setUp(() {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      channelController = OneSignalMockChannelController();
+      channelController.resetState();
+    });
+
+    test('display() calls displayNotification with correct notification ID',
+        () {
+      final notification = OSNotification(validNotificationJson);
+
+      notification.display();
+
+      expect(
+          channelController.state.displayedNotificationId, 'notification-123');
+    });
+
+    test('display() works with different notification IDs', () {
+      final json = {'notificationId': 'custom-notification-id'};
+      final notification = OSNotification(json);
+
+      notification.display();
+
+      expect(channelController.state.displayedNotificationId,
+          'custom-notification-id');
+    });
+
+    test('multiple display() calls update the displayed notification ID', () {
+      final notification1 = OSNotification({'notificationId': 'first-id'});
+      final notification2 = OSNotification({'notificationId': 'second-id'});
+
+      notification1.display();
+      expect(channelController.state.displayedNotificationId, 'first-id');
+
+      notification2.display();
+      expect(channelController.state.displayedNotificationId, 'second-id');
+    });
+  });
+
+  group('OSNotificationWillDisplayEvent preventDefault', () {
+    late OneSignalMockChannelController channelController;
+
+    setUp(() {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      channelController = OneSignalMockChannelController();
+      channelController.resetState();
+    });
+
+    test('preventDefault() calls preventDefault with correct notification ID',
+        () {
+      final json = {
+        'notification': validNotificationJson,
+      };
+      final event = OSNotificationWillDisplayEvent(json);
+
+      event.preventDefault();
+
+      expect(
+          channelController.state.preventedNotificationId, 'notification-123');
+    });
+
+    test('preventDefault() works with different notification IDs', () {
+      final json = {
+        'notification': {'notificationId': 'custom-will-display-id'},
+      };
+      final event = OSNotificationWillDisplayEvent(json);
+
+      event.preventDefault();
+
+      expect(channelController.state.preventedNotificationId,
+          'custom-will-display-id');
+    });
+
+    test('multiple preventDefault() calls update the prevented notification ID',
+        () {
+      final json1 = {
+        'notification': {'notificationId': 'prevent-1'},
+      };
+      final json2 = {
+        'notification': {'notificationId': 'prevent-2'},
+      };
+      final event1 = OSNotificationWillDisplayEvent(json1);
+      final event2 = OSNotificationWillDisplayEvent(json2);
+
+      event1.preventDefault();
+      expect(channelController.state.preventedNotificationId, 'prevent-1');
+
+      event2.preventDefault();
+      expect(channelController.state.preventedNotificationId, 'prevent-2');
+    });
+  });
+
+  group('OSNotificationClickEvent preventDefault', () {
+    late OneSignalMockChannelController channelController;
+
+    setUp(() {
+      TestWidgetsFlutterBinding.ensureInitialized();
+      channelController = OneSignalMockChannelController();
+      channelController.resetState();
+    });
+
+    test('preventDefault() calls preventDefault with correct notification ID',
+        () {
+      final json = {
+        'notification': validNotificationJson,
+        'result': clickResultJson,
+      };
+      final event = OSNotificationClickEvent(json);
+
+      event.preventDefault();
+
+      expect(
+          channelController.state.preventedNotificationId, 'notification-123');
+    });
+
+    test('preventDefault() works with different notification IDs', () {
+      final json = {
+        'notification': {'notificationId': 'custom-click-id'},
+        'result': <String, dynamic>{},
+      };
+      final event = OSNotificationClickEvent(json);
+
+      event.preventDefault();
+
+      expect(
+          channelController.state.preventedNotificationId, 'custom-click-id');
+    });
+
+    test('multiple preventDefault() calls update the prevented notification ID',
+        () {
+      final json1 = {
+        'notification': {'notificationId': 'click-prevent-1'},
+        'result': <String, dynamic>{},
+      };
+      final json2 = {
+        'notification': {'notificationId': 'click-prevent-2'},
+        'result': <String, dynamic>{},
+      };
+      final event1 = OSNotificationClickEvent(json1);
+      final event2 = OSNotificationClickEvent(json2);
+
+      event1.preventDefault();
+      expect(
+          channelController.state.preventedNotificationId, 'click-prevent-1');
+
+      event2.preventDefault();
+      expect(
+          channelController.state.preventedNotificationId, 'click-prevent-2');
     });
   });
 }

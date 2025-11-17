@@ -1,6 +1,7 @@
-import 'package:onesignal_flutter/src/utils.dart';
-import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'dart:convert';
+
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 
 /// A class representing the notification, including the
 /// payload of the notification as well as additional
