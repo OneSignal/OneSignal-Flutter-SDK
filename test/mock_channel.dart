@@ -24,6 +24,7 @@ class OneSignalMockChannelController {
       const MethodChannel('OneSignal#pushsubscription');
   final MethodChannel _sessionChannel =
       const MethodChannel('OneSignal#session');
+  final MethodChannel _userChannel = const MethodChannel('OneSignal#user');
 
   late OneSignalState state;
 
@@ -46,6 +47,8 @@ class OneSignalMockChannelController {
         .setMockMethodCallHandler(_pushSubscriptionChannel, _handleMethod);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_sessionChannel, _handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_userChannel, _handleMethod);
   }
 
   void resetState() {
@@ -59,6 +62,18 @@ class OneSignalMockChannelController {
       _pushSubscriptionChannel.name,
       _pushSubscriptionChannel.codec.encodeMethodCall(
         MethodCall('OneSignal#onPushSubscriptionChange', changeData),
+      ),
+      (ByteData? data) {},
+    );
+  }
+
+  // Helper method to simulate user state changes from native
+  void simulateUserStateChange(Map<String, dynamic> changeData) {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .handlePlatformMessage(
+      _userChannel.name,
+      _userChannel.codec.encodeMethodCall(
+        MethodCall('OneSignal#onUserStateChange', changeData),
       ),
       (ByteData? data) {},
     );
@@ -257,6 +272,46 @@ class OneSignalMockChannelController {
         state.addedOutcomeWithValueValue = args['outcome_value'] as double;
         state.addOutcomeWithValueCallCount++;
         break;
+      case "OneSignal#setLanguage":
+        state.language =
+            (call.arguments as Map<dynamic, dynamic>)['language'] as String?;
+        break;
+      case "OneSignal#addAliases":
+        state.aliases = call.arguments as Map<dynamic, dynamic>?;
+        break;
+      case "OneSignal#removeAliases":
+        state.removedAliases = call.arguments as List<dynamic>?;
+        break;
+      case "OneSignal#addTags":
+        state.tags = call.arguments as Map<dynamic, dynamic>?;
+        break;
+      case "OneSignal#removeTags":
+        state.deleteTags = call.arguments as List<dynamic>?;
+        break;
+      case "OneSignal#getTags":
+        return state.tags ?? {};
+      case "OneSignal#addEmail":
+        state.addedEmail = call.arguments as String?;
+        break;
+      case "OneSignal#removeEmail":
+        state.removedEmail = call.arguments as String?;
+        break;
+      case "OneSignal#addSms":
+        state.addedSms = call.arguments as String?;
+        break;
+      case "OneSignal#removeSms":
+        state.removedSms = call.arguments as String?;
+        break;
+      case "OneSignal#getExternalId":
+        return state.externalId;
+      case "OneSignal#getOnesignalId":
+        return state.onesignalId;
+      case "OneSignal#lifecycleInit":
+        // Could be from user, inappmessages, or pushsubscription
+        // We'll track both
+        state.lifecycleInitCalled = true;
+        state.userLifecycleInitCalled = true;
+        break;
     }
   }
 }
@@ -348,6 +403,16 @@ class OneSignalState {
   String? addedOutcomeWithValueName;
   double? addedOutcomeWithValueValue;
   int addOutcomeWithValueCallCount = 0;
+
+  // user
+  String? onesignalId;
+  Map<dynamic, dynamic>? aliases;
+  List<dynamic>? removedAliases;
+  String? addedEmail;
+  String? removedEmail;
+  String? addedSms;
+  String? removedSms;
+  bool? userLifecycleInitCalled;
 
   /*
     All of the following functions parse the MethodCall
