@@ -22,6 +22,8 @@ class OneSignalMockChannelController {
       const MethodChannel('OneSignal#notifications');
   final MethodChannel _pushSubscriptionChannel =
       const MethodChannel('OneSignal#pushsubscription');
+  final MethodChannel _sessionChannel =
+      const MethodChannel('OneSignal#session');
 
   late OneSignalState state;
 
@@ -42,6 +44,8 @@ class OneSignalMockChannelController {
         .setMockMethodCallHandler(_notificationsChannel, _handleMethod);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_pushSubscriptionChannel, _handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_sessionChannel, _handleMethod);
   }
 
   void resetState() {
@@ -239,6 +243,20 @@ class OneSignalMockChannelController {
         state.pushSubscriptionOptOutCalled = true;
         state.pushSubscriptionOptOutCallCount++;
         break;
+      case "OneSignal#addOutcome":
+        state.addedOutcome = call.arguments as String;
+        state.addOutcomeCallCount++;
+        break;
+      case "OneSignal#addUniqueOutcome":
+        state.addedUniqueOutcome = call.arguments as String;
+        state.addUniqueOutcomeCallCount++;
+        break;
+      case "OneSignal#addOutcomeWithValue":
+        final args = call.arguments as Map<dynamic, dynamic>;
+        state.addedOutcomeWithValueName = args['outcome_name'] as String;
+        state.addedOutcomeWithValueValue = args['outcome_value'] as double;
+        state.addOutcomeWithValueCallCount++;
+        break;
     }
   }
 }
@@ -321,6 +339,15 @@ class OneSignalState {
   bool pushSubscriptionOptOutCalled = false;
   int pushSubscriptionOptInCallCount = 0;
   int pushSubscriptionOptOutCallCount = 0;
+
+  // session outcomes
+  String? addedOutcome;
+  int addOutcomeCallCount = 0;
+  String? addedUniqueOutcome;
+  int addUniqueOutcomeCallCount = 0;
+  String? addedOutcomeWithValueName;
+  double? addedOutcomeWithValueValue;
+  int addOutcomeWithValueCallCount = 0;
 
   /*
     All of the following functions parse the MethodCall
