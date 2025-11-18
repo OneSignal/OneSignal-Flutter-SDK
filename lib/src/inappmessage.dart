@@ -33,12 +33,12 @@ class OSInAppMessageClickResult extends JSONStringRepresentable {
   String? url;
 
   // Whether or not the click action should dismiss the IAM
-  bool? closingMessage;
+  bool closingMessage = false;
 
   OSInAppMessageClickResult(Map<String, dynamic> json) {
     this.actionId = json["action_id"];
     this.url = json["url"];
-    this.closingMessage = json["closing_message"] ?? false;
+    this.closingMessage = json["closing_message"] as bool;
   }
 
   String jsonRepresentation() {

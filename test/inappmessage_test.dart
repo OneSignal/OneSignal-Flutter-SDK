@@ -77,8 +77,10 @@ void main() {
       expect(result.closingMessage, true);
     });
 
-    test('creates from empty JSON', () {
-      final json = <String, dynamic>{};
+    test('creates from minimal JSON', () {
+      final json = <String, dynamic>{
+        'closing_message': false,
+      };
       final result = OSInAppMessageClickResult(json);
 
       expect(result.actionId, isNull);
@@ -96,7 +98,9 @@ void main() {
     });
 
     test('jsonRepresentation handles null optional fields', () {
-      final json = <String, dynamic>{};
+      final json = <String, dynamic>{
+        'closing_message': false,
+      };
       final result = OSInAppMessageClickResult(json);
       final jsonString = result.jsonRepresentation();
 
@@ -111,6 +115,7 @@ void main() {
       final json = {
         'message': validMessageJson,
         'result': validClickResultJson,
+        'closing_message': false,
       };
       final event = OSInAppMessageClickEvent(json);
 
@@ -123,7 +128,9 @@ void main() {
     test('creates from JSON with minimal fields', () {
       final json = {
         'message': validMessageJson,
-        'result': {},
+        'result': {
+          'closing_message': false,
+        },
       };
       final event = OSInAppMessageClickEvent(json);
 
