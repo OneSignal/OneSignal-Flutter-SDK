@@ -7,7 +7,6 @@ on:
       - ".github/**"
       - ".vscode/**"
       - "README.md"
-  workflow_dispatch:
 
 jobs:
   build:
@@ -19,14 +18,17 @@ jobs:
       - name: Checkout OneSignal-Flutter-SDK
         uses: actions/checkout@v5
 
-      - name: Install Dependencies 🔗⛓📦
+      - name: Install
         run: flutter pub get
 
       - name: Static Analysis
         run: flutter analyze
 
+      - name: Activate rps
+        run: dart pub global activate rps
+
       - name: Ensure the Dart code is formatted correctly
         run: dart format --set-exit-if-changed --output=none .
 
       - name: Run Flutter unit tests
-        run: flutter test
+        run: rps test
