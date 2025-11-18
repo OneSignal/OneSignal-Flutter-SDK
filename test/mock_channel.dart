@@ -20,6 +20,8 @@ class OneSignalMockChannelController {
       const MethodChannel('OneSignal#liveactivities');
   final MethodChannel _notificationsChannel =
       const MethodChannel('OneSignal#notifications');
+  final MethodChannel _pushSubscriptionChannel =
+      const MethodChannel('OneSignal#pushsubscription');
 
   late OneSignalState state;
 
@@ -38,10 +40,24 @@ class OneSignalMockChannelController {
         .setMockMethodCallHandler(_liveActivitiesChannel, _handleMethod);
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .setMockMethodCallHandler(_notificationsChannel, _handleMethod);
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .setMockMethodCallHandler(_pushSubscriptionChannel, _handleMethod);
   }
 
   void resetState() {
     state = OneSignalState();
+  }
+
+  // Helper method to simulate push subscription changes from native
+  void simulatePushSubscriptionChange(Map<String, dynamic> changeData) {
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .handlePlatformMessage(
+      _pushSubscriptionChannel.name,
+      _pushSubscriptionChannel.codec.encodeMethodCall(
+        MethodCall('OneSignal#onPushSubscriptionChange', changeData),
+      ),
+      (ByteData? data) {},
+    );
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -209,6 +225,20 @@ class OneSignalMockChannelController {
       case "OneSignal#proceedWithWillDisplay":
         state.proceedWithWillDisplayCalled = true;
         break;
+      case "OneSignal#pushSubscriptionToken":
+        return state.pushSubscriptionToken;
+      case "OneSignal#pushSubscriptionId":
+        return state.pushSubscriptionId;
+      case "OneSignal#pushSubscriptionOptedIn":
+        return state.pushSubscriptionOptedIn;
+      case "OneSignal#optIn":
+        state.pushSubscriptionOptInCalled = true;
+        state.pushSubscriptionOptInCallCount++;
+        break;
+      case "OneSignal#optOut":
+        state.pushSubscriptionOptOutCalled = true;
+        state.pushSubscriptionOptOutCallCount++;
+        break;
     }
   }
 }
@@ -282,6 +312,15 @@ class OneSignalState {
   bool? nativeClickListenerAdded;
   int nativeClickListenerAddedCount = 0;
   bool? proceedWithWillDisplayCalled;
+
+  // push subscription
+  String? pushSubscriptionId;
+  String? pushSubscriptionToken;
+  bool? pushSubscriptionOptedIn;
+  bool pushSubscriptionOptInCalled = false;
+  bool pushSubscriptionOptOutCalled = false;
+  int pushSubscriptionOptInCallCount = 0;
+  int pushSubscriptionOptOutCallCount = 0;
 
   /*
     All of the following functions parse the MethodCall
