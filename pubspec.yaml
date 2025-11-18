@@ -4,7 +4,7 @@ version: 5.3.4
 homepage: https://github.com/OneSignal/OneSignal-Flutter-SDK
 
 scripts:
-  test: flutter test --coverage &&  dlcov -c 80 --log=0 --include-untested-files=true
+  test: flutter test --coverage && dart run dlcov -c 80 --log=0 --include-untested-files=true
 
 flutter:
   plugin:
@@ -27,5 +27,5 @@ dev_dependencies:
   rps: ^0.9.1
 
 environment:
-  sdk: ">=2.12.0 <3.0.0"
-  flutter: ">=1.10.0"
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.0.0"

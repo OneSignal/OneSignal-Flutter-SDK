@@ -11,12 +11,17 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/cirruslabs/flutter:3.35.5
 
     steps:
       - name: Checkout OneSignal-Flutter-SDK
         uses: actions/checkout@v5
+
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.35.5
+          cache: true
 
       - name: Install
         run: flutter pub get
@@ -24,11 +29,8 @@ jobs:
       - name: Static Analysis
         run: flutter analyze
 
-      - name: Activate rps
-        run: dart pub global activate rps
-
       - name: Ensure the Dart code is formatted correctly
         run: dart format --set-exit-if-changed --output=none .
 
       - name: Run Flutter unit tests
-        run: rps test
+        run: dart run rps test
