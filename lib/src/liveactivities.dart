@@ -98,22 +98,12 @@ class OneSignalLiveActivities {
 
 /// The setup options for [OneSignal.LiveActivities.setupDefault].
 class LiveActivitySetupOptions {
-  late bool _enablePushToStart;
-  late bool _enablePushToUpdate;
-
-  LiveActivitySetupOptions(
-      {bool enablePushToStart = true, bool enablePushToUpdate = true}) {
-    this._enablePushToStart = enablePushToStart;
-    this._enablePushToUpdate = enablePushToUpdate;
-  }
-
   /// When true, OneSignal will listen for pushToStart tokens.
-  bool get enablePushToStart {
-    return this._enablePushToStart;
-  }
+  final bool enablePushToStart;
 
   /// When true, OneSignal will listen for pushToUpdate tokens for each started live activity.
-  bool get enablePushToUpdate {
-    return this._enablePushToUpdate;
-  }
+  final bool enablePushToUpdate;
+
+  LiveActivitySetupOptions(
+      {this.enablePushToStart = true, this.enablePushToUpdate = true});
 }
