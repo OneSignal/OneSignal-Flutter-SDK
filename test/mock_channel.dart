@@ -79,6 +79,66 @@ class OneSignalMockChannelController {
     );
   }
 
+  // Generic helper method to simulate method calls from native on any channel
+  void simulateMethodCall(
+      String channelName, String methodName, dynamic arguments) {
+    final MethodChannel channel;
+
+    switch (channelName) {
+      case 'OneSignal':
+        channel = _channel;
+        break;
+      case 'OneSignal#debug':
+        channel = _debugChannel;
+        break;
+      case 'OneSignal#tags':
+        channel = _tagsChannel;
+        break;
+      case 'OneSignal#location':
+        channel = _locationChannel;
+        break;
+      case 'OneSignal#inappmessages':
+        channel = _inAppMessagesChannel;
+        break;
+      case 'OneSignal#liveactivities':
+        channel = _liveActivitiesChannel;
+        break;
+      case 'OneSignal#notifications':
+        channel = _notificationsChannel;
+        break;
+      case 'OneSignal#pushsubscription':
+        channel = _pushSubscriptionChannel;
+        break;
+      case 'OneSignal#session':
+        channel = _sessionChannel;
+        break;
+      case 'OneSignal#user':
+        channel = _userChannel;
+        break;
+      default:
+        throw ArgumentError('Unknown channel: $channelName');
+    }
+
+    TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
+        .handlePlatformMessage(
+      channel.name,
+      channel.codec.encodeMethodCall(
+        MethodCall(methodName, arguments),
+      ),
+      (ByteData? data) {},
+    );
+  }
+
+  // Convenience wrapper for in-app message events
+  void simulateInAppMessageEvent(String eventName, Map<String, dynamic> data) {
+    simulateMethodCall('OneSignal#inappmessages', eventName, data);
+  }
+
+  // Convenience wrapper for notification events
+  void simulateNotificationEvent(String eventName, Map<String, dynamic> data) {
+    simulateMethodCall('OneSignal#notifications', eventName, data);
+  }
+
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "OneSignal#initialize":
