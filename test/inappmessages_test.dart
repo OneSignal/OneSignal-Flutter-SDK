@@ -3,6 +3,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:onesignal_flutter/src/inappmessage.dart';
 import 'package:onesignal_flutter/src/inappmessages.dart';
 
+import 'mock_channel.dart';
+
 const validMessageJson = {
   'message_id': 'test-message-id-123',
 };
@@ -20,47 +22,28 @@ void main() {
 
   group('OneSignalInAppMessages', () {
     late OneSignalInAppMessages inAppMessages;
-    late List<MethodCall> methodCalls;
+    late OneSignalMockChannelController channelController;
 
     setUp(() {
-      methodCalls = [];
+      channelController = OneSignalMockChannelController();
+      channelController.resetState();
       inAppMessages = OneSignalInAppMessages();
-
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(
-        const MethodChannel('OneSignal#inappmessages'),
-        (call) async {
-          methodCalls.add(call);
-          return null;
-        },
-      );
-    });
-
-    tearDown(() {
-      TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-          .setMockMethodCallHandler(
-        const MethodChannel('OneSignal#inappmessages'),
-        null,
-      );
     });
 
     group('addTrigger', () {
       test('invokes OneSignal#addTrigger method with key-value pair', () async {
         await inAppMessages.addTrigger(triggerName, 'true');
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#addTrigger');
-        expect(methodCalls[0].arguments, {triggerName: 'true'});
+        expect(channelController.state.triggers, {triggerName: 'true'});
       });
 
       test('handles multiple triggers sequentially', () async {
         const triggerName2 = 'trigger2';
         await inAppMessages.addTrigger(triggerName, 'value1');
-        await inAppMessages.addTrigger(triggerName2, 'value2');
+        expect(channelController.state.triggers, {triggerName: 'value1'});
 
-        expect(methodCalls.length, 2);
-        expect(methodCalls[0].arguments, {triggerName: 'value1'});
-        expect(methodCalls[1].arguments, {triggerName2: 'value2'});
+        await inAppMessages.addTrigger(triggerName2, 'value2');
+        expect(channelController.state.triggers, {triggerName2: 'value2'});
       });
     });
 
@@ -74,16 +57,13 @@ void main() {
 
         await inAppMessages.addTriggers(triggers);
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#addTriggers');
-        expect(methodCalls[0].arguments, triggers);
+        expect(channelController.state.triggers, triggers);
       });
 
       test('handles empty triggers map', () async {
         await inAppMessages.addTriggers({});
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].arguments, {});
+        expect(channelController.state.triggers, {});
       });
     });
 
@@ -91,9 +71,7 @@ void main() {
       test('invokes OneSignal#removeTrigger method with key', () async {
         await inAppMessages.removeTrigger(triggerName);
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#removeTrigger');
-        expect(methodCalls[0].arguments, triggerName);
+        expect(channelController.state.removedTrigger, triggerName);
       });
     });
 
@@ -104,16 +82,13 @@ void main() {
 
         await inAppMessages.removeTriggers(keys);
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#removeTriggers');
-        expect(methodCalls[0].arguments, keys);
+        expect(channelController.state.removedTriggers, keys);
       });
 
       test('handles empty keys list', () async {
         await inAppMessages.removeTriggers([]);
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].arguments, []);
+        expect(channelController.state.removedTriggers, []);
       });
     });
 
@@ -121,8 +96,7 @@ void main() {
       test('invokes OneSignal#clearTriggers method', () async {
         await inAppMessages.clearTriggers();
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#clearTriggers');
+        expect(channelController.state.clearedTriggers, true);
       });
     });
 
@@ -130,34 +104,27 @@ void main() {
       test('invokes OneSignal#paused', () async {
         await inAppMessages.paused(true);
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#paused');
-        expect(methodCalls[0].arguments, true);
+        expect(channelController.state.inAppMessagesPaused, true);
 
         await inAppMessages.paused(false);
 
-        expect(methodCalls.length, 2);
-        expect(methodCalls[1].method, 'OneSignal#paused');
-        expect(methodCalls[1].arguments, false);
+        expect(channelController.state.inAppMessagesPaused, false);
       });
     });
 
     group('arePaused', () {
-      test('invokes OneSignal#arePaused method', () async {
-        TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
-            .setMockMethodCallHandler(
-          const MethodChannel('OneSignal#inappmessages'),
-          (call) async {
-            if (call.method == 'OneSignal#arePaused') {
-              return true;
-            }
-            return null;
-          },
-        );
-
+      test('invokes OneSignal#arePaused method and returns correct value',
+          () async {
+        await inAppMessages.paused(true);
         final result = await inAppMessages.arePaused();
 
         expect(result, true);
+      });
+
+      test('returns false when not paused', () async {
+        final result = await inAppMessages.arePaused();
+
+        expect(result, false);
       });
     });
 
@@ -165,8 +132,7 @@ void main() {
       test('invokes OneSignal#lifecycleInit method', () async {
         await inAppMessages.lifecycleInit();
 
-        expect(methodCalls.length, 1);
-        expect(methodCalls[0].method, 'OneSignal#lifecycleInit');
+        expect(channelController.state.lifecycleInitCalled, true);
       });
     });
 
@@ -180,7 +146,6 @@ void main() {
 
         inAppMessages.addClickListener(listener);
 
-        // Simulate native call to verify listener was added
         await inAppMessages.handleMethod(
           MethodCall(
             'OneSignal#onClickInAppMessage',
@@ -204,7 +169,6 @@ void main() {
         inAppMessages.addClickListener(listener);
         inAppMessages.removeClickListener(listener);
 
-        // Simulate native call to verify listener was removed
         await inAppMessages.handleMethod(
           MethodCall(
             'OneSignal#onClickInAppMessage',
@@ -231,7 +195,6 @@ void main() {
 
         inAppMessages.addWillDisplayListener(listener);
 
-        // Simulate native call to verify listener was added
         await inAppMessages.handleMethod(
           MethodCall(
             'OneSignal#onWillDisplayInAppMessage',
@@ -253,7 +216,6 @@ void main() {
         inAppMessages.addWillDisplayListener(listener);
         inAppMessages.removeWillDisplayListener(listener);
 
-        // Simulate native call to verify listener was removed
         await inAppMessages.handleMethod(
           MethodCall(
             'OneSignal#onWillDisplayInAppMessage',
@@ -275,7 +237,6 @@ void main() {
 
         inAppMessages.addDidDisplayListener(listener);
 
-        // Simulate native call to verify listener was added
         await inAppMessages.handleMethod(
           MethodCall(
             'OneSignal#onDidDisplayInAppMessage',
@@ -296,7 +257,6 @@ void main() {
         inAppMessages.addDidDisplayListener(listener);
         inAppMessages.removeDidDisplayListener(listener);
 
-        // Simulate native call to verify listener was removed
         await inAppMessages.handleMethod(
           MethodCall(
             'OneSignal#onDidDisplayInAppMessage',
@@ -339,7 +299,6 @@ void main() {
 
         inAppMessages.addWillDismissListener(listener);
 
-        // Simulate native call to verify listener was added
         await inAppMessages.handleMethod(
           MethodCall(
             'OneSignal#onWillDismissInAppMessage',
@@ -361,7 +320,6 @@ void main() {
         inAppMessages.addWillDismissListener(listener);
         inAppMessages.removeWillDismissListener(listener);
 
-        // Simulate native call to verify listener was removed
         await inAppMessages.handleMethod(
           MethodCall(
             'OneSignal#onWillDismissInAppMessage',
@@ -385,7 +343,6 @@ void main() {
 
         inAppMessages.addDidDismissListener(listener);
 
-        // Simulate native call to verify listener was added
         await inAppMessages.handleMethod(
           MethodCall(
             'OneSignal#onDidDismissInAppMessage',
@@ -407,7 +364,6 @@ void main() {
         inAppMessages.addDidDismissListener(listener);
         inAppMessages.removeDidDismissListener(listener);
 
-        // Simulate native call to verify listener was removed
         await inAppMessages.handleMethod(
           MethodCall(
             'OneSignal#onDidDismissInAppMessage',
