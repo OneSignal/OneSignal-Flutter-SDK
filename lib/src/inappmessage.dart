@@ -16,8 +16,8 @@ class OSInAppMessageClickEvent extends JSONStringRepresentable {
 
   String jsonRepresentation() {
     return convertToJsonString({
-      'message': this.message,
-      'result': this.result,
+      'message': this.message.jsonRepresentation(),
+      'result': this.result.jsonRepresentation(),
     });
   }
 }

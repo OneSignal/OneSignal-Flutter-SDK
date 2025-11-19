@@ -1,4 +1,5 @@
 import 'dart:async';
+
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:onesignal_flutter/src/inappmessage.dart';
@@ -20,7 +21,7 @@ class OneSignalInAppMessages {
 
   // constructor method
   OneSignalInAppMessages() {
-    this._channel.setMethodCallHandler(_handleMethod);
+    this._channel.setMethodCallHandler(handleMethod);
   }
 
   List<OnClickInAppMessageListener> _clickListeners =
@@ -78,7 +79,8 @@ class OneSignalInAppMessages {
   }
 
   // Private function that gets called by ObjC/Java
-  Future<Null> _handleMethod(MethodCall call) async {
+  // Exposed as public for testing purposes
+  Future<Null> handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#onClickInAppMessage') {
       for (var listener in _clickListeners) {
         listener(

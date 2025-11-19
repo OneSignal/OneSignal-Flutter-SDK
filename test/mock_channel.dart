@@ -29,13 +29,15 @@ class OneSignalMockChannelController {
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
-    print("Mock method called: ${call.method}");
     switch (call.method) {
       case "OneSignal#setAppId":
         state.setAppId(call.arguments);
         break;
       case "OneSignal#setLogLevel":
         state.setLogLevel(call.arguments);
+        break;
+      case "OneSignal#setAlertLevel":
+        state.setAlertLevel(call.arguments);
         break;
       case "OneSignal#consentGiven":
         state.consentGiven =
@@ -125,6 +127,12 @@ class OneSignalState {
     int? visual = params['visual'] as int?;
 
     if (level != null) logLevel = OSLogLevel.values[level];
+    if (visual != null) visualLevel = OSLogLevel.values[visual];
+  }
+
+  void setAlertLevel(Map<dynamic, dynamic> params) {
+    int? visual = params['visualLevel'] as int?;
+
     if (visual != null) visualLevel = OSLogLevel.values[visual];
   }
 
