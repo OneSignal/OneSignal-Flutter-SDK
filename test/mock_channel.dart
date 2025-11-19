@@ -125,10 +125,6 @@ class OneSignalMockChannelController {
       case "OneSignal#removeExternalUserId":
         state.externalId = null;
         return {"success": true};
-      case "OneSignal#setLanguage":
-        state.language =
-            (call.arguments as Map<dynamic, dynamic>)['language'] as String?;
-        return {"success": true};
       case "OneSignal#requestPermission":
         // Location requestPermission (no arguments)
         if (call.arguments == null) {
@@ -204,9 +200,6 @@ class OneSignalMockChannelController {
         break;
       case "OneSignal#arePaused":
         return state.inAppMessagesPaused ?? false;
-      case "OneSignal#lifecycleInit":
-        state.lifecycleInitCalled = true;
-        break;
       case "OneSignal#displayNotification":
         // This is called on OneSignal#notifications channel
         state.displayedNotificationId = (call.arguments

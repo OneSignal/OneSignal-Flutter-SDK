@@ -7,19 +7,23 @@ on:
       - ".github/**"
       - ".vscode/**"
       - "README.md"
-  workflow_dispatch:
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    container:
-      image: ghcr.io/cirruslabs/flutter:3.35.5
 
     steps:
       - name: Checkout OneSignal-Flutter-SDK
         uses: actions/checkout@v5
 
-      - name: Install Dependencies 🔗⛓📦
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.35.5
+          cache: true
+
+      - name: Install
         run: flutter pub get
 
       - name: Static Analysis
@@ -29,4 +33,4 @@ jobs:
         run: dart format --set-exit-if-changed --output=none .
 
       - name: Run Flutter unit tests
-        run: flutter test
+        run: dart run rps test
