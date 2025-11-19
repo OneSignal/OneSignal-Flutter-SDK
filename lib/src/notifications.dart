@@ -1,5 +1,6 @@
 import 'dart:async';
-import 'dart:io';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/notification.dart';
@@ -25,7 +26,7 @@ class OneSignalNotifications {
       <OnNotificationPermissionChangeObserver>[];
   // constructor method
   OneSignalNotifications() {
-    this._channel.setMethodCallHandler(_handleMethod);
+    this._channel.setMethodCallHandler(handleMethod);
   }
 
   bool _permission = false;
@@ -45,7 +46,7 @@ class OneSignalNotifications {
   /// provisional, // only available in iOS 12
   /// ephemeral, // only available in iOS 14
   Future<OSNotificationPermission> permissionNative() async {
-    if (Platform.isIOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       return OSNotificationPermission
           .values[await _channel.invokeMethod("OneSignal#permissionNative")];
     } else {
@@ -63,7 +64,7 @@ class OneSignalNotifications {
 
   /// Removes a single notification.
   Future<void> removeNotification(int notificationId) async {
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       return await _channel.invokeMethod(
           "OneSignal#removeNotification", {'notificationId': notificationId});
     }
@@ -71,7 +72,7 @@ class OneSignalNotifications {
 
   /// Removes a grouped notification.
   Future<void> removeGroupedNotifications(String notificationGroup) async {
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       return await _channel.invokeMethod("OneSignal#removeGroupedNotifications",
           {'notificationGroup': notificationGroup});
     }
@@ -93,7 +94,7 @@ class OneSignalNotifications {
   /// your app can request provisional authorization.
   Future<bool> registerForProvisionalAuthorization(
       bool fallbackToSettings) async {
-    if (Platform.isIOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       return await _channel
           .invokeMethod("OneSignal#registerForProvisionalAuthorization");
     } else {
@@ -122,7 +123,7 @@ class OneSignalNotifications {
     return await _channel.invokeMethod("OneSignal#lifecycleInit");
   }
 
-  Future<Null> _handleMethod(MethodCall call) async {
+  Future<Null> handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#onClickNotification') {
       for (var listener in _clickListeners) {
         listener(
