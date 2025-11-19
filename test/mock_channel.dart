@@ -81,6 +81,28 @@ class OneSignalMockChannelController {
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
+      case "OneSignal#initialize":
+        state.setAppId(call.arguments);
+        break;
+      case "OneSignal#login":
+        state.externalId =
+            (call.arguments as Map<dynamic, dynamic>)['externalId'] as String?;
+        break;
+      case "OneSignal#loginWithJWT":
+        state.externalId =
+            (call.arguments as Map<dynamic, dynamic>)['externalId'] as String?;
+        break;
+      case "OneSignal#logout":
+        state.externalId = null;
+        break;
+      case "OneSignal#consentGiven":
+        state.consentGiven =
+            (call.arguments as Map<dynamic, dynamic>)['granted'] as bool?;
+        break;
+      case "OneSignal#consentRequired":
+        state.requiresPrivacyConsent =
+            (call.arguments as Map<dynamic, dynamic>)['required'] as bool?;
+        break;
       case "OneSignal#setAppId":
         state.setAppId(call.arguments);
         break;
@@ -89,10 +111,6 @@ class OneSignalMockChannelController {
         break;
       case "OneSignal#setAlertLevel":
         state.setAlertLevel(call.arguments);
-        break;
-      case "OneSignal#consentGiven":
-        state.consentGiven =
-            (call.arguments as Map<dynamic, dynamic>)['given'] as bool?;
         break;
       case "OneSignal#promptPermission":
         state.calledPromptPermission = true;

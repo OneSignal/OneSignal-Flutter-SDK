@@ -1,22 +1,23 @@
 import 'dart:async';
-import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/debug.dart';
-import 'package:onesignal_flutter/src/user.dart';
-import 'package:onesignal_flutter/src/notifications.dart';
-import 'package:onesignal_flutter/src/session.dart';
-import 'package:onesignal_flutter/src/location.dart';
 import 'package:onesignal_flutter/src/inappmessages.dart';
 import 'package:onesignal_flutter/src/liveactivities.dart';
+import 'package:onesignal_flutter/src/location.dart';
+import 'package:onesignal_flutter/src/notifications.dart';
+import 'package:onesignal_flutter/src/session.dart';
+import 'package:onesignal_flutter/src/user.dart';
 
 export 'src/defines.dart';
-export 'src/pushsubscription.dart';
-export 'src/subscription.dart';
-export 'src/notification.dart';
-export 'src/notifications.dart';
 export 'src/inappmessage.dart';
 export 'src/inappmessages.dart';
 export 'src/liveactivities.dart';
+export 'src/notification.dart';
+export 'src/notifications.dart';
+export 'src/pushsubscription.dart';
+export 'src/subscription.dart';
 export 'src/user.dart';
 
 class OneSignal {
@@ -70,7 +71,7 @@ class OneSignal {
   @Deprecated(
       'Do not use, this method is not implemented. See https://documentation.onesignal.com/docs/identity-verification for updates.')
   static Future<void> loginWithJWT(String externalId, String jwt) async {
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       return await _channel.invokeMethod(
           'OneSignal#loginWithJWT', {'externalId': externalId, 'jwt': jwt});
     }
