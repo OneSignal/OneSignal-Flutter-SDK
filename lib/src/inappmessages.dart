@@ -21,7 +21,7 @@ class OneSignalInAppMessages {
 
   // constructor method
   OneSignalInAppMessages() {
-    this._channel.setMethodCallHandler(handleMethod);
+    this._channel.setMethodCallHandler(_handleMethod);
   }
 
   List<OnClickInAppMessageListener> _clickListeners =
@@ -79,8 +79,7 @@ class OneSignalInAppMessages {
   }
 
   // Private function that gets called by ObjC/Java
-  // Exposed as public for testing purposes
-  Future<Null> handleMethod(MethodCall call) async {
+  Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#onClickInAppMessage') {
       for (var listener in _clickListeners) {
         listener(

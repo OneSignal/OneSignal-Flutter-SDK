@@ -1,4 +1,3 @@
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onesignal_flutter/src/inappmessage.dart';
 import 'package:onesignal_flutter/src/inappmessages.dart';
@@ -146,14 +145,12 @@ void main() {
 
         inAppMessages.addClickListener(listener);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onClickInAppMessage',
-            {
-              'message': validMessageJson,
-              'result': validClickResultJson,
-            },
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onClickInAppMessage',
+          {
+            'message': validMessageJson,
+            'result': validClickResultJson,
+          },
         );
 
         expect(listenerCalled, true);
@@ -169,14 +166,12 @@ void main() {
         inAppMessages.addClickListener(listener);
         inAppMessages.removeClickListener(listener);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onClickInAppMessage',
-            {
-              'message': validMessageJson,
-              'result': validClickResultJson,
-            },
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onClickInAppMessage',
+          {
+            'message': validMessageJson,
+            'result': validClickResultJson,
+          },
         );
 
         expect(listenerCalled, false);
@@ -195,11 +190,9 @@ void main() {
 
         inAppMessages.addWillDisplayListener(listener);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onWillDisplayInAppMessage',
-            {'message': validMessageJson},
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onWillDisplayInAppMessage',
+          {'message': validMessageJson},
         );
 
         expect(listenerCalled, true);
@@ -216,11 +209,9 @@ void main() {
         inAppMessages.addWillDisplayListener(listener);
         inAppMessages.removeWillDisplayListener(listener);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onWillDisplayInAppMessage',
-            {'message': validMessageJson},
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onWillDisplayInAppMessage',
+          {'message': validMessageJson},
         );
 
         expect(listenerCalled, false);
@@ -237,11 +228,9 @@ void main() {
 
         inAppMessages.addDidDisplayListener(listener);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onDidDisplayInAppMessage',
-            {'message': validMessageJson},
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onDidDisplayInAppMessage',
+          {'message': validMessageJson},
         );
 
         expect(listenerCalled, true);
@@ -257,11 +246,9 @@ void main() {
         inAppMessages.addDidDisplayListener(listener);
         inAppMessages.removeDidDisplayListener(listener);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onDidDisplayInAppMessage',
-            {'message': validMessageJson},
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onDidDisplayInAppMessage',
+          {'message': validMessageJson},
         );
 
         expect(listenerCalled, false);
@@ -276,11 +263,9 @@ void main() {
 
         inAppMessages.addDidDisplayListener(listener);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onDidDisplayInAppMessage',
-            {'message': validMessageJson},
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onDidDisplayInAppMessage',
+          {'message': validMessageJson},
         );
 
         expect(listenerCalled, true);
@@ -299,11 +284,9 @@ void main() {
 
         inAppMessages.addWillDismissListener(listener);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onWillDismissInAppMessage',
-            {'message': validMessageJson},
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onWillDismissInAppMessage',
+          {'message': validMessageJson},
         );
 
         expect(listenerCalled, true);
@@ -320,11 +303,9 @@ void main() {
         inAppMessages.addWillDismissListener(listener);
         inAppMessages.removeWillDismissListener(listener);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onWillDismissInAppMessage',
-            {'message': validMessageJson},
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onWillDismissInAppMessage',
+          {'message': validMessageJson},
         );
 
         expect(listenerCalled, false);
@@ -343,11 +324,9 @@ void main() {
 
         inAppMessages.addDidDismissListener(listener);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onDidDismissInAppMessage',
-            {'message': validMessageJson},
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onDidDismissInAppMessage',
+          {'message': validMessageJson},
         );
 
         expect(listenerCalled, true);
@@ -364,11 +343,9 @@ void main() {
         inAppMessages.addDidDismissListener(listener);
         inAppMessages.removeDidDismissListener(listener);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onDidDismissInAppMessage',
-            {'message': validMessageJson},
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onDidDismissInAppMessage',
+          {'message': validMessageJson},
         );
 
         expect(listenerCalled, false);
@@ -390,14 +367,12 @@ void main() {
         inAppMessages.addClickListener(listener1);
         inAppMessages.addClickListener(listener2);
 
-        await inAppMessages.handleMethod(
-          MethodCall(
-            'OneSignal#onClickInAppMessage',
-            {
-              'message': validMessageJson,
-              'result': validClickResultJson,
-            },
-          ),
+        channelController.simulateInAppMessageEvent(
+          'OneSignal#onClickInAppMessage',
+          {
+            'message': validMessageJson,
+            'result': validClickResultJson,
+          },
         );
 
         expect(listenerCount, 2);

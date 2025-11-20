@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/notification.dart';
@@ -289,8 +288,8 @@ void main() {
         }
 
         notifications.addForegroundWillDisplayListener(listener);
-        await notifications.handleMethod(MethodCall(
-            'OneSignal#onWillDisplayNotification', notificationData));
+        channelController.simulateNotificationEvent(
+            'OneSignal#onWillDisplayNotification', notificationData);
 
         expect(listenerCalled, true);
       });
@@ -303,8 +302,8 @@ void main() {
 
         notifications.addForegroundWillDisplayListener(listener);
         notifications.removeForegroundWillDisplayListener(listener);
-        await notifications.handleMethod(MethodCall(
-            'OneSignal#onWillDisplayNotification', notificationData));
+        channelController.simulateNotificationEvent(
+            'OneSignal#onWillDisplayNotification', notificationData);
 
         expect(listenerCalled, false);
       });
@@ -323,8 +322,8 @@ void main() {
         notifications.addForegroundWillDisplayListener(listener1);
         notifications.addForegroundWillDisplayListener(listener2);
 
-        await notifications.handleMethod(MethodCall(
-            'OneSignal#onWillDisplayNotification', notificationData));
+        channelController.simulateNotificationEvent(
+            'OneSignal#onWillDisplayNotification', notificationData);
 
         expect(listener1Called, true);
         expect(listener2Called, true);
@@ -345,8 +344,8 @@ void main() {
         notifications.addForegroundWillDisplayListener(listener2);
         notifications.removeForegroundWillDisplayListener(listener1);
 
-        await notifications.handleMethod(MethodCall(
-            'OneSignal#onWillDisplayNotification', notificationData));
+        channelController.simulateNotificationEvent(
+            'OneSignal#onWillDisplayNotification', notificationData);
 
         expect(listener1Called, false);
         expect(listener2Called, true);
