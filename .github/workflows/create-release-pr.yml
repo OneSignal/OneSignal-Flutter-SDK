@@ -113,6 +113,10 @@ jobs:
 
           git add .
 
+      - name: Set up Flutter
+        if: inputs.ios_version != ''
+        uses: ./.github/actions/setup-flutter
+
       - name: Update iOS SDK version
         if: inputs.ios_version != ''
         run: |

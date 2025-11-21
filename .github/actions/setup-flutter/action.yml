@@ -1,0 +1,14 @@
+name: "Setup Flutter"
+description: "Sets up Flutter with the standard version for this repo"
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        channel: stable
+        flutter-version: "3.35.5"
+        cache: true
+    - name: Install dependencies
+      run: flutter pub get
+      shell: bash
