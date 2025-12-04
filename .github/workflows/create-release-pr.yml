@@ -111,7 +111,10 @@ jobs:
           sed -i '' "s|implementation 'com\.onesignal:OneSignal:[^']*'|implementation 'com.onesignal:OneSignal:${VERSION}'|" android/build.gradle
           echo "✓ Updated android/build.gradle with Android SDK ${VERSION}"
 
-          git add .
+          # Only commit if there are changes
+          git add -A
+          git diff --staged --quiet && exit 0
+          git commit -m "Update Android SDK to ${VERSION}" && git push
 
       - name: Set up Flutter
         if: inputs.ios_version != ''
@@ -140,7 +143,10 @@ jobs:
           cd example/ios
           pod update OneSignalXCFramework
 
-          git add .
+          # Only commit if there are changes
+          git add -A
+          git diff --staged --quiet && exit 0
+          git commit -m "Update iOS SDK to ${VERSION}" && git push
 
       - name: Update sdk version
         run: |
@@ -163,9 +169,10 @@ jobs:
           # Update OneSignalPlugin.m wrapper version
           sed -i '' "s/OneSignalWrapper\.sdkVersion = @\"[^\"]*\"/OneSignalWrapper.sdkVersion = @\"$WRAPPER_VERSION\"/g" ios/Classes/OneSignalPlugin.m
 
-          git add .
-          git commit -m "Release $NEW_VERSION"
-          git push
+          # Only commit if there are changes
+          git add -A
+          git diff --staged --quiet && exit 0
+          git commit -m "Release $NEW_VERSION" && git push
 
   create-pr:
     needs: [prep, update_version]
