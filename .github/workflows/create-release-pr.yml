@@ -75,6 +75,9 @@ jobs:
           ref: ${{ needs.prep.outputs.release_branch }}
           token: ${{ secrets.GH_PUSH_TOKEN || github.token }}
 
+      - name: Setup Git User
+        uses: OneSignal/sdk-actions/.github/actions/setup-git-user@main
+
       - name: Get current native SDK versions
         id: current_versions
         run: |
@@ -151,8 +154,6 @@ jobs:
       - name: Update sdk version
         run: |
           NEW_VERSION="${{ inputs.flutter_version }}"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
 
           # Convert version format for OneSignal wrapper (e.g., 5.2.15 -> 050215)
           # For pre-releases, extract base version first (e.g., 5.2.15-alpha.1 -> 5.2.15)
