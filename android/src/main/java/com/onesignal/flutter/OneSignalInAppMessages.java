@@ -48,7 +48,7 @@ IInAppMessageClickListener, IInAppMessageLifecycleListener{
         else if (call.method.contentEquals("OneSignal#paused"))
             this.paused(call, result);
         else if (call.method.contentEquals("OneSignal#lifecycleInit"))
-            this.lifecycleInit();
+            this.lifecycleInit(result);
         else
             replyNotImplemented(result);
     }
@@ -90,9 +90,10 @@ IInAppMessageClickListener, IInAppMessageLifecycleListener{
         replySuccess(result, null);
     }
 
-    public void lifecycleInit() {
+    public void lifecycleInit(Result result) {
         OneSignal.getInAppMessages().addLifecycleListener(this);
         OneSignal.getInAppMessages().addClickListener(this);
+        replySuccess(result, null);
     }
 
     @Override

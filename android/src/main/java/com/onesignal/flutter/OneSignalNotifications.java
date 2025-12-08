@@ -87,7 +87,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder implements
     else if (call.method.contentEquals("OneSignal#preventDefault"))
         this.preventDefault(call, result);
     else if (call.method.contentEquals("OneSignal#lifecycleInit"))
-        this.lifecycleInit();
+        this.lifecycleInit(result);
     else if (call.method.contentEquals("OneSignal#proceedWithWillDisplay"))
         this.proceedWithWillDisplay(call, result);
     else if (call.method.contentEquals("OneSignal#addNativeClickListener"))
@@ -210,9 +210,10 @@ public class OneSignalNotifications extends FlutterMessengerResponder implements
         invokeMethodOnUiThread("OneSignal#onNotificationPermissionDidChange", hash);
     }
 
-    private void lifecycleInit() {
+    private void lifecycleInit(Result result) {
         OneSignal.getNotifications().addForegroundLifecycleListener(this);
         OneSignal.getNotifications().addPermissionObserver(this);
+        replySuccess(result, null);
     }
 
     private void registerClickListener() {

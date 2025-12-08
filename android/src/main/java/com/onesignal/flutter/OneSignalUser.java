@@ -53,7 +53,7 @@ public class OneSignalUser extends FlutterMessengerResponder
         else if (call.method.contentEquals("OneSignal#getTags"))
             this.getTags(call, result);
         else if (call.method.contentEquals("OneSignal#lifecycleInit"))
-            this.lifecycleInit();
+            this.lifecycleInit(result);
         else
             replyNotImplemented(result);
     }
@@ -67,8 +67,9 @@ public class OneSignalUser extends FlutterMessengerResponder
         replySuccess(result, null);
     }
 
-    private void lifecycleInit() {
+    private void lifecycleInit(Result result) {
         OneSignal.getUser().addObserver(this);
+        replySuccess(result, null);
     }
 
     private void getOnesignalId(MethodCall call, Result result) {
