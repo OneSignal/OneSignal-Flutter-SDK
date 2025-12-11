@@ -36,7 +36,7 @@ public class OneSignalPushSubscription extends FlutterMessengerResponder impleme
         else if (call.method.contentEquals("OneSignal#pushSubscriptionOptedIn"))
             replySuccess(result, OneSignal.getUser().getPushSubscription().getOptedIn());
         else if (call.method.contentEquals("OneSignal#lifecycleInit"))
-            this.lifecycleInit();
+            this.lifecycleInit(result);
         else
             replyNotImplemented(result);
     }
@@ -50,8 +50,9 @@ public class OneSignalPushSubscription extends FlutterMessengerResponder impleme
         replySuccess(reply, null);
     }
 
-    private void lifecycleInit() {
+    private void lifecycleInit(Result result) {
         OneSignal.getUser().getPushSubscription().addObserver(this);
+        replySuccess(result, null);
     }  
 
     @Override
