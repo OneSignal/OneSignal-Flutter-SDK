@@ -38,5 +38,5 @@ android {
 }
 
 dependencies {
-    implementation 'com.onesignal:OneSignal:5.1.35'
+    implementation 'com.onesignal:OneSignal:5.4.0'
 }
