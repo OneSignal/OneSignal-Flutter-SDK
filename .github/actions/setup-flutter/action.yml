@@ -4,10 +4,10 @@ runs:
   using: "composite"
   steps:
     - name: Set up Flutter
-      uses: subosito/flutter-action@v2
+      uses: flutter-actions/setup-flutter@v4
       with:
         channel: stable
-        flutter-version: "3.35.5"
+        version: "3.35.5"
         cache: true
     - name: Install dependencies
       run: flutter pub get

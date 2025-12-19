@@ -1,0 +1,30 @@
+# OIDC published for pub.dev
+# Reference: https://dart.dev/tools/pub/automated-publishing
+name: Publish to pub.dev
+
+on:
+  push:
+    tags:
+      # must align with the tag-pattern configured on pub.dev, often just replace
+      # {{version}} with [0-9]+.[0-9]+.[0-9]+
+      - "[0-9]+.[0-9]+.[0-9]+" # tag-pattern on pub.dev: '{{version}}'
+
+# Publish using the reusable workflow from dart-lang.
+jobs:
+  publish:
+    permissions:
+      id-token: write # Required for authentication using OIDC
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+        # Setup OIDC token for publishing
+      - name: Set up Dart
+        uses: dart-lang/setup-dart@v1
+
+      - name: Setup Flutter
+        uses: ./.github/actions/setup-flutter
+
+      - name: Publish
+        run: dart pub publish --force

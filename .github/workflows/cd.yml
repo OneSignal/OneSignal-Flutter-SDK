@@ -1,4 +1,6 @@
-name: Publish to Pub.dev & Github
+# For Flutter publish, a tag must be created first so we create a Github Release
+# Then this should trigger the publish to Pub.dev workflow
+name: Publish to Github
 on:
   workflow_dispatch:
   pull_request:
@@ -7,10 +9,6 @@ on:
     branches:
       - main
       - rel/**
-
-permissions:
-  id-token: write # Required for authentication using OIDC
-  contents: write
 
 jobs:
   publish:
@@ -25,23 +23,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
-      - name: Set up Flutter
-        uses: ./.github/actions/setup-flutter
-
-      # This step is what enables Dart's OIDC "trusted publishing" wiring.
-      # Even though you publish with flutter, OIDC creds are handled via Dart tooling.
-      - uses: dart-lang/setup-dart@v1
-
       - name: Get version from pubspec.yaml
         id: version
         run: |
           VERSION=$(grep "^version:" pubspec.yaml | sed 's/version: //' | tr -d ' ')
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "Version: $VERSION"
-
-      - name: Publish to Pub.dev
-        run: |
-          flutter pub publish --force
 
   create-release:
     needs: publish
