@@ -1,5 +1,6 @@
 name: Publish to Pub.dev & Github
 on:
+  workflow_dispatch:
   pull_request:
     types:
       - closed
@@ -7,11 +8,16 @@ on:
       - main
       - rel/**
 
+permissions:
+  id-token: write # Required for authentication using OIDC
+  contents: write
+
 jobs:
   publish:
     if: |
-      github.event.pull_request.merged == true &&
-      contains(github.event.pull_request.title, 'chore: Release')
+      github.event_name == 'workflow_dispatch' ||
+      (github.event.pull_request.merged == true &&
+       contains(github.event.pull_request.title, 'chore: Release'))
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.version.outputs.version }}
@@ -21,6 +27,10 @@ jobs:
 
       - name: Set up Flutter
         uses: ./.github/actions/setup-flutter
+
+      # This step is what enables Dart's OIDC "trusted publishing" wiring.
+      # Even though you publish with flutter, OIDC creds are handled via Dart tooling.
+      - uses: dart-lang/setup-dart@v1
 
       - name: Get version from pubspec.yaml
         id: version
