@@ -19,6 +19,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Set up Flutter
+        uses: ./.github/actions/setup-flutter
+
       - name: Get version from pubspec.yaml
         id: version
         run: |
