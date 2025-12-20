@@ -32,14 +32,23 @@
 
 @implementation OSFlutterPushSubscription
 
-+ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
-  OSFlutterPushSubscription *instance = [OSFlutterPushSubscription new];
++ (instancetype)sharedInstance {
+  static OSFlutterPushSubscription *sharedInstance = nil;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    sharedInstance = [OSFlutterPushSubscription new];
+  });
+  return sharedInstance;
+}
 
-  instance.channel =
++ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
+  OSFlutterPushSubscription.sharedInstance.channel =
       [FlutterMethodChannel methodChannelWithName:@"OneSignal#pushsubscription"
                                   binaryMessenger:[registrar messenger]];
 
-  [registrar addMethodCallDelegate:instance channel:instance.channel];
+  [registrar
+      addMethodCallDelegate:OSFlutterPushSubscription.sharedInstance
+                    channel:OSFlutterPushSubscription.sharedInstance.channel];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call
@@ -72,6 +81,7 @@
 
 - (void)lifecycleInit:(FlutterMethodCall *)call
            withResult:(FlutterResult)result {
+  [OneSignal.User.pushSubscription removeObserver:self];
   [OneSignal.User.pushSubscription addObserver:self];
   result(nil);
 }
