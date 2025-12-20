@@ -28,8 +28,19 @@ import kotlin.coroutines.CoroutineContext;
 import kotlinx.coroutines.Dispatchers;
 
 public class OneSignalNotifications extends FlutterMessengerResponder implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
+    private static OneSignalNotifications sharedInstance;
+
     private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
     private final HashMap<String, INotificationWillDisplayEvent> preventedDefaultCache = new HashMap<>();
+
+    public static OneSignalNotifications getSharedInstance() {
+        if (sharedInstance == null) {
+            sharedInstance = new OneSignalNotifications();
+        }
+        return sharedInstance;
+    }
+
+    private OneSignalNotifications() { }
 
     /**
      * A helper class to encapsulate invoking the suspending function [requestPermission] in Java.
@@ -62,7 +73,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder implements
     }
 
     static void registerWith(BinaryMessenger messenger) {
-        OneSignalNotifications controller = new OneSignalNotifications();
+        OneSignalNotifications controller = getSharedInstance();
         controller.messenger = messenger;
         controller.channel = new MethodChannel(messenger, "OneSignal#notifications");
         controller.channel.setMethodCallHandler(controller);
@@ -110,14 +121,14 @@ public class OneSignalNotifications extends FlutterMessengerResponder implements
     private void removeNotification(MethodCall call, Result result) {
         int notificationId = call.argument("notificationId");
         OneSignal.getNotifications().removeNotification(notificationId);
-    
+
         replySuccess(result, null);
     }
 
     private void removeGroupedNotifications(MethodCall call, Result result) {
         String notificationGroup = call.argument("notificationGroup");
         OneSignal.getNotifications().removeGroupedNotifications(notificationGroup);
-    
+
         replySuccess(result, null);
     }
 
@@ -127,7 +138,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder implements
     }
 
     /// Our bridge layer needs to preventDefault() so that the Flutter listener has time to preventDefault() before the notification is displayed
-    /// This function is called after all of the flutter listeners have responded to the willDisplay event. 
+    /// This function is called after all of the flutter listeners have responded to the willDisplay event.
     /// If any of them have called preventDefault() we will not call display(). Otherwise we will display.
     private void proceedWithWillDisplay(MethodCall call, Result result) {
         String notificationId = call.argument("notificationId");
@@ -204,19 +215,24 @@ public class OneSignalNotifications extends FlutterMessengerResponder implements
     }
 
     @Override
-    public void onNotificationPermissionChange(boolean permission)  { 
+    public void onNotificationPermissionChange(boolean permission)  {
         HashMap<String, Object> hash = new HashMap<>();
         hash.put("permission", permission);
         invokeMethodOnUiThread("OneSignal#onNotificationPermissionDidChange", hash);
     }
 
     private void lifecycleInit(Result result) {
+        OneSignal.getNotifications().removeForegroundLifecycleListener(this);
         OneSignal.getNotifications().addForegroundLifecycleListener(this);
+        OneSignal.getNotifications().removePermissionObserver(this);
         OneSignal.getNotifications().addPermissionObserver(this);
+        notificationOnWillDisplayEventCache.clear();
+        preventedDefaultCache.clear();
         replySuccess(result, null);
     }
 
     private void registerClickListener() {
+        OneSignal.getNotifications().removeClickListener(this);
         OneSignal.getNotifications().addClickListener(this);
     }
-} 
+}

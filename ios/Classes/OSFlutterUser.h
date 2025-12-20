@@ -33,4 +33,6 @@
 
 @property (strong, nonatomic) FlutterMethodChannel *channel;
 
++ (instancetype)sharedInstance;
+
 @end

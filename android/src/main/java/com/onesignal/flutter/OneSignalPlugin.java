@@ -23,13 +23,13 @@ public class OneSignalPlugin extends FlutterMessengerResponder implements Flutte
   }
 
   private void init(Context context, BinaryMessenger messenger)
-  { 
+  {
     this.context = context;
     this.messenger = messenger;
-    OneSignalWrapper.setSdkType("flutter");  
+    OneSignalWrapper.setSdkType("flutter");
     // For 5.0.0, hard code to reflect SDK version
     OneSignalWrapper.setSdkVersion("050305");
-    
+
     channel = new MethodChannel(messenger, "OneSignal");
     channel.setMethodCallHandler(this);
 
@@ -120,7 +120,7 @@ public class OneSignalPlugin extends FlutterMessengerResponder implements Flutte
     OneSignal.login((String) call.argument("externalId"), (String) call.argument("jwt"));
     replySuccess(result, null);
   }
-  
+
   private void logout(MethodCall call, Result result) {
     OneSignal.logout();
     replySuccess(result, null);
