@@ -108,9 +108,14 @@
 - (void)lifecycleInit:(FlutterMethodCall *)call
            withResult:(FlutterResult)result {
   [OneSignal.InAppMessages
+      removeClickListener:OSFlutterInAppMessages.sharedInstance];
+  [OneSignal.InAppMessages
       addClickListener:OSFlutterInAppMessages.sharedInstance];
   [OneSignal.InAppMessages
+      removeLifecycleListener:OSFlutterInAppMessages.sharedInstance];
+  [OneSignal.InAppMessages
       addLifecycleListener:OSFlutterInAppMessages.sharedInstance];
+  result(nil);
 }
 
 #pragma mark In App Message Click

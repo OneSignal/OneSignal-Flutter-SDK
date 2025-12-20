@@ -74,8 +74,9 @@ class _MyAppState extends State<MyApp> {
     });
 
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-      print(
-          'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
+      print("YO222222!");
+      // print(
+      //     'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
 
       /// Display Notification, preventDefault to not display
       event.preventDefault();

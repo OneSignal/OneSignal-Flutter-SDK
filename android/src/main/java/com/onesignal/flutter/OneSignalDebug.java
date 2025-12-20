@@ -9,9 +9,19 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
 public class OneSignalDebug extends FlutterMessengerResponder implements MethodCallHandler {
+    private static OneSignalDebug sharedInstance;
 
-    static void registerWith(BinaryMessenger messenger) {
-        OneSignalDebug controller = new OneSignalDebug();
+    public static OneSignalDebug getSharedInstance() {
+        if (sharedInstance == null) {
+            sharedInstance = new OneSignalDebug();
+        }
+        return sharedInstance;
+    }
+
+    private OneSignalDebug() { }
+
+   static void registerWith(BinaryMessenger messenger) {
+        OneSignalDebug controller = getSharedInstance();
         controller.messenger = messenger;
         controller.channel = new MethodChannel(messenger, "OneSignal#debug");
         controller.channel.setMethodCallHandler(controller);

@@ -9,9 +9,19 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
 public class OneSignalLocation extends FlutterMessengerResponder implements MethodCallHandler {
+    private static OneSignalLocation sharedInstance;
+
+    public static OneSignalLocation getSharedInstance() {
+        if (sharedInstance == null) {
+            sharedInstance = new OneSignalLocation();
+        }
+        return sharedInstance;
+    }
+
+    private OneSignalLocation() { }
 
     static void registerWith(BinaryMessenger messenger) {
-        OneSignalLocation controller = new OneSignalLocation();
+        OneSignalLocation controller = getSharedInstance();
         controller.messenger = messenger;
         controller.channel = new MethodChannel(messenger, "OneSignal#location");
         controller.channel.setMethodCallHandler(controller);
