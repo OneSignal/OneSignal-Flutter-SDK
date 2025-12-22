@@ -3,3 +3,31 @@ build/
 test/
 **/local.properties
 test.json
+
+# IDE files
+.idea/
+android/.idea/
+*.iml
+*.ipr
+*.iws
+
+# System files
+.DS_Store
+
+# Android specific
+android/gradle/
+android/gradlew
+android/gradlew.bat
+android/.gradle/
+
+# Coverage and testing
+coverage/
+dlcov.log
+
+# Flutter/Pub specific
+.dart_tool/
+.packages
+.pub/
+pubspec.lock
+.flutter-plugins-dependencies
+flutter_export_environment.sh
