@@ -31,7 +31,7 @@ jobs:
           - language: actions
             build-mode: none
           - language: java-kotlin
-            build-mode: autobuild
+            build-mode: manual
           - language: ruby
             build-mode: none
           - language: swift
@@ -40,12 +40,24 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v6
 
+      # Set up Flutter for Java-Kotlin analysis
+      - name: Set up Flutter
+        if: matrix.language == 'java-kotlin'
+        uses: ./.github/actions/setup-flutter
+
       # Initializes the CodeQL tools for scanning.
       - name: Initialize CodeQL
         uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
+
+      # Build Android library for Java-Kotlin analysis
+      - name: Build Android library
+        if: matrix.language == 'java-kotlin'
+        run: |
+          cd android
+          ./gradlew assemble --no-daemon
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
