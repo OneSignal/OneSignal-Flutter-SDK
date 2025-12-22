@@ -3,8 +3,12 @@ description: OneSignal is a free push notification service for mobile apps. This
 version: 5.3.5
 homepage: https://github.com/OneSignal/OneSignal-Flutter-SDK
 
+# Uses rps package for scripts
+# E.g.`rps test` to run tests
 scripts:
   test: flutter test --coverage && dart run dlcov -c 95 --log=0 --include-untested-files=true
+  format-check: android/gradlew spotlessCheck
+  format: android/gradlew spotlessApply
 
 flutter:
   plugin:
