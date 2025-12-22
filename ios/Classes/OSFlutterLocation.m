@@ -13,8 +13,8 @@
  * 1. The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
- * 2. All copies of substantial portions of the Software may only be used in connection
- * with services provided by OneSignal.
+ * 2. All copies of substantial portions of the Software may only be used in
+ * connection with services provided by OneSignal.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,42 +26,43 @@
  */
 
 #import "OSFlutterLocation.h"
-#import <OneSignalFramework/OneSignalFramework.h>
 #import "OSFlutterCategories.h"
+#import <OneSignalFramework/OneSignalFramework.h>
 
 @implementation OSFlutterLocation
-+ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    OSFlutterLocation *instance = [OSFlutterLocation new];
++ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
+  OSFlutterLocation *instance = [OSFlutterLocation new];
 
-    instance.channel = [FlutterMethodChannel
-                        methodChannelWithName:@"OneSignal#location"
-                        binaryMessenger:[registrar messenger]];
+  instance.channel =
+      [FlutterMethodChannel methodChannelWithName:@"OneSignal#location"
+                                  binaryMessenger:[registrar messenger]];
 
-    [registrar addMethodCallDelegate:instance channel:instance.channel];
+  [registrar addMethodCallDelegate:instance channel:instance.channel];
 }
 
-- (void)handleMethodCall:(FlutterMethodCall*)call result:(FlutterResult)result {
-    if ([@"OneSignal#requestPermission" isEqualToString:call.method])
-        [self requestPermission:call withResult:result];
-    else if ([@"OneSignal#setShared" isEqualToString:call.method])
-        [self setLocationShared:call withResult:result];
-    else if ([@"OneSignal#isShared" isEqualToString:call.method])
-        result(@([OneSignal.Location isShared]));
-    else
-        result(FlutterMethodNotImplemented);
+- (void)handleMethodCall:(FlutterMethodCall *)call
+                  result:(FlutterResult)result {
+  if ([@"OneSignal#requestPermission" isEqualToString:call.method])
+    [self requestPermission:call withResult:result];
+  else if ([@"OneSignal#setShared" isEqualToString:call.method])
+    [self setLocationShared:call withResult:result];
+  else if ([@"OneSignal#isShared" isEqualToString:call.method])
+    result(@([OneSignal.Location isShared]));
+  else
+    result(FlutterMethodNotImplemented);
 }
 
-- (void)setLocationShared:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    BOOL locationShared = [call.arguments boolValue];
-    [OneSignal.Location setShared:locationShared];
-    result(nil);
+- (void)setLocationShared:(FlutterMethodCall *)call
+               withResult:(FlutterResult)result {
+  BOOL locationShared = [call.arguments boolValue];
+  [OneSignal.Location setShared:locationShared];
+  result(nil);
 }
 
-- (void)requestPermission:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    [OneSignal.Location requestPermission];
-    result(nil);
+- (void)requestPermission:(FlutterMethodCall *)call
+               withResult:(FlutterResult)result {
+  [OneSignal.Location requestPermission];
+  result(nil);
 }
-
-
 
 @end

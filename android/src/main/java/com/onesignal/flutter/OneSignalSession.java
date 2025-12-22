@@ -1,7 +1,6 @@
 package com.onesignal.flutter;
 
 import com.onesignal.OneSignal;
-
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -19,14 +18,10 @@ public class OneSignalSession extends FlutterMessengerResponder implements Metho
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
-        if (call.method.contentEquals("OneSignal#addOutcome"))
-            this.addOutcome(call, result);
-        else if (call.method.contentEquals("OneSignal#addUniqueOutcome"))
-            this.addUniqueOutcome(call, result);
-        else if (call.method.contentEquals("OneSignal#addOutcomeWithValue"))
-            this.addOutcomeWithValue(call, result);
-        else
-            replyNotImplemented(result);
+        if (call.method.contentEquals("OneSignal#addOutcome")) this.addOutcome(call, result);
+        else if (call.method.contentEquals("OneSignal#addUniqueOutcome")) this.addUniqueOutcome(call, result);
+        else if (call.method.contentEquals("OneSignal#addOutcomeWithValue")) this.addOutcomeWithValue(call, result);
+        else replyNotImplemented(result);
     }
 
     private void addOutcome(MethodCall call, Result result) {
@@ -70,5 +65,4 @@ public class OneSignalSession extends FlutterMessengerResponder implements Metho
         OneSignal.getSession().addOutcomeWithValue(name, value.floatValue());
         replySuccess(result, null);
     }
-
 }

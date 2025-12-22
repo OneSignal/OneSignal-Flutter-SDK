@@ -13,8 +13,8 @@
  * 1. The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
- * 2. All copies of substantial portions of the Software may only be used in connection
- * with services provided by OneSignal.
+ * 2. All copies of substantial portions of the Software may only be used in
+ * connection with services provided by OneSignal.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -39,147 +39,168 @@
 
 @implementation OSNotification (Flutter)
 - (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
+  NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"contentAvailable"] = @(self.contentAvailable);
-    json[@"mutableContent"] = @(self.mutableContent);
+  json[@"contentAvailable"] = @(self.contentAvailable);
+  json[@"mutableContent"] = @(self.mutableContent);
 
-    if (self.rawPayload) {
-        NSError *jsonError;
-        NSData *data = [NSJSONSerialization dataWithJSONObject:self.rawPayload options:NSJSONWritingPrettyPrinted error:&jsonError];
+  if (self.rawPayload) {
+    NSError *jsonError;
+    NSData *data =
+        [NSJSONSerialization dataWithJSONObject:self.rawPayload
+                                        options:NSJSONWritingPrettyPrinted
+                                          error:&jsonError];
 
-        if (!jsonError) {
-            NSString *rawPayloadString = [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
-            json[@"rawPayload"] = rawPayloadString;
-        }
+    if (!jsonError) {
+      NSString *rawPayloadString =
+          [[NSString alloc] initWithData:data encoding:NSUTF8StringEncoding];
+      json[@"rawPayload"] = rawPayloadString;
     }
+  }
 
-    if (self.notificationId) json[@"notificationId"] = self.notificationId;
-    if (self.templateName) json[@"templateName"] = self.templateName;
-    if (self.templateId) json[@"templateId"] = self.templateId;
-    if (self.badge) json[@"badge"] = @(self.badge);
-    if (self.badgeIncrement) json[@"badgeIncrement"] = @(self.badgeIncrement);
-    if (self.sound) json[@"sound"] = self.sound;
-    if (self.title) json[@"title"] = self.title;
-    if (self.subtitle) json[@"subtitle"] = self.subtitle;
-    if (self.body) json[@"body"] = self.body;
-    if (self.launchURL) json[@"launchUrl"] = self.launchURL;
-    if (self.additionalData) json[@"additionalData"] = self.additionalData;
-    if (self.attachments) json[@"attachments"] = self.attachments;
-    if (self.actionButtons) json[@"buttons"] = self.actionButtons;
-    if (self.category) json[@"category"] = self.category;
+  if (self.notificationId)
+    json[@"notificationId"] = self.notificationId;
+  if (self.templateName)
+    json[@"templateName"] = self.templateName;
+  if (self.templateId)
+    json[@"templateId"] = self.templateId;
+  if (self.badge)
+    json[@"badge"] = @(self.badge);
+  if (self.badgeIncrement)
+    json[@"badgeIncrement"] = @(self.badgeIncrement);
+  if (self.sound)
+    json[@"sound"] = self.sound;
+  if (self.title)
+    json[@"title"] = self.title;
+  if (self.subtitle)
+    json[@"subtitle"] = self.subtitle;
+  if (self.body)
+    json[@"body"] = self.body;
+  if (self.launchURL)
+    json[@"launchUrl"] = self.launchURL;
+  if (self.additionalData)
+    json[@"additionalData"] = self.additionalData;
+  if (self.attachments)
+    json[@"attachments"] = self.attachments;
+  if (self.actionButtons)
+    json[@"buttons"] = self.actionButtons;
+  if (self.category)
+    json[@"category"] = self.category;
 
-    return json;
+  return json;
 }
 @end
 
 @implementation OSNotificationClickEvent (Flutter)
 - (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
+  NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"notification"] = self.notification.toJson;
-    json[@"result"] = self.result.toJson;
+  json[@"notification"] = self.notification.toJson;
+  json[@"result"] = self.result.toJson;
 
-    return json;
+  return json;
 }
 @end
 
 @implementation OSNotificationClickResult (Flutter)
 - (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
+  NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"action_id"] = self.actionId;
-    json[@"url"] = self.url;
+  json[@"action_id"] = self.actionId;
+  json[@"url"] = self.url;
 
-    return json;
+  return json;
 }
 @end
 
 @implementation OSNotificationWillDisplayEvent (Flutter)
 - (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
+  NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"notification"] = self.notification.toJson;
+  json[@"notification"] = self.notification.toJson;
 
-    return json;
+  return json;
 }
 @end
 
 @implementation OSInAppMessageWillDisplayEvent (Flutter)
 - (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
+  NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"message"] = self.message.toJson;
+  json[@"message"] = self.message.toJson;
 
-    return json;
+  return json;
 }
 @end
 
 @implementation OSInAppMessageDidDisplayEvent (Flutter)
 - (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
+  NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"message"] = self.message.toJson;
+  json[@"message"] = self.message.toJson;
 
-    return json;
+  return json;
 }
 @end
 
 @implementation OSInAppMessageWillDismissEvent (Flutter)
 - (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
+  NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"message"] = self.message.toJson;
+  json[@"message"] = self.message.toJson;
 
-    return json;
+  return json;
 }
 @end
 
 @implementation OSInAppMessageDidDismissEvent (Flutter)
 - (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
+  NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"message"] = self.message.toJson;
+  json[@"message"] = self.message.toJson;
 
-    return json;
+  return json;
 }
 @end
 
 @implementation OSInAppMessageClickEvent (Flutter)
 - (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
+  NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"message"] = self.message.toJson;
-    json[@"result"] = self.result.toJson;
+  json[@"message"] = self.message.toJson;
+  json[@"result"] = self.result.toJson;
 
-    return json;
+  return json;
 }
 @end
 
 @implementation OSInAppMessageClickResult (Flutter)
 - (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
+  NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"action_id"] = self.actionId;
-    json[@"url"] = self.url;
-    json[@"closing_message"] = @(self.closingMessage);
+  json[@"action_id"] = self.actionId;
+  json[@"url"] = self.url;
+  json[@"closing_message"] = @(self.closingMessage);
 
-    return json;
+  return json;
 }
 @end
 
 @implementation OSInAppMessage (Flutter)
 - (NSDictionary *)toJson {
-    NSMutableDictionary *json = [NSMutableDictionary new];
+  NSMutableDictionary *json = [NSMutableDictionary new];
 
-    json[@"message_id"] = self.messageId;
+  json[@"message_id"] = self.messageId;
 
-    return json;
+  return json;
 }
 @end
 
 @implementation NSError (Flutter)
 - (FlutterError *)flutterError {
-    return [FlutterError errorWithCode:[NSString stringWithFormat:@"%i", (int)self.code] message:self.localizedDescription details:nil];
+  return [FlutterError
+      errorWithCode:[NSString stringWithFormat:@"%i", (int)self.code]
+            message:self.localizedDescription
+            details:nil];
 }
 @end

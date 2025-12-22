@@ -13,8 +13,8 @@
  * 1. The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
- * 2. All copies of substantial portions of the Software may only be used in connection
- * with services provided by OneSignal.
+ * 2. All copies of substantial portions of the Software may only be used in
+ * connection with services provided by OneSignal.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -26,50 +26,52 @@
  */
 
 #import "OSFlutterSession.h"
-#import <OneSignalFramework/OneSignalFramework.h>
 #import "OSFlutterCategories.h"
+#import <OneSignalFramework/OneSignalFramework.h>
 
 @implementation OSFlutterSession
-+ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
-    OSFlutterSession *instance = [OSFlutterSession new];
++ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
+  OSFlutterSession *instance = [OSFlutterSession new];
 
-    instance.channel = [FlutterMethodChannel
-                        methodChannelWithName:@"OneSignal#session"
-                        binaryMessenger:[registrar messenger]];
+  instance.channel =
+      [FlutterMethodChannel methodChannelWithName:@"OneSignal#session"
+                                  binaryMessenger:[registrar messenger]];
 
-    [registrar addMethodCallDelegate:instance channel:instance.channel];
+  [registrar addMethodCallDelegate:instance channel:instance.channel];
 }
 
-- (void)handleMethodCall:(FlutterMethodCall *)call result:(FlutterResult)result {
-    if ([@"OneSignal#addOutcome" isEqualToString:call.method]) {
-        [self addOutcome:call withResult:result];
-    } else if ([@"OneSignal#addUniqueOutcome" isEqualToString:call.method]) {
-        [self addUniqueOutcome:call withResult:result];
-    } else if ([@"OneSignal#addOutcomeWithValue" isEqualToString:call.method]) {
-        [self addOutcomeWithValue:call withResult:result];
-    } else {
-        result(FlutterMethodNotImplemented);
-    }
+- (void)handleMethodCall:(FlutterMethodCall *)call
+                  result:(FlutterResult)result {
+  if ([@"OneSignal#addOutcome" isEqualToString:call.method]) {
+    [self addOutcome:call withResult:result];
+  } else if ([@"OneSignal#addUniqueOutcome" isEqualToString:call.method]) {
+    [self addUniqueOutcome:call withResult:result];
+  } else if ([@"OneSignal#addOutcomeWithValue" isEqualToString:call.method]) {
+    [self addOutcomeWithValue:call withResult:result];
+  } else {
+    result(FlutterMethodNotImplemented);
+  }
 }
 
 - (void)addOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSString *name = call.arguments;
-    [OneSignal.Session addOutcome:name];
-    result(nil);
+  NSString *name = call.arguments;
+  [OneSignal.Session addOutcome:name];
+  result(nil);
 }
 
-- (void)addUniqueOutcome:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSString *name = call.arguments;
-    [OneSignal.Session addUniqueOutcome:name];
-    result(nil);
+- (void)addUniqueOutcome:(FlutterMethodCall *)call
+              withResult:(FlutterResult)result {
+  NSString *name = call.arguments;
+  [OneSignal.Session addUniqueOutcome:name];
+  result(nil);
 }
 
-- (void)addOutcomeWithValue:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-    NSString *name = call.arguments[@"outcome_name"];
-    NSNumber *value = call.arguments[@"outcome_value"];
-    [OneSignal.Session addOutcomeWithValue:name value:value];
-    result(nil);
+- (void)addOutcomeWithValue:(FlutterMethodCall *)call
+                 withResult:(FlutterResult)result {
+  NSString *name = call.arguments[@"outcome_name"];
+  NSNumber *value = call.arguments[@"outcome_value"];
+  [OneSignal.Session addOutcomeWithValue:name value:value];
+  result(nil);
 }
-
 
 @end

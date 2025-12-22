@@ -1,8 +1,7 @@
 package com.onesignal.flutter;
 
-import com.onesignal.OneSignal;
 import com.onesignal.Continue;
-
+import com.onesignal.OneSignal;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -20,21 +19,18 @@ public class OneSignalLocation extends FlutterMessengerResponder implements Meth
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
-        if (call.method.contentEquals("OneSignal#requestPermission"))
-            this.requestPermission(result);
-        else if (call.method.contentEquals("OneSignal#setShared"))
-            this.setShared(call, result);
+        if (call.method.contentEquals("OneSignal#requestPermission")) this.requestPermission(result);
+        else if (call.method.contentEquals("OneSignal#setShared")) this.setShared(call, result);
         else if (call.method.contentEquals("OneSignal#isShared"))
             replySuccess(result, OneSignal.getLocation().isShared());
-        else
-            replyNotImplemented(result);
+        else replyNotImplemented(result);
     }
 
     private void requestPermission(Result reply) {
         OneSignal.getLocation().requestPermission(Continue.none());
         replySuccess(reply, null);
     }
-    
+
     private void setShared(MethodCall call, Result result) {
         OneSignal.getLocation().setShared((boolean) call.arguments);
         replySuccess(result, null);
