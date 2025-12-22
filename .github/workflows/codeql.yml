@@ -32,8 +32,6 @@ jobs:
             build-mode: none
           - language: java-kotlin
             build-mode: manual
-          - language: ruby
-            build-mode: none
           - language: swift
             build-mode: autobuild
     steps:
