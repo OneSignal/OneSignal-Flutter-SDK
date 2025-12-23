@@ -1,5 +1,9 @@
 name: "CodeQL Advanced"
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 on:
   push:
     branches: ["main"]
@@ -16,7 +20,7 @@ jobs:
     #   - https://gh.io/supported-runners-and-hardware-resources
     #   - https://gh.io/using-larger-runners (GitHub.com only)
     # Consider using larger runners or machines with greater resources for possible analysis time improvements.
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     permissions:
       # required for all workflows
       security-events: write
@@ -30,17 +34,20 @@ jobs:
         include:
           - language: actions
             build-mode: none
-          - language: cpp
-            build-mode: autobuild
-          - language: java-kotlin
+            os: ubuntu-latest
+          - language: c-cpp
             build-mode: manual
+            os: macos-latest
+          - language: java-kotlin
+            build-mode: none
+            os: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
 
-      # Set up Flutter for Java-Kotlin analysis
+      # Set up Flutter for native analysis
       - name: Set up Flutter
-        if: matrix.language == 'java-kotlin'
+        if: matrix.language == 'java-kotlin' || matrix.language == 'c-cpp'
         uses: ./.github/actions/setup-flutter
 
       # Initializes the CodeQL tools for scanning.
@@ -49,13 +56,36 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           build-mode: ${{ matrix.build-mode }}
+          config: |
+            paths:
+              - 'android/**'
+              - 'ios/**'
+            paths-ignore:
+              - 'example/**'
 
-      # Build Android library for Java-Kotlin analysis
-      - name: Build Android library
-        if: matrix.language == 'java-kotlin'
+      - name: Build iOS library
+        if: matrix.language == 'c-cpp'
         run: |
-          cd android
-          ./gradlew assemble --no-daemon
+          # Fetch dependencies for the example app which uses the plugin
+          cd example
+          flutter pub get
+
+          # Install CocoaPods dependencies
+          cd ios
+          pod install
+
+          # Build using xcodebuild directly to ensure CodeQL can trace the compilation
+          xcodebuild -workspace Runner.xcworkspace \
+            -scheme Runner \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -arch arm64 \
+            COMPILER_INDEX_STORE_ENABLE=NO \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_ENTITLEMENTS="" \
+            CODE_SIGNING_IDENTITY="" \
+            build
 
       - name: Perform CodeQL Analysis
         uses: github/codeql-action/analyze@v4
