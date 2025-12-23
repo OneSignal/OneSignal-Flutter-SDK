@@ -13,8 +13,8 @@
  * 1. The above copyright notice and this permission notice shall be included in
  * all copies or substantial portions of the Software.
  *
- * 2. All copies of substantial portions of the Software may only be used in connection
- * with services provided by OneSignal.
+ * 2. All copies of substantial portions of the Software may only be used in
+ * connection with services provided by OneSignal.
  *
  * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
  * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
@@ -25,14 +25,14 @@
  * THE SOFTWARE.
  */
 
-
-#import <Foundation/Foundation.h>
 #import <Flutter/Flutter.h>
+#import <Foundation/Foundation.h>
 #import <OneSignalFramework/OneSignalFramework.h>
 
-@interface OSFlutterInAppMessages : NSObject<FlutterPlugin, OSInAppMessageLifecycleListener>
+@interface OSFlutterInAppMessages
+    : NSObject <FlutterPlugin, OSInAppMessageLifecycleListener>
 
-@property (strong, nonatomic) FlutterMethodChannel *channel;
+@property(strong, nonatomic) FlutterMethodChannel *channel;
 + (instancetype)sharedInstance;
 
 @end

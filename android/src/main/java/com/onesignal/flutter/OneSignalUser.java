@@ -4,20 +4,16 @@ import com.onesignal.OneSignal;
 import com.onesignal.debug.internal.logging.Logging;
 import com.onesignal.user.state.IUserStateObserver;
 import com.onesignal.user.state.UserChangedState;
-
-import org.json.JSONException;
-
-import java.util.List;
-import java.util.Map;
-
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import java.util.List;
+import java.util.Map;
+import org.json.JSONException;
 
-public class OneSignalUser extends FlutterMessengerResponder
-        implements MethodCallHandler, IUserStateObserver {
+public class OneSignalUser extends FlutterMessengerResponder implements MethodCallHandler, IUserStateObserver {
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalUser controller = new OneSignalUser();
@@ -28,34 +24,20 @@ public class OneSignalUser extends FlutterMessengerResponder
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {
-        if (call.method.contentEquals("OneSignal#setLanguage"))
-            this.setLanguage(call, result);
-        else if (call.method.contentEquals("OneSignal#getOnesignalId"))
-            this.getOnesignalId(call, result);
-        else if (call.method.contentEquals("OneSignal#getExternalId"))
-            this.getExternalId(call, result);
-        else if (call.method.contentEquals("OneSignal#addAliases"))
-            this.addAliases(call, result);
-        else if (call.method.contentEquals("OneSignal#removeAliases"))
-            this.removeAliases(call, result);
-        else if (call.method.contentEquals("OneSignal#addEmail"))
-            this.addEmail(call, result);
-        else if (call.method.contentEquals("OneSignal#removeEmail"))
-            this.removeEmail(call, result);
-        else if (call.method.contentEquals("OneSignal#addSms"))
-            this.addSms(call, result);
-        else if (call.method.contentEquals("OneSignal#removeSms"))
-            this.removeSms(call, result);
-        else if (call.method.contentEquals("OneSignal#addTags"))
-            this.addTags(call, result);
-        else if (call.method.contentEquals("OneSignal#removeTags"))
-            this.removeTags(call, result);
-        else if (call.method.contentEquals("OneSignal#getTags"))
-            this.getTags(call, result);
-        else if (call.method.contentEquals("OneSignal#lifecycleInit"))
-            this.lifecycleInit(result);
-        else
-            replyNotImplemented(result);
+        if (call.method.contentEquals("OneSignal#setLanguage")) this.setLanguage(call, result);
+        else if (call.method.contentEquals("OneSignal#getOnesignalId")) this.getOnesignalId(call, result);
+        else if (call.method.contentEquals("OneSignal#getExternalId")) this.getExternalId(call, result);
+        else if (call.method.contentEquals("OneSignal#addAliases")) this.addAliases(call, result);
+        else if (call.method.contentEquals("OneSignal#removeAliases")) this.removeAliases(call, result);
+        else if (call.method.contentEquals("OneSignal#addEmail")) this.addEmail(call, result);
+        else if (call.method.contentEquals("OneSignal#removeEmail")) this.removeEmail(call, result);
+        else if (call.method.contentEquals("OneSignal#addSms")) this.addSms(call, result);
+        else if (call.method.contentEquals("OneSignal#removeSms")) this.removeSms(call, result);
+        else if (call.method.contentEquals("OneSignal#addTags")) this.addTags(call, result);
+        else if (call.method.contentEquals("OneSignal#removeTags")) this.removeTags(call, result);
+        else if (call.method.contentEquals("OneSignal#getTags")) this.getTags(call, result);
+        else if (call.method.contentEquals("OneSignal#lifecycleInit")) this.lifecycleInit(result);
+        else replyNotImplemented(result);
     }
 
     private void setLanguage(MethodCall call, Result result) {
@@ -95,7 +77,9 @@ public class OneSignalUser extends FlutterMessengerResponder
             OneSignal.getUser().addAliases((Map<String, String>) call.arguments);
             replySuccess(result, null);
         } catch (ClassCastException e) {
-            replyError(result, "OneSignal",
+            replyError(
+                    result,
+                    "OneSignal",
                     "addAliases failed with error: " + e.getMessage() + "\n" + e.getStackTrace(),
                     null);
         }
@@ -108,7 +92,9 @@ public class OneSignalUser extends FlutterMessengerResponder
             OneSignal.getUser().removeAliases((List<String>) call.arguments);
             replySuccess(result, null);
         } catch (ClassCastException e) {
-            replyError(result, "OneSignal",
+            replyError(
+                    result,
+                    "OneSignal",
                     "removeAliases failed with error: " + e.getMessage() + "\n" + e.getStackTrace(),
                     null);
         }
@@ -141,7 +127,9 @@ public class OneSignalUser extends FlutterMessengerResponder
             OneSignal.getUser().addTags((Map<String, String>) call.arguments);
             replySuccess(result, null);
         } catch (ClassCastException e) {
-            replyError(result, "OneSignal",
+            replyError(
+                    result,
+                    "OneSignal",
                     "addTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(),
                     null);
         }
@@ -154,7 +142,9 @@ public class OneSignalUser extends FlutterMessengerResponder
             OneSignal.getUser().removeTags((List<String>) call.arguments);
             replySuccess(result, null);
         } catch (ClassCastException e) {
-            replyError(result, "OneSignal",
+            replyError(
+                    result,
+                    "OneSignal",
                     "deleteTags failed with error: " + e.getMessage() + "\n" + e.getStackTrace(),
                     null);
         }
@@ -167,13 +157,12 @@ public class OneSignalUser extends FlutterMessengerResponder
     @Override
     public void onUserStateChange(UserChangedState userChangedState) {
         try {
-            invokeMethodOnUiThread("OneSignal#onUserStateChange",
-                    OneSignalSerializer.convertOnUserStateChange(userChangedState));
+            invokeMethodOnUiThread(
+                    "OneSignal#onUserStateChange", OneSignalSerializer.convertOnUserStateChange(userChangedState));
         } catch (JSONException e) {
             e.getStackTrace();
             Logging.error(
-                    "Encountered an error attempting to convert UserChangedState object to hash map:"
-                            + e.toString(),
+                    "Encountered an error attempting to convert UserChangedState object to hash map:" + e.toString(),
                     null);
         }
     }

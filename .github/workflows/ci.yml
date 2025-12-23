@@ -22,8 +22,11 @@ jobs:
       - name: Static Analysis
         run: flutter analyze
 
-      - name: Ensure the Dart code is formatted correctly
-        run: dart format --set-exit-if-changed --output=none .
+      - name: Setup Clang
+        uses: OneSignal/sdk-actions/.github/actions/setup-clang@main
+
+      - name: Check formatting (dart,java,c)
+        run: dart run rps format-check
 
       - name: Run Flutter unit tests
         run: dart run rps test
