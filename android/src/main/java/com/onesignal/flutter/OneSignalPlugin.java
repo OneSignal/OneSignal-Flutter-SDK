@@ -96,6 +96,11 @@ public class OneSignalPlugin extends FlutterMessengerResponder
         replySuccess(reply, null);
     }
 
+    private void login(MethodCall call, Result result) {
+        OneSignal.login((String) call.argument("externalId"));
+        replySuccess(result, null);
+    }
+
     private void loginWithJWT(MethodCall call, Result result) {
         OneSignal.login((String) call.argument("externalId"), (String) call.argument("jwt"));
         replySuccess(result, null);
