@@ -66,17 +66,13 @@ class _MyAppState extends State<MyApp> {
     });
 
     OneSignal.Notifications.addClickListener((event) {
-      print('NOTIFICATION CLICK LISTENER CALLED WITH EVENT: $event');
-      this.setState(() {
-        _debugLabelString =
-            "Clicked notification: \n${event.notification.jsonRepresentation().replaceAll("\\n", "\n")}";
-      });
+      print(
+          'NOTIFICATION CLICK LISTENER CALLED WITH EVENT: ${event.notification.title}');
     });
 
     OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-      print("YO222222!");
-      // print(
-      //     'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.jsonRepresentation()}');
+      print(
+          'NOTIFICATION WILL DISPLAY LISTENER CALLED WITH: ${event.notification.title}');
 
       /// Display Notification, preventDefault to not display
       event.preventDefault();
