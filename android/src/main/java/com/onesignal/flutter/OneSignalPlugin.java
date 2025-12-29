@@ -29,9 +29,6 @@ public class OneSignalPlugin extends FlutterMessengerResponder
         channel = new MethodChannel(messenger, "OneSignal");
         channel.setMethodCallHandler(this);
 
-        channel = new MethodChannel(messenger, "OneSignal");
-        channel.setMethodCallHandler(this);
-
         OneSignalDebug.registerWith(messenger);
         OneSignalLocation.registerWith(messenger);
         OneSignalSession.registerWith(messenger);
@@ -94,6 +91,11 @@ public class OneSignalPlugin extends FlutterMessengerResponder
         boolean granted = call.argument("granted");
         OneSignal.setConsentGiven(granted);
         replySuccess(reply, null);
+    }
+
+    private void login(MethodCall call, Result result) {
+        OneSignal.login((String) call.argument("externalId"));
+        replySuccess(result, null);
     }
 
     private void loginWithJWT(MethodCall call, Result result) {
