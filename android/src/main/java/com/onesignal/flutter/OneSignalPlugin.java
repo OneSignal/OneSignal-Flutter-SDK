@@ -19,16 +19,15 @@ public class OneSignalPlugin extends FlutterMessengerResponder
 
     public OneSignalPlugin() {}
 
-  private void init(Context context, BinaryMessenger messenger)
-  {
-    this.context = context;
-    this.messenger = messenger;
-    OneSignalWrapper.setSdkType("flutter");
-    // For 5.0.0, hard code to reflect SDK version
-    OneSignalWrapper.setSdkVersion("050305");
+    private void init(Context context, BinaryMessenger messenger) {
+        this.context = context;
+        this.messenger = messenger;
+        OneSignalWrapper.setSdkType("flutter");
+        // For 5.0.0, hard code to reflect SDK version
+        OneSignalWrapper.setSdkVersion("050305");
 
-    channel = new MethodChannel(messenger, "OneSignal");
-    channel.setMethodCallHandler(this);
+        channel = new MethodChannel(messenger, "OneSignal");
+        channel.setMethodCallHandler(this);
 
         channel = new MethodChannel(messenger, "OneSignal");
         channel.setMethodCallHandler(this);
@@ -97,13 +96,13 @@ public class OneSignalPlugin extends FlutterMessengerResponder
         replySuccess(reply, null);
     }
 
-  private void loginWithJWT(MethodCall call, Result result) {
-    OneSignal.login((String) call.argument("externalId"), (String) call.argument("jwt"));
-    replySuccess(result, null);
-  }
+    private void loginWithJWT(MethodCall call, Result result) {
+        OneSignal.login((String) call.argument("externalId"), (String) call.argument("jwt"));
+        replySuccess(result, null);
+    }
 
-  private void logout(MethodCall call, Result result) {
-    OneSignal.logout();
-    replySuccess(result, null);
-  }
+    private void logout(MethodCall call, Result result) {
+        OneSignal.logout();
+        replySuccess(result, null);
+    }
 }

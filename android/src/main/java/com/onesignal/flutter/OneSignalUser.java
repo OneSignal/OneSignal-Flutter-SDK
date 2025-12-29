@@ -13,8 +13,7 @@ import java.util.List;
 import java.util.Map;
 import org.json.JSONException;
 
-public class OneSignalUser extends FlutterMessengerResponder
-        implements MethodCallHandler, IUserStateObserver {
+public class OneSignalUser extends FlutterMessengerResponder implements MethodCallHandler, IUserStateObserver {
     private static OneSignalUser sharedInstance;
 
     public static OneSignalUser getSharedInstance() {
@@ -24,7 +23,7 @@ public class OneSignalUser extends FlutterMessengerResponder
         return sharedInstance;
     }
 
-    private OneSignalUser() { }
+    private OneSignalUser() {}
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalUser controller = getSharedInstance();

@@ -18,8 +18,8 @@ import java.util.Collection;
 import java.util.Map;
 import org.json.JSONException;
 
-public class OneSignalInAppMessages extends FlutterMessengerResponder implements MethodCallHandler,
-IInAppMessageClickListener, IInAppMessageLifecycleListener{
+public class OneSignalInAppMessages extends FlutterMessengerResponder
+        implements MethodCallHandler, IInAppMessageClickListener, IInAppMessageLifecycleListener {
     private static OneSignalInAppMessages sharedInstance;
 
     public static OneSignalInAppMessages getSharedInstance() {
@@ -29,7 +29,7 @@ IInAppMessageClickListener, IInAppMessageLifecycleListener{
         return sharedInstance;
     }
 
-    private OneSignalInAppMessages() { }
+    private OneSignalInAppMessages() {}
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalInAppMessages controller = getSharedInstance();
@@ -113,27 +113,34 @@ IInAppMessageClickListener, IInAppMessageLifecycleListener{
                     "OneSignal#onClickInAppMessage", OneSignalSerializer.convertInAppMessageClickEventToMap(event));
         } catch (JSONException e) {
             e.getStackTrace();
-            Logging.error("Encountered an error attempting to convert IInAppMessageClickEvent object to hash map:" + e.toString(), null);
+            Logging.error(
+                    "Encountered an error attempting to convert IInAppMessageClickEvent object to hash map:"
+                            + e.toString(),
+                    null);
         }
     }
 
     @Override
     public void onWillDisplay(IInAppMessageWillDisplayEvent event) {
         try {
-            invokeMethodOnUiThread("OneSignal#onWillDisplayInAppMessage",
-            OneSignalSerializer.convertInAppMessageWillDisplayEventToMap(event));
+            invokeMethodOnUiThread(
+                    "OneSignal#onWillDisplayInAppMessage",
+                    OneSignalSerializer.convertInAppMessageWillDisplayEventToMap(event));
         } catch (JSONException e) {
             e.getStackTrace();
-            Logging.error("Encountered an error attempting to convert IInAppMessageWillDisplayEvent object to hash map:" + e.toString(), null);
+            Logging.error(
+                    "Encountered an error attempting to convert IInAppMessageWillDisplayEvent object to hash map:"
+                            + e.toString(),
+                    null);
         }
-
     }
 
     @Override
     public void onDidDisplay(IInAppMessageDidDisplayEvent event) {
         try {
-            invokeMethodOnUiThread("OneSignal#onDidDisplayInAppMessage",
-            OneSignalSerializer.convertInAppMessageDidDisplayEventToMap(event));
+            invokeMethodOnUiThread(
+                    "OneSignal#onDidDisplayInAppMessage",
+                    OneSignalSerializer.convertInAppMessageDidDisplayEventToMap(event));
         } catch (JSONException e) {
             e.getStackTrace();
             Logging.error(
@@ -146,8 +153,9 @@ IInAppMessageClickListener, IInAppMessageLifecycleListener{
     @Override
     public void onWillDismiss(IInAppMessageWillDismissEvent event) {
         try {
-            invokeMethodOnUiThread("OneSignal#onWillDismissInAppMessage",
-            OneSignalSerializer.convertInAppMessageWillDismissEventToMap(event));
+            invokeMethodOnUiThread(
+                    "OneSignal#onWillDismissInAppMessage",
+                    OneSignalSerializer.convertInAppMessageWillDismissEventToMap(event));
         } catch (JSONException e) {
             e.getStackTrace();
             Logging.error(
@@ -160,8 +168,9 @@ IInAppMessageClickListener, IInAppMessageLifecycleListener{
     @Override
     public void onDidDismiss(IInAppMessageDidDismissEvent event) {
         try {
-            invokeMethodOnUiThread("OneSignal#onDidDismissInAppMessage",
-            OneSignalSerializer.convertInAppMessageDidDismissEventToMap(event));
+            invokeMethodOnUiThread(
+                    "OneSignal#onDidDismissInAppMessage",
+                    OneSignalSerializer.convertInAppMessageDidDismissEventToMap(event));
         } catch (JSONException e) {
             e.getStackTrace();
             Logging.error(
@@ -169,6 +178,5 @@ IInAppMessageClickListener, IInAppMessageLifecycleListener{
                             + e.toString(),
                     null);
         }
-
     }
 }

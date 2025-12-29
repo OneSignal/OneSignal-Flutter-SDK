@@ -11,7 +11,8 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import org.json.JSONException;
 
-public class OneSignalPushSubscription extends FlutterMessengerResponder implements MethodCallHandler, IPushSubscriptionObserver {
+public class OneSignalPushSubscription extends FlutterMessengerResponder
+        implements MethodCallHandler, IPushSubscriptionObserver {
     private static OneSignalPushSubscription sharedInstance;
 
     public static OneSignalPushSubscription getSharedInstance() {
@@ -21,7 +22,7 @@ public class OneSignalPushSubscription extends FlutterMessengerResponder impleme
         return sharedInstance;
     }
 
-    private OneSignalPushSubscription() { }
+    private OneSignalPushSubscription() {}
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalPushSubscription controller = getSharedInstance();
@@ -68,7 +69,10 @@ public class OneSignalPushSubscription extends FlutterMessengerResponder impleme
                     OneSignalSerializer.convertOnPushSubscriptionChange(changeState));
         } catch (JSONException e) {
             e.getStackTrace();
-            Logging.error("Encountered an error attempting to convert PushSubscriptionChangedState object to hash map:" + e.toString(), null);
+            Logging.error(
+                    "Encountered an error attempting to convert PushSubscriptionChangedState object to hash map:"
+                            + e.toString(),
+                    null);
         }
     }
 }
