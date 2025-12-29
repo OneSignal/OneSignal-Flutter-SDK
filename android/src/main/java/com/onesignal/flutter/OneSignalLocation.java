@@ -18,7 +18,7 @@ public class OneSignalLocation extends FlutterMessengerResponder implements Meth
         return sharedInstance;
     }
 
-    private OneSignalLocation() { }
+    private OneSignalLocation() {}
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalLocation controller = getSharedInstance();

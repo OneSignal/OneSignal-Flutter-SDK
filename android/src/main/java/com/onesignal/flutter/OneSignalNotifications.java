@@ -22,7 +22,8 @@ import kotlinx.coroutines.Dispatchers;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class OneSignalNotifications extends FlutterMessengerResponder implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
+public class OneSignalNotifications extends FlutterMessengerResponder
+        implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
     private static OneSignalNotifications sharedInstance;
 
     private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
@@ -35,7 +36,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder implements
         return sharedInstance;
     }
 
-    private OneSignalNotifications() { }
+    private OneSignalNotifications() {}
 
     /**
      * A helper class to encapsulate invoking the suspending function [requestPermission] in Java.
@@ -127,7 +128,8 @@ public class OneSignalNotifications extends FlutterMessengerResponder implements
         replySuccess(result, null);
     }
 
-    /// Our bridge layer needs to preventDefault() so that the Flutter listener has time to preventDefault() before the notification is displayed
+    /// Our bridge layer needs to preventDefault() so that the Flutter listener has time to preventDefault() before the
+    // notification is displayed
     /// This function is called after all of the flutter listeners have responded to the willDisplay event.
     /// If any of them have called preventDefault() we will not call display(). Otherwise we will display.
     private void proceedWithWillDisplay(MethodCall call, Result result) {
@@ -218,7 +220,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder implements
     }
 
     @Override
-    public void onNotificationPermissionChange(boolean permission)  {
+    public void onNotificationPermissionChange(boolean permission) {
         HashMap<String, Object> hash = new HashMap<>();
         hash.put("permission", permission);
         invokeMethodOnUiThread("OneSignal#onNotificationPermissionDidChange", hash);

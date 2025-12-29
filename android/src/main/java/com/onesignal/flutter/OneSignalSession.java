@@ -17,7 +17,7 @@ public class OneSignalSession extends FlutterMessengerResponder implements Metho
         return sharedInstance;
     }
 
-    private OneSignalSession() { }
+    private OneSignalSession() {}
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalSession controller = getSharedInstance();

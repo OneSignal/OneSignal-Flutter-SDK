@@ -18,9 +18,9 @@ public class OneSignalDebug extends FlutterMessengerResponder implements MethodC
         return sharedInstance;
     }
 
-    private OneSignalDebug() { }
+    private OneSignalDebug() {}
 
-   static void registerWith(BinaryMessenger messenger) {
+    static void registerWith(BinaryMessenger messenger) {
         OneSignalDebug controller = getSharedInstance();
         controller.messenger = messenger;
         controller.channel = new MethodChannel(messenger, "OneSignal#debug");
