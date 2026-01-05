@@ -24,8 +24,11 @@ import org.json.JSONObject;
 
 public class OneSignalNotifications extends FlutterMessengerResponder
         implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
+    private static OneSignalNotifications instance;
     private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
     private final HashMap<String, INotificationWillDisplayEvent> preventedDefaultCache = new HashMap<>();
+    private boolean hasClickListener = false;
+    private boolean hasLifecycleListeners = false;
 
     /**
      * A helper class to encapsulate invoking the suspending function [requestPermission] in Java.
@@ -61,10 +64,35 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     }
 
     static void registerWith(BinaryMessenger messenger) {
-        OneSignalNotifications controller = new OneSignalNotifications();
-        controller.messenger = messenger;
-        controller.channel = new MethodChannel(messenger, "OneSignal#notifications");
-        controller.channel.setMethodCallHandler(controller);
+        if (instance != null) {
+            instance.removeListeners();
+        }
+        instance = new OneSignalNotifications();
+        instance.messenger = messenger;
+        instance.channel = new MethodChannel(messenger, "OneSignal#notifications");
+        instance.channel.setMethodCallHandler(instance);
+    }
+
+    static void unregisterWith() {
+        if (instance != null) {
+            instance.removeListeners();
+            instance.channel.setMethodCallHandler(null);
+            instance = null;
+        }
+    }
+
+    private void removeListeners() {
+        if (hasClickListener) {
+            OneSignal.getNotifications().removeClickListener(this);
+            hasClickListener = false;
+        }
+        if (hasLifecycleListeners) {
+            OneSignal.getNotifications().removeForegroundLifecycleListener(this);
+            OneSignal.getNotifications().removePermissionObserver(this);
+            hasLifecycleListeners = false;
+        }
+        notificationOnWillDisplayEventCache.clear();
+        preventedDefaultCache.clear();
     }
 
     @Override
@@ -218,10 +246,12 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     private void lifecycleInit(Result result) {
         OneSignal.getNotifications().addForegroundLifecycleListener(this);
         OneSignal.getNotifications().addPermissionObserver(this);
+        hasLifecycleListeners = true;
         replySuccess(result, null);
     }
 
     private void registerClickListener() {
         OneSignal.getNotifications().addClickListener(this);
+        hasClickListener = true;
     }
 }

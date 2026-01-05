@@ -13,12 +13,32 @@ import org.json.JSONException;
 
 public class OneSignalPushSubscription extends FlutterMessengerResponder
         implements MethodCallHandler, IPushSubscriptionObserver {
+    private static OneSignalPushSubscription instance;
+    private boolean hasObserver = false;
 
     static void registerWith(BinaryMessenger messenger) {
-        OneSignalPushSubscription controller = new OneSignalPushSubscription();
-        controller.messenger = messenger;
-        controller.channel = new MethodChannel(messenger, "OneSignal#pushsubscription");
-        controller.channel.setMethodCallHandler(controller);
+        if (instance != null) {
+            instance.removeListeners();
+        }
+        instance = new OneSignalPushSubscription();
+        instance.messenger = messenger;
+        instance.channel = new MethodChannel(messenger, "OneSignal#pushsubscription");
+        instance.channel.setMethodCallHandler(instance);
+    }
+
+    static void unregisterWith() {
+        if (instance != null) {
+            instance.removeListeners();
+            instance.channel.setMethodCallHandler(null);
+            instance = null;
+        }
+    }
+
+    private void removeListeners() {
+        if (hasObserver) {
+            OneSignal.getUser().getPushSubscription().removeObserver(this);
+            hasObserver = false;
+        }
     }
 
     @Override
@@ -47,6 +67,7 @@ public class OneSignalPushSubscription extends FlutterMessengerResponder
 
     private void lifecycleInit(Result result) {
         OneSignal.getUser().getPushSubscription().addObserver(this);
+        hasObserver = true;
         replySuccess(result, null);
     }
 

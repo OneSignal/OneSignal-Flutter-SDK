@@ -1,6 +1,7 @@
 package com.onesignal.flutter;
 
 import android.content.Context;
+import android.util.Log;
 import androidx.annotation.NonNull;
 import com.onesignal.OneSignal;
 import com.onesignal.common.OneSignalWrapper;
@@ -48,7 +49,16 @@ public class OneSignalPlugin extends FlutterMessengerResponder
         onDetachedFromEngine();
     }
 
-    private void onDetachedFromEngine() {}
+    private void onDetachedFromEngine() {
+        Log.d("OneSignalPlugin", "onDetachedFromEngine");
+        OneSignalNotifications.unregisterWith();
+        OneSignalInAppMessages.unregisterWith();
+        OneSignalPushSubscription.unregisterWith();
+        OneSignalUser.unregisterWith();
+        if (channel != null) {
+            channel.setMethodCallHandler(null);
+        }
+    }
 
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
