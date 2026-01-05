@@ -14,7 +14,9 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
@@ -28,6 +30,8 @@ public class OneSignalNotifications extends FlutterMessengerResponder
 
     private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
     private final HashMap<String, INotificationWillDisplayEvent> preventedDefaultCache = new HashMap<>();
+    private final List<Map<String, Object>> clickEventCache = new ArrayList<>();
+    private boolean hasClickListener = false;
 
     public static OneSignalNotifications getSharedInstance() {
         if (sharedInstance == null) {
@@ -76,6 +80,9 @@ public class OneSignalNotifications extends FlutterMessengerResponder
         controller.messenger = messenger;
         controller.channel = new MethodChannel(messenger, "OneSignal#notifications");
         controller.channel.setMethodCallHandler(controller);
+
+        // Register click listener early to cache cold start notification clicks
+        OneSignal.getNotifications().addClickListener(controller);
     }
 
     @Override
@@ -176,8 +183,13 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     @Override
     public void onClick(INotificationClickEvent event) {
         try {
-            invokeMethodOnUiThread(
-                    "OneSignal#onClickNotification", OneSignalSerializer.convertNotificationClickEventToMap(event));
+            Map<String, Object> eventMap = OneSignalSerializer.convertNotificationClickEventToMap(event);
+            if (hasClickListener) {
+                invokeMethodOnUiThread("OneSignal#onClickNotification", eventMap);
+            } else {
+                // Cache the event until Flutter registers its click listener
+                clickEventCache.add(eventMap);
+            }
         } catch (JSONException e) {
             e.getStackTrace();
             Logging.error(
@@ -237,7 +249,12 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     }
 
     private void registerClickListener() {
-        OneSignal.getNotifications().removeClickListener(this);
-        OneSignal.getNotifications().addClickListener(this);
+        hasClickListener = true;
+
+        // Flush any cached click events that occurred before Flutter registered
+        for (Map<String, Object> cachedEvent : clickEventCache) {
+            invokeMethodOnUiThread("OneSignal#onClickNotification", cachedEvent);
+        }
+        clickEventCache.clear();
     }
 }

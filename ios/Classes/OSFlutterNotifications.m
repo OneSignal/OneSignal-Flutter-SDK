@@ -39,6 +39,8 @@
     sharedInstance = [OSFlutterNotifications new];
     sharedInstance.onWillDisplayEventCache = [NSMutableDictionary new];
     sharedInstance.preventedDefaultCache = [NSMutableDictionary new];
+    sharedInstance.clickEventCache = [NSMutableArray new];
+    sharedInstance.hasClickListener = NO;
   });
   return sharedInstance;
 }
@@ -52,6 +54,9 @@
   [registrar
       addMethodCallDelegate:OSFlutterNotifications.sharedInstance
                     channel:OSFlutterNotifications.sharedInstance.channel];
+
+  // Register click listener early to cache cold start notification clicks
+  [OneSignal.Notifications addClickListener:OSFlutterNotifications.sharedInstance];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call
@@ -125,8 +130,15 @@
 
 - (void)registerClickListener:(FlutterMethodCall *)call
                    withResult:(FlutterResult)result {
-  [OneSignal.Notifications removeClickListener:self];
-  [OneSignal.Notifications addClickListener:self];
+  self.hasClickListener = YES;
+
+  // Flush any cached click events that occurred before Flutter registered
+  for (NSDictionary *cachedEvent in self.clickEventCache) {
+    [self.channel invokeMethod:@"OneSignal#onClickNotification"
+                     arguments:cachedEvent];
+  }
+  [self.clickEventCache removeAllObjects];
+
   result(nil);
 }
 
@@ -217,8 +229,13 @@
 #pragma mark Notification Click
 
 - (void)onClickNotification:(OSNotificationClickEvent *_Nonnull)event {
-  [self.channel invokeMethod:@"OneSignal#onClickNotification"
-                   arguments:event.toJson];
+  if (self.hasClickListener) {
+    [self.channel invokeMethod:@"OneSignal#onClickNotification"
+                     arguments:event.toJson];
+  } else {
+    // Cache the event until Flutter registers its click listener
+    [self.clickEventCache addObject:event.toJson];
+  }
 }
 
 @end

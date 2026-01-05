@@ -37,5 +37,7 @@
 + (instancetype)sharedInstance;
 @property(strong, nonatomic) NSMutableDictionary *onWillDisplayEventCache;
 @property(strong, nonatomic) NSMutableDictionary *preventedDefaultCache;
+@property(strong, nonatomic) NSMutableArray *clickEventCache;
+@property(nonatomic) BOOL hasClickListener;
 
 @end
