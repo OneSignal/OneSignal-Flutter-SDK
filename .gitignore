@@ -23,6 +23,3 @@ dlcov.log
 *.ipr
 *.iws
 .idea/
-
-# Swift Package Manager
-!.gitkeep
