@@ -1,5 +1,8 @@
 PODS:
   - Flutter (1.0.0)
+  - onesignal_flutter (5.3.4):
+    - Flutter
+    - OneSignalXCFramework (= 5.2.15)
   - OneSignalXCFramework (5.2.15):
     - OneSignalXCFramework/OneSignalComplete (= 5.2.15)
   - OneSignalXCFramework/OneSignal (5.2.15):
@@ -49,6 +52,7 @@ PODS:
 
 DEPENDENCIES:
   - Flutter (from `Flutter`)
+  - onesignal_flutter (from `.symlinks/plugins/onesignal_flutter/ios`)
   - OneSignalXCFramework (< 6.0.0, >= 5.0.2)
 
 SPEC REPOS:
@@ -58,9 +62,12 @@ SPEC REPOS:
 EXTERNAL SOURCES:
   Flutter:
     :path: Flutter
+  onesignal_flutter:
+    :path: ".symlinks/plugins/onesignal_flutter/ios"
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+  onesignal_flutter: 3bc39554927b132771c6838d91f431d5368b4ada
   OneSignalXCFramework: ea9e14a95b92ad48d9b35037cbae88a9542bdea3
 
 PODFILE CHECKSUM: 008ee3527530ade7ae7311fc02a615df31949c2e
