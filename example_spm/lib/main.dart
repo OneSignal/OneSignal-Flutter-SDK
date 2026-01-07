@@ -201,6 +201,11 @@ class _MyAppState extends State<MyApp> {
     OneSignal.Location.setShared(true);
   }
 
+  void _handleRequestLocationPermission() {
+    print("Requesting location permission");
+    OneSignal.Location.requestPermission();
+  }
+
   void _handleGetExternalId() async {
     var externalId = await OneSignal.User.getExternalId();
     print('External ID: $externalId');
@@ -396,6 +401,10 @@ class _MyAppState extends State<MyApp> {
                   new TableRow(children: [
                     new OneSignalButton("Set Location Shared",
                         _handleSetLocationShared, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Request Location",
+                        _handleRequestLocationPermission, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new OneSignalButton(
