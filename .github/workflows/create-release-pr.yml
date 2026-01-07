@@ -142,6 +142,10 @@ jobs:
           sed -i '' "s|s.dependency 'OneSignalXCFramework', '[^']*'|s.dependency 'OneSignalXCFramework', '${VERSION}'|" ios/onesignal_flutter.podspec
           echo "✓ Updated ios/onesignal_flutter.podspec with iOS SDK ${VERSION}"
 
+          # Update Package.swift with new version (for SPM)
+          sed -i '' "s|OneSignal-XCFramework\", exact: \"[^\"]*\"|OneSignal-XCFramework\", exact: \"${VERSION}\"|" ios/onesignal_flutter/Package.swift
+          echo "✓ Updated ios/onesignal_flutter/Package.swift with iOS SDK ${VERSION}"
+
           # Update ios example
           cd example/ios
           pod update OneSignalXCFramework
