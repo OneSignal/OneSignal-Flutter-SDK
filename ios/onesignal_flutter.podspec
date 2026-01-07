@@ -10,8 +10,8 @@ Pod::Spec.new do |s|
   s.license          = { :file => '../LICENSE' }
   s.author           = { 'Brad Hesse' => 'brad@onesignal.com', 'Josh Kasten' => 'josh@onesignal.com' }
   s.source           = { :path => '.' }
-  s.source_files = 'Classes/**/*'
-  s.public_header_files = 'Classes/**/*.h'
+  s.source_files = 'onesignal_flutter/Sources/onesignal_flutter/**/*.{h,m}'
+  s.public_header_files = 'onesignal_flutter/Sources/onesignal_flutter/include/**/*.h'
   s.dependency 'Flutter'
   s.dependency 'OneSignalXCFramework', '5.2.15'
   s.ios.deployment_target = '11.0'

@@ -1,3 +1,6 @@
 analyzer:
   exclude:
     - test/dlcov_references_test.dart
+    - example/**
+    - example_pod/**
+    - example_spm/**

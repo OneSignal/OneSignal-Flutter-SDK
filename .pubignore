@@ -31,3 +31,14 @@ dlcov.log
 pubspec.lock
 .flutter-plugins-dependencies
 flutter_export_environment.sh
+analysis_options.yaml
+
+# Misc
+CODEOWNERS
+CONTRIBUTING.md
+MIGRATION_GUIDE.md
+
+# Examples
+example
+example_pod
+example_spm
