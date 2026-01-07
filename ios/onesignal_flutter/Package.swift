@@ -20,7 +20,8 @@ let package = Package(
             dependencies: [
                 .product(name: "OneSignalFramework", package: "OneSignal-XCFramework"),
                 .product(name: "OneSignalInAppMessages", package: "OneSignal-XCFramework"),
-                .product(name: "OneSignalLocation", package: "OneSignal-XCFramework")
+                .product(name: "OneSignalLocation", package: "OneSignal-XCFramework"),
+                .product(name: "OneSignalExtension", package: "OneSignal-XCFramework")
             ],
             path: "Sources/onesignal_flutter"
         )
