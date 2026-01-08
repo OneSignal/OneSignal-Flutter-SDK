@@ -78,17 +78,15 @@ jobs:
       - name: Setup Git User
         uses: OneSignal/sdk-actions/.github/actions/setup-git-user@main
 
-      - name: Get current native SDK versions
+      - name: Get current native SDK versions from target branch
         id: current_versions
         run: |
-          # Current flutter version
-          CURRENT_VERSION=$(grep "^version:" pubspec.yaml | sed 's/version: //' | tr -d ' ')
+          git fetch origin ${{ inputs.target_branch }}
 
-          # Extract current Android SDK version
-          ANDROID_VERSION=$(sed -n "s/.*com\.onesignal:OneSignal:\([^']*\)'.*/\1/p" android/build.gradle)
-
-          # Extract current iOS SDK version
-          IOS_VERSION=$(sed -n "s/.*OneSignalXCFramework', '\([^']*\)'.*/\1/p" ios/onesignal_flutter.podspec)
+          # Get versions from target branch (not the release branch)
+          CURRENT_VERSION=$(git show origin/${{ inputs.target_branch }}:pubspec.yaml | grep "^version:" | sed 's/version: //' | tr -d ' ')
+          ANDROID_VERSION=$(git show origin/${{ inputs.target_branch }}:android/build.gradle | sed -n "s/.*com\.onesignal:OneSignal:\([^']*\)'.*/\1/p")
+          IOS_VERSION=$(git show origin/${{ inputs.target_branch }}:ios/onesignal_flutter.podspec | sed -n "s/.*OneSignalXCFramework', '\([^']*\)'.*/\1/p")
 
           echo "flutter_from=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "android_from=$ANDROID_VERSION" >> $GITHUB_OUTPUT
