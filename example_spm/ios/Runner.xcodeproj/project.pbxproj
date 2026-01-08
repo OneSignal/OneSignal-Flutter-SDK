@@ -28,6 +28,8 @@
 		CA2C87F221015A8D00D5D35D /* UserNotifications.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CA2C87F121015A8C00D5D35D /* UserNotifications.framework */; };
 		CAB34E9320F96BDA0024CA6B /* NotificationService.m in Sources */ = {isa = PBXBuildFile; fileRef = CAB34E9220F96BDA0024CA6B /* NotificationService.m */; };
 		CAB34E9D20F96F460024CA6B /* OneSignalNotificationServiceExtension.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = CAB34E8F20F96BDA0024CA6B /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		E82451E52F0F38F80032825E /* OneSignalFramework in Frameworks */ = {isa = PBXBuildFile; productRef = E82451E42F0F38F80032825E /* OneSignalFramework */; };
+		E82451E72F0F39250032825E /* OneSignalFramework in Frameworks */ = {isa = PBXBuildFile; productRef = E82451E62F0F39250032825E /* OneSignalFramework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -112,6 +114,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				47CD9D272BE10D9400F8B006 /* SwiftUI.framework in Frameworks */,
+				E82451E72F0F39250032825E /* OneSignalFramework in Frameworks */,
 				47CD9D252BE10D9400F8B006 /* WidgetKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -128,6 +131,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E82451E52F0F38F80032825E /* OneSignalFramework in Frameworks */,
 				CA2C87F221015A8D00D5D35D /* UserNotifications.framework in Frameworks */,
 				CA2C87DC21014E1C00D5D35D /* UIKit.framework in Frameworks */,
 				CA2C87DA21014E1800D5D35D /* SystemConfiguration.framework in Frameworks */,
@@ -169,7 +173,6 @@
 				47CD9D282BE10D9400F8B006 /* ExampleWidget */,
 				97C146EF1CF9000F007C117D /* Products */,
 				E458450F0521E6D94C4900F1 /* Frameworks */,
-				BA809C1A17A51DB9BC859D35 /* Pods */,
 			);
 			sourceTree = "<group>";
 		};
@@ -206,13 +209,6 @@
 				97C146F21CF9000F007C117D /* main.m */,
 			);
 			name = "Supporting Files";
-			sourceTree = "<group>";
-		};
-		BA809C1A17A51DB9BC859D35 /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-			);
-			path = Pods;
 			sourceTree = "<group>";
 		};
 		CAB34E9020F96BDA0024CA6B /* OneSignalNotificationServiceExtension */ = {
@@ -349,7 +345,8 @@
 			);
 			mainGroup = 97C146E51CF9000F007C117D;
 			packageReferences = (
-				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */,
+				781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */,
+				E82451E32F0F38D40032825E /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */,
 			);
 			productRefGroup = 97C146EF1CF9000F007C117D /* Products */;
 			projectDirPath = "";
@@ -844,16 +841,37 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "FlutterGeneratedPluginSwiftPackage" */ = {
+		781AD8BC2B33823900A9FFBB /* XCLocalSwiftPackageReference "Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = Flutter/ephemeral/Packages/FlutterGeneratedPluginSwiftPackage;
 		};
 /* End XCLocalSwiftPackageReference section */
 
+/* Begin XCRemoteSwiftPackageReference section */
+		E82451E32F0F38D40032825E /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/OneSignal/OneSignal-XCFramework";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.2.15;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
 /* Begin XCSwiftPackageProductDependency section */
 		78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */ = {
 			isa = XCSwiftPackageProductDependency;
 			productName = FlutterGeneratedPluginSwiftPackage;
+		};
+		E82451E42F0F38F80032825E /* OneSignalFramework */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E82451E32F0F38D40032825E /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */;
+			productName = OneSignalFramework;
+		};
+		E82451E62F0F39250032825E /* OneSignalFramework */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = E82451E32F0F38D40032825E /* XCRemoteSwiftPackageReference "OneSignal-XCFramework" */;
+			productName = OneSignalFramework;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

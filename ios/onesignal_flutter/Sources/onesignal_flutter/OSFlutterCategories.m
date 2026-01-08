@@ -25,7 +25,7 @@
  * THE SOFTWARE.
  */
 
-#import "OSFlutterCategories.h"
+#import "./include/onesignal_flutter/OSFlutterCategories.h"
 
 /*
     The OneSignal iOS SDK implements similar methods (`toDictionary`)

@@ -25,8 +25,8 @@
  * THE SOFTWARE.
  */
 
-#import "OSFlutterSession.h"
-#import "OSFlutterCategories.h"
+#import "./include/onesignal_flutter/OSFlutterSession.h"
+#import "./include/onesignal_flutter/OSFlutterCategories.h"
 #import <OneSignalFramework/OneSignalFramework.h>
 
 @implementation OSFlutterSession

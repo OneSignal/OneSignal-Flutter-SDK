@@ -24,9 +24,9 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-#import "OSFlutterUser.h"
-#import "OSFlutterCategories.h"
-#import "OSFlutterPushSubscription.h"
+#import "./include/onesignal_flutter/OSFlutterUser.h"
+#import "./include/onesignal_flutter/OSFlutterCategories.h"
+#import "./include/onesignal_flutter/OSFlutterPushSubscription.h"
 #import <OneSignalFramework/OneSignalFramework.h>
 #import <OneSignalUser/OneSignalUser.h>
 

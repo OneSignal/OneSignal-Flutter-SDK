@@ -25,8 +25,8 @@
  * THE SOFTWARE.
  */
 
-#import "OSFlutterNotifications.h"
-#import "OSFlutterCategories.h"
+#import "./include/onesignal_flutter/OSFlutterNotifications.h"
+#import "./include/onesignal_flutter/OSFlutterCategories.h"
 #import <OneSignalFramework/OneSignalFramework.h>
 #import <OneSignalNotifications/OneSignalNotifications.h>
 

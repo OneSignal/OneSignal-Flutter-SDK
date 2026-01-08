@@ -18,6 +18,7 @@ class _MyAppState extends State<MyApp> {
   String? _language;
   String? _liveActivityId;
   bool _enableConsentButton = false;
+  bool _locationShared = false;
 
   // CHANGE THIS parameter to true if you want to test GDPR privacy consent
   bool _requireConsent = false;
@@ -197,8 +198,20 @@ class _MyAppState extends State<MyApp> {
   }
 
   void _handleSetLocationShared() {
-    print("Setting location shared to true");
-    OneSignal.Location.setShared(true);
+    _locationShared = !_locationShared;
+    print("Setting location shared to $_locationShared");
+    OneSignal.Location.setShared(_locationShared);
+    setState(() {});
+  }
+
+  void _handleRequestLocationPermission() {
+    print("Requesting location permission");
+    OneSignal.Location.requestPermission();
+  }
+
+  void _handleIsLocationShared() async {
+    var isShared = await OneSignal.Location.isShared();
+    print('Location shared: $isShared');
   }
 
   void _handleGetExternalId() async {
@@ -394,8 +407,16 @@ class _MyAppState extends State<MyApp> {
                         _enableConsentButton)
                   ]),
                   new TableRow(children: [
-                    new OneSignalButton("Set Location Shared",
+                    new OneSignalButton("Location Shared: $_locationShared",
                         _handleSetLocationShared, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Request Location",
+                        _handleRequestLocationPermission, !_enableConsentButton)
+                  ]),
+                  new TableRow(children: [
+                    new OneSignalButton("Is Location Shared",
+                        _handleIsLocationShared, !_enableConsentButton)
                   ]),
                   new TableRow(children: [
                     new OneSignalButton(

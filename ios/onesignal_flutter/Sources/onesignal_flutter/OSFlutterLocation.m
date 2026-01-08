@@ -25,16 +25,16 @@
  * THE SOFTWARE.
  */
 
-#import "OSFlutterDebug.h"
-#import "OSFlutterCategories.h"
+#import "./include/onesignal_flutter/OSFlutterLocation.h"
+#import "./include/onesignal_flutter/OSFlutterCategories.h"
 #import <OneSignalFramework/OneSignalFramework.h>
 
-@implementation OSFlutterDebug
+@implementation OSFlutterLocation
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
-  OSFlutterDebug *instance = [OSFlutterDebug new];
+  OSFlutterLocation *instance = [OSFlutterLocation new];
 
   instance.channel =
-      [FlutterMethodChannel methodChannelWithName:@"OneSignal#debug"
+      [FlutterMethodChannel methodChannelWithName:@"OneSignal#location"
                                   binaryMessenger:[registrar messenger]];
 
   [registrar addMethodCallDelegate:instance channel:instance.channel];
@@ -42,26 +42,26 @@
 
 - (void)handleMethodCall:(FlutterMethodCall *)call
                   result:(FlutterResult)result {
-  if ([@"OneSignal#setLogLevel" isEqualToString:call.method])
-    [self setLogLevel:call withResult:result];
-  else if ([@"OneSignal#setAlertLevel" isEqualToString:call.method])
-    [self setAlertLevel:call withResult:result];
+  if ([@"OneSignal#requestPermission" isEqualToString:call.method])
+    [self requestPermission:call withResult:result];
+  else if ([@"OneSignal#setShared" isEqualToString:call.method])
+    [self setLocationShared:call withResult:result];
+  else if ([@"OneSignal#isShared" isEqualToString:call.method])
+    result(@([OneSignal.Location isShared]));
   else
     result(FlutterMethodNotImplemented);
 }
 
-- (void)setLogLevel:(FlutterMethodCall *)call withResult:(FlutterResult)result {
-  ONE_S_LOG_LEVEL logLevel =
-      (ONE_S_LOG_LEVEL)[call.arguments[@"logLevel"] intValue];
-  [OneSignal.Debug setLogLevel:logLevel];
+- (void)setLocationShared:(FlutterMethodCall *)call
+               withResult:(FlutterResult)result {
+  BOOL locationShared = [call.arguments boolValue];
+  [OneSignal.Location setShared:locationShared];
   result(nil);
 }
 
-- (void)setAlertLevel:(FlutterMethodCall *)call
-           withResult:(FlutterResult)result {
-  ONE_S_LOG_LEVEL visualLogLevel =
-      (ONE_S_LOG_LEVEL)[call.arguments[@"visualLevel"] intValue];
-  [OneSignal.Debug setAlertLevel:visualLogLevel];
+- (void)requestPermission:(FlutterMethodCall *)call
+               withResult:(FlutterResult)result {
+  [OneSignal.Location requestPermission];
   result(nil);
 }
 

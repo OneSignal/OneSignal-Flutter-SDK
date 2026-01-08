@@ -25,8 +25,8 @@
  * THE SOFTWARE.
  */
 
-#import "OSFlutterInAppMessages.h"
-#import "OSFlutterCategories.h"
+#import "./include/onesignal_flutter/OSFlutterInAppMessages.h"
+#import "./include/onesignal_flutter/OSFlutterCategories.h"
 #import <OneSignalFramework/OneSignalFramework.h>
 
 @implementation OSFlutterInAppMessages

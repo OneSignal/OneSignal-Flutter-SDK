@@ -25,15 +25,15 @@
  * THE SOFTWARE.
  */
 
-#import "OneSignalPlugin.h"
-#import "OSFlutterCategories.h"
-#import "OSFlutterDebug.h"
-#import "OSFlutterInAppMessages.h"
-#import "OSFlutterLiveActivities.h"
-#import "OSFlutterLocation.h"
-#import "OSFlutterNotifications.h"
-#import "OSFlutterSession.h"
-#import "OSFlutterUser.h"
+#import "./include/onesignal_flutter/OneSignalPlugin.h"
+#import "./include/onesignal_flutter/OSFlutterCategories.h"
+#import "./include/onesignal_flutter/OSFlutterDebug.h"
+#import "./include/onesignal_flutter/OSFlutterInAppMessages.h"
+#import "./include/onesignal_flutter/OSFlutterLiveActivities.h"
+#import "./include/onesignal_flutter/OSFlutterLocation.h"
+#import "./include/onesignal_flutter/OSFlutterNotifications.h"
+#import "./include/onesignal_flutter/OSFlutterSession.h"
+#import "./include/onesignal_flutter/OSFlutterUser.h"
 
 @interface OneSignalPlugin ()
 

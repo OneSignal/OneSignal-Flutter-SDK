@@ -25,8 +25,8 @@
  * THE SOFTWARE.
  */
 
-#import "OSFlutterLiveActivities.h"
-#import "OSFlutterCategories.h"
+#import "./include/onesignal_flutter/OSFlutterLiveActivities.h"
+#import "./include/onesignal_flutter/OSFlutterCategories.h"
 #import "OneSignalLiveActivities/OneSignalLiveActivities-Swift.h"
 #import <OneSignalFramework/OneSignalFramework.h>
 

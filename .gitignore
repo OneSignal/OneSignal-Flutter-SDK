@@ -23,10 +23,3 @@ dlcov.log
 *.ipr
 *.iws
 .idea/
-
-# Swift Package Manager
-**/.build/
-**/.swiftpm/
-**/Package.resolved
-**/.lock
-**/workspace-state.json

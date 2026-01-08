@@ -25,8 +25,8 @@
  * THE SOFTWARE.
  */
 
-#import "OSFlutterPushSubscription.h"
-#import "OSFlutterCategories.h"
+#import "./include/onesignal_flutter/OSFlutterPushSubscription.h"
+#import "./include/onesignal_flutter/OSFlutterCategories.h"
 #import <OneSignalFramework/OneSignalFramework.h>
 #import <OneSignalUser/OneSignalUser.h>
 
