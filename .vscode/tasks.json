@@ -1,0 +1,38 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Android Logcat (OneSignal)",
+      "type": "shell",
+      "command": "adb logcat | grep -iE '(onesignal|flutter)'",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Android Logcat (Flutter)",
+      "type": "shell",
+      "command": "adb logcat | grep -E ' flutter :'",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Android Logcat (All)",
+      "type": "shell",
+      "command": "adb logcat",
+      "isBackground": true,
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ]
+}
