@@ -14,9 +14,19 @@ import java.util.Map;
 import org.json.JSONException;
 
 public class OneSignalUser extends FlutterMessengerResponder implements MethodCallHandler, IUserStateObserver {
+    private static OneSignalUser sharedInstance;
+
+    public static OneSignalUser getSharedInstance() {
+        if (sharedInstance == null) {
+            sharedInstance = new OneSignalUser();
+        }
+        return sharedInstance;
+    }
+
+    private OneSignalUser() {}
 
     static void registerWith(BinaryMessenger messenger) {
-        OneSignalUser controller = new OneSignalUser();
+        OneSignalUser controller = getSharedInstance();
         controller.messenger = messenger;
         controller.channel = new MethodChannel(messenger, "OneSignal#user");
         controller.channel.setMethodCallHandler(controller);
@@ -50,6 +60,7 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
     }
 
     private void lifecycleInit(Result result) {
+        OneSignal.getUser().removeObserver(this);
         OneSignal.getUser().addObserver(this);
         replySuccess(result, null);
     }

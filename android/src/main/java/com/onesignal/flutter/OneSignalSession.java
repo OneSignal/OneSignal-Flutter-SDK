@@ -8,9 +8,19 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 
 public class OneSignalSession extends FlutterMessengerResponder implements MethodCallHandler {
+    private static OneSignalSession sharedInstance;
+
+    public static OneSignalSession getSharedInstance() {
+        if (sharedInstance == null) {
+            sharedInstance = new OneSignalSession();
+        }
+        return sharedInstance;
+    }
+
+    private OneSignalSession() {}
 
     static void registerWith(BinaryMessenger messenger) {
-        OneSignalSession controller = new OneSignalSession();
+        OneSignalSession controller = getSharedInstance();
         controller.messenger = messenger;
         controller.channel = new MethodChannel(messenger, "OneSignal#session");
         controller.channel.setMethodCallHandler(controller);

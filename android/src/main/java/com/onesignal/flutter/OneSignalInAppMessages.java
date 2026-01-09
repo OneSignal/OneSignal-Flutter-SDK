@@ -20,13 +20,23 @@ import org.json.JSONException;
 
 public class OneSignalInAppMessages extends FlutterMessengerResponder
         implements MethodCallHandler, IInAppMessageClickListener, IInAppMessageLifecycleListener {
+    private static OneSignalInAppMessages sharedInstance;
+
+    public static OneSignalInAppMessages getSharedInstance() {
+        if (sharedInstance == null) {
+            sharedInstance = new OneSignalInAppMessages();
+        }
+        return sharedInstance;
+    }
+
+    private OneSignalInAppMessages() {}
 
     static void registerWith(BinaryMessenger messenger) {
-        OneSignalInAppMessages sharedInstance = new OneSignalInAppMessages();
+        OneSignalInAppMessages controller = getSharedInstance();
 
-        sharedInstance.messenger = messenger;
-        sharedInstance.channel = new MethodChannel(messenger, "OneSignal#inappmessages");
-        sharedInstance.channel.setMethodCallHandler(sharedInstance);
+        controller.messenger = messenger;
+        controller.channel = new MethodChannel(messenger, "OneSignal#inappmessages");
+        controller.channel.setMethodCallHandler(controller);
     }
 
     @Override
@@ -89,7 +99,9 @@ public class OneSignalInAppMessages extends FlutterMessengerResponder
     }
 
     public void lifecycleInit(Result result) {
+        OneSignal.getInAppMessages().removeLifecycleListener(this);
         OneSignal.getInAppMessages().addLifecycleListener(this);
+        OneSignal.getInAppMessages().removeClickListener(this);
         OneSignal.getInAppMessages().addClickListener(this);
         replySuccess(result, null);
     }

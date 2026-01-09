@@ -31,14 +31,22 @@
 #import <OneSignalUser/OneSignalUser.h>
 
 @implementation OSFlutterUser
-+ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
-  OSFlutterUser *instance = [OSFlutterUser new];
++ (instancetype)sharedInstance {
+  static OSFlutterUser *sharedInstance = nil;
+  static dispatch_once_t onceToken;
+  dispatch_once(&onceToken, ^{
+    sharedInstance = [OSFlutterUser new];
+  });
+  return sharedInstance;
+}
 
-  instance.channel =
++ (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
+  OSFlutterUser.sharedInstance.channel =
       [FlutterMethodChannel methodChannelWithName:@"OneSignal#user"
                                   binaryMessenger:[registrar messenger]];
 
-  [registrar addMethodCallDelegate:instance channel:instance.channel];
+  [registrar addMethodCallDelegate:OSFlutterUser.sharedInstance
+                           channel:OSFlutterUser.sharedInstance.channel];
   [OSFlutterPushSubscription registerWithRegistrar:registrar];
 }
 
@@ -139,6 +147,7 @@
 
 - (void)lifecycleInit:(FlutterMethodCall *)call
            withResult:(FlutterResult)result {
+  [OneSignal.User removeObserver:self];
   [OneSignal.User addObserver:self];
   result(nil);
 }

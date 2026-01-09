@@ -116,13 +116,16 @@
 
 - (void)lifecycleInit:(FlutterMethodCall *)call
            withResult:(FlutterResult)result {
+  [OneSignal.Notifications removeForegroundLifecycleListener:self];
   [OneSignal.Notifications addForegroundLifecycleListener:self];
+  [OneSignal.Notifications removePermissionObserver:self];
   [OneSignal.Notifications addPermissionObserver:self];
   result(nil);
 }
 
 - (void)registerClickListener:(FlutterMethodCall *)call
                    withResult:(FlutterResult)result {
+  [OneSignal.Notifications removeClickListener:self];
   [OneSignal.Notifications addClickListener:self];
   result(nil);
 }

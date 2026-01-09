@@ -24,8 +24,19 @@ import org.json.JSONObject;
 
 public class OneSignalNotifications extends FlutterMessengerResponder
         implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
+    private static OneSignalNotifications sharedInstance;
+
     private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
     private final HashMap<String, INotificationWillDisplayEvent> preventedDefaultCache = new HashMap<>();
+
+    public static OneSignalNotifications getSharedInstance() {
+        if (sharedInstance == null) {
+            sharedInstance = new OneSignalNotifications();
+        }
+        return sharedInstance;
+    }
+
+    private OneSignalNotifications() {}
 
     /**
      * A helper class to encapsulate invoking the suspending function [requestPermission] in Java.
@@ -61,7 +72,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     }
 
     static void registerWith(BinaryMessenger messenger) {
-        OneSignalNotifications controller = new OneSignalNotifications();
+        OneSignalNotifications controller = getSharedInstance();
         controller.messenger = messenger;
         controller.channel = new MethodChannel(messenger, "OneSignal#notifications");
         controller.channel.setMethodCallHandler(controller);
@@ -216,12 +227,17 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     }
 
     private void lifecycleInit(Result result) {
+        OneSignal.getNotifications().removeForegroundLifecycleListener(this);
         OneSignal.getNotifications().addForegroundLifecycleListener(this);
+        OneSignal.getNotifications().removePermissionObserver(this);
         OneSignal.getNotifications().addPermissionObserver(this);
+        notificationOnWillDisplayEventCache.clear();
+        preventedDefaultCache.clear();
         replySuccess(result, null);
     }
 
     private void registerClickListener() {
+        OneSignal.getNotifications().removeClickListener(this);
         OneSignal.getNotifications().addClickListener(this);
     }
 }
