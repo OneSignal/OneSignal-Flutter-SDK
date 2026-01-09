@@ -28,6 +28,8 @@ public class OneSignalNotifications extends FlutterMessengerResponder
 
     private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
     private final HashMap<String, INotificationWillDisplayEvent> preventedDefaultCache = new HashMap<>();
+    private HashMap<String, Object> cachedClickEvent = null;
+    private boolean hasSetClickListener = false;
 
     public static OneSignalNotifications getSharedInstance() {
         if (sharedInstance == null) {
@@ -76,6 +78,9 @@ public class OneSignalNotifications extends FlutterMessengerResponder
         controller.messenger = messenger;
         controller.channel = new MethodChannel(messenger, "OneSignal#notifications");
         controller.channel.setMethodCallHandler(controller);
+        // Register click listener immediately to capture cold start clicks
+        OneSignal.getNotifications().removeClickListener(controller);
+        OneSignal.getNotifications().addClickListener(controller);
     }
 
     @Override
@@ -176,8 +181,13 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     @Override
     public void onClick(INotificationClickEvent event) {
         try {
-            invokeMethodOnUiThread(
-                    "OneSignal#onClickNotification", OneSignalSerializer.convertNotificationClickEventToMap(event));
+            HashMap<String, Object> eventMap = OneSignalSerializer.convertNotificationClickEventToMap(event);
+            if (hasSetClickListener) {
+                invokeMethodOnUiThread("OneSignal#onClickNotification", eventMap);
+            } else {
+                // Cache the event for when Flutter registers its listener (cold start scenario)
+                cachedClickEvent = eventMap;
+            }
         } catch (JSONException e) {
             e.getStackTrace();
             Logging.error(
@@ -237,7 +247,11 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     }
 
     private void registerClickListener() {
-        OneSignal.getNotifications().removeClickListener(this);
-        OneSignal.getNotifications().addClickListener(this);
+        hasSetClickListener = true;
+        // Replay any cached click event from cold start
+        if (cachedClickEvent != null) {
+            invokeMethodOnUiThread("OneSignal#onClickNotification", cachedClickEvent);
+            cachedClickEvent = null;
+        }
     }
 }

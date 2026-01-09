@@ -52,6 +52,10 @@
   [registrar
       addMethodCallDelegate:OSFlutterNotifications.sharedInstance
                     channel:OSFlutterNotifications.sharedInstance.channel];
+  
+  // Register click listener immediately to capture cold start clicks
+  [OneSignal.Notifications removeClickListener:OSFlutterNotifications.sharedInstance];
+  [OneSignal.Notifications addClickListener:OSFlutterNotifications.sharedInstance];
 }
 
 - (void)handleMethodCall:(FlutterMethodCall *)call
@@ -125,8 +129,13 @@
 
 - (void)registerClickListener:(FlutterMethodCall *)call
                    withResult:(FlutterResult)result {
-  [OneSignal.Notifications removeClickListener:self];
-  [OneSignal.Notifications addClickListener:self];
+  self.hasSetClickListener = YES;
+  // Replay any cached click event from cold start
+  if (self.cachedClickEvent) {
+    [self.channel invokeMethod:@"OneSignal#onClickNotification"
+                     arguments:self.cachedClickEvent];
+    self.cachedClickEvent = nil;
+  }
   result(nil);
 }
 
@@ -217,8 +226,13 @@
 #pragma mark Notification Click
 
 - (void)onClickNotification:(OSNotificationClickEvent *_Nonnull)event {
-  [self.channel invokeMethod:@"OneSignal#onClickNotification"
-                   arguments:event.toJson];
+  if (self.hasSetClickListener) {
+    [self.channel invokeMethod:@"OneSignal#onClickNotification"
+                     arguments:event.toJson];
+  } else {
+    // Cache the event for when Flutter registers its listener (cold start scenario)
+    self.cachedClickEvent = event.toJson;
+  }
 }
 
 @end
