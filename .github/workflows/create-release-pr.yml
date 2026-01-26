@@ -142,6 +142,7 @@ jobs:
 
           # Update ios example
           cd example/ios
+          flutter pub get  # Ensure symlinks are created
           pod update OneSignalXCFramework
 
           # Only commit if there are changes

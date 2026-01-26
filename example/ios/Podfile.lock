@@ -67,7 +67,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  onesignal_flutter: 88a5f2fadd08e0e489a5c915b43ef2dc4b1694b8
+  onesignal_flutter: 1c287b13a09745d60ce7c82a9e80b1dce8e56e64
   OneSignalXCFramework: 8ed6648481bee0bd973a138fecd80331b798524f
 
 PODFILE CHECKSUM: 008ee3527530ade7ae7311fc02a615df31949c2e
