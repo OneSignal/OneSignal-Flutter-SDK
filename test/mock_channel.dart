@@ -386,7 +386,8 @@ class OneSignalMockChannelController {
       case "OneSignal#trackEvent":
         final args = call.arguments as Map<dynamic, dynamic>;
         state.trackedEventName = args['name'] as String?;
-        state.trackedEventProperties = args['properties'] as Map<dynamic, dynamic>?;
+        state.trackedEventProperties =
+            args['properties'] as Map<dynamic, dynamic>?;
         break;
     }
   }

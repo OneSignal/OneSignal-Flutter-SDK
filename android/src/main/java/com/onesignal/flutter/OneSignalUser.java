@@ -170,7 +170,8 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
     private void trackEvent(MethodCall call, Result result) {
         String name = call.argument("name");
         Map<String, Object> properties = call.argument("properties");
-        OneSignal.getUser().trackEvent(name, properties);
+        Map<String, Object> sanitizedProperties = OneSignalSerializer.formatPropertiesMap(properties);
+        OneSignal.getUser().trackEvent(name, sanitizedProperties);
         replySuccess(result, null);
     }
 
