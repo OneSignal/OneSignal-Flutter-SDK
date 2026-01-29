@@ -20,6 +20,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -254,5 +255,42 @@ class OneSignalSerializer {
     /** Helper method to return null value if string is empty **/
     static String setNullIfEmpty(String value) {
         return value.isEmpty() ? null : value;
+    }
+
+    /**
+     * Formats a properties map, recursively stripping null values.
+     * The native SDK doesn't accept null values in properties currently.
+     */
+    static HashMap<String, Object> formatPropertiesMap(Map<String, Object> map) {
+        if (map == null) return null;
+
+        HashMap<String, Object> result = new HashMap<>();
+        for (Map.Entry<String, Object> entry : map.entrySet()) {
+            Object value = entry.getValue();
+            if (value != null) {
+                result.put(entry.getKey(), convertValue(value));
+            }
+        }
+        return result;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Object convertValue(Object value) {
+        if (value instanceof Map) {
+            return formatPropertiesMap((Map<String, Object>) value);
+        } else if (value instanceof List) {
+            return stripNullValuesFromList((List<Object>) value);
+        }
+        return value;
+    }
+
+    private static List<Object> stripNullValuesFromList(List<Object> list) {
+        List<Object> result = new ArrayList<>();
+        for (Object item : list) {
+            if (item != null) {
+                result.add(convertValue(item));
+            }
+        }
+        return result;
     }
 }
