@@ -47,8 +47,7 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
         else if (call.method.contentEquals("OneSignal#removeTags")) this.removeTags(call, result);
         else if (call.method.contentEquals("OneSignal#getTags")) this.getTags(call, result);
         else if (call.method.contentEquals("OneSignal#lifecycleInit")) this.lifecycleInit(result);
-        else if (call.method.contentEquals("OneSignal#trackEvent"))
-            this.trackEvent(call, result);
+        else if (call.method.contentEquals("OneSignal#trackEvent")) this.trackEvent(call, result);
         else replyNotImplemented(result);
     }
 
