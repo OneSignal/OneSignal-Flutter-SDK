@@ -291,6 +291,37 @@ void main() {
       expect(controller.state.lifecycleInitCalled, true);
     });
 
+    group('trackEvent', () {
+      test('invokes native method with event name only', () async {
+        await user.trackEvent('purchase');
+
+        expect(controller.state.trackedEventName, 'purchase');
+        expect(controller.state.trackedEventProperties, isNull);
+      });
+
+      test('invokes native method with event name and properties', () async {
+        await user.trackEvent('purchase', {
+          'amount': 99.99,
+          'currency': 'USD',
+          'item_count': 3,
+        });
+
+        expect(controller.state.trackedEventName, 'purchase');
+        expect(controller.state.trackedEventProperties, {
+          'amount': 99.99,
+          'currency': 'USD',
+          'item_count': 3,
+        });
+      });
+
+      test('handles empty properties map', () async {
+        await user.trackEvent('page_view', {});
+
+        expect(controller.state.trackedEventName, 'page_view');
+        expect(controller.state.trackedEventProperties, {});
+      });
+    });
+
     group('observers', () {
       test('can add observer', () {
         bool observerCalled = false;

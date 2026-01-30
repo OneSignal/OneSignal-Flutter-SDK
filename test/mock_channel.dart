@@ -383,6 +383,12 @@ class OneSignalMockChannelController {
         state.lifecycleInitCalled = true;
         state.userLifecycleInitCalled = true;
         break;
+      case "OneSignal#trackEvent":
+        final args = call.arguments as Map<dynamic, dynamic>;
+        state.trackedEventName = args['name'] as String?;
+        state.trackedEventProperties =
+            args['properties'] as Map<dynamic, dynamic>?;
+        break;
     }
   }
 }
@@ -484,6 +490,10 @@ class OneSignalState {
   String? addedSms;
   String? removedSms;
   bool? userLifecycleInitCalled;
+
+  // events
+  String? trackedEventName;
+  Map<dynamic, dynamic>? trackedEventProperties;
 
   /*
     All of the following functions parse the MethodCall

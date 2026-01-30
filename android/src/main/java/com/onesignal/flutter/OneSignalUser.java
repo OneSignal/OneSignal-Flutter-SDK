@@ -47,6 +47,7 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
         else if (call.method.contentEquals("OneSignal#removeTags")) this.removeTags(call, result);
         else if (call.method.contentEquals("OneSignal#getTags")) this.getTags(call, result);
         else if (call.method.contentEquals("OneSignal#lifecycleInit")) this.lifecycleInit(result);
+        else if (call.method.contentEquals("OneSignal#trackEvent")) this.trackEvent(call, result);
         else replyNotImplemented(result);
     }
 
@@ -163,6 +164,13 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
 
     private void getTags(MethodCall call, Result result) {
         replySuccess(result, OneSignal.getUser().getTags());
+    }
+
+    private void trackEvent(MethodCall call, Result result) {
+        String name = call.argument("name");
+        Map<String, Object> properties = call.argument("properties");
+        OneSignal.getUser().trackEvent(name, properties);
+        replySuccess(result, null);
     }
 
     @Override
