@@ -1,9 +1,333 @@
 import 'dart:async';
+import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 const String kAppId = '77e32082-ea27-42e3-a898-c72e141824ef';
+
+/// Notification template data for demo push notifications
+enum NotificationType {
+  general(
+    group: 'General',
+    icon: Icons.notifications,
+    smallIconRes: 'ic_bell_white_24dp',
+    iconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_ICON%2Fbell.png?alt=media&token=73c2bdd9-355f-42bb-80d7-aead737a9dbc',
+    buttons: [],
+    templates: [
+      NotificationTemplate(
+        title: 'Welcome',
+        message: 'Thanks for installing our app!',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fmain.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+      NotificationTemplate(
+        title: 'App Update Available',
+        message: 'A new version is ready to download.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fmain.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+      NotificationTemplate(
+        title: 'Daily Reminder',
+        message: 'Don\'t forget to check in today!',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fmain.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+    ],
+  ),
+  greeting(
+    group: 'Greetings',
+    icon: Icons.waving_hand,
+    smallIconRes: 'ic_human_greeting_white_24dp',
+    iconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_ICON%2Fhuman-greeting.png?alt=media&token=178bd69d-634e-40b3-ac32-b56c88e6cd6a',
+    buttons: [],
+    templates: [
+      NotificationTemplate(
+        title: '',
+        message: 'Welcome to Nike!',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_ICON%2Fhuman-greeting-red.png?alt=media&token=cb9f3418-db61-443c-955a-57e664d30271',
+        bigPictureUrl: '',
+      ),
+      NotificationTemplate(
+        title: '',
+        message: 'Welcome to Adidas!',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_ICON%2Fhuman-greeting-red.png?alt=media&token=cb9f3418-db61-443c-955a-57e664d30271',
+        bigPictureUrl: '',
+      ),
+      NotificationTemplate(
+        title: '',
+        message: "Welcome to Sandra's cooking blog!",
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_ICON%2Fhuman-greeting-red.png?alt=media&token=cb9f3418-db61-443c-955a-57e664d30271',
+        bigPictureUrl: '',
+      ),
+    ],
+  ),
+  promotions(
+    group: 'Promotions',
+    icon: Icons.local_offer,
+    smallIconRes: 'ic_brightness_percent_white_24dp',
+    iconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_ICON%2Fbrightness-percent.png?alt=media&token=6a8b4348-ad51-4e3a-97d0-4deb46b1576e',
+    buttons: [],
+    templates: [
+      NotificationTemplate(
+        title: '50% Off Sale!',
+        message: 'Limited time offer. Shop now!',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpromotion.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpromotion_big.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+      ),
+      NotificationTemplate(
+        title: 'Flash Deal!',
+        message: 'Hurry! This deal ends in 2 hours.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpromotion.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpromotion_big.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+      ),
+      NotificationTemplate(
+        title: 'Exclusive Offer',
+        message: 'Just for you! Get 20% off your next order.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpromotion.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpromotion_big.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+      ),
+    ],
+  ),
+  breakingNews(
+    group: 'Breaking News',
+    icon: Icons.newspaper,
+    smallIconRes: 'ic_newspaper_white_24dp',
+    iconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_ICON%2Fnewspaper.png?alt=media&token=053e419b-14f1-4f0d-a439-bb5b46d1b917',
+    buttons: [
+      {'id': 'id1', 'text': 'View'},
+      {'id': 'id2', 'text': 'Save'},
+      {'id': 'id3', 'text': 'Share'},
+    ],
+    templates: [
+      NotificationTemplate(
+        title: 'Breaking: Major Update',
+        message: 'Tap to read the full story.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fnews.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fnews_big.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+      ),
+      NotificationTemplate(
+        title: 'Tech News Alert',
+        message: 'New developments in the tech world.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fnews.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fnews_big.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+      ),
+      NotificationTemplate(
+        title: 'Sports Update',
+        message: 'Your team just scored!',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fnews.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fnews_big.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+      ),
+    ],
+  ),
+  abandonedCart(
+    group: 'Abandoned Cart',
+    icon: Icons.shopping_cart,
+    smallIconRes: 'ic_cart_white_24dp',
+    iconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_ICON%2Fcart.png?alt=media&token=cf7f4d13-6aa2-4824-9b2f-42e5f33f545b',
+    buttons: [],
+    templates: [
+      NotificationTemplate(
+        title: 'You Left Something Behind',
+        message: 'Your cart is waiting for you.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fcart.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+      NotificationTemplate(
+        title: 'Complete Your Purchase',
+        message: 'Items in your cart are selling fast!',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fcart.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+      NotificationTemplate(
+        title: 'Don\'t Miss Out',
+        message: 'Your saved items might go out of stock.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fcart.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+    ],
+  ),
+  newPost(
+    group: 'New Post',
+    icon: Icons.image,
+    smallIconRes: 'ic_image_white_24dp',
+    iconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_ICON%2Fimage.png?alt=media&token=6fb66f31-23de-4c76-a2ff-da40d46ebf15',
+    buttons: [],
+    templates: [
+      NotificationTemplate(
+        title: 'New Photo Posted',
+        message: 'Check out the latest post!',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpost.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpost_big.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+      ),
+      NotificationTemplate(
+        title: 'Someone Tagged You',
+        message: 'You were tagged in a new post.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpost.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpost_big.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+      ),
+      NotificationTemplate(
+        title: 'Trending Now',
+        message: 'This post is getting lots of attention.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpost.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Fpost_big.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+      ),
+    ],
+  ),
+  reEngagement(
+    group: 'Re-Engagement',
+    icon: Icons.touch_app,
+    smallIconRes: 'ic_gesture_tap_white_24dp',
+    iconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_ICON%2Fgesture-tap.png?alt=media&token=045ddcb9-f4e5-457e-8577-baa0e264e227',
+    buttons: [],
+    templates: [
+      NotificationTemplate(
+        title: 'We Miss You!',
+        message: 'It\'s been a while. Come back and see what\'s new.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Freengage.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+      NotificationTemplate(
+        title: 'You\'re Missing Out',
+        message: 'New features await you!',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Freengage.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+      NotificationTemplate(
+        title: 'Come Back!',
+        message: 'Your friends are waiting for you.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Freengage.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+    ],
+  ),
+  rating(
+    group: 'Rating',
+    icon: Icons.star,
+    smallIconRes: 'ic_star_white_24dp',
+    iconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_ICON%2Fstar.png?alt=media&token=da0987e5-a635-488f-9fba-24a1ee5d704a',
+    buttons: [],
+    templates: [
+      NotificationTemplate(
+        title: 'Enjoying the App?',
+        message: 'Please take a moment to rate us!',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Frating.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+      NotificationTemplate(
+        title: 'Share Your Feedback',
+        message: 'Your opinion matters to us.',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Frating.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+      NotificationTemplate(
+        title: 'Rate Us 5 Stars',
+        message: 'Help others discover our app!',
+        largeIconUrl: 'https://firebasestorage.googleapis.com/v0/b/onesignaltest-e7802.appspot.com/o/NOTIFICATION_IMAGE%2Frating.png?alt=media&token=a3f6a6e8-6bde-49f8-b4d6-cd1d7e10c042',
+        bigPictureUrl: '',
+      ),
+    ],
+  );
+
+  const NotificationType({
+    required this.group,
+    required this.icon,
+    required this.smallIconRes,
+    required this.iconUrl,
+    required this.buttons,
+    required this.templates,
+  });
+
+  final String group;
+  final IconData icon;
+  final String smallIconRes;
+  final String iconUrl;
+  final List<Map<String, String>> buttons;
+  final List<NotificationTemplate> templates;
+}
+
+class NotificationTemplate {
+  const NotificationTemplate({
+    required this.title,
+    required this.message,
+    required this.largeIconUrl,
+    required this.bigPictureUrl,
+  });
+
+  final String title;
+  final String message;
+  final String largeIconUrl;
+  final String bigPictureUrl;
+}
+
+/// Tracks template position for cycling through templates
+final _templatePositions = <NotificationType, int>{};
+
+int _getTemplatePos(NotificationType type) {
+  final pos = _templatePositions[type] ?? 0;
+  _templatePositions[type] = (pos + 1) % type.templates.length;
+  return pos;
+}
+
+Future<void> sendDeviceNotification(NotificationType notification) async {
+  final subscription = OneSignal.User.pushSubscription;
+  final subscriptionId = subscription.id;
+
+  if (subscriptionId == null || !(subscription.optedIn ?? false)) {
+    debugPrint('Push subscription not available or not opted in');
+    return;
+  }
+
+  final pos = _getTemplatePos(notification);
+  final template = notification.templates[pos];
+
+  final notificationContent = <String, dynamic>{
+    'app_id': kAppId,
+    'include_player_ids': [subscriptionId],
+    'contents': {'en': template.message},
+    'small_icon': notification.smallIconRes,
+    'large_icon': template.largeIconUrl,
+    'android_group': notification.group,
+    'android_led_color': 'FFE9444E',
+    'android_accent_color': 'FFE9444E',
+    'android_sound': 'nil',
+  };
+
+  if (template.title.isNotEmpty) {
+    notificationContent['headings'] = {'en': template.title};
+  }
+
+  if (template.bigPictureUrl.isNotEmpty) {
+    notificationContent['big_picture'] = template.bigPictureUrl;
+  }
+
+  if (notification.buttons.isNotEmpty) {
+    notificationContent['buttons'] = notification.buttons;
+  }
+
+  try {
+    final client = HttpClient();
+    final request = await client.postUrl(
+      Uri.parse('https://onesignal.com/api/v1/notifications'),
+    );
+    request.headers.set('Accept', 'application/vnd.onesignal.v1+json');
+    request.headers.set('Content-Type', 'application/json; charset=UTF-8');
+    request.write(jsonEncode(notificationContent));
+
+    final response = await request.close();
+    final responseBody = await response.transform(utf8.decoder).join();
+
+    if (response.statusCode == 200 || response.statusCode == 202) {
+      debugPrint('Success sending notification: $responseBody');
+    } else {
+      debugPrint('Failure sending notification: $responseBody');
+    }
+    client.close();
+  } catch (e) {
+    debugPrint('Error sending notification: $e');
+  }
+}
 
 void main() => runApp(const OneSignalDemoApp());
 
@@ -845,19 +1169,35 @@ class _HomePageState extends State<HomePage> {
           mainAxisSpacing: 8,
           crossAxisSpacing: 8,
           childAspectRatio: 1.5,
-          children: [
-            _buildGridButton('General', Icons.notifications),
-            _buildGridButton('Greetings', Icons.waving_hand),
-            _buildGridButton('Promotions', Icons.local_offer),
-            _buildGridButton('Breaking News', Icons.newspaper),
-            _buildGridButton('Abandoned Cart', Icons.shopping_cart),
-            _buildGridButton('New Post', Icons.image),
-            _buildGridButton('Re-Engagement', Icons.touch_app),
-            _buildGridButton('Rating', Icons.star),
-          ],
+          children: NotificationType.values
+              .map((type) => _buildPushNotificationButton(type))
+              .toList(),
         ),
         const SizedBox(height: 16),
       ],
+    );
+  }
+
+  Widget _buildPushNotificationButton(NotificationType type) {
+    return ElevatedButton(
+      onPressed: () => sendDeviceNotification(type),
+      style: ElevatedButton.styleFrom(
+        backgroundColor: const Color(0xFFD45653),
+        foregroundColor: Colors.white,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(type.icon, size: 28),
+          const SizedBox(height: 4),
+          Text(
+            type.group,
+            textAlign: TextAlign.center,
+            style: const TextStyle(fontSize: 12),
+          ),
+        ],
+      ),
     );
   }
 
@@ -878,10 +1218,10 @@ class _HomePageState extends State<HomePage> {
           crossAxisSpacing: 8,
           childAspectRatio: 1.5,
           children: [
-            _buildGridButton('Top Banner', Icons.vertical_align_top),
-            _buildGridButton('Bottom Banner', Icons.vertical_align_bottom),
-            _buildGridButton('Center Modal', Icons.crop_square),
-            _buildGridButton('Full Screen', Icons.phone_android),
+            _buildInAppMessageButton('Top Banner', Icons.vertical_align_top),
+            _buildInAppMessageButton('Bottom Banner', Icons.vertical_align_bottom),
+            _buildInAppMessageButton('Center Modal', Icons.crop_square),
+            _buildInAppMessageButton('Full Screen', Icons.phone_android),
           ],
         ),
         const SizedBox(height: 16),
@@ -889,10 +1229,9 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildGridButton(String label, IconData icon) {
+  Widget _buildInAppMessageButton(String label, IconData icon) {
     return ElevatedButton(
       onPressed: () {
-        // Add trigger to show specific in-app message
         OneSignal.InAppMessages.addTrigger('show_message', label.toLowerCase());
       },
       style: ElevatedButton.styleFrom(
