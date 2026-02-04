@@ -64,9 +64,11 @@ class _HomePageState extends State<HomePage> {
     OneSignal.Notifications.clearAll();
 
     // Set initial state now that SDK is initialized
+    final tags = await OneSignal.User.getTags();
     setState(() {
       _pushId = OneSignal.User.pushSubscription.id;
       _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? false;
+      _tags = tags;
     });
 
     // Observer for future state changes
@@ -341,30 +343,88 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _showOutcomeDialog() {
-    final controller = TextEditingController();
+    final nameController = TextEditingController();
+    final valueController = TextEditingController();
+    String selectedType = 'Normal Outcome';
+
     showDialog(
       context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('Send Outcome'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(hintText: 'Outcome name'),
+      builder: (context) => StatefulBuilder(
+        builder: (context, setDialogState) => AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              DropdownButton<String>(
+                value: selectedType,
+                isExpanded: true,
+                items: const [
+                  DropdownMenuItem(
+                    value: 'Normal Outcome',
+                    child: Text('Normal Outcome'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Unique Outcome',
+                    child: Text('Unique Outcome'),
+                  ),
+                  DropdownMenuItem(
+                    value: 'Outcome with Value',
+                    child: Text('Outcome with Value'),
+                  ),
+                ],
+                onChanged: (value) {
+                  if (value != null) {
+                    setDialogState(() {
+                      selectedType = value;
+                    });
+                  }
+                },
+              ),
+              const SizedBox(height: 16),
+              TextField(
+                controller: nameController,
+                decoration: const InputDecoration(hintText: 'Name'),
+              ),
+              if (selectedType == 'Outcome with Value') ...[
+                const SizedBox(height: 16),
+                TextField(
+                  controller: valueController,
+                  decoration: const InputDecoration(hintText: 'Value'),
+                  keyboardType: TextInputType.number,
+                ),
+              ],
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              onPressed: () {
+                if (nameController.text.isNotEmpty) {
+                  switch (selectedType) {
+                    case 'Normal Outcome':
+                      OneSignal.Session.addOutcome(nameController.text);
+                      break;
+                    case 'Unique Outcome':
+                      OneSignal.Session.addUniqueOutcome(nameController.text);
+                      break;
+                    case 'Outcome with Value':
+                      final value =
+                          double.tryParse(valueController.text) ?? 0.0;
+                      OneSignal.Session.addOutcomeWithValue(
+                        nameController.text,
+                        value,
+                      );
+                      break;
+                  }
+                }
+                Navigator.pop(context);
+              },
+              child: const Text('SEND'),
+            ),
+          ],
         ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context),
-            child: const Text('CANCEL'),
-          ),
-          TextButton(
-            onPressed: () {
-              if (controller.text.isNotEmpty) {
-                OneSignal.Session.addOutcome(controller.text);
-              }
-              Navigator.pop(context);
-            },
-            child: const Text('SEND'),
-          ),
-        ],
       ),
     );
   }
@@ -430,24 +490,6 @@ class _HomePageState extends State<HomePage> {
       color: const Color(0xFFD45653),
       child: Row(
         children: [
-          Container(
-            width: 32,
-            height: 32,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: const Center(
-              child: Text(
-                '1',
-                style: TextStyle(
-                  color: Color(0xFFD45653),
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-          ),
           const SizedBox(width: 8),
           const Text(
             'OneSignal',
@@ -525,7 +567,9 @@ class _HomePageState extends State<HomePage> {
     return _buildListSectionWithItems(
       title: 'Aliases',
       emptyText: 'No Aliases Added',
-      items: _aliases.entries.map((e) => MapEntry(e.key, '${e.key}: ${e.value}')).toList(),
+      items: _aliases.entries
+          .map((e) => MapEntry(e.key, '${e.key}: ${e.value}'))
+          .toList(),
       buttonText: 'ADD ALIAS',
       onAdd: _showAddAliasDialog,
       onDelete: (key) {
@@ -634,7 +678,9 @@ class _HomePageState extends State<HomePage> {
     return _buildListSectionWithItems(
       title: 'Tags',
       emptyText: 'No Tags Added',
-      items: _tags.entries.map((e) => MapEntry(e.key, '${e.key}: ${e.value}')).toList(),
+      items: _tags.entries
+          .map((e) => MapEntry(e.key, '${e.key}: ${e.value}'))
+          .toList(),
       buttonText: 'ADD TAG',
       onAdd: _showAddTagDialog,
       onDelete: (key) {
@@ -715,7 +761,9 @@ class _HomePageState extends State<HomePage> {
     return _buildListSectionWithItems(
       title: 'Triggers',
       emptyText: 'No Triggers Added',
-      items: _triggers.entries.map((e) => MapEntry(e.key, '${e.key}: ${e.value}')).toList(),
+      items: _triggers.entries
+          .map((e) => MapEntry(e.key, '${e.key}: ${e.value}'))
+          .toList(),
       buttonText: 'ADD TRIGGER',
       onAdd: _showAddTriggerDialog,
       onDelete: (key) {
@@ -916,7 +964,10 @@ class _HomePageState extends State<HomePage> {
                           style: const TextStyle(fontWeight: FontWeight.bold),
                         ),
                         trailing: IconButton(
-                          icon: const Icon(Icons.delete, color: Color(0xFFD45653)),
+                          icon: const Icon(
+                            Icons.delete,
+                            color: Color(0xFFD45653),
+                          ),
                           onPressed: () => onDelete(item.key),
                         ),
                       ),
