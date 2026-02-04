@@ -522,13 +522,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildAliasesSection() {
-    return _buildListSection(
-      'Aliases',
-      _aliases.isEmpty
-          ? 'No Aliases Added'
-          : _aliases.entries.map((e) => '${e.key}: ${e.value}').join(', '),
-      'ADD ALIAS',
-      _showAddAliasDialog,
+    return _buildListSectionWithItems(
+      title: 'Aliases',
+      emptyText: 'No Aliases Added',
+      items: _aliases.entries.map((e) => MapEntry(e.key, '${e.key}: ${e.value}')).toList(),
+      buttonText: 'ADD ALIAS',
+      onAdd: _showAddAliasDialog,
+      onDelete: (key) {
+        OneSignal.User.removeAlias(key);
+        setState(() {
+          _aliases.remove(key);
+        });
+      },
     );
   }
 
@@ -594,31 +599,50 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildEmailsSection() {
-    return _buildListSection(
-      'Emails',
-      _emails.isEmpty ? 'No Emails Added' : _emails.join(', '),
-      'ADD EMAIL',
-      _showAddEmailDialog,
+    return _buildListSectionWithItems(
+      title: 'Emails',
+      emptyText: 'No Emails Added',
+      items: _emails.map((e) => MapEntry(e, e)).toList(),
+      buttonText: 'ADD EMAIL',
+      onAdd: _showAddEmailDialog,
+      onDelete: (email) {
+        OneSignal.User.removeEmail(email);
+        setState(() {
+          _emails.remove(email);
+        });
+      },
     );
   }
 
   Widget _buildSmsSection() {
-    return _buildListSection(
-      'SMSs',
-      _smsNumbers.isEmpty ? 'No SMSs Added' : _smsNumbers.join(', '),
-      'ADD SMS',
-      _showAddSmsDialog,
+    return _buildListSectionWithItems(
+      title: 'SMSs',
+      emptyText: 'No SMSs Added',
+      items: _smsNumbers.map((s) => MapEntry(s, s)).toList(),
+      buttonText: 'ADD SMS',
+      onAdd: _showAddSmsDialog,
+      onDelete: (sms) {
+        OneSignal.User.removeSms(sms);
+        setState(() {
+          _smsNumbers.remove(sms);
+        });
+      },
     );
   }
 
   Widget _buildTagsSection() {
-    return _buildListSection(
-      'Tags',
-      _tags.isEmpty
-          ? 'No Tags Added'
-          : _tags.entries.map((e) => '${e.key}: ${e.value}').join(', '),
-      'ADD TAG',
-      _showAddTagDialog,
+    return _buildListSectionWithItems(
+      title: 'Tags',
+      emptyText: 'No Tags Added',
+      items: _tags.entries.map((e) => MapEntry(e.key, '${e.key}: ${e.value}')).toList(),
+      buttonText: 'ADD TAG',
+      onAdd: _showAddTagDialog,
+      onDelete: (key) {
+        OneSignal.User.removeTag(key);
+        setState(() {
+          _tags.remove(key);
+        });
+      },
     );
   }
 
@@ -688,13 +712,18 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget _buildTriggersSection() {
-    return _buildListSection(
-      'Triggers',
-      _triggers.isEmpty
-          ? 'No Triggers Added'
-          : _triggers.entries.map((e) => '${e.key}: ${e.value}').join(', '),
-      'ADD TRIGGER',
-      _showAddTriggerDialog,
+    return _buildListSectionWithItems(
+      title: 'Triggers',
+      emptyText: 'No Triggers Added',
+      items: _triggers.entries.map((e) => MapEntry(e.key, '${e.key}: ${e.value}')).toList(),
+      buttonText: 'ADD TRIGGER',
+      onAdd: _showAddTriggerDialog,
+      onDelete: (key) {
+        OneSignal.InAppMessages.removeTrigger(key);
+        setState(() {
+          _triggers.remove(key);
+        });
+      },
     );
   }
 
@@ -838,12 +867,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _buildListSection(
-    String title,
-    String content,
-    String buttonText,
-    VoidCallback onAdd,
-  ) {
+  Widget _buildListSectionWithItems({
+    required String title,
+    required String emptyText,
+    required List<MapEntry<String, String>> items,
+    required String buttonText,
+    required VoidCallback onAdd,
+    required void Function(String key) onDelete,
+  }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -854,7 +885,6 @@ class _HomePageState extends State<HomePage> {
         const SizedBox(height: 4),
         Container(
           width: double.infinity,
-          padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: Colors.white,
             borderRadius: const BorderRadius.only(
@@ -863,11 +893,36 @@ class _HomePageState extends State<HomePage> {
             ),
             border: Border.all(color: Colors.grey.shade300),
           ),
-          child: Text(
-            content,
-            textAlign: TextAlign.center,
-            style: const TextStyle(fontWeight: FontWeight.bold),
-          ),
+          child: items.isEmpty
+              ? Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Text(
+                    emptyText,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(fontWeight: FontWeight.bold),
+                  ),
+                )
+              : Column(
+                  children: items.map((item) {
+                    return Container(
+                      decoration: BoxDecoration(
+                        border: Border(
+                          bottom: BorderSide(color: Colors.grey.shade300),
+                        ),
+                      ),
+                      child: ListTile(
+                        title: Text(
+                          item.value,
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        trailing: IconButton(
+                          icon: const Icon(Icons.delete, color: Color(0xFFD45653)),
+                          onPressed: () => onDelete(item.key),
+                        ),
+                      ),
+                    );
+                  }).toList(),
+                ),
         ),
         SizedBox(
           width: double.infinity,
