@@ -64,6 +64,7 @@ class _HomePageState extends State<HomePage> {
 
     OneSignal.User.pushSubscription.addObserver((state) {
       setState(() {
+        print('OneSignal push subscription changed: ${state.jsonRepresentation()}');
         _pushId = OneSignal.User.pushSubscription.id;
         _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? true;
       });
