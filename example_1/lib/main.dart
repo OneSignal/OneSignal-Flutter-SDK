@@ -57,15 +57,26 @@ class _HomePageState extends State<HomePage> {
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
     OneSignal.consentRequired(_requireConsent);
 
-    OneSignal.initialize(kAppId);
+    // Initialize and wait for SDK to be ready
+    await OneSignal.initialize(kAppId);
 
     OneSignal.LiveActivities.setupDefault();
     OneSignal.Notifications.clearAll();
 
+    // Set initial state now that SDK is initialized
+    setState(() {
+      _pushId = OneSignal.User.pushSubscription.id;
+      _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? false;
+    });
+
+    // Observer for future state changes
     OneSignal.User.pushSubscription.addObserver((state) {
+      print(
+        'OneSignal push subscription changed: ${state.jsonRepresentation()}',
+      );
       setState(() {
-        _pushId = OneSignal.User.pushSubscription.id;
-        _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? true;
+        _pushId = state.current.id;
+        _pushEnabled = state.current.optedIn;
       });
     });
 
@@ -91,11 +102,6 @@ class _HomePageState extends State<HomePage> {
     });
 
     OneSignal.InAppMessages.paused(true);
-
-    setState(() {
-      _pushId = OneSignal.User.pushSubscription.id;
-      _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? true;
-    });
   }
 
   void _showLoginDialog() {
@@ -106,9 +112,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text('External User Id'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            hintText: 'Enter external user id',
-          ),
+          decoration: const InputDecoration(hintText: 'Enter external user id'),
         ),
         actions: [
           TextButton(
@@ -159,7 +163,10 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               if (keyController.text.isNotEmpty &&
                   valueController.text.isNotEmpty) {
-                OneSignal.User.addAlias(keyController.text, valueController.text);
+                OneSignal.User.addAlias(
+                  keyController.text,
+                  valueController.text,
+                );
                 setState(() {
                   _aliases[keyController.text] = valueController.text;
                 });
@@ -182,9 +189,7 @@ class _HomePageState extends State<HomePage> {
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            hintText: 'Enter email address',
-          ),
+          decoration: const InputDecoration(hintText: 'Enter email address'),
         ),
         actions: [
           TextButton(
@@ -217,9 +222,7 @@ class _HomePageState extends State<HomePage> {
         content: TextField(
           controller: controller,
           keyboardType: TextInputType.phone,
-          decoration: const InputDecoration(
-            hintText: 'Enter phone number',
-          ),
+          decoration: const InputDecoration(hintText: 'Enter phone number'),
         ),
         actions: [
           TextButton(
@@ -274,7 +277,9 @@ class _HomePageState extends State<HomePage> {
               if (keyController.text.isNotEmpty &&
                   valueController.text.isNotEmpty) {
                 OneSignal.User.addTagWithKey(
-                    keyController.text, valueController.text);
+                  keyController.text,
+                  valueController.text,
+                );
                 setState(() {
                   _tags[keyController.text] = valueController.text;
                 });
@@ -319,7 +324,9 @@ class _HomePageState extends State<HomePage> {
               if (keyController.text.isNotEmpty &&
                   valueController.text.isNotEmpty) {
                 OneSignal.InAppMessages.addTrigger(
-                    keyController.text, valueController.text);
+                  keyController.text,
+                  valueController.text,
+                );
                 setState(() {
                   _triggers[keyController.text] = valueController.text;
                 });
@@ -341,9 +348,7 @@ class _HomePageState extends State<HomePage> {
         title: const Text('Send Outcome'),
         content: TextField(
           controller: controller,
-          decoration: const InputDecoration(
-            hintText: 'Outcome name',
-          ),
+          decoration: const InputDecoration(hintText: 'Outcome name'),
         ),
         actions: [
           TextButton(
@@ -399,9 +404,14 @@ class _HomePageState extends State<HomePage> {
                       _buildSendPushNotificationSection(),
                       _buildSendInAppMessageSection(),
                       const SizedBox(height: 16),
-                      _buildFullWidthButton('NEXT ACTIVITY', () {
-                        // Navigate to next activity if needed
-                      }, color: Colors.grey.shade300, textColor: Colors.black87),
+                      _buildFullWidthButton(
+                        'NEXT ACTIVITY',
+                        () {
+                          // Navigate to next activity if needed
+                        },
+                        color: Colors.grey.shade300,
+                        textColor: Colors.black87,
+                      ),
                     ],
                   ),
                 ),
@@ -811,9 +821,7 @@ class _HomePageState extends State<HomePage> {
       style: ElevatedButton.styleFrom(
         backgroundColor: const Color(0xFFD45653),
         foregroundColor: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(4),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -901,14 +909,9 @@ class _HomePageState extends State<HomePage> {
           backgroundColor: color ?? const Color(0xFFD45653),
           foregroundColor: textColor ?? Colors.white,
           padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(4),
-          ),
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
         ),
-        child: Text(
-          text,
-          style: const TextStyle(fontWeight: FontWeight.bold),
-        ),
+        child: Text(text, style: const TextStyle(fontWeight: FontWeight.bold)),
       ),
     );
   }

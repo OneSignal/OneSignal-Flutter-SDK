@@ -57,16 +57,24 @@ class _HomePageState extends State<HomePage> {
     OneSignal.Debug.setAlertLevel(OSLogLevel.none);
     OneSignal.consentRequired(_requireConsent);
 
-    OneSignal.initialize(kAppId);
+    // Initialize and wait for SDK to be ready
+    await OneSignal.initialize(kAppId);
 
     OneSignal.LiveActivities.setupDefault();
     OneSignal.Notifications.clearAll();
 
+    // Set initial state now that SDK is initialized
+    setState(() {
+      _pushId = OneSignal.User.pushSubscription.id;
+      _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? true;
+    });
+
+    // Observer for future state changes
     OneSignal.User.pushSubscription.addObserver((state) {
       setState(() {
         print('OneSignal push subscription changed: ${state.jsonRepresentation()}');
-        _pushId = OneSignal.User.pushSubscription.id;
-        _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? true;
+        _pushId = state.current.id;
+        _pushEnabled = state.current.optedIn;
       });
     });
 
@@ -92,11 +100,6 @@ class _HomePageState extends State<HomePage> {
     });
 
     OneSignal.InAppMessages.paused(true);
-
-    setState(() {
-      _pushId = OneSignal.User.pushSubscription.id;
-      _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? true;
-    });
   }
 
   void _showLoginDialog() {

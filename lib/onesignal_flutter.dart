@@ -46,13 +46,14 @@ class OneSignal {
   /// The initializer for OneSignal.
   ///
   /// The initializer accepts an [appId] which the developer can get
-  /// from the OneSignal consoleas well as a dictonary of [launchOptions]
-  static void initialize(String appId) {
-    _channel.invokeMethod('OneSignal#initialize', {'appId': appId});
-    InAppMessages.lifecycleInit();
-    User.lifecycleInit();
-    User.pushSubscription.lifecycleInit();
-    Notifications.lifecycleInit();
+  /// from the OneSignal console. Returns a [Future] that completes when
+  /// the SDK has finished initializing and subscription state is available.
+  static Future<void> initialize(String appId) async {
+    await _channel.invokeMethod('OneSignal#initialize', {'appId': appId});
+    await InAppMessages.lifecycleInit();
+    await User.lifecycleInit();
+    await User.pushSubscription.lifecycleInit();
+    await Notifications.lifecycleInit();
   }
 
   /// Login to OneSignal under the user identified by the [externalId] provided.
