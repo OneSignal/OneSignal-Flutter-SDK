@@ -776,6 +776,9 @@ class _HomePageState extends State<HomePage> {
                       _buildActionButton('LOGOUT USER', () {
                         OneSignal.logout();
                       }),
+                      _buildActionButton('PROMPT FOR PUSH', () {
+                        OneSignal.Notifications.requestPermission(true);
+                      }),
                       _buildAliasesSection(),
                       _buildPushSection(),
                       _buildEmailsSection(),
