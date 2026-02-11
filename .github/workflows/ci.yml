@@ -23,7 +23,7 @@ jobs:
         run: flutter analyze
 
       - name: Setup Clang
-        uses: OneSignal/sdk-actions/.github/actions/setup-clang@main
+        uses: OneSignal/sdk-shared/.github/actions/setup-clang@main
 
       - name: Check formatting (dart,java,c)
         run: dart run rps format-check
