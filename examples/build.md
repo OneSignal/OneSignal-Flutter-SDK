@@ -4,27 +4,43 @@ This document contains all the prompts and requirements needed to build the OneS
 
 ---
 
-## Phase 0: Reference Screenshots (Optional)
+## Phase 0: Reference Screenshots (REQUIRED)
 
 ### Prompt 0.1 - Capture Reference UI
 
 ```
-Before building anything, check if an Android emulator is running with the
-reference OneSignal demo app installed.
+Before building anything, an Android emulator MUST be running with the
+reference OneSignal demo app installed. These screenshots are the source
+of truth for the UI you are building. Do NOT proceed to Phase 1 without them.
 
 Check for a connected emulator:
   adb devices
 
-If a device is listed, launch the reference app:
+If no device is listed, stop and ask the user to start one.
+
+Launch the reference app:
   adb shell am start -n com.onesignal.sdktest/.ui.main.MainActivity
 
-Then capture screenshots by scrolling through the full UI:
+Create an output directory:
+  mkdir -p /tmp/onesignal_reference
+
+Capture screenshots by scrolling through the full UI:
 1. Take a screenshot from the top of the screen:
      adb shell screencap -p /sdcard/ref_01.png && adb pull /sdcard/ref_01.png /tmp/onesignal_reference/ref_01.png
 2. Scroll down by roughly one viewport height:
      adb shell input swipe 500 1500 500 500
 3. Take the next screenshot (ref_02.png, ref_03.png, etc.)
 4. Repeat until you've reached the bottom of the scrollable content
+
+You MUST read each captured screenshot image so you can see the actual UI.
+These images define the visual target for every section you build later.
+Pay close attention to:
+  - Section header style and casing
+  - Card vs non-card content grouping
+  - Button placement (inside vs outside cards)
+  - List item layout (stacked vs inline key-value)
+  - Icon choices (delete, close, info, etc.)
+  - Typography, spacing, and colors
 
 You can also interact with the reference app to observe specific flows:
 
@@ -43,12 +59,9 @@ Example flow to observe "Add Tag" behavior:
   3. Tap the confirm button -> screenshot the result
   4. Compare the tag list state before and after
 
-Use these screenshots and observed behaviors as a reference throughout the
-remaining phases to match layout, spacing, section order, dialog flows, and
-overall look and feel of the Flutter app to the existing Android app.
-
-If no emulator is running or the reference app is not installed, skip this
-phase and rely on the written descriptions in the prompts below.
+Refer back to these screenshots throughout all remaining phases whenever
+you need to decide on layout, spacing, section order, dialog flows, or
+overall look and feel.
 ```
 
 ---
@@ -71,6 +84,9 @@ Build the app with:
 - Use const constructors wherever possible for performance
 - Separate widget files per section to keep files focused and readable
 
+If examples/onesignal_logo.svg exists, copy it into the demo project at
+assets/onesignal_logo.svg and use it for the AppBar logo via flutter_svg.
+
 Reference the OneSignal Flutter SDK from the parent repo using a path dependency:
   onesignal_flutter:
     path: ../../
@@ -88,6 +104,7 @@ dependencies:
   provider: ^6.1.0              # State management
   shared_preferences: ^2.3.0    # Local persistence
   http: ^1.2.0                  # REST API calls
+  flutter_svg: ^2.0.0           # SVG rendering (AppBar logo)
 
 dev_dependencies:
   flutter_test:
