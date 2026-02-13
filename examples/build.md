@@ -357,6 +357,8 @@ Send In-App Message Section (placed right after In-App Messaging):
   - WHITE text
   - Type-specific icon on LEFT side only (no right side icon)
   - Full width of the card
+  - Left-aligned text and icon content (not centered)
+  - UPPERCASE button text
 - On tap: adds trigger and shows SnackBar "Sent In-App Message: {type}"
 
 Tooltip should explain each IAM type.

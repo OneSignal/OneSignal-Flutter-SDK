@@ -34,11 +34,11 @@ class SendIamSection extends StatelessWidget {
                   ),
                 ),
                 child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisAlignment: MainAxisAlignment.start,
                   children: [
                     Icon(type.icon, size: 18),
                     const SizedBox(width: 8),
-                    Text(type.label),
+                    Text(type.label.toUpperCase()),
                   ],
                 ),
               ),
