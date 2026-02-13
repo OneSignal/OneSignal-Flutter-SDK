@@ -920,7 +920,7 @@ Implementation:
 ## Key Files Structure
 
 ```
-examples/onesignal_flutter_demo/
+examples/demo/
 ├── lib/
 │   ├── main.dart                        # App entry, SDK init, Provider setup
 │   ├── theme.dart                       # OneSignal Material 3 theme
