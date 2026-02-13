@@ -988,7 +988,7 @@ Note:
 
 ```dart
 // In main.dart or a constants file
-const String oneSignalAppId = 'YOUR_APP_ID_HERE';
+const String oneSignalAppId = '77e32082-ea27-42e3-a898-c72e141824ef';
 ```
 
 Note: REST API key is NOT required for the fetchUser endpoint.
