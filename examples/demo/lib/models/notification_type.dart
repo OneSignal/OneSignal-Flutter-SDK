@@ -1,11 +1,11 @@
 enum NotificationType {
   simple(
-    title: 'OneSignal',
-    body: 'This is a simple notification',
+    title: 'Simple Notification',
+    body: 'This is a simple push notification',
   ),
   withImage(
-    title: 'OneSignal',
-    body: 'This notification has an image',
+    title: 'Image Notification',
+    body: 'This notification includes an image',
     bigPicture:
         'https://media.onesignal.com/automated_push_templates/ratings_template.png',
   );

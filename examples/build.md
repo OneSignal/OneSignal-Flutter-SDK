@@ -324,9 +324,9 @@ Push Section:
 Send Push Notification Section (placed right after Push Section):
 - Section title: "Send Push Notification" with info icon for tooltip
 - Three buttons:
-  1. SIMPLE - sends basic notification with title/body
-  2. WITH IMAGE - sends notification with big picture
-     (use https://media.onesignal.com/automated_push_templates/ratings_template.png)
+  1. SIMPLE - title: "Simple Notification", body: "This is a simple push notification"
+  2. WITH IMAGE - title: "Image Notification", body: "This notification includes an image"
+     (big picture: https://media.onesignal.com/automated_push_templates/ratings_template.png)
   3. CUSTOM - opens dialog for custom title and body
 
 Tooltip should explain each button type.
