@@ -16,7 +16,7 @@ Check for a connected emulator:
   adb devices
 
 If a device is listed, launch the reference app:
-  adb shell am start -n com.onesignal.sdktest/.application.MainActivity
+  adb shell am start -n com.onesignal.sdktest/.ui.main.MainActivity
 
 Then capture screenshots by scrolling through the full UI:
 1. Take a screenshot from the top of the screen:
@@ -26,9 +26,26 @@ Then capture screenshots by scrolling through the full UI:
 3. Take the next screenshot (ref_02.png, ref_03.png, etc.)
 4. Repeat until you've reached the bottom of the scrollable content
 
-Use these screenshots as a visual reference throughout the remaining phases
-to match layout, spacing, section order, and overall look and feel of the
-Flutter app to the existing Android app.
+You can also interact with the reference app to observe specific flows:
+
+Dump the UI hierarchy to find elements by resource-id, text, or content-desc:
+  adb shell uiautomator dump /sdcard/ui.xml && adb pull /sdcard/ui.xml /tmp/onesignal_reference/ui.xml
+
+Parse the XML to find an element's bounds, then tap it:
+  adb shell input tap <centerX> <centerY>
+
+Type into a focused text field:
+  adb shell input text "test"
+
+Example flow to observe "Add Tag" behavior:
+  1. Dump UI -> find the ADD button bounds -> tap it
+  2. Dump UI -> find the Key and Value fields -> tap and type into them
+  3. Tap the confirm button -> screenshot the result
+  4. Compare the tag list state before and after
+
+Use these screenshots and observed behaviors as a reference throughout the
+remaining phases to match layout, spacing, section order, dialog flows, and
+overall look and feel of the Flutter app to the existing Android app.
 
 If no emulator is running or the reference app is not installed, skip this
 phase and rely on the written descriptions in the prompts below.
