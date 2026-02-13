@@ -15,7 +15,7 @@ class SingleInputDialog extends StatefulWidget {
     super.key,
     required this.title,
     required this.fieldLabel,
-    this.confirmLabel = 'ADD',
+    this.confirmLabel = 'Add',
     this.keyboardType = TextInputType.text,
   });
 
@@ -35,20 +35,24 @@ class _SingleInputDialogState extends State<SingleInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: Text(widget.title),
-      content: Semantics(
-        label: '${widget.fieldLabel}_input',
-        child: TextField(
-          controller: _controller,
-          decoration: InputDecoration(labelText: widget.fieldLabel),
-          keyboardType: widget.keyboardType,
-          onChanged: (_) => setState(() {}),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Semantics(
+          label: '${widget.fieldLabel}_input',
+          child: TextField(
+            controller: _controller,
+            decoration: InputDecoration(labelText: widget.fieldLabel),
+            keyboardType: widget.keyboardType,
+            onChanged: (_) => setState(() {}),
+          ),
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('CANCEL'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: _controller.text.isEmpty
@@ -95,33 +99,40 @@ class _PairInputDialogState extends State<PairInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: Text(widget.title),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Semantics(
-            label: '${widget.keyLabel}_input',
-            child: TextField(
-              controller: _keyController,
-              decoration: InputDecoration(labelText: widget.keyLabel),
-              onChanged: (_) => setState(() {}),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Row(
+          children: [
+            Expanded(
+              child: Semantics(
+                label: '${widget.keyLabel}_input',
+                child: TextField(
+                  controller: _keyController,
+                  decoration: InputDecoration(labelText: widget.keyLabel),
+                  onChanged: (_) => setState(() {}),
+                ),
+              ),
             ),
-          ),
-          const SizedBox(height: 12),
-          Semantics(
-            label: '${widget.valueLabel}_input',
-            child: TextField(
-              controller: _valueController,
-              decoration: InputDecoration(labelText: widget.valueLabel),
-              onChanged: (_) => setState(() {}),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Semantics(
+                label: '${widget.valueLabel}_input',
+                child: TextField(
+                  controller: _valueController,
+                  decoration: InputDecoration(labelText: widget.valueLabel),
+                  onChanged: (_) => setState(() {}),
+                ),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('CANCEL'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: _isValid
@@ -130,7 +141,7 @@ class _PairInputDialogState extends State<PairInputDialog> {
                     MapEntry(_keyController.text, _valueController.text),
                   )
               : null,
-          child: const Text('ADD'),
+          child: const Text('Add'),
         ),
       ],
     );
@@ -206,57 +217,58 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: Text(widget.title),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            for (var i = 0; i < _keyControllers.length; i++)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 8),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _keyControllers[i],
-                        decoration: InputDecoration(
-                          labelText: widget.keyLabel,
-                          isDense: true,
-                        ),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              for (var i = 0; i < _keyControllers.length; i++) ...[
+                if (i > 0) const Divider(),
+                Row(
+                children: [
+                  Expanded(
+                    child: TextField(
+                      controller: _keyControllers[i],
+                      decoration: InputDecoration(
+                        labelText: widget.keyLabel,
+                        isDense: true,
                       ),
                     ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: TextField(
-                        controller: _valueControllers[i],
-                        decoration: InputDecoration(
-                          labelText: widget.valueLabel,
-                          isDense: true,
-                        ),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: TextField(
+                      controller: _valueControllers[i],
+                      decoration: InputDecoration(
+                        labelText: widget.valueLabel,
+                        isDense: true,
                       ),
                     ),
-                    if (_keyControllers.length > 1)
-                      IconButton(
-                        icon: const Icon(Icons.remove_circle_outline, size: 20),
-                        onPressed: () => _removeRow(i),
-                      )
-                    else
-                      const SizedBox(width: 48),
-                  ],
-                ),
+                  ),
+                  if (_keyControllers.length > 1)
+                    IconButton(
+                      icon: const Icon(Icons.close, size: 20),
+                      onPressed: () => _removeRow(i),
+                    ),
+                ],
               ),
-            TextButton.icon(
-              onPressed: _addRow,
-              icon: const Icon(Icons.add, size: 18),
-              label: const Text('Add Row'),
-            ),
-          ],
+            ],
+              TextButton.icon(
+                onPressed: _addRow,
+                icon: const Icon(Icons.add, size: 18),
+                label: const Text('Add Row'),
+              ),
+            ],
+          ),
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('CANCEL'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: _allValid
@@ -269,7 +281,7 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
                   Navigator.pop(context, pairs);
                 }
               : null,
-          child: const Text('ADD ALL'),
+          child: const Text('Add All'),
         ),
       ],
     );
@@ -298,38 +310,43 @@ class _MultiSelectRemoveDialogState extends State<MultiSelectRemoveDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: Text(widget.title),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: widget.items.map((item) {
-            return CheckboxListTile(
-              title: Text('${item.key}: ${item.value}'),
-              value: _selected.contains(item.key),
-              onChanged: (checked) {
-                setState(() {
-                  if (checked == true) {
-                    _selected.add(item.key);
-                  } else {
-                    _selected.remove(item.key);
-                  }
-                });
-              },
-              contentPadding: EdgeInsets.zero,
-            );
-          }).toList(),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: widget.items.map((item) {
+              return CheckboxListTile(
+                title: Text(item.key),
+                value: _selected.contains(item.key),
+                controlAffinity: ListTileControlAffinity.leading,
+                onChanged: (checked) {
+                  setState(() {
+                    if (checked == true) {
+                      _selected.add(item.key);
+                    } else {
+                      _selected.remove(item.key);
+                    }
+                  });
+                },
+                contentPadding: EdgeInsets.zero,
+              );
+            }).toList(),
+          ),
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('CANCEL'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: _selected.isEmpty
               ? null
               : () => Navigator.pop(context, _selected.toList()),
-          child: Text('REMOVE (${_selected.length})'),
+          child: Text('Remove (${_selected.length})'),
         ),
       ],
     );
@@ -356,25 +373,29 @@ class _LoginDialogState extends State<LoginDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: const Text('Login User'),
-      content: Semantics(
-        label: 'external_user_id_input',
-        child: TextField(
-          controller: _controller,
-          decoration: const InputDecoration(labelText: 'External User Id'),
-          onChanged: (_) => setState(() {}),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Semantics(
+          label: 'external_user_id_input',
+          child: TextField(
+            controller: _controller,
+            decoration: const InputDecoration(labelText: 'External User Id'),
+            onChanged: (_) => setState(() {}),
+          ),
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('CANCEL'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: _controller.text.isEmpty
               ? null
               : () => Navigator.pop(context, _controller.text),
-          child: const Text('LOGIN'),
+          child: const Text('Login'),
         ),
       ],
     );
@@ -414,57 +435,61 @@ class _OutcomeDialogState extends State<OutcomeDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: const Text('Send Outcome'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            RadioGroup<OutcomeType>(
-              groupValue: _type,
-              onChanged: (v) => setState(() { if (v != null) _type = v; }),
-              child: Column(
-                children: [
-                  RadioListTile<OutcomeType>(
-                    title: const Text('Normal Outcome'),
-                    value: OutcomeType.normal,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  RadioListTile<OutcomeType>(
-                    title: const Text('Unique Outcome'),
-                    value: OutcomeType.unique,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                  RadioListTile<OutcomeType>(
-                    title: const Text('Outcome with Value'),
-                    value: OutcomeType.withValue,
-                    contentPadding: EdgeInsets.zero,
-                  ),
-                ],
+      content: SizedBox(
+        width: double.maxFinite,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              RadioGroup<OutcomeType>(
+                groupValue: _type,
+                onChanged: (v) => setState(() { if (v != null) _type = v; }),
+                child: Column(
+                  children: [
+                    RadioListTile<OutcomeType>(
+                      title: const Text('Normal Outcome'),
+                      value: OutcomeType.normal,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    RadioListTile<OutcomeType>(
+                      title: const Text('Unique Outcome'),
+                      value: OutcomeType.unique,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                    RadioListTile<OutcomeType>(
+                      title: const Text('Outcome with Value'),
+                      value: OutcomeType.withValue,
+                      contentPadding: EdgeInsets.zero,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            const SizedBox(height: 8),
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Name'),
-              onChanged: (_) => setState(() {}),
-            ),
-            if (_type == OutcomeType.withValue) ...[
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               TextField(
-                controller: _valueController,
-                decoration: const InputDecoration(labelText: 'Value'),
-                keyboardType:
-                    const TextInputType.numberWithOptions(decimal: true),
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Outcome Name'),
                 onChanged: (_) => setState(() {}),
               ),
+              if (_type == OutcomeType.withValue) ...[
+                const SizedBox(height: 12),
+                TextField(
+                  controller: _valueController,
+                  decoration: const InputDecoration(labelText: 'Value'),
+                  keyboardType:
+                      const TextInputType.numberWithOptions(decimal: true),
+                  onChanged: (_) => setState(() {}),
+                ),
+              ],
             ],
-          ],
+          ),
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('CANCEL'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: _isValid
@@ -478,7 +503,7 @@ class _OutcomeDialogState extends State<OutcomeDialog> {
                   });
                 }
               : null,
-          child: const Text('SEND'),
+          child: const Text('Send'),
         ),
       ],
     );
@@ -529,34 +554,38 @@ class _TrackEventDialogState extends State<TrackEventDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: const Text('Track Event'),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: _nameController,
-              decoration: const InputDecoration(labelText: 'Event Name'),
-              onChanged: (_) => setState(() {}),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: _propsController,
-              decoration: InputDecoration(
-                labelText: 'Properties (optional, JSON)',
-                hintText: '{"key": "value"}',
-                errorText: _jsonError,
+      content: SizedBox(
+        width: double.maxFinite,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _nameController,
+                decoration: const InputDecoration(labelText: 'Event Name'),
+                onChanged: (_) => setState(() {}),
               ),
-              maxLines: 3,
-              onChanged: _validateJson,
-            ),
-          ],
+              const SizedBox(height: 12),
+              TextField(
+                controller: _propsController,
+                decoration: InputDecoration(
+                  labelText: 'Properties (optional, JSON)',
+                  hintText: '{"key": "value"}',
+                  errorText: _jsonError,
+                ),
+                maxLines: 3,
+                onChanged: _validateJson,
+              ),
+            ],
+          ),
         ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('CANCEL'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: _isValid
@@ -572,7 +601,7 @@ class _TrackEventDialogState extends State<TrackEventDialog> {
                   });
                 }
               : null,
-          child: const Text('TRACK'),
+          child: const Text('Track'),
         ),
       ],
     );
@@ -605,27 +634,31 @@ class _CustomNotificationDialogState extends State<CustomNotificationDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: const Text('Custom Notification'),
-      content: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          TextField(
-            controller: _titleController,
-            decoration: const InputDecoration(labelText: 'Title'),
-            onChanged: (_) => setState(() {}),
-          ),
-          const SizedBox(height: 12),
-          TextField(
-            controller: _bodyController,
-            decoration: const InputDecoration(labelText: 'Body'),
-            onChanged: (_) => setState(() {}),
-          ),
-        ],
+      content: SizedBox(
+        width: double.maxFinite,
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _titleController,
+              decoration: const InputDecoration(labelText: 'Title'),
+              onChanged: (_) => setState(() {}),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _bodyController,
+              decoration: const InputDecoration(labelText: 'Body'),
+              onChanged: (_) => setState(() {}),
+            ),
+          ],
+        ),
       ),
       actions: [
         TextButton(
           onPressed: () => Navigator.pop(context),
-          child: const Text('CANCEL'),
+          child: const Text('Cancel'),
         ),
         TextButton(
           onPressed: _isValid
@@ -634,7 +667,7 @@ class _CustomNotificationDialogState extends State<CustomNotificationDialog> {
                     'body': _bodyController.text,
                   })
               : null,
-          child: const Text('SEND'),
+          child: const Text('Send'),
         ),
       ],
     );
@@ -650,33 +683,37 @@ class TooltipDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
       title: Text(tooltip.title),
-      content: SingleChildScrollView(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(tooltip.description),
-            if (tooltip.options != null && tooltip.options!.isNotEmpty) ...[
-              const SizedBox(height: 16),
-              ...tooltip.options!.map((option) => Padding(
-                    padding: const EdgeInsets.only(bottom: 8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          option.name,
-                          style: const TextStyle(fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          option.description,
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
-                      ],
-                    ),
-                  )),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(tooltip.description),
+              if (tooltip.options != null && tooltip.options!.isNotEmpty) ...[
+                const SizedBox(height: 16),
+                ...tooltip.options!.map((option) => Padding(
+                      padding: const EdgeInsets.only(bottom: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            option.name,
+                            style: const TextStyle(fontWeight: FontWeight.bold),
+                          ),
+                          Text(
+                            option.description,
+                            style: TextStyle(color: Colors.grey[600]),
+                          ),
+                        ],
+                      ),
+                    )),
+              ],
             ],
-          ],
+          ),
         ),
       ),
       actions: [

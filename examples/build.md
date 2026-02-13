@@ -493,6 +493,15 @@ Location Section:
 - PROMPT LOCATION button
 ```
 
+### Prompt 2.14 - Secondary Activity
+
+```
+Secondary Activity (launched by "Next Activity" button at bottom of main screen):
+- Activity title: "Secondary Activity"
+- Page content: centered text "Secondary Activity" using headlineMedium style
+- Simple screen, no additional functionality needed
+```
+
 ---
 
 ## Phase 3: View User API Integration
@@ -814,9 +823,10 @@ loading_overlay.dart:
 - Shown via isLoading state from AppViewModel
 
 dialogs.dart:
+- All dialogs use insetPadding: EdgeInsets.symmetric(horizontal: 16) and SizedBox(width: double.maxFinite) on content for full-width layout
 - SingleInputDialog (one TextField)
 - PairInputDialog (key-value TextFields, single pair)
-- MultiPairInputDialog (dynamic rows, add/remove, batch submit)
+- MultiPairInputDialog (dynamic rows with dividers between them, X icon to delete a row, full-width dialog, batch submit)
 - MultiSelectRemoveDialog (CheckboxListTile for batch remove)
 - LoginDialog, OutcomeDialog, TrackEventDialog
 - CustomNotificationDialog, TooltipDialog
@@ -829,10 +839,12 @@ Tags, Aliases, and Triggers all share a reusable MultiPairInputDialog widget
 for adding multiple key-value pairs at once.
 
 Behavior:
-- Dialog opens with one empty key-value row
+- Dialog opens full-width (insetPadding: EdgeInsets.symmetric(horizontal: 16))
+- Starts with one empty key-value row (Key and Value fields side by side)
 - "Add Row" TextButton below the rows adds another empty row
-- Each row has a remove IconButton (hidden when only one row exists)
-- "Add All" button is disabled until ALL key and value TextEditingControllers in every row are filled
+- Dividers separate each row for visual clarity
+- Each row shows an X (Icons.close) delete button on the right (hidden when only one row)
+- "Add All" button is disabled until ALL key and value fields in every row are filled
 - Validation runs on every text change and after row add/remove
 - On "Add All" press, all rows are collected and submitted as a batch
 - Batch operations use SDK bulk APIs (addAliases, addTags, addTriggers)
@@ -852,7 +864,7 @@ for selectively removing items from the current list.
 
 Behavior:
 - Accepts the current list of items as List<MapEntry<String, String>>
-- Renders one CheckboxListTile per item with label "key: value"
+- Renders one Checkbox per item on the left with just the key as the label (not "key: value")
 - User can check 0, 1, or more items
 - "Remove (N)" button shows count of selected items, disabled when none selected
 - On confirm, checked items' keys are collected as List<String> and passed to the callback
@@ -975,7 +987,7 @@ examples/demo/
 │   │   └── app_viewmodel.dart           # ChangeNotifier with all UI state
 │   ├── screens/
 │   │   ├── home_screen.dart             # Main scrollable screen (includes LogView)
-│   │   └── secondary_screen.dart        # Simple secondary page
+│   │   └── secondary_screen.dart        # "Secondary Activity" page
 │   └── widgets/
 │       ├── section_card.dart            # Card with title and info icon
 │       ├── toggle_row.dart              # Label + Switch

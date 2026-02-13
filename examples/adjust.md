@@ -55,20 +55,45 @@ on each emulator and toggle "Pause In-App Messages" on.
 Create output directories:
   mkdir -p /tmp/onesignal_reference /tmp/onesignal_flutter
 
-Capture screenshots from both emulators at the same scroll position.
-Repeat this pattern while scrolling through each section of the app:
+Layout note: Both apps have a sticky LOGS section pinned at the top.
+On both emulators the scrollable content area starts at roughly y=800.
+When calculating swipe distances or tap targets, account for this offset.
+The screen resolution is 1344x2992 on both emulators, giving a visible
+scrollable viewport of about 2200px below the LOGS section.
 
-1. Capture the current viewport from both:
-     adb -s $REF shell screencap -p /sdcard/ref_01.png && adb -s $REF pull /sdcard/ref_01.png /tmp/onesignal_reference/ref_01.png
-     adb -s $FLUTTER shell screencap -p /sdcard/flutter_01.png && adb -s $FLUTTER pull /sdcard/flutter_01.png /tmp/onesignal_flutter/flutter_01.png
+Use uiautomator to find exact element positions before scrolling or tapping:
+  adb -s $REF shell uiautomator dump /sdcard/ui.xml && adb -s $REF pull /sdcard/ui.xml /tmp/onesignal_reference/ui.xml
+  adb -s $FLUTTER shell uiautomator dump /sdcard/ui.xml && adb -s $FLUTTER pull /sdcard/ui.xml /tmp/onesignal_flutter/ui.xml
 
-2. Scroll both down by roughly one viewport:
-     adb -s $REF shell input swipe 500 1500 500 500
-     adb -s $FLUTTER shell input swipe 500 1500 500 500
+Parse bounds to locate section headers and buttons:
+  python3 -c "
+  import xml.etree.ElementTree as ET
+  tree = ET.parse('/tmp/onesignal_flutter/ui.xml')
+  for node in tree.iter():
+      d = node.get('content-desc','')
+      b = node.get('bounds','')
+      if d.strip():
+          print(d.split(chr(10))[0][:50], b)
+  "
 
-3. Capture the next pair (ref_02/flutter_02, ref_03/flutter_03, etc.)
+To scroll a specific section header into view, dump the UI hierarchy,
+find the nearest visible element, and compute the swipe delta needed
+to bring the target section just below the LOGS area (y~800). For example,
+if the TAGS header is currently at y=2400 and you want it at y=850:
+  delta = 2400 - 850 = 1550
+  adb -s $FLUTTER shell input swipe 672 2000 672 450
+  (swipe from y=2000 up by ~1550px to y=450)
 
-4. Repeat until you have covered all sections from top to bottom.
+After scrolling, re-dump the UI hierarchy to confirm the section is now
+visible and get updated coordinates before tapping any buttons.
+
+Capture matching screenshots at each scroll position:
+  adb -s $REF shell screencap -p /sdcard/ref_01.png && adb -s $REF pull /sdcard/ref_01.png /tmp/onesignal_reference/ref_01.png
+  adb -s $FLUTTER shell screencap -p /sdcard/flutter_01.png && adb -s $FLUTTER pull /sdcard/flutter_01.png /tmp/onesignal_flutter/flutter_01.png
+
+Scroll section by section, aligning both emulators so the same section
+header sits just below the LOGS area on each, then capture and compare.
+Repeat until you have covered all sections from top to bottom.
 
 Compare each pair of screenshots side by side. Look for differences in:
   - Section order and grouping
@@ -78,26 +103,19 @@ Compare each pair of screenshots side by side. Look for differences in:
   - Toggle/switch alignment
   - List item layout (key-value pairs, delete icons)
   - Empty state text
-  - Dialog layout and field arrangement
+  - Dialog layout and field arrangement (ignore dialog width — all Flutter
+    dialogs use full-width insetPadding by design)
   - Logs section styling (background colors, text colors, header style)
     must match the reference app screenshots
 
-To inspect specific UI elements or flows on either emulator:
-
-Dump the UI hierarchy:
-  adb -s $REF shell uiautomator dump /sdcard/ui.xml && adb -s $REF pull /sdcard/ui.xml /tmp/onesignal_reference/ui.xml
-  adb -s $FLUTTER shell uiautomator dump /sdcard/ui.xml && adb -s $FLUTTER pull /sdcard/ui.xml /tmp/onesignal_flutter/ui.xml
-
-Tap an element by coordinates:
+Tap an element by computing the center of its bounds:
   adb -s $FLUTTER shell input tap <centerX> <centerY>
 
 Type into a focused field:
   adb -s $FLUTTER shell input text "test"
 
-Example: compare the "Add Tag" dialog flow on both emulators,
-then verify the tag list looks the same after adding a tag.
-
-Also compare key dialogs on both emulators:
+Compare key dialogs on both emulators by tapping the corresponding
+button on each, then capturing and comparing the dialog screenshots:
   - Add Alias (single pair input)
   - Add Multiple Aliases/Tags (dynamic rows with add/remove)
   - Remove Selected Tags (checkbox multi-select)
@@ -105,8 +123,8 @@ Also compare key dialogs on both emulators:
   - Send Outcome (radio options)
   - Track Event (with JSON properties field)
   - Custom Notification (title + body)
-Open each dialog on both emulators, screenshot, and compare field layout,
-button placement, spacing, and validation behavior.
+For each dialog, compare field layout, button placement, spacing,
+and validation behavior. Dismiss the dialog on both before moving on.
 ```
 
 ### Fix inconsistencies
@@ -122,6 +140,7 @@ to fix any visual differences. Common things to adjust:
   - Section ordering in home_screen.dart
   - Dialog field layout in dialogs.dart
 
-After each fix, hot reload (press 'r' in the Flutter terminal) and
+After each fix, hot reload by pressing 'r' in the user's active Flutter
+terminal (check open terminals for a running flutter process) and
 re-capture the Flutter screenshot to verify the change matches the reference.
 ```
