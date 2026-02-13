@@ -56,22 +56,21 @@ class _LogViewState extends State<LogView> {
   Widget build(BuildContext context) {
     final logs = LogManager().logs;
 
-    const logBackground = Color(0xFF3C3C3C);
+    const logBackground = Color(0xFF1A1B1E);
 
     return Semantics(
       label: 'log_view_container',
       child: Card(
-        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        margin: EdgeInsets.zero,
         color: logBackground,
+        shape: const RoundedRectangleBorder(),
         child: Column(
           children: [
             Semantics(
               label: 'log_view_header',
               child: InkWell(
                 onTap: () => setState(() => _expanded = !_expanded),
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(12),
-                ),
+                borderRadius: BorderRadius.zero,
                 child: Padding(
                   padding: const EdgeInsets.symmetric(
                     horizontal: 16,
@@ -185,7 +184,6 @@ class _LogViewState extends State<LogView> {
                                             fontFamily: 'monospace',
                                             color: Colors.white70,
                                           ),
-                                          overflow: TextOverflow.ellipsis,
                                         ),
                                       ),
                                     ),

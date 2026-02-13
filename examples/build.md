@@ -914,9 +914,12 @@ LogManager Features:
 
 LogView Features:
 - STICKY at the top of the screen (always visible while scrolling content below)
-- Match the reference app's log section styling (background colors, text colors,
-  header style, icon colors) from the Phase 0 screenshots
-- Fixed 100dp height with ListView.builder
+- Full width, no horizontal margin, no rounded corners, no top margin (touches appbar)
+- Background color: 0xFF1A1B1E
+- Single horizontal scroll on the entire log list (not per-row), no text truncation
+- Use LayoutBuilder + ConstrainedBox(minWidth) so content is at least screen-wide
+- Use vertical SingleChildScrollView + Column instead of ListView.builder (100dp container is small)
+- Fixed 100dp height
 - Default expanded
 - Trash icon button (Icons.delete) for clearing logs, not a text button
 - Auto-scroll to newest using ScrollController
