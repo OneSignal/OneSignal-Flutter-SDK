@@ -56,10 +56,13 @@ class _LogViewState extends State<LogView> {
   Widget build(BuildContext context) {
     final logs = LogManager().logs;
 
+    const logBackground = Color(0xFF3C3C3C);
+
     return Semantics(
       label: 'log_view_container',
       child: Card(
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+        color: logBackground,
         child: Column(
           children: [
             Semantics(
@@ -78,14 +81,17 @@ class _LogViewState extends State<LogView> {
                     children: [
                       const Text(
                         'LOGS',
-                        style: TextStyle(fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
                       const SizedBox(width: 8),
                       Semantics(
                         label: 'log_view_count',
                         child: Text(
                           '(${logs.length})',
-                          style: TextStyle(color: Colors.grey[600]),
+                          style: TextStyle(color: Colors.grey[400]),
                         ),
                       ),
                       const Spacer(),
@@ -97,7 +103,7 @@ class _LogViewState extends State<LogView> {
                             child: Icon(
                               Icons.delete,
                               size: 18,
-                              color: Colors.grey[600],
+                              color: Colors.grey[400],
                             ),
                           ),
                         ),
@@ -107,6 +113,7 @@ class _LogViewState extends State<LogView> {
                             ? Icons.expand_less
                             : Icons.expand_more,
                         size: 20,
+                        color: Colors.grey[400],
                       ),
                     ],
                   ),
@@ -121,10 +128,10 @@ class _LogViewState extends State<LogView> {
                   child: logs.isEmpty
                       ? Semantics(
                           label: 'log_view_empty',
-                          child: const Center(
+                          child: Center(
                             child: Text(
                               'No logs yet',
-                              style: TextStyle(color: Colors.grey),
+                              style: TextStyle(color: Colors.grey[500]),
                             ),
                           ),
                         )
@@ -176,6 +183,7 @@ class _LogViewState extends State<LogView> {
                                           style: const TextStyle(
                                             fontSize: 11,
                                             fontFamily: 'monospace',
+                                            color: Colors.white70,
                                           ),
                                           overflow: TextOverflow.ellipsis,
                                         ),
