@@ -39,6 +39,14 @@ Launch the reference app on the reference emulator:
 
 The Flutter app should already be running on the other emulator. If not:
   cd examples/demo && flutter run -d $FLUTTER
+
+Before capturing screenshots, dismiss any in-app messages showing on
+either emulator. Tap the X or click-through button on each IAM until
+both apps show their main UI with no overlays.
+
+Then pause in-app messages on both emulators so new IAMs don't
+interrupt the comparison. Scroll to the "In-App Messaging" section
+on each emulator and toggle "Pause In-App Messages" on.
 ```
 
 ### Capture and compare screenshots
@@ -71,11 +79,9 @@ Compare each pair of screenshots side by side. Look for differences in:
   - List item layout (key-value pairs, delete icons)
   - Empty state text
   - Dialog layout and field arrangement
-```
+  - Logs section styling (background colors, text colors, header style)
+    must match the reference app screenshots
 
-### Interactive comparison (optional)
-
-```
 To inspect specific UI elements or flows on either emulator:
 
 Dump the UI hierarchy:
@@ -90,6 +96,17 @@ Type into a focused field:
 
 Example: compare the "Add Tag" dialog flow on both emulators,
 then verify the tag list looks the same after adding a tag.
+
+Also compare key dialogs on both emulators:
+  - Add Alias (single pair input)
+  - Add Multiple Aliases/Tags (dynamic rows with add/remove)
+  - Remove Selected Tags (checkbox multi-select)
+  - Login User
+  - Send Outcome (radio options)
+  - Track Event (with JSON properties field)
+  - Custom Notification (title + body)
+Open each dialog on both emulators, screenshot, and compare field layout,
+button placement, spacing, and validation behavior.
 ```
 
 ### Fix inconsistencies

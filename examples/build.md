@@ -21,6 +21,10 @@ If no device is listed, stop and ask the user to start one.
 Launch the reference app:
   adb shell am start -n com.onesignal.sdktest/.ui.main.MainActivity
 
+Dismiss any in-app messages that appear on launch. Tap the X or
+click-through button on each IAM until the main UI is fully visible
+with no overlays.
+
 Create an output directory:
   mkdir -p /tmp/onesignal_reference
 
@@ -58,6 +62,17 @@ Example flow to observe "Add Tag" behavior:
   2. Dump UI -> find the Key and Value fields -> tap and type into them
   3. Tap the confirm button -> screenshot the result
   4. Compare the tag list state before and after
+
+Also capture screenshots of key dialogs to match their layout:
+  - Add Alias (single pair input)
+  - Add Multiple Aliases/Tags (dynamic rows with add/remove)
+  - Remove Selected Tags (checkbox multi-select)
+  - Login User
+  - Send Outcome (radio options)
+  - Track Event (with JSON properties field)
+  - Custom Notification (title + body)
+These dialog screenshots are important for matching field layout,
+button placement, spacing, and validation behavior.
 
 Refer back to these screenshots throughout all remaining phases whenever
 you need to decide on layout, spacing, section order, dialog flows, or
@@ -887,9 +902,10 @@ LogManager Features:
 
 LogView Features:
 - STICKY at the top of the screen (always visible while scrolling content below)
-- Collapsible header (default expanded)
+- Match the reference app's log section styling (background colors, text colors,
+  header style, icon colors) from the Phase 0 screenshots
 - Fixed 100dp height with ListView.builder
-- Color-coded by level (Debug=blue, Info=green, Warn=amber, Error=red)
+- Default expanded
 - Trash icon button (Icons.delete) for clearing logs, not a text button
 - Auto-scroll to newest using ScrollController
 

@@ -77,7 +77,7 @@ class _LogViewState extends State<LogView> {
                   child: Row(
                     children: [
                       const Text(
-                        'Logs',
+                        'LOGS',
                         style: TextStyle(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(width: 8),
