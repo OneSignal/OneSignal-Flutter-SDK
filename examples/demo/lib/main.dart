@@ -26,6 +26,11 @@ Future<void> main() async {
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
   OneSignal.consentRequired(prefs.consentRequired);
   OneSignal.consentGiven(prefs.privacyConsent);
+
+  // Restore cached SDK states before initialize so they take effect immediately
+  OneSignal.InAppMessages.paused(prefs.iamPaused);
+  OneSignal.Location.setShared(prefs.locationShared);
+
   OneSignal.initialize(appId);
 
   // Register IAM listeners
@@ -50,13 +55,12 @@ Future<void> main() async {
     LogManager().i('Notification', 'Clicked: ${event.notification.title}');
   });
   OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-    LogManager().i('Notification', 'Foreground will display: ${event.notification.title}');
+    LogManager().i(
+      'Notification',
+      'Foreground will display: ${event.notification.title}',
+    );
     event.notification.display();
   });
-
-  // Restore cached SDK states after initialization
-  OneSignal.InAppMessages.paused(prefs.iamPaused);
-  OneSignal.Location.setShared(prefs.locationShared);
 
   // Set up API service
   final apiService = OneSignalApiService()..setAppId(appId);
