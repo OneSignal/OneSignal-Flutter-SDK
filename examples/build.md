@@ -4,6 +4,38 @@ This document contains all the prompts and requirements needed to build the OneS
 
 ---
 
+## Phase 0: Reference Screenshots (Optional)
+
+### Prompt 0.1 - Capture Reference UI
+
+```
+Before building anything, check if an Android emulator is running with the
+reference OneSignal demo app installed.
+
+Check for a connected emulator:
+  adb devices
+
+If a device is listed, launch the reference app:
+  adb shell am start -n com.onesignal.sdktest/.application.MainActivity
+
+Then capture screenshots by scrolling through the full UI:
+1. Take a screenshot from the top of the screen:
+     adb shell screencap -p /sdcard/ref_01.png && adb pull /sdcard/ref_01.png /tmp/onesignal_reference/ref_01.png
+2. Scroll down by roughly one viewport height:
+     adb shell input swipe 500 1500 500 500
+3. Take the next screenshot (ref_02.png, ref_03.png, etc.)
+4. Repeat until you've reached the bottom of the scrollable content
+
+Use these screenshots as a visual reference throughout the remaining phases
+to match layout, spacing, section order, and overall look and feel of the
+Flutter app to the existing Android app.
+
+If no emulator is running or the reference app is not installed, skip this
+phase and rely on the written descriptions in the prompts below.
+```
+
+---
+
 ## Phase 1: Initial Setup
 
 ### Prompt 1.1 - Project Foundation
