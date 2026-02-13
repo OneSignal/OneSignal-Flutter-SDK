@@ -1,6 +1,6 @@
-# OneSignal Sample App V2 - Build Guide
+# OneSignal Flutter Sample App - Build Guide
 
-This document contains all the prompts and requirements needed to build the OneSignal Sample App V2 from scratch. Give these prompts to an AI assistant or follow them manually to recreate the app.
+This document contains all the prompts and requirements needed to build the OneSignal Flutter Sample App from scratch. Give these prompts to an AI assistant or follow them manually to recreate the app.
 
 ---
 
@@ -9,98 +9,128 @@ This document contains all the prompts and requirements needed to build the OneS
 ### Prompt 1.1 - Project Foundation
 
 ```
-Build a sample Android app with:
-- MVVM architecture with Jetpack Compose UI
-- Kotlin Coroutines for background threading (Dispatchers.IO, Dispatchers.Main)
-- Gradle Kotlin DSL with buildSrc for type-safe dependency management
-- Support for Google FCM and Huawei HMS product flavors (matching existing OneSignalDemo setup)
-- Package name: com.onesignal.sdktest (must match google-services.json and agconnect-services.json)
+Build a sample Flutter app with:
+- Clean architecture: repository pattern with ChangeNotifier-based state management (Provider)
+- Dart 3+ with null safety
+- Material 3 theming with OneSignal brand colors
+- Support for both Android and iOS
+- Android package name: com.onesignal.example
+- iOS bundle identifier: com.onesignal.example
 - All dialogs should have EMPTY input fields (for Appium testing - test framework enters values)
-- Material3 theming with OneSignal brand colors
+- Use const constructors wherever possible for performance
+- Separate widget files per section to keep files focused and readable
 ```
 
-### Prompt 1.2 - OneSignal Code Organization
+### Prompt 1.2 - Dependencies (pubspec.yaml)
 
 ```
-Centralize all OneSignal SDK calls in a single OneSignalRepository.kt class:
+Add these dependencies to pubspec.yaml:
+
+dependencies:
+  flutter:
+    sdk: flutter
+  onesignal_flutter: ^5.4.0    # OneSignal SDK
+  provider: ^6.1.0              # State management
+  shared_preferences: ^2.3.0    # Local persistence
+  http: ^1.2.0                  # REST API calls
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+```
+
+### Prompt 1.3 - OneSignal Repository
+
+```
+Create a OneSignalRepository class that centralizes all OneSignal SDK calls.
+This is a plain Dart class (not a ChangeNotifier) injected into the ViewModel.
 
 User operations:
-- loginUser(externalUserId: String)
-- logoutUser()
+- loginUser(String externalUserId) -> Future<void>
+- logoutUser() -> Future<void>
 
 Alias operations:
-- addAlias(label: String, id: String)
-- addAliases(aliases: Map<String, String>)  // Batch add
+- addAlias(String label, String id) -> void
+- addAliases(Map<String, dynamic> aliases) -> void
 
 Email operations:
-- addEmail(email: String)
-- removeEmail(email: String)
+- addEmail(String email) -> void
+- removeEmail(String email) -> void
 
 SMS operations:
-- addSms(smsNumber: String)
-- removeSms(smsNumber: String)
+- addSms(String smsNumber) -> void
+- removeSms(String smsNumber) -> void
 
 Tag operations:
-- addTag(key: String, value: String)
-- addTags(tags: Map<String, String>)  // Batch add
-- removeTag(key: String)
-- removeTags(keys: Collection<String>)  // Batch remove
-- getTags(): Map<String, String>
+- addTag(String key, String value) -> void
+- addTags(Map<String, dynamic> tags) -> void
+- removeTag(String key) -> void
+- removeTags(List<String> keys) -> void
+- getTags() -> Future<Map<String, String>>
 
-Trigger operations:
-- addTrigger(key: String, value: String)
-- addTriggers(triggers: Map<String, String>)  // Batch add
-- removeTrigger(key: String)
-- clearTriggers(keys: Collection<String>)
+Trigger operations (via OneSignal.InAppMessages):
+- addTrigger(String key, String value) -> void
+- addTriggers(Map<String, String> triggers) -> void
+- removeTrigger(String key) -> void
+- removeTriggers(List<String> keys) -> void
+- clearTriggers() -> void
 
-Outcome operations:
-- sendOutcome(name: String)
-- sendUniqueOutcome(name: String)
-- sendOutcomeWithValue(name: String, value: Float)
+Outcome operations (via OneSignal.Session):
+- sendOutcome(String name) -> void
+- sendUniqueOutcome(String name) -> void
+- sendOutcomeWithValue(String name, double value) -> void
 
 Track Event:
-- trackEvent(name: String, properties: Map<String, Any?>?)  // Properties as parsed JSON map
+- trackEvent(String name, Map<String, dynamic>? properties) -> void
 
 Push subscription:
-- getPushSubscriptionId(): String?
-- isPushEnabled(): Boolean
-- setPushEnabled(enabled: Boolean)
+- getPushSubscriptionId() -> String?
+- isPushOptedIn() -> bool?
+- optInPush() -> void
+- optOutPush() -> void
+
+Notifications:
+- hasPermission() -> bool
+- requestPermission(bool fallbackToSettings) -> Future<bool>
 
 In-App Messages:
-- setInAppMessagesPaused(paused: Boolean)
-- isInAppMessagesPaused(): Boolean
+- setInAppMessagesPaused(bool paused) -> void
+- isInAppMessagesPaused() -> Future<bool>
 
 Location:
-- setLocationShared(shared: Boolean)
-- isLocationShared(): Boolean
-- promptLocation()
+- setLocationShared(bool shared) -> void
+- isLocationShared() -> Future<bool>
+- requestLocationPermission() -> void
 
 Privacy consent:
-- setConsentRequired(required: Boolean)
-- getConsentRequired(): Boolean
-- setPrivacyConsent(granted: Boolean)
-- getPrivacyConsent(): Boolean
+- setConsentRequired(bool required) -> void
+- setConsentGiven(bool granted) -> void
 
-Notification sending (via REST API, delegated to OneSignalService):
-- sendNotification(type: NotificationType): Boolean
-- sendCustomNotification(title: String, body: String): Boolean
-- fetchUser(onesignalId: String): UserData?
+User IDs:
+- getExternalId() -> Future<String?>
+- getOnesignalId() -> Future<String?>
+
+Notification sending (via REST API, delegated to OneSignalApiService):
+- sendNotification(NotificationType type) -> Future<bool>
+- sendCustomNotification(String title, String body) -> Future<bool>
+- fetchUser(String onesignalId) -> Future<UserData?>
 ```
 
-### Prompt 1.3 - OneSignalService (REST API Client)
+### Prompt 1.4 - OneSignalApiService (REST API Client)
 
 ```
-Create OneSignalService.kt object for REST API calls:
+Create OneSignalApiService class for REST API calls using the http package:
 
 Properties:
-- appId: String (set from MainApplication)
+- _appId: String (set during initialization)
 
 Methods:
-- setAppId(appId: String)
-- getAppId(): String
-- sendNotification(type: NotificationType): Boolean
-- sendCustomNotification(title: String, body: String): Boolean
-- fetchUser(onesignalId: String): UserData?
+- setAppId(String appId)
+- getAppId() -> String
+- sendNotification(NotificationType type, String subscriptionId) -> Future<bool>
+- sendCustomNotification(String title, String body, String subscriptionId) -> Future<bool>
+- fetchUser(String onesignalId) -> Future<UserData?>
 
 sendNotification endpoint:
 - POST https://onesignal.com/api/v1/notifications
@@ -114,30 +144,40 @@ fetchUser endpoint:
 - Returns UserData with aliases, tags, emails, smsNumbers, externalId
 ```
 
-### Prompt 1.4 - SDK Observers
+### Prompt 1.5 - SDK Observers
 
 ```
-In MainApplication.kt, set up OneSignal listeners:
-- IInAppMessageLifecycleListener (onWillDisplay, onDidDisplay, onWillDismiss, onDidDismiss)
-- IInAppMessageClickListener
-- INotificationClickListener
-- INotificationLifecycleListener (with preventDefault() for async display testing)
-- IUserStateObserver (log when user state changes)
-- After registering listeners, restore cached SDK states from SharedPreferences:
-  - OneSignal.InAppMessages.paused = cached paused status
-  - OneSignal.Location.isShared = cached location shared status
+In main.dart, set up OneSignal initialization and listeners before runApp():
 
-In MainViewModel.kt, implement observers:
-- IPushSubscriptionObserver - react to push subscription changes
-- IPermissionObserver - react to notification permission changes
-- IUserStateObserver - call fetchUserDataFromApi() when user changes (login/logout)
+OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+OneSignal.consentRequired(cachedConsentRequired);
+OneSignal.consentGiven(cachedPrivacyConsent);
+OneSignal.initialize(appId);
+
+Then register listeners:
+- OneSignal.InAppMessages.addWillDisplayListener(...)
+- OneSignal.InAppMessages.addDidDisplayListener(...)
+- OneSignal.InAppMessages.addWillDismissListener(...)
+- OneSignal.InAppMessages.addDidDismissListener(...)
+- OneSignal.InAppMessages.addClickListener(...)
+- OneSignal.Notifications.addClickListener(...)
+- OneSignal.Notifications.addForegroundWillDisplayListener(...)
+
+After initialization, restore cached SDK states from SharedPreferences:
+- OneSignal.InAppMessages.paused(cachedPausedStatus)
+- OneSignal.Location.setShared(cachedLocationShared)
+
+In AppViewModel (ChangeNotifier), register observers:
+- OneSignal.User.pushSubscription.addObserver(...) - react to push subscription changes
+- OneSignal.Notifications.addPermissionObserver(...) - react to permission changes
+- OneSignal.User.addObserver(...) - call fetchUserDataFromApi() when user changes
 ```
 
 ---
 
 ## Phase 2: UI Sections
 
-### Section Order (top to bottom) - FINAL
+### Section Order (top to bottom)
 
 1. **App Section** (App ID, Guidance Banner, Consent Toggle, Logged-in-as display, Login/Logout)
 2. **Push Section** (Push ID, Enabled Toggle, Auto-prompts permission on load)
@@ -152,7 +192,7 @@ In MainViewModel.kt, implement observers:
 11. **Triggers Section** (Add/Add Multiple/Remove Selected/Clear All - IN MEMORY ONLY)
 12. **Track Event Section** (Track Event with JSON validation)
 13. **Location Section** (Location Shared toggle, Prompt Location button)
-14. **Next Activity Button**
+14. **Next Page Button**
 
 ### Prompt 2.1 - App Section
 
@@ -163,25 +203,25 @@ App Section layout:
 
 2. Sticky guidance banner below App ID:
    - Text: "Add your own App ID, then rebuild to fully test all functionality."
-   - Link text: "Get your keys at onesignal.com" (clickable, opens browser)
+   - Link text: "Get your keys at onesignal.com" (clickable, opens browser via url_launcher)
    - Light background color to stand out
 
 3. Consent card with up to two toggles:
    a. "Consent Required" toggle (always visible):
       - Label: "Consent Required"
       - Description: "Require consent before SDK processes data"
-      - Sets OneSignal.consentRequired
+      - Calls OneSignal.consentRequired(value)
    b. "Privacy Consent" toggle (only visible when Consent Required is ON):
       - Label: "Privacy Consent"
       - Description: "Consent given for data collection"
-      - Sets OneSignal.consentGiven
+      - Calls OneSignal.consentGiven(value)
       - Separated from the above toggle by a horizontal divider
    - NOT a blocking overlay - user can interact with app regardless of state
 
 4. "Logged in as" display (ABOVE the buttons, only visible when logged in):
-   - Prominent green Card background (#E8F5E9)
+   - Prominent green Container background (Color(0xFFE8F5E9))
    - "Logged in as:" label
-   - External User ID displayed large and centered (bold, green #2E7D32)
+   - External User ID displayed large and centered (bold, green Color(0xFF2E7D32))
    - Positioned ABOVE the Login/Switch User button
 
 5. LOGIN USER button:
@@ -199,7 +239,7 @@ Push Section:
 - Section title: "Push" with info icon for tooltip
 - Push Subscription ID display (readonly)
 - Enabled toggle switch (controls optIn/optOut)
-- Notification permission is automatically requested when MainActivity loads
+- Notification permission is automatically requested when home screen loads
 - PROMPT PUSH button:
   - Only visible when notification permission is NOT granted (fallback if user denied)
   - Requests notification permission when clicked
@@ -236,16 +276,16 @@ In-App Messaging Section (placed right after Send Push):
 Send In-App Message Section (placed right after In-App Messaging):
 - Section title: "Send In-App Message" with info icon for tooltip
 - Four FULL-WIDTH buttons (not a grid):
-  1. TOP BANNER - VerticalAlignTop icon
-  2. BOTTOM BANNER - VerticalAlignBottom icon
-  3. CENTER MODAL - CropSquare icon
-  4. FULL SCREEN - Fullscreen icon
+  1. TOP BANNER - Icons.vertical_align_top
+  2. BOTTOM BANNER - Icons.vertical_align_bottom
+  3. CENTER MODAL - Icons.crop_square
+  4. FULL SCREEN - Icons.fullscreen
 - Button styling:
-  - RED background color (#E9444E)
+  - RED background color (Color(0xFFE9444E))
   - WHITE text
   - Type-specific icon on LEFT side only (no right side icon)
   - Full width of the card
-- On click: adds trigger and shows toast "Sent In-App Message: {type}"
+- On tap: adds trigger and shows SnackBar "Sent In-App Message: {type}"
 
 Tooltip should explain each IAM type.
 ```
@@ -255,7 +295,7 @@ Tooltip should explain each IAM type.
 ```
 Aliases Section (placed after Send In-App Message):
 - Section title: "Aliases" with info icon for tooltip
-- Compose list showing key-value pairs (read-only, no delete icons)
+- List showing key-value pairs (read-only, no delete icons)
 - Each item shows: Label | ID
 - Filter out "external_id" and "onesignal_id" from display (these are special)
 - "No Aliases Added" text when empty
@@ -269,14 +309,14 @@ Aliases Section (placed after Send In-App Message):
 ```
 Emails Section:
 - Section title: "Emails" with info icon for tooltip
-- Compose list showing email addresses
+- List showing email addresses
 - Each item shows email with delete icon
 - "No Emails Added" text when empty
 - ADD EMAIL button -> dialog with empty email field
 - Collapse behavior when >5 items:
   - Show first 5 items
-  - Show "X more" text (clickable)
-  - Expand to show all when clicked
+  - Show "X more" text (tappable)
+  - Expand to show all when tapped
 ```
 
 ### Prompt 2.8 - SMS Section
@@ -284,7 +324,7 @@ Emails Section:
 ```
 SMS Section:
 - Section title: "SMS" with info icon for tooltip
-- Compose list showing phone numbers
+- List showing phone numbers
 - Each item shows phone number with delete icon
 - "No SMS Added" text when empty
 - ADD SMS button -> dialog with empty SMS field
@@ -296,7 +336,7 @@ SMS Section:
 ```
 Tags Section:
 - Section title: "Tags" with info icon for tooltip
-- Compose list showing key-value pairs
+- List showing key-value pairs
 - Each item shows: Key | Value with delete icon
 - "No Tags Added" text when empty
 - ADD button -> PairInputDialog with empty Key and Value fields (single add)
@@ -314,7 +354,7 @@ Outcome Events Section:
 - SEND OUTCOME button -> opens dialog with 3 radio options:
   1. Normal Outcome -> shows name input field
   2. Unique Outcome -> shows name input field
-  3. Outcome with Value -> shows name and value (float) input fields
+  3. Outcome with Value -> shows name and value (double) input fields
 ```
 
 ### Prompt 2.11 - Triggers Section (IN MEMORY ONLY)
@@ -322,7 +362,7 @@ Outcome Events Section:
 ```
 Triggers Section:
 - Section title: "Triggers" with info icon for tooltip
-- Compose list showing key-value pairs
+- List showing key-value pairs
 - Each item shows: Key | Value with delete icon
 - "No Triggers Added" text when empty
 - ADD button -> PairInputDialog with empty Key and Value fields (single add)
@@ -332,7 +372,7 @@ Triggers Section:
   - CLEAR ALL -> Removes all triggers at once
 
 IMPORTANT: Triggers are stored IN MEMORY ONLY during the app session.
-- triggersList is a mutableListOf<Pair<String, String>>() in MainViewModel
+- triggersList is a List<MapEntry<String, String>> in AppViewModel
 - Triggers are NOT persisted to SharedPreferences
 - Triggers are cleared when the app is killed/restarted
 - This is intentional - triggers are transient test data for IAM testing
@@ -347,7 +387,7 @@ Track Event Section:
   - "Event Name" label + empty input field (required, shows error if empty on submit)
   - "Properties (optional, JSON)" label + input field with placeholder hint {"key": "value"}
     - If non-empty and not valid JSON, shows "Invalid JSON format" error on the field
-    - If valid JSON, parsed via JSONObject and converted to Map<String, Any?> for the SDK call
+    - If valid JSON, parsed via jsonDecode and converted to Map<String, dynamic> for the SDK call
     - If empty, passes null
   - TRACK button disabled until name is filled AND JSON is valid (or empty)
 - Calls OneSignal.User.trackEvent(name, properties)
@@ -372,15 +412,15 @@ Location Section:
 
 ```
 Loading indicator overlay:
-- Full-screen semi-transparent overlay with centered spinner
-- isLoading LiveData in MainViewModel
-- Show/hide based on isLoading state
+- Full-screen semi-transparent overlay with centered CircularProgressIndicator
+- isLoading flag in AppViewModel
+- Show/hide via Stack + Visibility based on isLoading state
 - IMPORTANT: Add 100ms delay after populating data before dismissing loading indicator
   - This ensures UI has time to render
-  - Use kotlinx.coroutines.delay(100) after setting all LiveData values
+  - Use await Future.delayed(const Duration(milliseconds: 100)) after setting state
 
 On cold start:
-- Check if OneSignal.User.onesignalId is not null
+- Check if OneSignal onesignalId is not null (via getOnesignalId())
 - If exists: show loading -> call fetchUserDataFromApi() -> populate UI -> delay 100ms -> hide loading
 - If null: just show empty state (no loading indicator)
 
@@ -408,13 +448,23 @@ Note: REST API key is NOT required for fetchUser endpoint.
 ### Prompt 3.2 - UserData Model
 
 ```
-data class UserData(
-    val aliases: Map<String, String>,    // From identity object (filter out external_id, onesignal_id)
-    val tags: Map<String, String>,        // From properties.tags object
-    val emails: List<String>,             // From subscriptions where type="Email" -> token
-    val smsNumbers: List<String>,         // From subscriptions where type="SMS" -> token
-    val externalId: String?               // From identity.external_id
-)
+class UserData {
+  final Map<String, String> aliases;    // From identity object (filter out external_id, onesignal_id)
+  final Map<String, String> tags;       // From properties.tags object
+  final List<String> emails;            // From subscriptions where type=="Email" -> token
+  final List<String> smsNumbers;        // From subscriptions where type=="SMS" -> token
+  final String? externalId;             // From identity.external_id
+
+  const UserData({
+    required this.aliases,
+    required this.tags,
+    required this.emails,
+    required this.smsNumbers,
+    this.externalId,
+  });
+
+  factory UserData.fromJson(Map<String, dynamic> json) { ... }
+}
 ```
 
 ---
@@ -435,69 +485,71 @@ This file is maintained in the sdk-shared repo and shared across all platform de
 ### Prompt 4.2 - Tooltip Helper
 
 ```
-Create TooltipHelper.kt:
+Create TooltipHelper as a singleton:
 
-object TooltipHelper {
-    private var tooltips: Map<String, TooltipData> = emptyMap()
-    private var initialized = false
+class TooltipHelper {
+  static final TooltipHelper _instance = TooltipHelper._internal();
+  factory TooltipHelper() => _instance;
+  TooltipHelper._internal();
 
-    private const val TOOLTIP_URL =
-        "https://raw.githubusercontent.com/OneSignal/sdk-shared/main/demo/tooltip_content.json"
+  Map<String, TooltipData> _tooltips = {};
+  bool _initialized = false;
 
-    fun init(context: Context) {
-        if (initialized) return
+  static const _tooltipUrl =
+      'https://raw.githubusercontent.com/OneSignal/sdk-shared/main/demo/tooltip_content.json';
 
-        // IMPORTANT: Fetch on background thread to avoid blocking app startup
-        CoroutineScope(Dispatchers.IO).launch {
-            // Fetch tooltip_content.json from TOOLTIP_URL using HttpURLConnection
-            // Parse JSON into tooltips map
-            // On failure (no network, etc.), leave tooltips empty — tooltips are non-critical
+  Future<void> init() async {
+    if (_initialized) return;
 
-            withContext(Dispatchers.Main) {
-                // Update tooltips map on main thread
-                initialized = true
-            }
-        }
-    }
+    try {
+      // Fetch tooltip_content.json from _tooltipUrl using http.get
+      // Parse JSON into _tooltips map
+      // On failure (no network, etc.), leave _tooltips empty — tooltips are non-critical
+    } catch (_) {}
 
-    fun getTooltip(key: String): TooltipData?
+    _initialized = true;
+  }
+
+  TooltipData? getTooltip(String key) => _tooltips[key];
 }
 
-data class TooltipData(
-    val title: String,
-    val description: String,
-    val options: List<TooltipOption>? = null
-)
+class TooltipData {
+  final String title;
+  final String description;
+  final List<TooltipOption>? options;
 
-data class TooltipOption(
-    val name: String,
-    val description: String
-)
+  const TooltipData({required this.title, required this.description, this.options});
+}
+
+class TooltipOption {
+  final String name;
+  final String description;
+
+  const TooltipOption({required this.name, required this.description});
+}
 ```
 
-### Prompt 4.3 - Tooltip UI Integration (Compose)
+### Prompt 4.3 - Tooltip UI Integration
 
 ```
-For each section, pass an onInfoClick callback to SectionCard:
-- SectionCard has an optional info icon that calls onInfoClick when tapped
-- In MainScreen, wire onInfoClick to show a TooltipDialog composable
+For each section, pass an onInfoTap callback to SectionCard:
+- SectionCard has an optional info icon that calls onInfoTap when tapped
+- In HomeScreen, wire onInfoTap to show a TooltipDialog
 - TooltipDialog displays title, description, and options (if present)
 
-Example in MainScreen.kt:
+Example in HomeScreen:
 AliasesSection(
     ...,
-    onInfoClick = { showTooltipDialog = "aliases" }
+    onInfoTap: () => _showTooltipDialog(context, 'aliases'),
 )
 
-showTooltipDialog?.let { key ->
-    val tooltip = TooltipHelper.getTooltip(key)
+void _showTooltipDialog(BuildContext context, String key) {
+    final tooltip = TooltipHelper().getTooltip(key);
     if (tooltip != null) {
-        TooltipDialog(
-            title = tooltip.title,
-            description = tooltip.description,
-            options = tooltip.options?.map { it.name to it.description },
-            onDismiss = { showTooltipDialog = null }
-        )
+        showDialog(
+            context: context,
+            builder: (_) => TooltipDialog(tooltip: tooltip),
+        );
     }
 }
 ```
@@ -509,7 +561,7 @@ showTooltipDialog?.let { key ->
 ### What IS Persisted (SharedPreferences)
 
 ```
-SharedPreferenceUtil.kt stores:
+PreferencesService stores:
 - OneSignal App ID
 - Consent required status
 - Privacy consent status
@@ -523,22 +575,22 @@ SharedPreferenceUtil.kt stores:
 ```
 On app startup, state is restored in two layers:
 
-1. MainApplication.kt restores SDK state from SharedPreferences cache BEFORE init:
-   - OneSignal.consentRequired = SharedPreferenceUtil.getCachedConsentRequired(context)
-   - OneSignal.consentGiven = SharedPreferenceUtil.getUserPrivacyConsent(context)
-   - OneSignal.initWithContext(this, appId)
-   Then AFTER init, restores remaining SDK state:
-   - OneSignal.InAppMessages.paused = SharedPreferenceUtil.getCachedInAppMessagingPausedStatus(context)
-   - OneSignal.Location.isShared = SharedPreferenceUtil.getCachedLocationSharedStatus(context)
+1. main.dart restores SDK state from SharedPreferences cache BEFORE initialize:
+   - OneSignal.consentRequired(cachedConsentRequired)
+   - OneSignal.consentGiven(cachedPrivacyConsent)
+   - OneSignal.initialize(appId)
+   Then AFTER initialize, restores remaining SDK state:
+   - OneSignal.InAppMessages.paused(cachedPausedStatus)
+   - OneSignal.Location.setShared(cachedLocationShared)
    This ensures consent settings are in place before the SDK initializes.
 
-2. MainViewModel.loadInitialState() reads UI state from the SDK (not SharedPreferences):
-   - _consentRequired from repository.getConsentRequired() (reads OneSignal.consentRequired)
-   - _privacyConsentGiven from repository.getPrivacyConsent() (reads OneSignal.consentGiven)
-   - _inAppMessagesPaused from repository.isInAppMessagesPaused() (reads OneSignal.InAppMessages.paused)
-   - _locationShared from repository.isLocationShared() (reads OneSignal.Location.isShared)
-   - _externalUserId from OneSignal.User.externalId (empty string means no user logged in)
-   - _appId from SharedPreferenceUtil (app-level config, no SDK getter)
+2. AppViewModel.loadInitialState() reads UI state from the SDK (not SharedPreferences):
+   - consentRequired from cached prefs (no SDK getter)
+   - privacyConsentGiven from cached prefs (no SDK getter)
+   - inAppMessagesPaused from OneSignal.InAppMessages.arePaused()
+   - locationShared from OneSignal.Location.isShared()
+   - externalUserId from OneSignal.User.getExternalId()
+   - appId from PreferencesService (app-level config)
 
 This two-layer approach ensures:
 - The SDK is configured with the user's last preferences before anything else runs
@@ -549,8 +601,8 @@ This two-layer approach ensures:
 ### What is NOT Persisted (In-Memory Only)
 
 ```
-MainViewModel holds in memory:
-- triggersList: MutableList<Pair<String, String>>
+AppViewModel holds in memory:
+- triggersList: List<MapEntry<String, String>>
   - Triggers are session-only
   - Cleared on app restart
   - Used for testing IAM trigger conditions
@@ -612,8 +664,8 @@ Aliases are managed with a hybrid approach:
 ### Notification Permission
 
 ```
-Notification permission is automatically requested when MainActivity loads:
-- Call viewModel.promptPush() at end of onCreate()
+Notification permission is automatically requested when the home screen loads:
+- Call viewModel.promptPush() in initState() of HomeScreen
 - This ensures prompt appears after user sees the app UI
 - PROMPT PUSH button remains as fallback if user initially denied
 - Button hidden once permission is granted
@@ -621,81 +673,81 @@ Notification permission is automatically requested when MainActivity loads:
 
 ---
 
-## Phase 8: Jetpack Compose Architecture
+## Phase 8: Flutter Architecture
 
-### Prompt 8.1 - Compose Setup
-
-```
-Enable Jetpack Compose in the project:
-
-build.gradle.kts (app):
-- buildFeatures { compose = true }
-- composeOptions { kotlinCompilerExtensionVersion = "1.5.10" }
-
-Dependencies (via BOM):
-- composeBom = "2024.02.00"
-- composeUi, composeUiGraphics, composeUiToolingPreview
-- composeMaterial3
-- composeMaterialIconsExtended (for IAM type icons)
-- composeRuntime, composeRuntimeLivedata
-- activityCompose
-- lifecycleViewModelCompose, lifecycleRuntimeCompose
-```
-
-### Prompt 8.2 - Reusable Components
+### Prompt 8.1 - State Management with Provider
 
 ```
-Create reusable Compose components in ui/components/:
+Use Provider for dependency injection and ChangeNotifier for state management.
 
-SectionCard.kt:
-- Card with title text and optional info icon
-- Column content slot
-- OnInfoClick callback for tooltips
+main.dart:
+- ChangeNotifierProvider<AppViewModel> at the root of the widget tree
+- Initialize OneSignal SDK before runApp()
+- Fetch tooltips in the background (non-blocking)
 
-ToggleRow.kt:
+AppViewModel extends ChangeNotifier:
+- Holds all UI state as private fields with public getters
+- Exposes action methods that update state and call notifyListeners()
+- Receives OneSignalRepository via constructor injection
+- Receives PreferencesService via constructor injection
+```
+
+### Prompt 8.2 - Reusable Widgets
+
+```
+Create reusable widgets in lib/widgets/:
+
+section_card.dart:
+- Card with title Text and optional info IconButton
+- Column child slot
+- onInfoTap callback for tooltips
+- Consistent padding and styling
+
+toggle_row.dart:
 - Label, optional description, Switch
-- Horizontal layout with space between
+- Row layout with MainAxisAlignment.spaceBetween
 
-ActionButton.kt:
+action_button.dart:
 - PrimaryButton (filled, primary color background)
 - DestructiveButton (outlined, red accent)
-- Full-width buttons for consistent styling
+- Full-width buttons with SizedBox(width: double.infinity)
 
-ListComponents.kt:
-- PairItem (key-value with delete icon)
-- SingleItem (single value with delete icon)
-- EmptyState (centered "No items" text)
-- CollapsibleSingleList (shows 5, expandable)
-- PairList (simple list of pairs)
+list_widgets.dart:
+- PairItem (key-value with optional delete IconButton)
+- SingleItem (single value with delete IconButton)
+- EmptyState (centered "No items" Text)
+- CollapsibleList (shows 5 items, expandable)
+- PairList (simple list of key-value pairs)
 
-LoadingOverlay.kt:
-- Semi-transparent full-screen overlay
+loading_overlay.dart:
+- Semi-transparent full-screen overlay using Stack + Container
 - Centered CircularProgressIndicator
-- Shown via isLoading state
+- Shown via isLoading state from AppViewModel
 
-Dialogs.kt:
-- SingleInputDialog (one text field)
-- PairInputDialog (key-value fields, single pair)
+dialogs.dart:
+- SingleInputDialog (one TextField)
+- PairInputDialog (key-value TextFields, single pair)
 - MultiPairInputDialog (dynamic rows, add/remove, batch submit)
-- MultiSelectRemoveDialog (checkboxes for batch remove)
+- MultiSelectRemoveDialog (CheckboxListTile for batch remove)
 - LoginDialog, OutcomeDialog, TrackEventDialog
 - CustomNotificationDialog, TooltipDialog
 ```
 
-### Prompt 8.3 - Reusable Multi-Pair Dialog (Compose)
+### Prompt 8.3 - Reusable Multi-Pair Dialog
 
 ```
-Tags, Aliases, and Triggers all share a reusable MultiPairInputDialog composable
+Tags, Aliases, and Triggers all share a reusable MultiPairInputDialog widget
 for adding multiple key-value pairs at once.
 
 Behavior:
 - Dialog opens with one empty key-value row
-- "Add Row" button below the rows adds another empty row
-- Each row has a remove button (hidden when only one row exists)
-- "Add All" button is disabled until ALL key and value fields in every row are filled
+- "Add Row" TextButton below the rows adds another empty row
+- Each row has a remove IconButton (hidden when only one row exists)
+- "Add All" button is disabled until ALL key and value TextEditingControllers in every row are filled
 - Validation runs on every text change and after row add/remove
 - On "Add All" press, all rows are collected and submitted as a batch
 - Batch operations use SDK bulk APIs (addAliases, addTags, addTriggers)
+- TextEditingControllers are properly disposed in the StatefulWidget
 
 Used by:
 - ADD MULTIPLE button (Aliases section) -> calls viewModel.addAliases(pairs)
@@ -703,18 +755,18 @@ Used by:
 - ADD MULTIPLE button (Triggers section) -> calls viewModel.addTriggers(pairs)
 ```
 
-### Prompt 8.4 - Reusable Remove Multi Dialog (Compose)
+### Prompt 8.4 - Reusable Remove Multi Dialog
 
 ```
-Aliases, Tags, and Triggers share a reusable MultiSelectRemoveDialog composable
+Tags and Triggers share a reusable MultiSelectRemoveDialog widget
 for selectively removing items from the current list.
 
 Behavior:
-- Accepts the current list of items as List<Pair<String, String>>
-- Renders one Checkbox per item with label "key: value"
+- Accepts the current list of items as List<MapEntry<String, String>>
+- Renders one CheckboxListTile per item with label "key: value"
 - User can check 0, 1, or more items
 - "Remove (N)" button shows count of selected items, disabled when none selected
-- On confirm, checked items' keys are collected as Collection<String> and passed to the callback
+- On confirm, checked items' keys are collected as List<String> and passed to the callback
 
 Used by:
 - REMOVE SELECTED button (Tags section) -> calls viewModel.removeSelectedTags(keys)
@@ -724,23 +776,24 @@ Used by:
 ### Prompt 8.5 - Theme
 
 ```
-Create OneSignal theme in ui/theme/Theme.kt:
+Create OneSignal theme in lib/theme.dart:
 
 Colors:
-- OneSignalRed = #E54B4D (primary)
-- OneSignalGreen = #34A853 (success)
-- OneSignalGreenLight = #E6F4EA (success background)
-- LightBackground = #F8F9FA
-- CardBackground = White
-- DividerColor = #E8EAED
-- WarningBackground = #FFF8E1
+- oneSignalRed = Color(0xFFE54B4D) (primary)
+- oneSignalGreen = Color(0xFF34A853) (success)
+- oneSignalGreenLight = Color(0xFFE6F4EA) (success background)
+- lightBackground = Color(0xFFF8F9FA)
+- cardBackground = Colors.white
+- dividerColor = Color(0xFFE8EAED)
+- warningBackground = Color(0xFFFFF8E1)
 
-OneSignalTheme composable:
-- MaterialTheme with LightColorScheme
-- Custom Typography with SemiBold weights
-- Custom Shapes with rounded corners (8/12/16/24dp)
-- Primary = OneSignalRed
-- Surface variants for cards
+AppTheme class with static ThemeData get light:
+- useMaterial3: true
+- ColorScheme.fromSeed with OneSignalRed as seed
+- Override primary to oneSignalRed
+- Custom CardTheme with rounded corners (12dp)
+- Custom ElevatedButtonTheme with rounded corners (8dp)
+- Custom InputDecorationTheme with OutlineInputBorder
 ```
 
 ### Prompt 8.6 - Log View (Appium-Ready)
@@ -749,55 +802,44 @@ OneSignalTheme composable:
 Add collapsible log view at top of screen for debugging and Appium testing.
 
 Files:
-- util/LogManager.kt - Thread-safe pass-through logger
-- ui/components/LogView.kt - Compose UI with test tags
+- lib/services/log_manager.dart - Singleton logger
+- lib/widgets/log_view.dart - Log viewer widget with Semantics labels
 
 LogManager Features:
-- Pass-through to Android logcat AND UI display
-- Thread-safe (posts to main thread for Compose state)
-- Captures SDK logs via OneSignal.Debug.addLogListener
-- API: LogManager.d/i/w/e(tag, message) mimics android.util.Log
+- Singleton with ChangeNotifier for reactive UI updates
+- Thread-safe (all updates on main isolate via Flutter's single-thread model)
+- API: LogManager().d(tag, message), .i(), .w(), .e() mimics debugPrint levels
+- Also prints to console via debugPrint for development
 
 LogView Features:
 - Collapsible header (default expanded)
-- 5-line height (~100dp)
+- Fixed 100dp height with ListView.builder
 - Color-coded by level (Debug=blue, Info=green, Warn=amber, Error=red)
 - Clear button
-- Auto-scroll to newest
+- Auto-scroll to newest using ScrollController
 
-Appium Test Tags:
-| Tag | Description |
-|-----|-------------|
+Appium Semantic Labels:
+| Label | Description |
+|-------|-------------|
 | log_view_container | Main container |
-| log_view_header | Clickable expand/collapse |
+| log_view_header | Tappable expand/collapse |
 | log_view_count | Shows "(N)" log count |
 | log_view_clear_button | Clear all logs |
-| log_view_list | Scrollable LazyColumn |
+| log_view_list | Scrollable ListView |
 | log_view_empty | "No logs yet" state |
 | log_entry_N | Each log row (N=index) |
 | log_entry_N_timestamp | Timestamp text |
 | log_entry_N_level | D/I/W/E indicator |
 | log_entry_N_message | Log message content |
 
-SDK Log Integration (MainApplication):
-OneSignal.Debug.addLogListener { event ->
-    LogManager.log("SDK", event.entry, level)
-}
-
-Appium Example:
-# Verify a log message exists
-log_msg = driver.find_element(By.XPATH, "//*[@resource-id='log_entry_0_message']")
-assert "Notification sent" in log_msg.text
-
-# Scroll logs
-log_list = driver.find_element(By.XPATH, "//*[@resource-id='log_view_list']")
-driver.execute_script("mobile: scroll", {"element": log_list, "direction": "down"})
+Use Semantics widget with label property for Appium accessibility:
+Semantics(label: 'log_entry_${index}_message', child: Text(entry.message))
 ```
 
-### Prompt 8.7 - Toast Messages
+### Prompt 8.7 - SnackBar Messages
 
 ```
-All user actions should display toast messages:
+All user actions should display SnackBar messages:
 
 - Login: "Logged in as: {userId}"
 - Logout: "Logged out"
@@ -812,10 +854,10 @@ All user actions should display toast messages:
 - Push: "Push enabled/disabled"
 
 Implementation:
-- MainViewModel has toastMessage: LiveData<String?>
-- MainActivity observes and shows Android Toast
-- LaunchedEffect triggers on toastMessage change
-- All toast messages are also logged via LogManager.info()
+- AppViewModel exposes a snackBarMessage stream or ValueNotifier<String?>
+- HomeScreen listens and shows ScaffoldMessenger.of(context).showSnackBar()
+- All SnackBar messages are also logged via LogManager().i()
+- Clear previous SnackBar before showing new one via ScaffoldMessenger.of(context).clearSnackBars()
 ```
 
 ---
@@ -823,90 +865,109 @@ Implementation:
 ## Key Files Structure
 
 ```
-Examples/OneSignalDemoV2/
-├── buildSrc/
-│   └── src/main/kotlin/
-│       ├── Versions.kt          # Version constants (includes Compose versions)
-│       └── Dependencies.kt      # Dependency strings (includes Compose deps)
-├── app/
-│   ├── src/main/
-│   │   ├── java/com/onesignal/sdktest/
-│   │   │   ├── application/
-│   │   │   │   └── MainApplication.kt   # SDK init, log listener, observers
-│   │   │   ├── data/
-│   │   │   │   ├── model/
-│   │   │   │   │   ├── NotificationType.kt    # With bigPicture URL
-│   │   │   │   │   └── InAppMessageType.kt    # With Material icons
-│   │   │   │   ├── network/
-│   │   │   │   │   └── OneSignalService.kt    # REST API client
-│   │   │   │   └── repository/
-│   │   │   │       └── OneSignalRepository.kt
-│   │   │   ├── ui/
-│   │   │   │   ├── components/                # Reusable Compose components
-│   │   │   │   │   ├── SectionCard.kt         # Card with title and info icon
-│   │   │   │   │   ├── ToggleRow.kt           # Label + Switch
-│   │   │   │   │   ├── ActionButton.kt        # Primary/Destructive buttons
-│   │   │   │   │   ├── ListComponents.kt      # PairList, SingleList, EmptyState
-│   │   │   │   │   ├── LoadingOverlay.kt      # Full-screen loading spinner
-│   │   │   │   │   ├── LogView.kt             # Collapsible log viewer (Appium-ready)
-│   │   │   │   │   └── Dialogs.kt             # All dialog composables
-│   │   │   │   ├── main/
-│   │   │   │   │   ├── MainActivity.kt        # ComponentActivity with setContent
-│   │   │   │   │   ├── MainScreen.kt          # Main Compose screen (includes LogView)
-│   │   │   │   │   ├── Sections.kt            # Individual section composables
-│   │   │   │   │   └── MainViewModel.kt       # With batch operations
-│   │   │   │   ├── secondary/
-│   │   │   │   │   └── SecondaryActivity.kt   # Simple Compose screen
-│   │   │   │   └── theme/
-│   │   │   │       └── Theme.kt               # OneSignal Material3 theme
-│   │   │   └── util/
-│   │   │       ├── SharedPreferenceUtil.kt
-│   │   │       ├── LogManager.kt              # Thread-safe pass-through logger
-│   │   │       └── TooltipHelper.kt           # Fetches tooltips from remote URL
-│   │   └── res/
-│   │       └── values/
-│   │           ├── strings.xml
-│   │           ├── colors.xml
-│   │           └── styles.xml
-│   └── src/huawei/
-│       └── java/com/onesignal/sdktest/notification/
-│           └── HmsMessageServiceAppLevel.kt
-├── google-services.json
-├── agconnect-services.json
-└── build_app_prompt.md (this file)
+examples/onesignal_flutter_demo/
+├── lib/
+│   ├── main.dart                        # App entry, SDK init, Provider setup
+│   ├── theme.dart                       # OneSignal Material 3 theme
+│   ├── models/
+│   │   ├── user_data.dart               # UserData model from API
+│   │   ├── notification_type.dart       # Enum with bigPicture URL
+│   │   └── in_app_message_type.dart     # Enum with Material icons
+│   ├── services/
+│   │   ├── onesignal_api_service.dart   # REST API client (http)
+│   │   ├── preferences_service.dart     # SharedPreferences wrapper
+│   │   ├── tooltip_helper.dart          # Fetches tooltips from remote URL
+│   │   └── log_manager.dart             # Singleton logger with ChangeNotifier
+│   ├── repositories/
+│   │   └── onesignal_repository.dart    # Centralized SDK calls
+│   ├── viewmodels/
+│   │   └── app_viewmodel.dart           # ChangeNotifier with all UI state
+│   ├── screens/
+│   │   ├── home_screen.dart             # Main scrollable screen (includes LogView)
+│   │   └── secondary_screen.dart        # Simple secondary page
+│   └── widgets/
+│       ├── section_card.dart            # Card with title and info icon
+│       ├── toggle_row.dart              # Label + Switch
+│       ├── action_button.dart           # Primary/Destructive buttons
+│       ├── list_widgets.dart            # PairList, SingleList, EmptyState
+│       ├── loading_overlay.dart         # Full-screen loading spinner
+│       ├── log_view.dart                # Collapsible log viewer (Appium-ready)
+│       ├── dialogs.dart                 # All dialog widgets
+│       └── sections/
+│           ├── app_section.dart         # App ID, consent, login/logout
+│           ├── push_section.dart        # Push subscription controls
+│           ├── send_push_section.dart   # Send notification buttons
+│           ├── in_app_section.dart      # IAM pause toggle
+│           ├── send_iam_section.dart    # Send IAM buttons with icons
+│           ├── aliases_section.dart     # Alias management
+│           ├── emails_section.dart      # Email management
+│           ├── sms_section.dart         # SMS management
+│           ├── tags_section.dart        # Tag management
+│           ├── outcomes_section.dart    # Outcome events
+│           ├── triggers_section.dart    # Trigger management (in-memory)
+│           ├── track_event_section.dart # Event tracking with JSON
+│           └── location_section.dart    # Location controls
+├── android/
+│   └── app/
+│       └── src/main/
+│           └── AndroidManifest.xml      # Package: com.onesignal.example
+├── ios/
+│   └── Runner/
+│       └── Info.plist
+├── pubspec.yaml                         # Dependencies
+├── google-services.json                 # Firebase config (Android)
+└── agconnect-services.json              # Huawei config (Android, if needed)
 ```
 
 Note:
-- All UI is Jetpack Compose (no XML layouts)
+- All UI is Flutter widgets (no platform-specific UI)
 - Tooltip content is fetched from remote URL (not bundled locally)
 - LogView at top of screen displays SDK and app logs for debugging/Appium testing
+- Provider is used at the root for dependency injection and state management
 
 ---
 
 ## Configuration
 
-### strings.xml Placeholders
+### App ID Placeholder
 
-```xml
-<!-- Replace with your own OneSignal App ID -->
-<string name="onesignal_app_id">YOUR_APP_ID_HERE</string>
+```dart
+// In main.dart or a constants file
+const String oneSignalAppId = 'YOUR_APP_ID_HERE';
 ```
 
 Note: REST API key is NOT required for the fetchUser endpoint.
 
-### Package Name
+### Package / Bundle Identifier
 
-The package name MUST be `com.onesignal.sdktest` to work with the existing:
+The identifiers MUST be `com.onesignal.example` to work with the existing:
 - `google-services.json` (Firebase configuration)
 - `agconnect-services.json` (Huawei configuration)
 
-If you change the package name, you must also update these files with your own Firebase/Huawei project configuration.
+If you change the identifier, you must also update these files with your own Firebase/Huawei project configuration.
+
+---
+
+## Flutter Best Practices Applied
+
+- **const constructors** on all stateless widgets and immutable data classes
+- **Provider** for dependency injection and reactive state, avoiding global mutable state
+- **Single responsibility** per file: one widget/class per file, sections split into their own files
+- **TextEditingController disposal** in all StatefulWidgets that create controllers
+- **Keys** on list items via ValueKey for efficient rebuilds
+- **Semantics** widgets for accessibility and Appium test automation
+- **async/await** over raw Future chaining for readability
+- **Immutable state** where possible; lists exposed as unmodifiable views from the ViewModel
+- **Material 3** theming with ColorScheme.fromSeed for consistent design tokens
+- **Minimal rebuilds** by using Consumer/Selector from Provider to scope rebuilds
+- **Error handling** with try/catch on all network and SDK async calls
+- **No platform channels needed** since the OneSignal Flutter SDK handles all bridging
 
 ---
 
 ## Summary
 
-This app demonstrates all OneSignal Android SDK features:
+This app demonstrates all OneSignal Flutter SDK features:
 - User management (login/logout, aliases with batch add)
 - Push notifications (subscription, sending with images, auto-permission prompt)
 - Email and SMS subscriptions
@@ -919,12 +980,12 @@ This app demonstrates all OneSignal Android SDK features:
 - Privacy consent management
 
 The app is designed to be:
-1. **Testable** - Empty dialogs for Appium automation
+1. **Testable** - Empty dialogs with Semantics labels for Appium automation
 2. **Comprehensive** - All SDK features demonstrated
-3. **Clean** - MVVM architecture with Jetpack Compose UI
-4. **Cross-platform ready** - Tooltip content in JSON for sharing across wrappers
+3. **Clean** - Repository pattern with Provider-based state management
+4. **Cross-platform** - Single codebase for Android and iOS
 5. **Session-based triggers** - Triggers stored in memory only, cleared on restart
 6. **Responsive UI** - Loading indicator with delay to ensure UI populates before dismissing
-7. **Performant** - Tooltip JSON loaded on background thread
-8. **Modern UI** - Material3 theming with reusable Compose components
+7. **Performant** - Tooltip JSON loaded asynchronously, const widgets, scoped rebuilds
+8. **Modern UI** - Material 3 theming with reusable widget components
 9. **Batch Operations** - Add multiple items at once, select and remove multiple items
