@@ -58,7 +58,9 @@ phase and rely on the written descriptions in the prompts below.
 ### Prompt 1.1 - Project Foundation
 
 ```
-Build a sample Flutter app with:
+Create a new Flutter project at examples/demo/ (relative to the SDK repo root).
+
+Build the app with:
 - Clean architecture: repository pattern with ChangeNotifier-based state management (Provider)
 - Dart 3+ with null safety
 - Material 3 theming with OneSignal brand colors
@@ -68,6 +70,10 @@ Build a sample Flutter app with:
 - All dialogs should have EMPTY input fields (for Appium testing - test framework enters values)
 - Use const constructors wherever possible for performance
 - Separate widget files per section to keep files focused and readable
+
+Reference the OneSignal Flutter SDK from the parent repo using a path dependency:
+  onesignal_flutter:
+    path: ../../
 ```
 
 ### Prompt 1.2 - Dependencies (pubspec.yaml)
