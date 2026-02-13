@@ -26,12 +26,11 @@ Future<void> main() async {
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
   OneSignal.consentRequired(prefs.consentRequired);
   OneSignal.consentGiven(prefs.privacyConsent);
+  await OneSignal.initialize(appId);
 
-  // Restore cached SDK states before initialize so they take effect immediately
+  // Restore cached SDK states after init fully completes
   OneSignal.InAppMessages.paused(prefs.iamPaused);
   OneSignal.Location.setShared(prefs.locationShared);
-
-  OneSignal.initialize(appId);
 
   // Register IAM listeners
   OneSignal.InAppMessages.addWillDisplayListener((event) {
