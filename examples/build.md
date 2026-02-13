@@ -867,10 +867,11 @@ LogManager Features:
 - Also prints to console via debugPrint for development
 
 LogView Features:
+- STICKY at the top of the screen (always visible while scrolling content below)
 - Collapsible header (default expanded)
 - Fixed 100dp height with ListView.builder
 - Color-coded by level (Debug=blue, Info=green, Warn=amber, Error=red)
-- Clear button
+- Trash icon button (Icons.delete) for clearing logs, not a text button
 - Auto-scroll to newest using ScrollController
 
 Appium Semantic Labels:
