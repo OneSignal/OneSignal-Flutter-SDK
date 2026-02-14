@@ -321,7 +321,7 @@ App Section layout:
    - Shows "SWITCH USER" when a user is logged in
    - Opens dialog with empty "External User Id" field
 
-6. LOGOUT USER button
+6. LOGOUT USER button (only visible when a user is logged in)
 ```
 
 ### Prompt 2.2 - Push Section

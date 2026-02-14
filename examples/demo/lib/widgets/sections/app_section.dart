@@ -183,13 +183,15 @@ class AppSection extends StatelessWidget {
               }
             },
           ),
-          const SizedBox(height: 8),
+          if (vm.isLoggedIn) ...[
+            const SizedBox(height: 8),
 
-          // Logout button
-          DestructiveButton(
-            label: 'LOGOUT USER',
-            onPressed: vm.logoutUser,
-          ),
+            // Logout button
+            DestructiveButton(
+              label: 'LOGOUT USER',
+              onPressed: vm.logoutUser,
+            ),
+          ],
         ],
       ),
     );
