@@ -156,7 +156,7 @@ class AppSection extends StatelessWidget {
                         'External ID',
                         style: TextStyle(fontSize: 14),
                       ),
-                      Text(
+                      SelectableText(
                         vm.isLoggedIn
                             ? (vm.externalUserId ?? '')
                             : '–',
