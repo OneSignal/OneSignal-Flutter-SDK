@@ -7,8 +7,8 @@ homepage: https://github.com/OneSignal/OneSignal-Flutter-SDK
 # E.g.`rps test` to run tests
 scripts:
   test: flutter test --coverage && dart run dlcov -c 95 --log=0 --include-untested-files=true
-  format-check: dart format --set-exit-if-changed --output=none . && android/gradlew spotlessCheck
-  format: dart format . && android/gradlew spotlessApply
+  format-check: dart format --set-exit-if-changed --output=none lib test && android/gradlew spotlessCheck
+  format: dart format lib test && android/gradlew spotlessApply
 
 flutter:
   plugin:

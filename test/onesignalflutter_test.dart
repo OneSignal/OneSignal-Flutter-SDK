@@ -16,7 +16,7 @@ void main() {
 
   group('OneSignal', () {
     test('initialize sets appId and calls lifecycle methods', () async {
-      OneSignal.initialize('test-app-id');
+      await OneSignal.initialize('test-app-id');
 
       expect(channelController.state.appId, equals('test-app-id'));
       expect(channelController.state.lifecycleInitCalled, isTrue);
