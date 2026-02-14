@@ -137,7 +137,7 @@ class AppSection extends StatelessWidget {
                     children: [
                       const Text('Status', style: TextStyle(fontSize: 14)),
                       Text(
-                        vm.isLoggedIn ? 'Logged In' : 'Logged Out',
+                        vm.isLoggedIn ? 'Logged In' : 'Anonymous',
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w500,
@@ -148,22 +148,22 @@ class AppSection extends StatelessWidget {
                       ),
                     ],
                   ),
-                  if (vm.isLoggedIn) ...[
-                    const Divider(),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'External ID',
-                          style: TextStyle(fontSize: 14),
-                        ),
-                        Text(
-                          vm.externalUserId ?? '',
-                          style: const TextStyle(fontSize: 14),
-                        ),
-                      ],
-                    ),
-                  ],
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      const Text(
+                        'External ID',
+                        style: TextStyle(fontSize: 14),
+                      ),
+                      Text(
+                        vm.isLoggedIn
+                            ? (vm.externalUserId ?? '')
+                            : '–',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ],
+                  ),
                 ],
               ),
             ),
