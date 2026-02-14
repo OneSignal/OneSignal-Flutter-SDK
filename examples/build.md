@@ -99,8 +99,13 @@ Build the app with:
 - Use const constructors wherever possible for performance
 - Separate widget files per section to keep files focused and readable
 
-If examples/onesignal_logo.svg exists, copy it into the demo project at
-assets/onesignal_logo.svg and use it for the AppBar logo via flutter_svg.
+Download the app bar logo SVG from:
+  https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/assets/onesignal_logo.svg
+Save it to the demo project at assets/onesignal_logo.svg and use it for the AppBar logo via flutter_svg.
+
+Download the app icon PNG from:
+  https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/assets/onesignal_logo_icon.png
+Use it to generate the Android and iOS app icons (e.g. via flutter_launcher_icons or manually).
 
 Reference the OneSignal Flutter SDK from the parent repo using a path dependency:
   onesignal_flutter:
@@ -223,7 +228,8 @@ sendNotification endpoint:
 - POST https://onesignal.com/api/v1/notifications
 - Accept header: "application/vnd.onesignal.v1+json"
 - Uses include_subscription_ids (not include_player_ids)
-- Includes big_picture for image notifications
+- Includes big_picture for Android image notifications
+- Includes ios_attachments for iOS image notifications (needed for the NSE to download and attach images)
 
 fetchUser endpoint:
 - GET https://api.onesignal.com/apps/{app_id}/users/by/onesignal_id/{onesignal_id}
@@ -346,7 +352,8 @@ Send Push Notification Section (placed right after Push Section):
 - Three buttons:
   1. SIMPLE - title: "Simple Notification", body: "This is a simple push notification"
   2. WITH IMAGE - title: "Image Notification", body: "This notification includes an image"
-     (big picture: https://media.onesignal.com/automated_push_templates/ratings_template.png)
+     big_picture (Android): https://media.onesignal.com/automated_push_templates/ratings_template.png
+     ios_attachments (iOS): {"image": "https://media.onesignal.com/automated_push_templates/ratings_template.png"}
   3. CUSTOM - opens dialog for custom title and body
 
 Tooltip should explain each button type.
@@ -982,7 +989,7 @@ examples/demo/
 │   ├── theme.dart                       # OneSignal Material 3 theme
 │   ├── models/
 │   │   ├── user_data.dart               # UserData model from API
-│   │   ├── notification_type.dart       # Enum with bigPicture URL
+│   │   ├── notification_type.dart       # Enum with bigPicture and iosAttachments
 │   │   └── in_app_message_type.dart     # Enum with Material icons
 │   ├── services/
 │   │   ├── onesignal_api_service.dart   # REST API client (http)
