@@ -290,10 +290,15 @@ The `project.pbxproj` needs native target entries for both extensions. These are
 
 ---
 
-## 6. Run pod install
+## 6. Install dependencies
+
+Run `flutter pub get` first (the Podfile reads `Generated.xcconfig` which this creates), then `pod install`:
 
 ```sh
+flutter pub get
 cd ios && pod install
 ```
 
 This generates the Pods workspace, xcconfig files, and CocoaPods build phases (`[CP] Check Pods Manifest.lock`, `[CP] Embed Pods Frameworks`). Open the `.xcworkspace` file (not `.xcodeproj`) going forward.
+
+Note: avoid setting `CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER` in extension build configurations since CocoaPods provides it via xcconfig.
