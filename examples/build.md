@@ -103,9 +103,11 @@ Download the app bar logo SVG from:
   https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/assets/onesignal_logo.svg
 Save it to the demo project at assets/onesignal_logo.svg and use it for the AppBar logo via flutter_svg.
 
-Download the app icon PNG from:
-  https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/assets/onesignal_logo_icon.png
-Use it to generate the Android and iOS app icons (e.g. via flutter_launcher_icons or manually).
+Download the padded app icon PNG from:
+  https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/assets/onesignal_logo_icon_padded.png
+Save it to assets/onesignal_logo_icon_padded.png, generate all platform app icons, then delete the downloaded file:
+  dart run flutter_launcher_icons
+  rm assets/onesignal_logo_icon_padded.png
 
 Reference the OneSignal Flutter SDK from the parent repo using a path dependency:
   onesignal_flutter:
@@ -130,6 +132,15 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/onesignal_logo_icon_padded.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/onesignal_logo_icon_padded.png"
 ```
 
 ### Prompt 1.3 - OneSignal Repository
