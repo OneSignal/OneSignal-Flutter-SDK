@@ -26,6 +26,9 @@ class OneSignalApiService {
       if (type.bigPicture != null) {
         body['big_picture'] = type.bigPicture;
       }
+      if (type.iosAttachments != null) {
+        body['ios_attachments'] = type.iosAttachments;
+      }
 
       final response = await http.post(
         Uri.parse('https://onesignal.com/api/v1/notifications'),
@@ -36,7 +39,10 @@ class OneSignalApiService {
         body: jsonEncode(body),
       );
 
-      LogManager().i('API', 'Send notification response: ${response.statusCode}');
+      LogManager().i(
+        'API',
+        'Send notification response: ${response.statusCode}',
+      );
       return response.statusCode == 200;
     } catch (e) {
       LogManager().e('API', 'Send notification error: $e');
@@ -66,7 +72,10 @@ class OneSignalApiService {
         body: jsonEncode(payload),
       );
 
-      LogManager().i('API', 'Send custom notification response: ${response.statusCode}');
+      LogManager().i(
+        'API',
+        'Send custom notification response: ${response.statusCode}',
+      );
       return response.statusCode == 200;
     } catch (e) {
       LogManager().e('API', 'Send custom notification error: $e');
