@@ -182,6 +182,8 @@ class AppViewModel extends ChangeNotifier {
       _externalUserId = externalUserId;
       await _prefs.setExternalUserId(externalUserId);
 
+      _isLoading = false;
+      notifyListeners();
       _showSnackBar('Logged in as: $externalUserId');
     } catch (e) {
       _isLoading = false;
