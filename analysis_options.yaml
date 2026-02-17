@@ -4,3 +4,4 @@ analyzer:
     - example/**
     - example_pod/**
     - example_spm/**
+    - examples/**
