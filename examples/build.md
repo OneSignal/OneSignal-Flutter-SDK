@@ -408,6 +408,7 @@ Send In-App Message Section (placed right after In-App Messaging):
   - Left-aligned text and icon content (not centered)
   - UPPERCASE button text
 - On tap: adds trigger and shows SnackBar "Sent In-App Message: {type}"
+  - Also upserts `iam_type` in the Triggers list immediately so UI reflects the sent IAM type
 
 Tooltip should explain each IAM type.
 ```
@@ -421,7 +422,7 @@ Aliases Section (placed after Send In-App Message):
 - Each item shows: Label | ID
 - Filter out "external_id" and "onesignal_id" from display (these are special)
 - "No Aliases Added" text when empty
-- ADD button -> PairInputDialog with empty Label and ID fields (single add)
+- ADD button -> PairInputDialog with empty Label and ID fields on the same row (single add)
 - ADD MULTIPLE button -> MultiPairInputDialog (dynamic rows, add/remove)
 - No remove/delete functionality (aliases are add-only from the UI)
 ```
@@ -432,7 +433,7 @@ Aliases Section (placed after Send In-App Message):
 Emails Section:
 - Section title: "Emails" with info icon for tooltip
 - List showing email addresses
-- Each item shows email with delete icon
+- Each item shows email with an X icon (remove action)
 - "No Emails Added" text when empty
 - ADD EMAIL button -> dialog with empty email field
 - Collapse behavior when >5 items:
@@ -447,7 +448,7 @@ Emails Section:
 SMS Section:
 - Section title: "SMS" with info icon for tooltip
 - List showing phone numbers
-- Each item shows phone number with delete icon
+- Each item shows phone number with an X icon (remove action)
 - "No SMS Added" text when empty
 - ADD SMS button -> dialog with empty SMS field
 - Collapse behavior when >5 items (same as Emails)
@@ -459,7 +460,7 @@ SMS Section:
 Tags Section:
 - Section title: "Tags" with info icon for tooltip
 - List showing key-value pairs
-- Each item shows: Key | Value with delete icon
+- Each item shows key above value (stacked layout) with an X icon on the right (remove action)
 - "No Tags Added" text when empty
 - ADD button -> PairInputDialog with empty Key and Value fields (single add)
 - ADD MULTIPLE button -> MultiPairInputDialog (dynamic rows)
@@ -485,7 +486,7 @@ Outcome Events Section:
 Triggers Section:
 - Section title: "Triggers" with info icon for tooltip
 - List showing key-value pairs
-- Each item shows: Key | Value with delete icon
+- Each item shows key above value (stacked layout) with an X icon on the right (remove action)
 - "No Triggers Added" text when empty
 - ADD button -> PairInputDialog with empty Key and Value fields (single add)
 - ADD MULTIPLE button -> MultiPairInputDialog (dynamic rows)
@@ -495,6 +496,7 @@ Triggers Section:
 
 IMPORTANT: Triggers are stored IN MEMORY ONLY during the app session.
 - triggersList is a List<MapEntry<String, String>> in AppViewModel
+- Sending an IAM button also updates the same list by setting `iam_type`
 - Triggers are NOT persisted to SharedPreferences
 - Triggers are cleared when the app is killed/restarted
 - This is intentional - triggers are transient test data for IAM testing
@@ -859,7 +861,7 @@ loading_overlay.dart:
 dialogs.dart:
 - All dialogs use insetPadding: EdgeInsets.symmetric(horizontal: 16) and SizedBox(width: double.maxFinite) on content for full-width layout
 - SingleInputDialog (one TextField)
-- PairInputDialog (key-value TextFields, single pair)
+- PairInputDialog (key-value TextFields on the same row, single pair)
 - MultiPairInputDialog (dynamic rows with dividers between them, X icon to delete a row, full-width dialog, batch submit)
 - MultiSelectRemoveDialog (CheckboxListTile for batch remove)
 - LoginDialog, OutcomeDialog, TrackEventDialog

@@ -275,6 +275,10 @@ class AppViewModel extends ChangeNotifier {
 
   void sendInAppMessage(InAppMessageType type) {
     _repository.addTrigger('iam_type', type.triggerValue);
+    _triggersList = List.from(_triggersList)
+      ..removeWhere((e) => e.key == 'iam_type')
+      ..add(MapEntry('iam_type', type.triggerValue));
+    notifyListeners();
     _showSnackBar('Sent In-App Message: ${type.label}');
   }
 
