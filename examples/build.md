@@ -51,6 +51,7 @@ Pay close attention to:
   - List item layout (stacked vs inline key-value)
   - Icon choices (delete, close, info, etc.)
   - Typography, spacing, and colors
+  - Spacing: 12px gap between sections, 8px gap between cards/buttons within a section
 
 You can also interact with the reference app to observe specific flows:
 
@@ -918,6 +919,10 @@ Colors:
 - cardBackground = Colors.white
 - dividerColor = Color(0xFFE8EAED)
 - warningBackground = Color(0xFFFFF8E1)
+
+Spacing constants:
+- cardGap = 8.0    // gap between a card/banner and its action buttons within a section
+- sectionGap = 12.0 // gap between sections (SectionCard wrapper bottom margin)
 
 AppTheme class with static ThemeData get light:
 - useMaterial3: true
