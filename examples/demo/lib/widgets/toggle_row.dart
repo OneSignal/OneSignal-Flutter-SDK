@@ -4,14 +4,14 @@ class ToggleRow extends StatelessWidget {
   final String label;
   final String? description;
   final bool value;
-  final ValueChanged<bool> onChanged;
+  final ValueChanged<bool>? onChanged;
 
   const ToggleRow({
     super.key,
     required this.label,
     this.description,
     required this.value,
-    required this.onChanged,
+    this.onChanged,
   });
 
   @override
