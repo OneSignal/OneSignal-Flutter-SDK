@@ -1,4 +1,4 @@
-example/
+examples/
 build/
 test/
 **/local.properties
