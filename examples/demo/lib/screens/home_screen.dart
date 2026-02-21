@@ -67,6 +67,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
+        centerTitle: true,
         title: Row(
           mainAxisSize: MainAxisSize.min,
           children: [

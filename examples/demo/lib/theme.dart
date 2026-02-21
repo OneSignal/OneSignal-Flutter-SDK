@@ -1,5 +1,13 @@
 import 'package:flutter/material.dart';
 
+class AppSpacing {
+  static const double gap = 8;
+  static const gapBox = SizedBox(height: gap);
+  static const cardPadding = EdgeInsets.symmetric(horizontal: 12, vertical: 12);
+
+  AppSpacing._();
+}
+
 class AppColors {
   static const oneSignalRed = Color(0xFFE54B4D);
   static const oneSignalGreen = Color(0xFF34A853);

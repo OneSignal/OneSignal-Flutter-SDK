@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/notification_type.dart';
+import '../../theme.dart';
 import '../../viewmodels/app_viewmodel.dart';
 import '../action_button.dart';
 import '../dialogs.dart';
@@ -25,12 +26,12 @@ class SendPushSection extends StatelessWidget {
             label: 'SIMPLE',
             onPressed: () => vm.sendNotification(NotificationType.simple),
           ),
-          const SizedBox(height: 8),
+          AppSpacing.gapBox,
           PrimaryButton(
             label: 'WITH IMAGE',
             onPressed: () => vm.sendNotification(NotificationType.withImage),
           ),
-          const SizedBox(height: 8),
+          AppSpacing.gapBox,
           PrimaryButton(
             label: 'CUSTOM',
             onPressed: () async {

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../theme.dart';
 import '../../viewmodels/app_viewmodel.dart';
 import '../action_button.dart';
 import '../dialogs.dart';
@@ -24,7 +25,7 @@ class SmsSection extends StatelessWidget {
           Card(
             margin: EdgeInsets.zero,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              padding: AppSpacing.cardPadding,
               child: CollapsibleList(
                 items: vm.smsNumbersList,
                 emptyText: 'No SMS added',
@@ -32,7 +33,7 @@ class SmsSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          AppSpacing.gapBox,
           PrimaryButton(
             label: 'ADD SMS',
             onPressed: () async {

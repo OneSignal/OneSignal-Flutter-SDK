@@ -28,10 +28,10 @@ class AppSection extends StatelessWidget {
           Card(
             margin: EdgeInsets.zero,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: AppSpacing.cardPadding,
               child: Row(
                 children: [
-                  const Text('App ID', style: TextStyle(fontSize: 14)),
+                  Text('App ID', style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(width: 12),
                   Expanded(
                     child: SelectableText(
@@ -47,7 +47,7 @@ class AppSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          AppSpacing.gapBox,
 
           // Guidance banner
           Container(
@@ -64,7 +64,7 @@ class AppSection extends StatelessWidget {
                   'Add your own App ID, then rebuild to fully test all functionality.',
                   style: TextStyle(fontSize: 13),
                 ),
-                const SizedBox(height: 4),
+                AppSpacing.gapBox,
                 GestureDetector(
                   onTap: () => launchUrl(
                     Uri.parse('https://onesignal.com'),
@@ -82,13 +82,13 @@ class AppSection extends StatelessWidget {
               ],
             ),
           ),
-          const SizedBox(height: 8),
+          AppSpacing.gapBox,
 
           // Consent card
           Card(
             margin: EdgeInsets.zero,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: AppSpacing.cardPadding,
               child: Column(
                 children: [
                   ToggleRow(
@@ -110,11 +110,11 @@ class AppSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: 24),
 
           // USER section header
           Padding(
-            padding: const EdgeInsets.only(bottom: 6),
+            padding: EdgeInsets.only(bottom: AppSpacing.gap),
             child: Text(
               'USER',
               style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -129,7 +129,7 @@ class AppSection extends StatelessWidget {
           Card(
             margin: EdgeInsets.zero,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+              padding: AppSpacing.cardPadding,
               child: Column(
                 children: [
                   Row(
@@ -168,7 +168,7 @@ class AppSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          AppSpacing.gapBox,
 
           // Login / Switch User button
           PrimaryButton(
@@ -184,7 +184,7 @@ class AppSection extends StatelessWidget {
             },
           ),
           if (vm.isLoggedIn) ...[
-            const SizedBox(height: 8),
+            AppSpacing.gapBox,
 
             // Logout button
             DestructiveButton(

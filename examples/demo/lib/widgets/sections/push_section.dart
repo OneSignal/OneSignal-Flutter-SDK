@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../theme.dart';
 import '../../viewmodels/app_viewmodel.dart';
 import '../action_button.dart';
 import '../section_card.dart';
@@ -23,14 +24,14 @@ class PushSection extends StatelessWidget {
           Card(
             margin: EdgeInsets.zero,
             child: Padding(
-              padding: const EdgeInsets.all(16),
+              padding: AppSpacing.cardPadding,
               child: Column(
                 children: [
                   Row(
                     children: [
-                      const Text(
+                      Text(
                         'Push ID',
-                        style: TextStyle(fontSize: 14),
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       const SizedBox(width: 12),
                       Expanded(
@@ -58,7 +59,7 @@ class PushSection extends StatelessWidget {
             ),
           ),
           if (!vm.hasNotificationPermission) ...[
-            const SizedBox(height: 8),
+            AppSpacing.gapBox,
             PrimaryButton(
               label: 'PROMPT PUSH',
               onPressed: vm.promptPush,

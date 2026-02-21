@@ -22,7 +22,7 @@ class ToggleRow extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: Theme.of(context).textTheme.bodyLarge),
+              Text(label, style: Theme.of(context).textTheme.bodyMedium),
               if (description != null)
                 Text(
                   description!,
@@ -33,7 +33,11 @@ class ToggleRow extends StatelessWidget {
             ],
           ),
         ),
-        Switch(value: value, onChanged: onChanged),
+        Switch(
+          value: value,
+          onChanged: onChanged,
+          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+        ),
       ],
     );
   }

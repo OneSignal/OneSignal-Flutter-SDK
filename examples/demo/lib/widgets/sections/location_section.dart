@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../theme.dart';
 import '../../viewmodels/app_viewmodel.dart';
 import '../action_button.dart';
 import '../section_card.dart';
@@ -23,7 +24,7 @@ class LocationSection extends StatelessWidget {
           Card(
             margin: EdgeInsets.zero,
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              padding: AppSpacing.cardPadding,
               child: ToggleRow(
                 label: 'Location Shared',
                 description: 'Share device location with OneSignal',
@@ -32,7 +33,7 @@ class LocationSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 8),
+          AppSpacing.gapBox,
           PrimaryButton(
             label: 'PROMPT LOCATION',
             onPressed: vm.promptLocation,
