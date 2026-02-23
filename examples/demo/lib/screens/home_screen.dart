@@ -99,12 +99,8 @@ class _HomeScreenState extends State<HomeScreen> {
               child: ListView(
                 padding: const EdgeInsets.only(bottom: 24),
                 children: [
-                  AppSection(
-                    onInfoTap: () => _showTooltipDialog(context, 'app'),
-                  ),
-                  UserSection(
-                    onInfoTap: () => _showTooltipDialog(context, 'user'),
-                  ),
+                  const AppSection(),
+                  const UserSection(),
                   PushSection(
                     onInfoTap: () => _showTooltipDialog(context, 'push'),
                   ),

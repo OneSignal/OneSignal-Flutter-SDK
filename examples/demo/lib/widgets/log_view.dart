@@ -29,15 +29,6 @@ class _LogViewState extends State<LogView> {
 
   void _onLogChanged() {
     setState(() {});
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_scrollController.hasClients) {
-        _scrollController.animateTo(
-          _scrollController.position.maxScrollExtent,
-          duration: const Duration(milliseconds: 100),
-          curve: Curves.easeOut,
-        );
-      }
-    });
   }
 
   Color _levelColor(LogLevel level) {
@@ -118,7 +109,7 @@ class _LogViewState extends State<LogView> {
                         _expanded
                             ? Icons.expand_less
                             : Icons.expand_more,
-                        size: 20,
+                        size: 18,
                         color: AppColors.osGrey500,
                       ),
                     ],
@@ -148,7 +139,7 @@ class _LogViewState extends State<LogView> {
                           itemCount: logs.length,
                           padding: const EdgeInsets.symmetric(horizontal: 12),
                           itemBuilder: (context, index) {
-                            final entry = logs[index];
+                            final entry = logs[logs.length - 1 - index];
                             return Semantics(
                               label: 'log_entry_$index',
                               child: Padding(

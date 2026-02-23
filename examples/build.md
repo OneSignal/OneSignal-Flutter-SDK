@@ -952,7 +952,7 @@ LogView Features:
 - Fixed 100dp height
 - Default expanded
 - Trash icon button (Icons.delete) for clearing logs, not a text button
-- Auto-scroll to newest using ScrollController
+- Reverse order: newest logs at top
 
 Appium Semantic Labels:
 | Label | Description |
