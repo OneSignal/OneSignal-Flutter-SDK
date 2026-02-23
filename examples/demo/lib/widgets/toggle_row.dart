@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme.dart';
+
 class ToggleRow extends StatelessWidget {
   final String label;
   final String? description;
@@ -27,7 +29,7 @@ class ToggleRow extends StatelessWidget {
                 Text(
                   description!,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: Colors.grey[600],
+                        color: AppColors.subtleText,
                       ),
                 ),
             ],

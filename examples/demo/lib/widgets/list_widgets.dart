@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../theme.dart';
+
 class PairItem extends StatelessWidget {
   final String keyText;
   final String valueText;
@@ -24,17 +26,15 @@ class PairItem extends StatelessWidget {
               children: [
                 Text(
                   keyText,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w500,
-                    fontSize: 14,
-                  ),
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        fontWeight: FontWeight.w500,
+                      ),
                 ),
                 Text(
                   valueText,
-                  style: TextStyle(
-                    fontSize: 13,
-                    color: Colors.grey[600],
-                  ),
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                        color: AppColors.subtleText,
+                      ),
                 ),
               ],
             ),
@@ -42,7 +42,7 @@ class PairItem extends StatelessWidget {
           if (onDelete != null)
             GestureDetector(
               onTap: onDelete,
-              child: Icon(Icons.close, size: 18, color: Colors.grey[500]),
+              child: Icon(Icons.close, size: 18, color: AppColors.sectionHeaderText),
             ),
         ],
       ),
@@ -66,11 +66,11 @@ class SingleItem extends StatelessWidget {
       padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
       child: Row(
         children: [
-          Expanded(child: Text(text, style: const TextStyle(fontSize: 14))),
+          Expanded(child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
           if (onDelete != null)
             GestureDetector(
               onTap: onDelete,
-              child: Icon(Icons.close, size: 18, color: Colors.grey[500]),
+              child: Icon(Icons.close, size: 18, color: AppColors.sectionHeaderText),
             ),
         ],
       ),
@@ -90,7 +90,9 @@ class EmptyState extends StatelessWidget {
       child: Center(
         child: Text(
           text,
-          style: TextStyle(color: Colors.grey[400], fontSize: 14),
+          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                color: AppColors.subtleText,
+              ),
         ),
       ),
     );

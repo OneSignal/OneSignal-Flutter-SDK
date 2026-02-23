@@ -31,16 +31,15 @@ class UserSection extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text('Status', style: TextStyle(fontSize: 14)),
+                      Text('Status', style: Theme.of(context).textTheme.bodyMedium),
                       Text(
                         vm.isLoggedIn ? 'Logged In' : 'Anonymous',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: vm.isLoggedIn
-                              ? AppColors.oneSignalGreen
-                              : Colors.grey[600],
-                        ),
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              fontWeight: FontWeight.w500,
+                              color: vm.isLoggedIn
+                                  ? AppColors.oneSignalGreen
+                                  : AppColors.subtleText,
+                            ),
                       ),
                     ],
                   ),
@@ -48,13 +47,13 @@ class UserSection extends StatelessWidget {
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      const Text(
+                      Text(
                         'External ID',
-                        style: TextStyle(fontSize: 14),
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       SelectableText(
                         vm.isLoggedIn ? (vm.externalUserId ?? '') : '–',
-                        style: const TextStyle(fontSize: 14),
+                        style: Theme.of(context).textTheme.bodyMedium,
                       ),
                     ],
                   ),

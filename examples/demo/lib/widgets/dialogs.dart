@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 
 import '../services/tooltip_helper.dart';
+import '../theme.dart';
 
 // Single input dialog (login, email, sms)
 class SingleInputDialog extends StatefulWidget {
@@ -702,11 +703,15 @@ class TooltipDialog extends StatelessWidget {
                         children: [
                           Text(
                             option.name,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
+                            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.bold,
+                                ),
                           ),
                           Text(
                             option.description,
-                            style: TextStyle(color: Colors.grey[600]),
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  color: AppColors.subtleText,
+                                ),
                           ),
                         ],
                       ),

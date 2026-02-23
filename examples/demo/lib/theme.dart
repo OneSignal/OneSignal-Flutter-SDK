@@ -11,11 +11,12 @@ class AppSpacing {
 class AppColors {
   static const oneSignalRed = Color(0xFFE54B4D);
   static const oneSignalGreen = Color(0xFF34A853);
-  static const oneSignalGreenLight = Color(0xFFE6F4EA);
   static const lightBackground = Color(0xFFF8F9FA);
   static const cardBackground = Colors.white;
   static const dividerColor = Color(0xFFE8EAED);
   static const warningBackground = Color(0xFFFFF8E1);
+  static const sectionHeaderText = Color(0xFF616161);
+  static const subtleText = Color(0xFF757575);
 
   AppColors._();
 }

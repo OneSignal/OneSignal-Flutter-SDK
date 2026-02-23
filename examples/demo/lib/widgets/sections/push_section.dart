@@ -37,10 +37,9 @@ class PushSection extends StatelessWidget {
                       Expanded(
                         child: SelectableText(
                           vm.pushSubscriptionId ?? 'N/A',
-                          style: const TextStyle(
-                            fontFamily: 'monospace',
-                            fontSize: 12,
-                          ),
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontFamily: 'monospace',
+                              ),
                           textAlign: TextAlign.end,
                         ),
                       ),

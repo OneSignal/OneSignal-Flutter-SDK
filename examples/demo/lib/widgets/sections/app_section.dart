@@ -34,10 +34,9 @@ class AppSection extends StatelessWidget {
                   Expanded(
                     child: SelectableText(
                       vm.appId,
-                      style: const TextStyle(
-                        fontFamily: 'monospace',
-                        fontSize: 12,
-                      ),
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            fontFamily: 'monospace',
+                          ),
                       textAlign: TextAlign.end,
                     ),
                   ),
@@ -48,37 +47,37 @@ class AppSection extends StatelessWidget {
           AppSpacing.gapBox,
 
           // Guidance banner
-          Container(
+          SizedBox(
             width: double.infinity,
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
+            child: Card(
               color: AppColors.warningBackground,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Text(
-                  'Add your own App ID, then rebuild to fully test all functionality.',
-                  style: TextStyle(fontSize: 13),
-                ),
-                AppSpacing.gapBox,
-                GestureDetector(
-                  onTap: () => launchUrl(
-                    Uri.parse('https://onesignal.com'),
-                    mode: LaunchMode.externalApplication,
+              margin: EdgeInsets.zero,
+            child: Padding(
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Add your own App ID, then rebuild to fully test all functionality.',
+                    style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  child: Text(
-                    'Get your keys at onesignal.com',
-                    style: TextStyle(
-                      fontSize: 13,
-                      color: Theme.of(context).colorScheme.primary,
-                      decoration: TextDecoration.underline,
+                  GestureDetector(
+                    onTap: () => launchUrl(
+                      Uri.parse('https://onesignal.com'),
+                      mode: LaunchMode.externalApplication,
+                    ),
+                    child: Text(
+                      'Get your keys at onesignal.com',
+                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                            color: AppColors.oneSignalRed,
+                            fontWeight: FontWeight.w600,
+                          ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
+          ),
           ),
           AppSpacing.gapBox,
 
