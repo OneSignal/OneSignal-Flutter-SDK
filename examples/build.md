@@ -292,22 +292,23 @@ In AppViewModel (ChangeNotifier), register observers:
 
 ### Section Order (top to bottom)
 
-1. **App Section** (App ID, Guidance Banner, Consent Toggle, Logged-in-as display, Login/Logout)
-2. **Push Section** (Push ID, Enabled Toggle, Auto-prompts permission on load)
-3. **Send Push Notification Section** (Simple, With Image, Custom buttons)
-4. **In-App Messaging Section** (Pause toggle)
-5. **Send In-App Message Section** (Top Banner, Bottom Banner, Center Modal, Full Screen - with icons)
-6. **Aliases Section** (Add/Add Multiple, read-only list)
-7. **Emails Section** (Collapsible list >5 items)
-8. **SMS Section** (Collapsible list >5 items)
-9. **Tags Section** (Add/Add Multiple/Remove Selected)
-10. **Outcome Events Section** (Send Outcome dialog with type selection)
-11. **Triggers Section** (Add/Add Multiple/Remove Selected/Clear All - IN MEMORY ONLY)
-12. **Track Event Section** (Track Event with JSON validation)
-13. **Location Section** (Location Shared toggle, Prompt Location button)
-14. **Next Page Button**
+1. **App Section** (App ID, Guidance Banner, Consent Toggle)
+2. **User Section** (Status, External ID, Login/Logout)
+3. **Push Section** (Push ID, Enabled Toggle, Auto-prompts permission on load)
+4. **Send Push Notification Section** (Simple, With Image, Custom buttons)
+5. **In-App Messaging Section** (Pause toggle)
+6. **Send In-App Message Section** (Top Banner, Bottom Banner, Center Modal, Full Screen - with icons)
+7. **Aliases Section** (Add/Add Multiple, read-only list)
+8. **Emails Section** (Collapsible list >5 items)
+9. **SMS Section** (Collapsible list >5 items)
+10. **Tags Section** (Add/Add Multiple/Remove Selected)
+11. **Outcome Events Section** (Send Outcome dialog with type selection)
+12. **Triggers Section** (Add/Add Multiple/Remove Selected/Clear All - IN MEMORY ONLY)
+13. **Track Event Section** (Track Event with JSON validation)
+14. **Location Section** (Location Shared toggle, Prompt Location button)
+15. **Next Page Button**
 
-### Prompt 2.1 - App Section
+### Prompt 2.1a - App Section
 
 ```
 App Section layout:
@@ -330,8 +331,14 @@ App Section layout:
       - Calls OneSignal.consentGiven(value)
       - Separated from the above toggle by a horizontal divider
    - NOT a blocking overlay - user can interact with app regardless of state
+```
 
-4. User status card (always visible, ABOVE the login/logout buttons):
+### Prompt 2.1b - User Section
+
+```
+User Section layout (separate SectionCard titled "User", placed after App Section):
+
+1. User status card (always visible, ABOVE the login/logout buttons):
    - Card with two rows separated by a divider
    - Row 1: "Status" label on the left, value on the right
    - Row 2: "External ID" label on the left, value on the right
@@ -342,12 +349,12 @@ App Section layout:
      - Status shows "Logged In" with green styling (Color(0xFF2E7D32))
      - External ID shows the actual external user ID
 
-5. LOGIN USER button:
+2. LOGIN USER button:
    - Shows "LOGIN USER" when no user is logged in
    - Shows "SWITCH USER" when a user is logged in
    - Opens dialog with empty "External User Id" field
 
-6. LOGOUT USER button (only visible when a user is logged in)
+3. LOGOUT USER button (only visible when a user is logged in)
 ```
 
 ### Prompt 2.2 - Push Section
@@ -1040,7 +1047,8 @@ examples/demo/
 │       ├── log_view.dart                # Collapsible log viewer (Appium-ready)
 │       ├── dialogs.dart                 # All dialog widgets
 │       └── sections/
-│           ├── app_section.dart         # App ID, consent, login/logout
+│           ├── app_section.dart         # App ID, guidance banner, consent
+│           ├── user_section.dart        # User status, login/logout
 │           ├── push_section.dart        # Push subscription controls
 │           ├── send_push_section.dart   # Send notification buttons
 │           ├── in_app_section.dart      # IAM pause toggle

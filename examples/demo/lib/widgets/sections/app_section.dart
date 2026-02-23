@@ -4,8 +4,6 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme.dart';
 import '../../viewmodels/app_viewmodel.dart';
-import '../dialogs.dart';
-import '../action_button.dart';
 import '../section_card.dart';
 import '../toggle_row.dart';
 
@@ -110,88 +108,6 @@ class AppSection extends StatelessWidget {
               ),
             ),
           ),
-          const SizedBox(height: 24),
-
-          // USER section header
-          Padding(
-            padding: EdgeInsets.only(bottom: AppSpacing.gap),
-            child: Text(
-              'USER',
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.grey[700],
-                    letterSpacing: 0.5,
-                  ),
-            ),
-          ),
-
-          // User status card
-          Card(
-            margin: EdgeInsets.zero,
-            child: Padding(
-              padding: AppSpacing.cardPadding,
-              child: Column(
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text('Status', style: TextStyle(fontSize: 14)),
-                      Text(
-                        vm.isLoggedIn ? 'Logged In' : 'Anonymous',
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
-                          color: vm.isLoggedIn
-                              ? AppColors.oneSignalGreen
-                              : Colors.grey[600],
-                        ),
-                      ),
-                    ],
-                  ),
-                  const Divider(),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      const Text(
-                        'External ID',
-                        style: TextStyle(fontSize: 14),
-                      ),
-                      SelectableText(
-                        vm.isLoggedIn
-                            ? (vm.externalUserId ?? '')
-                            : '–',
-                        style: const TextStyle(fontSize: 14),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-          ),
-          AppSpacing.gapBox,
-
-          // Login / Switch User button
-          PrimaryButton(
-            label: vm.isLoggedIn ? 'SWITCH USER' : 'LOGIN USER',
-            onPressed: () async {
-              final result = await showDialog<String>(
-                context: context,
-                builder: (_) => const LoginDialog(),
-              );
-              if (result != null && context.mounted) {
-                vm.loginUser(result);
-              }
-            },
-          ),
-          if (vm.isLoggedIn) ...[
-            AppSpacing.gapBox,
-
-            // Logout button
-            DestructiveButton(
-              label: 'LOGOUT USER',
-              onPressed: vm.logoutUser,
-            ),
-          ],
         ],
       ),
     );

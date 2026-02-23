@@ -10,6 +10,7 @@ import '../widgets/loading_overlay.dart';
 import '../widgets/log_view.dart';
 import '../widgets/sections/aliases_section.dart';
 import '../widgets/sections/app_section.dart';
+import '../widgets/sections/user_section.dart';
 import '../widgets/sections/emails_section.dart';
 import '../widgets/sections/in_app_section.dart';
 import '../widgets/sections/location_section.dart';
@@ -101,6 +102,9 @@ class _HomeScreenState extends State<HomeScreen> {
                 children: [
                   AppSection(
                     onInfoTap: () => _showTooltipDialog(context, 'app'),
+                  ),
+                  UserSection(
+                    onInfoTap: () => _showTooltipDialog(context, 'user'),
                   ),
                   PushSection(
                     onInfoTap: () => _showTooltipDialog(context, 'push'),
