@@ -51,7 +51,6 @@ Pay close attention to:
   - List item layout (stacked vs inline key-value)
   - Icon choices (delete, close, info, etc.)
   - Typography, spacing, and colors
-  - Spacing: 12px gap between sections, 8px gap between cards/buttons within a section
 
 You can also interact with the reference app to observe specific flows:
 
@@ -318,7 +317,7 @@ App Section layout:
 2. Sticky guidance banner below App ID:
    - Text: "Add your own App ID, then rebuild to fully test all functionality."
    - Link text: "Get your keys at onesignal.com" (clickable, opens browser via url_launcher)
-   - Light background color to stand out
+   - Warning banner styling per styles.md
 
 3. Consent card with up to two toggles:
    a. "Consent Required" toggle (always visible):
@@ -346,7 +345,7 @@ User Section layout (separate SectionCard titled "User", placed after App Sectio
      - Status shows "Anonymous"
      - External ID shows "–" (dash)
    - When logged in:
-     - Status shows "Logged In" with green styling (Color(0xFF2E7D32))
+     - Status shows "Logged In" with green styling
      - External ID shows the actual external user ID
 
 2. LOGIN USER button:
@@ -407,13 +406,8 @@ Send In-App Message Section (placed right after In-App Messaging):
   2. BOTTOM BANNER - Icons.vertical_align_bottom, trigger: "iam_type" = "bottom_banner"
   3. CENTER MODAL - Icons.crop_square, trigger: "iam_type" = "center_modal"
   4. FULL SCREEN - Icons.fullscreen, trigger: "iam_type" = "full_screen"
-- Button styling:
-  - RED background color (Color(0xFFE9444E))
-  - WHITE text
-  - Type-specific icon on LEFT side only (no right side icon)
-  - Full width of the card
-  - Left-aligned text and icon content (not centered)
-  - UPPERCASE button text
+- Button styling: primary (red) background, white text, type-specific icon on
+  LEFT side only, full width, left-aligned content, UPPERCASE text
 - On tap: adds trigger and shows SnackBar "Sent In-App Message: {type}"
   - Also upserts `iam_type` in the Triggers list immediately so UI reflects the sent IAM type
 
@@ -849,9 +843,9 @@ toggle_row.dart:
 - Row layout with MainAxisAlignment.spaceBetween
 
 action_button.dart:
-- PrimaryButton (filled, primary color background)
-- DestructiveButton (outlined, red accent)
+- PrimaryButton (filled) and DestructiveButton (outlined)
 - Full-width buttons with SizedBox(width: double.infinity)
+- Styling per styles.md
 
 list_widgets.dart:
 - PairItem (key-value with optional delete IconButton)
@@ -861,8 +855,7 @@ list_widgets.dart:
 - PairList (simple list of key-value pairs)
 
 loading_overlay.dart:
-- Semi-transparent full-screen overlay using Stack + Container
-- Centered CircularProgressIndicator
+- Full-screen overlay with centered CircularProgressIndicator (styling per styles.md)
 - Shown via isLoading state from AppViewModel
 
 dialogs.dart:
@@ -920,28 +913,18 @@ Used by:
 ### Prompt 8.5 - Theme
 
 ```
-Create OneSignal theme in lib/theme.dart:
+Create OneSignal theme in lib/theme.dart.
 
-Colors:
-- oneSignalRed = Color(0xFFE54B4D) (primary)
-- oneSignalGreen = Color(0xFF34A853) (success)
-- oneSignalGreenLight = Color(0xFFE6F4EA) (success background)
-- lightBackground = Color(0xFFF8F9FA)
-- cardBackground = Colors.white
-- dividerColor = Color(0xFFE8EAED)
-- warningBackground = Color(0xFFFFF8E1)
+All colors, spacing, typography, button styles, card styles, and component
+specs are defined in the shared style reference:
+  https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/demo/styles.md
 
-Spacing constants:
-- cardGap = 8.0    // gap between a card/banner and its action buttons within a section
-- sectionGap = 12.0 // gap between sections (SectionCard wrapper bottom margin)
+Implement an AppTheme class with a static ThemeData getter that maps the
+style reference values to Material 3 theming (ColorScheme.fromSeed,
+CardTheme, ElevatedButtonTheme, InputDecorationTheme, etc.).
 
-AppTheme class with static ThemeData get light:
-- useMaterial3: true
-- ColorScheme.fromSeed with OneSignalRed as seed
-- Override primary to oneSignalRed
-- Custom CardTheme with rounded corners (12dp)
-- Custom ElevatedButtonTheme with rounded corners (8dp)
-- Custom InputDecorationTheme with OutlineInputBorder
+Also define AppColors and AppSpacing convenience classes that expose the
+tokens from styles.md as typed constants for use throughout the app.
 ```
 
 ### Prompt 8.6 - Log View (Appium-Ready)
