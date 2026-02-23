@@ -31,7 +31,7 @@ class SectionCard extends StatelessWidget {
                     title.toUpperCase(),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
                           fontWeight: FontWeight.bold,
-                          color: AppColors.sectionHeaderText,
+                          color: AppColors.osGrey700,
                           letterSpacing: 0.5,
                         ),
                   ),
@@ -42,7 +42,7 @@ class SectionCard extends StatelessWidget {
                     child: Icon(
                       Icons.info_outline,
                       size: 18,
-                      color: AppColors.sectionHeaderText,
+                      color: AppColors.osGrey500,
                     ),
                   ),
               ],

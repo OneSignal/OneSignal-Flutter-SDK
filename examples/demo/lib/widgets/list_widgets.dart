@@ -33,7 +33,7 @@ class PairItem extends StatelessWidget {
                 Text(
                   valueText,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.subtleText,
+                        color: AppColors.osGrey600,
                       ),
                 ),
               ],
@@ -42,7 +42,7 @@ class PairItem extends StatelessWidget {
           if (onDelete != null)
             GestureDetector(
               onTap: onDelete,
-              child: Icon(Icons.close, size: 18, color: AppColors.sectionHeaderText),
+              child: Icon(Icons.close, size: 18, color: AppColors.osPrimary),
             ),
         ],
       ),
@@ -70,7 +70,7 @@ class SingleItem extends StatelessWidget {
           if (onDelete != null)
             GestureDetector(
               onTap: onDelete,
-              child: Icon(Icons.close, size: 18, color: AppColors.sectionHeaderText),
+              child: Icon(Icons.close, size: 18, color: AppColors.osPrimary),
             ),
         ],
       ),
@@ -91,7 +91,7 @@ class EmptyState extends StatelessWidget {
         child: Text(
           text,
           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: AppColors.subtleText,
+                color: AppColors.osGrey600,
               ),
         ),
       ),

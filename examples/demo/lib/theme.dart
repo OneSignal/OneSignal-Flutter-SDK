@@ -9,15 +9,22 @@ class AppSpacing {
 }
 
 class AppColors {
-  static const oneSignalRed = Color(0xFFE54B4D);
-  static const oneSignalGreen = Color(0xFF34A853);
-  static const lightBackground = Color(0xFFF8F9FA);
-  static const cardBackground = Colors.white;
-  static const dividerColor = Color(0xFFE8EAED);
-  static const warningBackground = Color(0xFFFFF8E1);
-  static const sectionHeaderText = Color(0xFF616161);
-  static const subtleText = Color(0xFF757575);
-
+  static const osPrimary = Color(0xFFE54B4D);
+  static const osSuccess = Color(0xFF34A853);
+  static const osGrey700 = Color(0xFF616161);
+  static const osGrey600 = Color(0xFF757575);
+  static const osGrey500 = Color(0xFF9E9E9E);
+  static const osLightBackground = Color(0xFFF8F9FA);
+  static const osCardBackground = Colors.white;
+  static const osDivider = Color(0xFFE8EAED);
+  static const osWarningBackground = Color(0xFFFFF8E1);
+  static const osOverlayScrim = Color(0x42000000);
+  static const osLogBackground = Color(0xFF1A1B1E);
+  static const osLogDebug = Color(0xFF82AAFF);
+  static const osLogInfo = Color(0xFFC3E88D);
+  static const osLogWarn = Color(0xFFFFCB6B);
+  static const osLogError = Color(0xFFFF5370);
+  static const osLogTimestamp = Color(0xFF676E7B);
   AppColors._();
 }
 
@@ -26,16 +33,16 @@ class AppTheme {
     return ThemeData(
       useMaterial3: true,
       colorScheme: ColorScheme.fromSeed(
-        seedColor: AppColors.oneSignalRed,
-      ).copyWith(primary: AppColors.oneSignalRed),
-      scaffoldBackgroundColor: AppColors.lightBackground,
+        seedColor: AppColors.osPrimary,
+      ).copyWith(primary: AppColors.osPrimary),
+      scaffoldBackgroundColor: AppColors.osLightBackground,
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.oneSignalRed,
+        backgroundColor: AppColors.osPrimary,
         foregroundColor: Colors.white,
         elevation: 0,
       ),
       cardTheme: CardThemeData(
-        color: AppColors.cardBackground,
+        color: AppColors.osCardBackground,
         elevation: 1,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),

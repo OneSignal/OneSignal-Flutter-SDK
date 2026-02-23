@@ -50,7 +50,7 @@ class AppSection extends StatelessWidget {
           SizedBox(
             width: double.infinity,
             child: Card(
-              color: AppColors.warningBackground,
+              color: AppColors.osWarningBackground,
               margin: EdgeInsets.zero,
             child: Padding(
               padding: const EdgeInsets.all(12),
@@ -69,7 +69,7 @@ class AppSection extends StatelessWidget {
                     child: Text(
                       'Get your keys at onesignal.com',
                       style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: AppColors.oneSignalRed,
+                            color: AppColors.osPrimary,
                             fontWeight: FontWeight.w600,
                           ),
                     ),

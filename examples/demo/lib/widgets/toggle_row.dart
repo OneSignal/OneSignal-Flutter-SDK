@@ -29,7 +29,7 @@ class ToggleRow extends StatelessWidget {
                 Text(
                   description!,
                   style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.subtleText,
+                        color: AppColors.osGrey600,
                       ),
                 ),
             ],

@@ -159,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.oneSignalRed,
+                        backgroundColor: AppColors.osPrimary,
                         foregroundColor: Colors.white,
                       ),
                       child: const Text('NEXT ACTIVITY'),

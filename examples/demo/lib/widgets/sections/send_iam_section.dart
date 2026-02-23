@@ -26,7 +26,7 @@ class SendIamSection extends StatelessWidget {
             child: ElevatedButton(
               onPressed: () => vm.sendInAppMessage(type),
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.oneSignalRed,
+                backgroundColor: AppColors.osPrimary,
                 foregroundColor: Colors.white,
                 minimumSize: const Size(double.infinity, 48),
                 shape: RoundedRectangleBorder(

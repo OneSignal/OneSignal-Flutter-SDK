@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../services/log_manager.dart';
+import '../theme.dart';
 
 class LogView extends StatefulWidget {
   const LogView({super.key});
@@ -42,21 +43,25 @@ class _LogViewState extends State<LogView> {
   Color _levelColor(LogLevel level) {
     switch (level) {
       case LogLevel.debug:
-        return Colors.blue;
+        return AppColors.osLogDebug;
       case LogLevel.info:
-        return Colors.green;
+        return AppColors.osLogInfo;
       case LogLevel.warn:
-        return Colors.amber;
+        return AppColors.osLogWarn;
       case LogLevel.error:
-        return Colors.red;
+        return AppColors.osLogError;
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final logs = LogManager().logs;
+    final textTheme = Theme.of(context).textTheme;
+    final logEntryStyle = textTheme.labelSmall?.copyWith(
+      fontFamily: 'monospace',
+    );
 
-    const logBackground = Color(0xFF1A1B1E);
+    const logBackground = AppColors.osLogBackground;
 
     return Semantics(
       label: 'log_view_container',
@@ -78,9 +83,9 @@ class _LogViewState extends State<LogView> {
                   ),
                   child: Row(
                     children: [
-                      const Text(
+                      Text(
                         'LOGS',
-                        style: TextStyle(
+                        style: textTheme.labelSmall?.copyWith(
                           fontWeight: FontWeight.bold,
                           color: Colors.white,
                         ),
@@ -90,7 +95,9 @@ class _LogViewState extends State<LogView> {
                         label: 'log_view_count',
                         child: Text(
                           '(${logs.length})',
-                          style: TextStyle(color: Colors.grey[400]),
+                          style: textTheme.labelSmall?.copyWith(
+                            color: AppColors.osGrey500,
+                          ),
                         ),
                       ),
                       const Spacer(),
@@ -99,10 +106,10 @@ class _LogViewState extends State<LogView> {
                           label: 'log_view_clear_button',
                           child: GestureDetector(
                             onTap: () => LogManager().clear(),
-                            child: Icon(
+                            child: const Icon(
                               Icons.delete,
                               size: 18,
-                              color: Colors.grey[400],
+                              color: AppColors.osGrey500,
                             ),
                           ),
                         ),
@@ -112,7 +119,7 @@ class _LogViewState extends State<LogView> {
                             ? Icons.expand_less
                             : Icons.expand_more,
                         size: 20,
-                        color: Colors.grey[400],
+                        color: AppColors.osGrey500,
                       ),
                     ],
                   ),
@@ -130,7 +137,9 @@ class _LogViewState extends State<LogView> {
                           child: Center(
                             child: Text(
                               'No logs yet',
-                              style: TextStyle(color: Colors.grey[500]),
+                              style: textTheme.bodyMedium?.copyWith(
+                                color: AppColors.osGrey500,
+                              ),
                             ),
                           ),
                         )
@@ -153,10 +162,8 @@ class _LogViewState extends State<LogView> {
                                       label: 'log_entry_${index}_timestamp',
                                       child: Text(
                                         entry.formattedTime,
-                                        style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey[500],
-                                          fontFamily: 'monospace',
+                                        style: logEntryStyle?.copyWith(
+                                          color: AppColors.osLogTimestamp,
                                         ),
                                       ),
                                     ),
@@ -165,11 +172,9 @@ class _LogViewState extends State<LogView> {
                                       label: 'log_entry_${index}_level',
                                       child: Text(
                                         entry.levelLabel,
-                                        style: TextStyle(
-                                          fontSize: 11,
+                                        style: logEntryStyle?.copyWith(
                                           fontWeight: FontWeight.bold,
                                           color: _levelColor(entry.level),
-                                          fontFamily: 'monospace',
                                         ),
                                       ),
                                     ),
@@ -179,10 +184,8 @@ class _LogViewState extends State<LogView> {
                                         label: 'log_entry_${index}_message',
                                         child: Text(
                                           '${entry.tag}: ${entry.message}',
-                                          style: const TextStyle(
-                                            fontSize: 11,
-                                            fontFamily: 'monospace',
-                                            color: Colors.white70,
+                                          style: logEntryStyle?.copyWith(
+                                            color: Colors.white,
                                           ),
                                         ),
                                       ),

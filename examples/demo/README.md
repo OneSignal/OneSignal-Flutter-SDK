@@ -26,7 +26,13 @@ cd ios && pod install && cd ..
 flutter run
 ```
 
-If multiple devices are connected, select one when prompted or specify it:
+For Android with multiple emulators, use the helper script to pick by AVD name:
+
+```bash
+../run-android.sh
+```
+
+Or specify a device directly:
 
 ```bash
 flutter run -d <device_id>

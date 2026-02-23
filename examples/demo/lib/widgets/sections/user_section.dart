@@ -37,8 +37,8 @@ class UserSection extends StatelessWidget {
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               fontWeight: FontWeight.w500,
                               color: vm.isLoggedIn
-                                  ? AppColors.oneSignalGreen
-                                  : AppColors.subtleText,
+                                  ? AppColors.osSuccess
+                                  : AppColors.osGrey600,
                             ),
                       ),
                     ],

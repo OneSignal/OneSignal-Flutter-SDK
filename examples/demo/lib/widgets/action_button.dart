@@ -21,7 +21,7 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.oneSignalRed,
+          backgroundColor: AppColors.osPrimary,
           foregroundColor: Colors.white,
         ),
         child: Row(
@@ -56,8 +56,8 @@ class DestructiveButton extends StatelessWidget {
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.oneSignalRed,
-          side: const BorderSide(color: AppColors.oneSignalRed),
+          foregroundColor: AppColors.osPrimary,
+          side: const BorderSide(color: AppColors.osPrimary),
         ),
         child: Text(label),
       ),
