@@ -34,8 +34,8 @@ class UserSection extends StatelessWidget {
                       Text('Status', style: Theme.of(context).textTheme.bodyMedium),
                       Text(
                         vm.isLoggedIn ? 'Logged In' : 'Anonymous',
-                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              fontWeight: FontWeight.w500,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              fontFamily: 'monospace',
                               color: vm.isLoggedIn
                                   ? AppColors.osSuccess
                                   : AppColors.osGrey600,
@@ -53,7 +53,9 @@ class UserSection extends StatelessWidget {
                       ),
                       SelectableText(
                         vm.isLoggedIn ? (vm.externalUserId ?? '') : '–',
-                        style: Theme.of(context).textTheme.bodyMedium,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              fontFamily: 'monospace',
+                            ),
                       ),
                     ],
                   ),

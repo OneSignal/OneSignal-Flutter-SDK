@@ -26,9 +26,7 @@ class PairItem extends StatelessWidget {
               children: [
                 Text(
                   keyText,
-                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        fontWeight: FontWeight.w500,
-                      ),
+                  style: Theme.of(context).textTheme.bodyMedium,
                 ),
                 Text(
                   valueText,

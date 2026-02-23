@@ -8,7 +8,6 @@ This document contains all the prompts and requirements needed to build the OneS
 
 ### Prompt 0.1 - Capture Reference UI
 
-```
 Before building anything, an Android emulator MUST be running with the
 reference OneSignal demo app installed. These screenshots are the source
 of truth for the UI you are building. Do NOT proceed to Phase 1 without them.
@@ -83,7 +82,6 @@ button placement, spacing, and validation behavior.
 Refer back to these screenshots throughout all remaining phases whenever
 you need to decide on layout, spacing, section order, dialog flows, or
 overall look and feel.
-```
 
 ---
 
@@ -91,7 +89,6 @@ overall look and feel.
 
 ### Prompt 1.1 - Project Foundation
 
-```
 Create a new Flutter project at examples/demo/ (relative to the SDK repo root).
 
 Build the app with:
@@ -120,11 +117,9 @@ Save it to assets/onesignal_logo_icon_padded.png, generate all platform app icon
 Reference the OneSignal Flutter SDK from the parent repo using a path dependency:
   onesignal_flutter:
     path: ../../
-```
 
 ### Prompt 1.2 - Dependencies (pubspec.yaml)
 
-```
 Add these dependencies to pubspec.yaml:
 
 dependencies:
@@ -149,11 +144,9 @@ flutter_launcher_icons:
   image_path: "assets/onesignal_logo_icon_padded.png"
   adaptive_icon_background: "#FFFFFF"
   adaptive_icon_foreground: "assets/onesignal_logo_icon_padded.png"
-```
 
 ### Prompt 1.3 - OneSignal Repository
 
-```
 Create a OneSignalRepository class that centralizes all OneSignal SDK calls.
 This is a plain Dart class (not a ChangeNotifier) injected into the ViewModel.
 
@@ -226,11 +219,9 @@ Notification sending (via REST API, delegated to OneSignalApiService):
 - sendNotification(NotificationType type) -> Future<bool>
 - sendCustomNotification(String title, String body) -> Future<bool>
 - fetchUser(String onesignalId) -> Future<UserData?>
-```
 
 ### Prompt 1.4 - OneSignalApiService (REST API Client)
 
-```
 Create OneSignalApiService class for REST API calls using the http package:
 
 Properties:
@@ -254,11 +245,9 @@ fetchUser endpoint:
 - GET https://api.onesignal.com/apps/{app_id}/users/by/onesignal_id/{onesignal_id}
 - NO Authorization header needed (public endpoint)
 - Returns UserData with aliases, tags, emails, smsNumbers, externalId
-```
 
 ### Prompt 1.5 - SDK Observers
 
-```
 In main.dart, set up OneSignal initialization and listeners before runApp():
 
 OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
@@ -283,7 +272,6 @@ In AppViewModel (ChangeNotifier), register observers:
 - OneSignal.User.pushSubscription.addObserver(...) - react to push subscription changes
 - OneSignal.Notifications.addPermissionObserver(...) - react to permission changes
 - OneSignal.User.addObserver(...) - call fetchUserDataFromApi() when user changes
-```
 
 ---
 
@@ -309,7 +297,6 @@ In AppViewModel (ChangeNotifier), register observers:
 
 ### Prompt 2.1a - App Section
 
-```
 App Section layout:
 
 1. App ID display (readonly Text showing the OneSignal App ID)
@@ -330,11 +317,9 @@ App Section layout:
       - Calls OneSignal.consentGiven(value)
       - Separated from the above toggle by a horizontal divider
    - NOT a blocking overlay - user can interact with app regardless of state
-```
 
 ### Prompt 2.1b - User Section
 
-```
 User Section layout (separate SectionCard titled "User", placed after App Section):
 
 1. User status card (always visible, ABOVE the login/logout buttons):
@@ -351,14 +336,12 @@ User Section layout (separate SectionCard titled "User", placed after App Sectio
 2. LOGIN USER button:
    - Shows "LOGIN USER" when no user is logged in
    - Shows "SWITCH USER" when a user is logged in
-   - Opens dialog with empty "External User Id" field
+   - Opens "Login User" dialog with empty "External User Id" field
 
 3. LOGOUT USER button (only visible when a user is logged in)
-```
 
 ### Prompt 2.2 - Push Section
 
-```
 Push Section:
 - Section title: "Push" with info icon for tooltip
 - Push Subscription ID display (readonly)
@@ -369,11 +352,9 @@ Push Section:
   - Only visible when notification permission is NOT granted (fallback if user denied)
   - Requests notification permission when clicked
   - Hidden once permission is granted
-```
 
 ### Prompt 2.3 - Send Push Notification Section
 
-```
 Send Push Notification Section (placed right after Push Section):
 - Section title: "Send Push Notification" with info icon for tooltip
 - Three buttons:
@@ -384,21 +365,17 @@ Send Push Notification Section (placed right after Push Section):
   3. CUSTOM - opens dialog for custom title and body
 
 Tooltip should explain each button type.
-```
 
 ### Prompt 2.4 - In-App Messaging Section
 
-```
 In-App Messaging Section (placed right after Send Push):
 - Section title: "In-App Messaging" with info icon for tooltip
 - Pause In-App Messages toggle switch:
   - Label: "Pause In-App Messages"
   - Description: "Toggle in-app message display"
-```
 
 ### Prompt 2.5 - Send In-App Message Section
 
-```
 Send In-App Message Section (placed right after In-App Messaging):
 - Section title: "Send In-App Message" with info icon for tooltip
 - Four FULL-WIDTH buttons (not a grid):
@@ -412,25 +389,21 @@ Send In-App Message Section (placed right after In-App Messaging):
   - Also upserts `iam_type` in the Triggers list immediately so UI reflects the sent IAM type
 
 Tooltip should explain each IAM type.
-```
 
 ### Prompt 2.6 - Aliases Section
 
-```
 Aliases Section (placed after Send In-App Message):
 - Section title: "Aliases" with info icon for tooltip
-- List showing key-value pairs (read-only, no delete icons)
-- Each item shows: Label | ID
+- Stacked key-value list (read-only, no delete icons)
+- Each item shows Label on top, ID below (see styles.md "Stacked" list layout)
 - Filter out "external_id" and "onesignal_id" from display (these are special)
 - "No Aliases Added" text when empty
 - ADD button -> PairInputDialog with empty Label and ID fields on the same row (single add)
 - ADD MULTIPLE button -> MultiPairInputDialog (dynamic rows, add/remove)
 - No remove/delete functionality (aliases are add-only from the UI)
-```
 
 ### Prompt 2.7 - Emails Section
 
-```
 Emails Section:
 - Section title: "Emails" with info icon for tooltip
 - List showing email addresses
@@ -441,11 +414,9 @@ Emails Section:
   - Show first 5 items
   - Show "X more" text (tappable)
   - Expand to show all when tapped
-```
 
 ### Prompt 2.8 - SMS Section
 
-```
 SMS Section:
 - Section title: "SMS" with info icon for tooltip
 - List showing phone numbers
@@ -453,11 +424,9 @@ SMS Section:
 - "No SMS Added" text when empty
 - ADD SMS button -> dialog with empty SMS field
 - Collapse behavior when >5 items (same as Emails)
-```
 
 ### Prompt 2.9 - Tags Section
 
-```
 Tags Section:
 - Section title: "Tags" with info icon for tooltip
 - List showing key-value pairs
@@ -468,22 +437,18 @@ Tags Section:
 - REMOVE SELECTED button:
   - Only visible when at least one tag exists
   - Opens MultiSelectRemoveDialog with checkboxes
-```
 
 ### Prompt 2.10 - Outcome Events Section
 
-```
 Outcome Events Section:
 - Section title: "Outcome Events" with info icon for tooltip
 - SEND OUTCOME button -> opens dialog with 3 radio options:
   1. Normal Outcome -> shows name input field
   2. Unique Outcome -> shows name input field
   3. Outcome with Value -> shows name and value (double) input fields
-```
 
 ### Prompt 2.11 - Triggers Section (IN MEMORY ONLY)
 
-```
 Triggers Section:
 - Section title: "Triggers" with info icon for tooltip
 - List showing key-value pairs
@@ -501,11 +466,9 @@ IMPORTANT: Triggers are stored IN MEMORY ONLY during the app session.
 - Triggers are NOT persisted to SharedPreferences
 - Triggers are cleared when the app is killed/restarted
 - This is intentional - triggers are transient test data for IAM testing
-```
 
 ### Prompt 2.12 - Track Event Section
 
-```
 Track Event Section:
 - Section title: "Track Event" with info icon for tooltip
 - TRACK EVENT button -> opens TrackEventDialog with:
@@ -516,27 +479,22 @@ Track Event Section:
     - If empty, passes null
   - TRACK button disabled until name is filled AND JSON is valid (or empty)
 - Calls OneSignal.User.trackEvent(name, properties)
-```
 
 ### Prompt 2.13 - Location Section
 
-```
 Location Section:
 - Section title: "Location" with info icon for tooltip
 - Location Shared toggle switch:
   - Label: "Location Shared"
   - Description: "Share device location with OneSignal"
 - PROMPT LOCATION button
-```
 
 ### Prompt 2.14 - Secondary Activity
 
-```
 Secondary Activity (launched by "Next Activity" button at bottom of main screen):
 - Activity title: "Secondary Activity"
 - Page content: centered text "Secondary Activity" using headlineMedium style
 - Simple screen, no additional functionality needed
-```
 
 ---
 
@@ -544,7 +502,6 @@ Secondary Activity (launched by "Next Activity" button at bottom of main screen)
 
 ### Prompt 3.1 - Data Loading Flow
 
-```
 Loading indicator overlay:
 - Full-screen semi-transparent overlay with centered CircularProgressIndicator
 - isLoading flag in AppViewModel
@@ -577,11 +534,9 @@ On onUserStateChange callback:
 - Update UI with new data (aliases, tags, emails, sms)
 
 Note: REST API key is NOT required for fetchUser endpoint.
-```
 
 ### Prompt 3.2 - UserData Model
 
-```
 class UserData {
   final Map<String, String> aliases;    // From identity object (filter out external_id, onesignal_id)
   final Map<String, String> tags;       // From properties.tags object
@@ -599,7 +554,6 @@ class UserData {
 
   factory UserData.fromJson(Map<String, dynamic> json) { ... }
 }
-```
 
 ---
 
@@ -607,18 +561,15 @@ class UserData {
 
 ### Prompt 4.1 - Tooltip Content (Remote)
 
-```
 Tooltip content is fetched at runtime from the sdk-shared repo. Do NOT bundle a local copy.
 
 URL:
 https://raw.githubusercontent.com/OneSignal/sdk-shared/main/demo/tooltip_content.json
 
 This file is maintained in the sdk-shared repo and shared across all platform demo apps.
-```
 
 ### Prompt 4.2 - Tooltip Helper
 
-```
 Create TooltipHelper as a singleton:
 
 class TooltipHelper {
@@ -661,11 +612,9 @@ class TooltipOption {
 
   const TooltipOption({required this.name, required this.description});
 }
-```
 
 ### Prompt 4.3 - Tooltip UI Integration
 
-```
 For each section, pass an onInfoTap callback to SectionCard:
 - SectionCard has an optional info icon that calls onInfoTap when tapped
 - In HomeScreen, wire onInfoTap to show a TooltipDialog
@@ -686,7 +635,6 @@ void _showTooltipDialog(BuildContext context, String key) {
         );
     }
 }
-```
 
 ---
 
@@ -694,7 +642,6 @@ void _showTooltipDialog(BuildContext context, String key) {
 
 ### What IS Persisted (SharedPreferences)
 
-```
 PreferencesService stores:
 - OneSignal App ID
 - Consent required status
@@ -702,11 +649,9 @@ PreferencesService stores:
 - External user ID (for login state restoration)
 - Location shared status
 - In-app messaging paused status
-```
 
 ### Initialization Flow
 
-```
 On app startup, state is restored in two layers:
 
 1. main.dart restores SDK state from SharedPreferences cache BEFORE initialize:
@@ -730,11 +675,9 @@ This two-layer approach ensures:
 - The SDK is configured with the user's last preferences before anything else runs
 - The ViewModel reads the SDK's actual state as the source of truth for the UI
 - The UI always reflects what the SDK reports, not stale cache values
-```
 
 ### What is NOT Persisted (In-Memory Only)
 
-```
 AppViewModel holds in memory:
 - triggersList: List<MapEntry<String, String>>
   - Triggers are session-only
@@ -754,13 +697,11 @@ AppViewModel holds in memory:
 - tagsList:
   - Can be read from SDK via getTags()
   - Also fetched from API for consistency
-```
 
 ---
 
 ## Phase 6: Testing Values (Appium Compatibility)
 
-```
 All dialog input fields should be EMPTY by default.
 The test automation framework (Appium) will enter these values:
 
@@ -776,7 +717,6 @@ The test automation framework (Appium) will enter these values:
 - Outcome Dialog: Name = "test_outcome", Value = "1.5"
 - Track Event Dialog: Name = "test_event", Properties = "{\"key\": \"value\"}"
 - Custom Notification Dialog: Title = "Test Title", Body = "Test Body"
-```
 
 ---
 
@@ -784,7 +724,6 @@ The test automation framework (Appium) will enter these values:
 
 ### Alias Management
 
-```
 Aliases are managed with a hybrid approach:
 
 1. On app start/login: Fetched from REST API via fetchUserDataFromApi()
@@ -793,18 +732,15 @@ Aliases are managed with a hybrid approach:
    - Immediately add to local aliasesList (don't wait for API)
    - This ensures instant UI feedback while SDK syncs in background
 3. On next app launch: Fresh data from API includes the synced alias
-```
 
 ### Notification Permission
 
-```
 Notification permission is automatically requested when the home screen loads:
 - Call viewModel.promptPush() in initState() of HomeScreen
 - This ensures prompt appears after user sees the app UI
 - PROMPT PUSH button remains as fallback if user initially denied
 - Button hidden once permission is granted
 - Keep Push "Enabled" toggle disabled until permission is granted
-```
 
 ---
 
@@ -812,7 +748,6 @@ Notification permission is automatically requested when the home screen loads:
 
 ### Prompt 8.1 - State Management with Provider
 
-```
 Use Provider for dependency injection and ChangeNotifier for state management.
 
 main.dart:
@@ -825,11 +760,9 @@ AppViewModel extends ChangeNotifier:
 - Exposes action methods that update state and call notifyListeners()
 - Receives OneSignalRepository via constructor injection
 - Receives PreferencesService via constructor injection
-```
 
 ### Prompt 8.2 - Reusable Widgets
 
-```
 Create reusable widgets in lib/widgets/:
 
 section_card.dart:
@@ -866,11 +799,9 @@ dialogs.dart:
 - MultiSelectRemoveDialog (CheckboxListTile for batch remove)
 - LoginDialog, OutcomeDialog, TrackEventDialog
 - CustomNotificationDialog, TooltipDialog
-```
 
 ### Prompt 8.3 - Reusable Multi-Pair Dialog
 
-```
 Tags, Aliases, and Triggers all share a reusable MultiPairInputDialog widget
 for adding multiple key-value pairs at once.
 
@@ -890,11 +821,9 @@ Used by:
 - ADD MULTIPLE button (Aliases section) -> calls viewModel.addAliases(pairs)
 - ADD MULTIPLE button (Tags section) -> calls viewModel.addTags(pairs)
 - ADD MULTIPLE button (Triggers section) -> calls viewModel.addTriggers(pairs)
-```
 
 ### Prompt 8.4 - Reusable Remove Multi Dialog
 
-```
 Tags and Triggers share a reusable MultiSelectRemoveDialog widget
 for selectively removing items from the current list.
 
@@ -908,11 +837,9 @@ Behavior:
 Used by:
 - REMOVE SELECTED button (Tags section) -> calls viewModel.removeSelectedTags(keys)
 - REMOVE SELECTED button (Triggers section) -> calls viewModel.removeSelectedTriggers(keys)
-```
 
 ### Prompt 8.5 - Theme
 
-```
 Create OneSignal theme in lib/theme.dart.
 
 All colors, spacing, typography, button styles, card styles, and component
@@ -921,15 +848,13 @@ specs are defined in the shared style reference:
 
 Implement an AppTheme class with a static ThemeData getter that maps the
 style reference values to Material 3 theming (ColorScheme.fromSeed,
-CardTheme, ElevatedButtonTheme, InputDecorationTheme, etc.).
+CardTheme, ElevatedButtonTheme, InputDecorationTheme, dividerColor, etc.).
 
 Also define AppColors and AppSpacing convenience classes that expose the
 tokens from styles.md as typed constants for use throughout the app.
-```
 
 ### Prompt 8.6 - Log View (Appium-Ready)
 
-```
 Add collapsible log view at top of screen for debugging and Appium testing.
 
 Files:
@@ -943,16 +868,10 @@ LogManager Features:
 - Also prints to console via debugPrint for development
 
 LogView Features:
-- STICKY at the top of the screen (always visible while scrolling content below)
-- Full width, no horizontal margin, no rounded corners, no top margin (touches appbar)
-- Background color: 0xFF1A1B1E
-- Single horizontal scroll on the entire log list (not per-row), no text truncation
-- Use LayoutBuilder + ConstrainedBox(minWidth) so content is at least screen-wide
-- Use vertical SingleChildScrollView + Column instead of ListView.builder (100dp container is small)
-- Fixed 100dp height
-- Default expanded
-- Trash icon button (Icons.delete) for clearing logs, not a text button
-- Reverse order: newest logs at top
+- Refer to the Logs View section of the shared style reference for layout, colors, and typography
+- Header sits above the list; 100dp height applies to the list area only
+- Newest entries at the top (reverse index at render time)
+- Trash icon only visible when entries exist
 
 Appium Semantic Labels:
 | Label | Description |
@@ -970,11 +889,9 @@ Appium Semantic Labels:
 
 Use Semantics widget with label property for Appium accessibility:
 Semantics(label: 'log_entry_${index}_message', child: Text(entry.message))
-```
 
 ### Prompt 8.7 - SnackBar Messages
 
-```
 All user actions should display SnackBar messages:
 
 - Login: "Logged in as: {userId}"
@@ -994,7 +911,6 @@ Implementation:
 - HomeScreen listens and shows ScaffoldMessenger.of(context).showSnackBar()
 - All SnackBar messages are also logged via LogManager().i()
 - Clear previous SnackBar before showing new one via ScaffoldMessenger.of(context).clearSnackBars()
-```
 
 ---
 

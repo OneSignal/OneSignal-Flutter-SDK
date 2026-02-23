@@ -106,15 +106,15 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   SendPushSection(
                     onInfoTap: () =>
-                        _showTooltipDialog(context, 'send_push_notification'),
+                        _showTooltipDialog(context, 'sendPushNotification'),
                   ),
                   InAppSection(
                     onInfoTap: () =>
-                        _showTooltipDialog(context, 'in_app_messaging'),
+                        _showTooltipDialog(context, 'inAppMessaging'),
                   ),
                   SendIamSection(
                     onInfoTap: () =>
-                        _showTooltipDialog(context, 'send_in_app_message'),
+                        _showTooltipDialog(context, 'sendInAppMessage'),
                   ),
                   AliasesSection(
                     onInfoTap: () => _showTooltipDialog(context, 'aliases'),
@@ -130,14 +130,14 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                   OutcomesSection(
                     onInfoTap: () =>
-                        _showTooltipDialog(context, 'outcome_events'),
+                        _showTooltipDialog(context, 'outcomes'),
                   ),
                   TriggersSection(
                     onInfoTap: () => _showTooltipDialog(context, 'triggers'),
                   ),
                   TrackEventSection(
                     onInfoTap: () =>
-                        _showTooltipDialog(context, 'track_event'),
+                        _showTooltipDialog(context, 'trackEvent'),
                   ),
                   LocationSection(
                     onInfoTap: () => _showTooltipDialog(context, 'location'),

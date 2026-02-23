@@ -16,9 +16,10 @@ class AppColors {
   static const osGrey500 = Color(0xFF9E9E9E);
   static const osLightBackground = Color(0xFFF8F9FA);
   static const osCardBackground = Colors.white;
+  static const osCardBorder = Color(0x1A000000); // rgba(0, 0, 0, 0.1)
   static const osDivider = Color(0xFFE8EAED);
   static const osWarningBackground = Color(0xFFFFF8E1);
-  static const osOverlayScrim = Color(0x42000000);
+  static const osBackdrop = Color(0x8A000000);
   static const osLogBackground = Color(0xFF1A1B1E);
   static const osLogDebug = Color(0xFF82AAFF);
   static const osLogInfo = Color(0xFFC3E88D);
@@ -43,9 +44,13 @@ class AppTheme {
       ),
       cardTheme: CardThemeData(
         color: AppColors.osCardBackground,
-        elevation: 1,
+        elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(12),
+          side: const BorderSide(
+            color: AppColors.osCardBorder,
+            width: 2,
+          ),
         ),
         margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       ),
@@ -67,10 +72,29 @@ class AppTheme {
           textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
+      textButtonTheme: TextButtonThemeData(
+        style: TextButton.styleFrom(
+          disabledForegroundColor: AppColors.osGrey500,
+        ),
+      ),
+      dialogTheme: const DialogThemeData(
+        backgroundColor: Colors.white,
+      ),
+      dividerColor: AppColors.osDivider,
       inputDecorationTheme: InputDecorationTheme(
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.osGrey700),
         ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.osGrey700),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: AppColors.osPrimary, width: 2),
+        ),
+        hintStyle: const TextStyle(color: AppColors.osGrey600),
         contentPadding: const EdgeInsets.symmetric(
           horizontal: 12,
           vertical: 14,
