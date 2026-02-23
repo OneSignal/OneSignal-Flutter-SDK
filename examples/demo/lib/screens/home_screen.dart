@@ -82,7 +82,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(width: 8),
             Text(
-              'Sample App',
+              'Flutter',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                     color: Colors.white,
                   ),

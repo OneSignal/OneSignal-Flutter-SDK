@@ -55,6 +55,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(8),
           ),
           minimumSize: const Size(double.infinity, 48),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
       outlinedButtonTheme: OutlinedButtonThemeData(
@@ -63,6 +64,7 @@ class AppTheme {
             borderRadius: BorderRadius.circular(8),
           ),
           minimumSize: const Size(double.infinity, 48),
+          textStyle: const TextStyle(fontWeight: FontWeight.w600),
         ),
       ),
       inputDecorationTheme: InputDecorationTheme(

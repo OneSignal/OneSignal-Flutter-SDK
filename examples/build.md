@@ -99,7 +99,7 @@ Build the app with:
 - Dart 3+ with null safety
 - Material 3 theming with OneSignal brand colors
 - App name: "OneSignal Demo"
-- Top app bar: centered title with OneSignal logo SVG + "Sample App" text (use centerTitle: true on AppBar)
+- Top app bar: centered title with OneSignal logo SVG + "Flutter" text (use centerTitle: true on AppBar)
 - Support for both Android and iOS
 - Android package name: com.onesignal.example
 - iOS bundle identifier: com.onesignal.example
