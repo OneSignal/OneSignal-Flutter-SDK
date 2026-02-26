@@ -87,13 +87,13 @@ class AppViewModel extends ChangeNotifier {
 
     _consentRequired = _prefs.consentRequired;
     _privacyConsentGiven = _prefs.privacyConsent;
+    _externalUserId = _prefs.externalUserId;
 
-    try {
-      _iamPaused = await _repository.isInAppMessagesPaused();
-      _locationShared = await _repository.isLocationShared();
-      _externalUserId = await _repository.getExternalId();
-    } catch (e) {
-      LogManager().e('App', 'Error loading initial state: $e');
+    _iamPaused = _prefs.iamPaused;
+    _locationShared = _prefs.locationShared;
+
+    if (_externalUserId != null) {
+      _repository.loginUser(_externalUserId!);
     }
 
     _pushSubscriptionId = _repository.getPushSubscriptionId();
@@ -125,7 +125,8 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.pushSubscription.addObserver((state) {
       _pushSubscriptionId = state.current.id;
       _pushEnabled = state.current.optedIn;
-      LogManager().i('Observer', 'Push subscription changed: id=${state.current.id}, optedIn=${state.current.optedIn}');
+      LogManager().i('Observer',
+          'Push subscription changed: id=${state.current.id}, optedIn=${state.current.optedIn}');
       notifyListeners();
     });
 
@@ -257,12 +258,15 @@ class AppViewModel extends ChangeNotifier {
   // Notifications
   Future<void> sendNotification(NotificationType type) async {
     final success = await _repository.sendNotification(type);
-    _showSnackBar(success ? 'Notification sent: ${type.name}' : 'Failed to send notification');
+    _showSnackBar(success
+        ? 'Notification sent: ${type.name}'
+        : 'Failed to send notification');
   }
 
   Future<void> sendCustomNotification(String title, String body) async {
     final success = await _repository.sendCustomNotification(title, body);
-    _showSnackBar(success ? 'Custom notification sent' : 'Failed to send notification');
+    _showSnackBar(
+        success ? 'Custom notification sent' : 'Failed to send notification');
   }
 
   // IAM
@@ -292,8 +296,7 @@ class AppViewModel extends ChangeNotifier {
 
   void addAliases(Map<String, String> aliases) {
     _repository.addAliases(aliases);
-    _aliasesList = List.from(_aliasesList)
-      ..addAll(aliases.entries);
+    _aliasesList = List.from(_aliasesList)..addAll(aliases.entries);
     notifyListeners();
     _showSnackBar('${aliases.length} alias(es) added');
   }
@@ -345,16 +348,14 @@ class AppViewModel extends ChangeNotifier {
 
   void removeTag(String key) {
     _repository.removeTag(key);
-    _tagsList = List.from(_tagsList)
-      ..removeWhere((e) => e.key == key);
+    _tagsList = List.from(_tagsList)..removeWhere((e) => e.key == key);
     notifyListeners();
     _showSnackBar('Tag removed: $key');
   }
 
   void removeSelectedTags(List<String> keys) {
     _repository.removeTags(keys);
-    _tagsList = List.from(_tagsList)
-      ..removeWhere((e) => keys.contains(e.key));
+    _tagsList = List.from(_tagsList)..removeWhere((e) => keys.contains(e.key));
     notifyListeners();
     _showSnackBar('${keys.length} tag(s) removed');
   }
@@ -376,8 +377,7 @@ class AppViewModel extends ChangeNotifier {
 
   void removeTrigger(String key) {
     _repository.removeTrigger(key);
-    _triggersList = List.from(_triggersList)
-      ..removeWhere((e) => e.key == key);
+    _triggersList = List.from(_triggersList)..removeWhere((e) => e.key == key);
     notifyListeners();
     _showSnackBar('Trigger removed: $key');
   }
