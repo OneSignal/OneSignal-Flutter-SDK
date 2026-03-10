@@ -269,6 +269,11 @@ class AppViewModel extends ChangeNotifier {
         success ? 'Custom notification sent' : 'Failed to send notification');
   }
 
+  void clearAllNotifications() {
+    _repository.clearAllNotifications();
+    _showSnackBar('All notifications cleared');
+  }
+
   // IAM
   Future<void> setIamPaused(bool paused) async {
     _iamPaused = paused;

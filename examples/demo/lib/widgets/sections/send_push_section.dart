@@ -44,6 +44,11 @@ class SendPushSection extends StatelessWidget {
               }
             },
           ),
+          AppSpacing.gapBox,
+          DestructiveButton(
+            label: 'CLEAR ALL',
+            onPressed: vm.clearAllNotifications,
+          ),
         ],
       ),
     );

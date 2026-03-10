@@ -32,6 +32,12 @@ For Android with multiple emulators, use the helper script to pick by AVD name:
 ../run-android.sh
 ```
 
+For iOS with multiple simulators:
+
+```bash
+../run-ios.sh
+```
+
 Or specify a device directly:
 
 ```bash
