@@ -150,6 +150,11 @@ class OneSignalRepository {
     return await OneSignal.Notifications.requestPermission(fallbackToSettings);
   }
 
+  void clearAllNotifications() {
+    LogManager().i('SDK', 'Clear all notifications');
+    OneSignal.Notifications.clearAll();
+  }
+
   // In-app messages
   void setInAppMessagesPaused(bool paused) {
     LogManager().i('SDK', 'Set IAM paused: $paused');
