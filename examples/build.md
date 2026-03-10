@@ -1,8 +1,11 @@
 # OneSignal Flutter Sample App - Build Guide
 
-This document supplements the [shared build guide](https://github.com/OneSignal/sdk-shared/blob/main/demo/build.md) with Flutter-specific implementation details. Read the shared guide first, then apply these overrides.
+This document extends the shared build guide with Flutter-specific details.
 
-Replace `{{PLATFORM}}` with **Flutter** in all shared prompts.
+**Read the shared guide first:**
+https://raw.githubusercontent.com/OneSignal/sdk-shared/refs/heads/main/demo/build.md
+
+Replace `{{PLATFORM}}` with `Flutter` everywhere in that guide. Everything below either overrides or supplements sections from the shared guide.
 
 ---
 
