@@ -26,6 +26,9 @@
  */
 
 #import "OSFlutterLocation.h"
+
+#if ONESIGNAL_LOCATION_ENABLED
+
 #import "OSFlutterCategories.h"
 #import <OneSignalFramework/OneSignalFramework.h>
 
@@ -66,3 +69,5 @@
 }
 
 @end
+
+#endif

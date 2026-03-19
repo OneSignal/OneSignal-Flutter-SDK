@@ -30,9 +30,9 @@
 #import "OSFlutterDebug.h"
 #import "OSFlutterInAppMessages.h"
 #import "OSFlutterLiveActivities.h"
-#import "OSFlutterLocation.h"
 #import "OSFlutterNotifications.h"
 #import "OSFlutterSession.h"
+#import "OSFlutterLocation.h"
 #import "OSFlutterUser.h"
 
 @interface OneSignalPlugin ()
@@ -69,7 +69,9 @@
   [OSFlutterUser registerWithRegistrar:registrar];
   [OSFlutterNotifications registerWithRegistrar:registrar];
   [OSFlutterSession registerWithRegistrar:registrar];
+#if ONESIGNAL_LOCATION_ENABLED
   [OSFlutterLocation registerWithRegistrar:registrar];
+#endif
   [OSFlutterInAppMessages registerWithRegistrar:registrar];
   [OSFlutterLiveActivities registerWithRegistrar:registrar];
 }

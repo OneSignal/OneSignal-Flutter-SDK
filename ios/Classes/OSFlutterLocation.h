@@ -25,6 +25,12 @@
  * THE SOFTWARE.
  */
 
+#ifndef ONESIGNAL_LOCATION_ENABLED
+    #define ONESIGNAL_LOCATION_ENABLED 1
+#endif
+
+#if ONESIGNAL_LOCATION_ENABLED
+
 #import <Flutter/Flutter.h>
 #import <Foundation/Foundation.h>
 
@@ -33,3 +39,5 @@
 @property(strong, nonatomic) FlutterMethodChannel *channel;
 
 @end
+
+#endif
