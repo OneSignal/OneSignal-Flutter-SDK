@@ -187,6 +187,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder
         }
     }
 
+    @SuppressWarnings("unchecked")
     private JSONObject getJsonFromMap(Map<String, Object> map) throws JSONException {
         JSONObject jsonData = new JSONObject();
         for (String key : map.keySet()) {

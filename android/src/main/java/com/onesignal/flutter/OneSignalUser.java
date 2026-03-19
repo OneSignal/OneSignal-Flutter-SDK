@@ -82,9 +82,8 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
         replySuccess(result, externalId);
     }
 
+    @SuppressWarnings("unchecked")
     private void addAliases(MethodCall call, Result result) {
-        // call.arguments is being casted to a Map<String, Object> so a try-catch with
-        // a ClassCastException will be thrown
         try {
             OneSignal.getUser().addAliases((Map<String, String>) call.arguments);
             replySuccess(result, null);
@@ -97,9 +96,8 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void removeAliases(MethodCall call, Result result) {
-        // call.arguments is being casted to a List<String> so a try-catch with
-        // a ClassCastException will be thrown
         try {
             OneSignal.getUser().removeAliases((List<String>) call.arguments);
             replySuccess(result, null);
@@ -132,9 +130,8 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
         replySuccess(result, null);
     }
 
+    @SuppressWarnings("unchecked")
     private void addTags(MethodCall call, Result result) {
-        // call.arguments is being casted to a Map<String, Object> so a try-catch with
-        // a ClassCastException will be thrown
         try {
             OneSignal.getUser().addTags((Map<String, String>) call.arguments);
             replySuccess(result, null);
@@ -147,9 +144,8 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
         }
     }
 
+    @SuppressWarnings("unchecked")
     private void removeTags(MethodCall call, Result result) {
-        // call.arguments is being casted to a List<String> so a try-catch with
-        // a ClassCastException will be thrown
         try {
             OneSignal.getUser().removeTags((List<String>) call.arguments);
             replySuccess(result, null);

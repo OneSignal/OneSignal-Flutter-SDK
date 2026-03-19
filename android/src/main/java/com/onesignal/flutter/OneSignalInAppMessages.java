@@ -53,9 +53,8 @@ public class OneSignalInAppMessages extends FlutterMessengerResponder
         else replyNotImplemented(result);
     }
 
+    @SuppressWarnings("unchecked")
     private void addTriggers(MethodCall call, Result result) {
-        // call.arguments is being casted to a Map<String, Object> so a try-catch with
-        //  a ClassCastException will be thrown
         try {
             OneSignal.getInAppMessages().addTriggers((Map<String, String>) call.arguments);
             replySuccess(result, null);
@@ -73,9 +72,8 @@ public class OneSignalInAppMessages extends FlutterMessengerResponder
         replySuccess(result, null);
     }
 
+    @SuppressWarnings("unchecked")
     private void removeTriggers(MethodCall call, Result result) {
-        // call.arguments is being casted to a Collection<String> a try-catch with
-        //  a ClassCastException will be thrown
         try {
             OneSignal.getInAppMessages().removeTriggers((Collection<String>) call.arguments);
             replySuccess(result, null);
