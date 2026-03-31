@@ -50,18 +50,18 @@ class _LiveActivitiesSectionState extends State<LiveActivitiesSection> {
               padding: AppSpacing.cardPadding,
               child: Column(
                 children: [
-                  TextField(
+                  _InputRow(
+                    label: 'Activity ID',
                     controller: _activityIdController,
-                    decoration: const InputDecoration(labelText: 'Activity ID'),
                     onChanged: (value) {
                       vm.setActivityId(value);
                       setState(() {});
                     },
                   ),
-                  AppSpacing.gapBox,
-                  TextField(
+                  const SizedBox(height: 4),
+                  _InputRow(
+                    label: 'Order #',
                     controller: _orderNumberController,
-                    decoration: const InputDecoration(labelText: 'Order #'),
                     onChanged: (value) => vm.setOrderNumber(value),
                   ),
                 ],
@@ -95,19 +95,65 @@ class _LiveActivitiesSectionState extends State<LiveActivitiesSection> {
           AppSpacing.gapBox,
           SizedBox(
             width: double.infinity,
-            child: ElevatedButton(
+            child: OutlinedButton(
               onPressed: activityEmpty || !vm.hasApiKey
                   ? null
                   : () => vm.endLiveActivity(),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
+              style: OutlinedButton.styleFrom(
+                foregroundColor: AppColors.osPrimary,
+                side: const BorderSide(color: AppColors.osPrimary),
               ),
               child: const Text('END LIVE ACTIVITY'),
             ),
           ),
         ],
       ),
+    );
+  }
+}
+
+class _InputRow extends StatelessWidget {
+  final String label;
+  final TextEditingController controller;
+  final ValueChanged<String> onChanged;
+
+  const _InputRow({
+    required this.label,
+    required this.controller,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        SizedBox(
+          width: 80,
+          child: Text(
+            label,
+            style: const TextStyle(
+              fontSize: 14,
+              color: AppColors.osGrey600,
+            ),
+          ),
+        ),
+        Expanded(
+          child: TextField(
+            controller: controller,
+            textAlign: TextAlign.right,
+            style: const TextStyle(fontSize: 14, color: Color(0xFF212121)),
+            decoration: const InputDecoration(
+              border: InputBorder.none,
+              enabledBorder: InputBorder.none,
+              focusedBorder: InputBorder.none,
+              contentPadding: EdgeInsets.symmetric(vertical: 4),
+              isDense: true,
+            ),
+            autocorrect: false,
+            onChanged: onChanged,
+          ),
+        ),
+      ],
     );
   }
 }
