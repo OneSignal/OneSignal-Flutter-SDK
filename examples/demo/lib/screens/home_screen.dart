@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -13,6 +14,7 @@ import '../widgets/sections/app_section.dart';
 import '../widgets/sections/user_section.dart';
 import '../widgets/sections/emails_section.dart';
 import '../widgets/sections/in_app_section.dart';
+import '../widgets/sections/live_activities_section.dart';
 import '../widgets/sections/location_section.dart';
 import '../widgets/sections/outcomes_section.dart';
 import '../widgets/sections/push_section.dart';
@@ -142,6 +144,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   LocationSection(
                     onInfoTap: () => _showTooltipDialog(context, 'location'),
                   ),
+                  if (defaultTargetPlatform == TargetPlatform.iOS)
+                    LiveActivitiesSection(
+                      onInfoTap: () =>
+                          _showTooltipDialog(context, 'liveActivities'),
+                    ),
                   const SizedBox(height: 8),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 16),

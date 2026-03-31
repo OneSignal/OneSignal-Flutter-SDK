@@ -13,6 +13,24 @@ class AppViewModel extends ChangeNotifier {
 
   AppViewModel(this._repository, this._prefs);
 
+  static const _orderStatuses = [
+    {
+      'status': 'preparing',
+      'message': 'Your order is being prepared',
+      'estimatedTime': '15 min',
+    },
+    {
+      'status': 'on_the_way',
+      'message': 'Driver is heading your way',
+      'estimatedTime': '10 min',
+    },
+    {
+      'status': 'delivered',
+      'message': 'Order delivered!',
+      'estimatedTime': '',
+    },
+  ];
+
   // Loading state
   bool _isLoading = false;
   bool get isLoading => _isLoading;
@@ -62,6 +80,26 @@ class AppViewModel extends ChangeNotifier {
   // Location state
   bool _locationShared = false;
   bool get locationShared => _locationShared;
+
+  // Live Activity state
+  String _activityId = 'order-1';
+  String get activityId => _activityId;
+
+  String _orderNumber = 'ORD-1234';
+  String get orderNumber => _orderNumber;
+
+  int _statusIndex = 0;
+
+  bool _isLaUpdating = false;
+  bool get isLaUpdating => _isLaUpdating;
+
+  bool get hasApiKey => _repository.hasApiKey();
+
+  String get nextStatusLabel {
+    final nextIndex = (_statusIndex + 1) % _orderStatuses.length;
+    final status = _orderStatuses[nextIndex]['status']!;
+    return status.toUpperCase().replaceAll('_', ' ');
+  }
 
   // Data lists
   List<MapEntry<String, String>> _aliasesList = [];
@@ -422,6 +460,60 @@ class AppViewModel extends ChangeNotifier {
   void trackEvent(String name, Map<String, dynamic>? properties) {
     _repository.trackEvent(name, properties);
     _showSnackBar('Event tracked: $name');
+  }
+
+  // Live Activities
+  void setActivityId(String id) {
+    _activityId = id;
+    notifyListeners();
+  }
+
+  void setOrderNumber(String number) {
+    _orderNumber = number;
+    notifyListeners();
+  }
+
+  Future<void> startLiveActivity() async {
+    final attributes = {'orderNumber': _orderNumber};
+    final content = Map<String, dynamic>.from(_orderStatuses[0]);
+    _statusIndex = 0;
+    await _repository.startDefaultLiveActivity(_activityId, attributes, content);
+    notifyListeners();
+    _showSnackBar('Started Live Activity: $_activityId');
+  }
+
+  Future<void> updateLiveActivity() async {
+    _isLaUpdating = true;
+    notifyListeners();
+
+    final nextIndex = (_statusIndex + 1) % _orderStatuses.length;
+    final content = Map<String, dynamic>.from(_orderStatuses[nextIndex]);
+    final success = await _repository.updateLiveActivity(_activityId, content);
+
+    _isLaUpdating = false;
+    if (success) {
+      _statusIndex = nextIndex;
+      _showSnackBar('Updated Live Activity: $_activityId');
+    } else {
+      _showSnackBar('Failed to update Live Activity');
+    }
+    notifyListeners();
+  }
+
+  Future<void> exitLiveActivity() async {
+    await _repository.exitLiveActivity(_activityId);
+    _showSnackBar('Exited Live Activity: $_activityId');
+  }
+
+  Future<void> endLiveActivity() async {
+    final success = await _repository.endLiveActivity(_activityId);
+    if (success) {
+      _statusIndex = 0;
+      _showSnackBar('Ended Live Activity: $_activityId');
+    } else {
+      _showSnackBar('Failed to end Live Activity');
+    }
+    notifyListeners();
   }
 
   // Location

@@ -180,6 +180,34 @@ class OneSignalRepository {
     OneSignal.Location.requestPermission();
   }
 
+  // Live Activities
+  bool hasApiKey() => _apiService.hasApiKey();
+
+  Future<void> startDefaultLiveActivity(
+    String activityId,
+    Map<String, dynamic> attributes,
+    Map<String, dynamic> content,
+  ) async {
+    LogManager().i('SDK', 'Start default live activity: $activityId');
+    await OneSignal.LiveActivities.startDefault(activityId, attributes, content);
+  }
+
+  Future<void> exitLiveActivity(String activityId) async {
+    LogManager().i('SDK', 'Exit live activity: $activityId');
+    await OneSignal.LiveActivities.exitLiveActivity(activityId);
+  }
+
+  Future<bool> updateLiveActivity(
+    String activityId,
+    Map<String, dynamic> contentState,
+  ) async {
+    return _apiService.updateLiveActivity(activityId, contentState);
+  }
+
+  Future<bool> endLiveActivity(String activityId) async {
+    return _apiService.endLiveActivity(activityId);
+  }
+
   // Privacy consent
   void setConsentRequired(bool required) {
     LogManager().i('SDK', 'Set consent required: $required');
