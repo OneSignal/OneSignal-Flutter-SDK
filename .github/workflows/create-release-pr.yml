@@ -159,7 +159,7 @@ jobs:
           echo "✓ Updated pubspec.yaml version to ${NEW_VERSION}"
 
           # Update podspec version
-          sed -i '' "s|s.version          = '[^']*'|s.version          = '${NEW_VERSION}'|" ios/onesignal_flutter.podspec
+          sed -i '' "s|s\.version[[:space:]]*=[[:space:]]*'[^']*'|s.version          = '${NEW_VERSION}'|" ios/onesignal_flutter.podspec
           echo "✓ Updated ios/onesignal_flutter.podspec version to ${NEW_VERSION}"
 
           # Update android build.gradle version
