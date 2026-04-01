@@ -27,8 +27,8 @@
 
 #import "./include/onesignal_flutter/OSFlutterLiveActivities.h"
 #import "./include/onesignal_flutter/OSFlutterCategories.h"
-#import <OneSignalLiveActivities/OneSignalLiveActivities-Swift.h>
 #import <OneSignalFramework/OneSignalFramework.h>
+#import <OneSignalLiveActivities/OneSignalLiveActivities-Swift.h>
 
 @implementation OSFlutterLiveActivities
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar> *)registrar {
