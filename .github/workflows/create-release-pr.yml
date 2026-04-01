@@ -136,6 +136,10 @@ jobs:
           sed -i '' "s|s.dependency 'OneSignalXCFramework', '[^']*'|s.dependency 'OneSignalXCFramework', '${VERSION}'|" ios/onesignal_flutter.podspec
           echo "✓ Updated ios/onesignal_flutter.podspec with iOS SDK ${VERSION}"
 
+          # Update Package.swift with new version
+          sed -i '' "s|\.package(url: \"https://github.com/OneSignal/OneSignal-XCFramework\", exact: \"[^\"]*\")|.package(url: \"https://github.com/OneSignal/OneSignal-XCFramework\", exact: \"${VERSION}\")|" ios/onesignal_flutter/Package.swift
+          echo "✓ Updated ios/onesignal_flutter/Package.swift with iOS SDK ${VERSION}"
+
           # Only commit if there are changes
           git add -A
           git diff --staged --quiet && exit 0
@@ -158,7 +162,7 @@ jobs:
           sed -i '' "s/OneSignalWrapper\.setSdkVersion(\"[^\"]*\")/OneSignalWrapper.setSdkVersion(\"$WRAPPER_VERSION\")/g" android/src/main/java/com/onesignal/flutter/OneSignalPlugin.java
 
           # Update OneSignalPlugin.m wrapper version
-          sed -i '' "s/OneSignalWrapper\.sdkVersion = @\"[^\"]*\"/OneSignalWrapper.sdkVersion = @\"$WRAPPER_VERSION\"/g" ios/Classes/OneSignalPlugin.m
+          sed -i '' "s/OneSignalWrapper\.sdkVersion = @\"[^\"]*\"/OneSignalWrapper.sdkVersion = @\"$WRAPPER_VERSION\"/g" ios/onesignal_flutter/Sources/onesignal_flutter/OneSignalPlugin.m
 
           # Only commit if there are changes
           git add -A

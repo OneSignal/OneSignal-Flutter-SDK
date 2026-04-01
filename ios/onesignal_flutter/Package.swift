@@ -12,16 +12,16 @@ let package = Package(
         .library(name: "onesignal-flutter", targets: ["onesignal_flutter"])
     ],
     dependencies: [
-        .package(url: "https://github.com/OneSignal/OneSignal-iOS-SDK", exact: "5.5.0"),
+        .package(url: "https://github.com/OneSignal/OneSignal-XCFramework", exact: "5.5.0"),
     ],
     targets: [
         .target(
             name: "onesignal_flutter",
             dependencies: [
-                .product(name: "OneSignalFramework", package: "OneSignal-iOS-SDK"),
-                .product(name: "OneSignalInAppMessages", package: "OneSignal-iOS-SDK"),
-                .product(name: "OneSignalLocation", package: "OneSignal-iOS-SDK"),
-                .product(name: "OneSignalExtension", package: "OneSignal-iOS-SDK"),
+                .product(name: "OneSignalFramework", package: "OneSignal-XCFramework"),
+                .product(name: "OneSignalInAppMessages", package: "OneSignal-XCFramework"),
+                .product(name: "OneSignalLocation", package: "OneSignal-XCFramework"),
+                .product(name: "OneSignalExtension", package: "OneSignal-XCFramework"),
             ],
             cSettings: [
                 .headerSearchPath("include/onesignal_flutter")
