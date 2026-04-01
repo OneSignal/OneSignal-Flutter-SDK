@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 
 import '../../theme.dart';
 import '../../viewmodels/app_viewmodel.dart';
+import '../app_text_field.dart';
 import '../action_button.dart';
 import '../section_card.dart';
 
@@ -138,7 +139,7 @@ class _InputRow extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: TextField(
+          child: AppTextField(
             controller: controller,
             textAlign: TextAlign.right,
             style: const TextStyle(fontSize: 14, color: Color(0xFF212121)),
@@ -149,7 +150,6 @@ class _InputRow extends StatelessWidget {
               contentPadding: EdgeInsets.symmetric(vertical: 4),
               isDense: true,
             ),
-            autocorrect: false,
             onChanged: onChanged,
           ),
         ),
