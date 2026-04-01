@@ -55,14 +55,18 @@ This enables push notifications (`aps-environment`) and an App Group shared with
 
 ### Info.plist
 
-In `Runner/Info.plist`, add the `UIBackgroundModes` array inside the top-level `<dict>`:
+In `Runner/Info.plist`, add the following inside the top-level `<dict>`:
 
 ```xml
+<key>NSSupportsLiveActivities</key>
+<true/>
 <key>UIBackgroundModes</key>
 <array>
     <string>remote-notification</string>
 </array>
 ```
+
+`NSSupportsLiveActivities` is required in the **main app target** for ActivityKit to start Live Activities. `UIBackgroundModes` with `remote-notification` enables background push processing.
 
 ---
 
@@ -199,7 +203,7 @@ Same standard `CFBundle*` keys as the NSE, plus `NSSupportsLiveActivities`.
 
 ### OneSignalWidgetLiveActivity.swift
 
-`OneSignalWidgetAttributes` must conform to `OneSignalLiveActivityAttributes` (with `var onesignal: OneSignalLiveActivityAttributeData`), and `ContentState` must conform to `OneSignalLiveActivityContentState` (with `var onesignal: OneSignalLiveActivityContentStateData?`).
+Uses `DefaultLiveActivityAttributes` from the OneSignal SDK, which allows the SDK to handle the entire Live Activity lifecycle. Attributes and content state are passed as dynamic dictionaries from the Flutter side via `startDefault()`. The widget renders an order delivery UI with status-based theming and a progress bar.
 
 ```swift
 import ActivityKit
@@ -207,45 +211,141 @@ import WidgetKit
 import SwiftUI
 import OneSignalLiveActivities
 
-struct OneSignalWidgetAttributes: OneSignalLiveActivityAttributes  {
-    public struct ContentState: OneSignalLiveActivityContentState {
-        var emoji: String
-        var onesignal: OneSignalLiveActivityContentStateData?
-    }
-    var name: String
-    var onesignal: OneSignalLiveActivityAttributeData
-}
-
+@available(iOS 16.2, *)
 struct OneSignalWidgetLiveActivity: Widget {
+
+    private func statusIcon(for status: String) -> String {
+        switch status {
+        case "on_the_way": return "box.truck.fill"
+        case "delivered":  return "checkmark.circle.fill"
+        default:           return "bag.fill"
+        }
+    }
+
+    private func statusColor(for status: String) -> Color {
+        switch status {
+        case "on_the_way": return .blue
+        case "delivered":  return .green
+        default:           return .orange
+        }
+    }
+
+    private func statusLabel(for status: String) -> String {
+        switch status {
+        case "on_the_way": return "On the Way"
+        case "delivered":  return "Delivered"
+        default:           return "Preparing"
+        }
+    }
+
     var body: some WidgetConfiguration {
-        ActivityConfiguration(for: OneSignalWidgetAttributes.self) { context in
-            VStack {
-                Text("Hello \(context.attributes.name) \(context.state.emoji)")
+        ActivityConfiguration(for: DefaultLiveActivityAttributes.self) { context in
+            let orderNumber = context.attributes.data["orderNumber"]?.asString() ?? "Order"
+            let status = context.state.data["status"]?.asString() ?? "preparing"
+            let message = context.state.data["message"]?.asString() ?? "Your order is being prepared"
+            let eta = context.state.data["estimatedTime"]?.asString() ?? ""
+
+            VStack(spacing: 10) {
+                HStack {
+                    Text(orderNumber)
+                        .font(.caption)
+                        .foregroundColor(.gray)
+                    Spacer()
+                    if !eta.isEmpty {
+                        Text(eta)
+                            .font(.caption)
+                            .foregroundColor(.white.opacity(0.7))
+                    }
+                }
+
+                HStack(spacing: 12) {
+                    Image(systemName: statusIcon(for: status))
+                        .font(.title2)
+                        .foregroundColor(statusColor(for: status))
+
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(statusLabel(for: status))
+                            .font(.headline)
+                            .foregroundColor(.white)
+                        Text(message)
+                            .font(.subheadline)
+                            .foregroundColor(.white.opacity(0.8))
+                            .lineLimit(1)
+                    }
+                    Spacer()
+                }
+
+                DeliveryProgressBar(status: status)
             }
-            .activityBackgroundTint(Color.cyan)
-            .activitySystemActionForegroundColor(Color.black)
+            .padding()
+            .activityBackgroundTint(Color(red: 0.11, green: 0.13, blue: 0.19))
+            .activitySystemActionForegroundColor(.white)
 
         } dynamicIsland: { context in
-            DynamicIsland {
+            let status = context.state.data["status"]?.asString() ?? "preparing"
+            let message = context.state.data["message"]?.asString() ?? "Preparing"
+            let eta = context.state.data["estimatedTime"]?.asString() ?? ""
+
+            return DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    Text("Leading")
+                    Image(systemName: statusIcon(for: status))
+                        .font(.title2)
+                        .foregroundColor(statusColor(for: status))
+                }
+                DynamicIslandExpandedRegion(.center) {
+                    Text(statusLabel(for: status))
+                        .font(.headline)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("Trailing")
+                    if !eta.isEmpty {
+                        Text(eta)
+                            .font(.caption)
+                            .foregroundColor(.secondary)
+                    }
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text("Bottom \(context.state.emoji)")
+                    Text(message)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
             } compactLeading: {
-                Text("L")
+                Image(systemName: statusIcon(for: status))
+                    .foregroundColor(statusColor(for: status))
             } compactTrailing: {
-                Text("T \(context.state.emoji)")
+                Text(statusLabel(for: status))
+                    .font(.caption)
             } minimal: {
-                Text(context.state.emoji)
+                Image(systemName: statusIcon(for: status))
+                    .foregroundColor(statusColor(for: status))
             }
-            .widgetURL(URL(string: "http://www.apple.com"))
-            .keylineTint(Color.red)
         }
+    }
+}
+
+@available(iOS 16.2, *)
+struct DeliveryProgressBar: View {
+    let status: String
+
+    private var progress: CGFloat {
+        switch status {
+        case "on_the_way": return 0.6
+        case "delivered":  return 1.0
+        default:           return 0.25
+        }
+    }
+
+    var body: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(Color.white.opacity(0.2))
+                    .frame(height: 6)
+                RoundedRectangle(cornerRadius: 3)
+                    .fill(progress >= 1.0 ? Color.green : Color.blue)
+                    .frame(width: geo.size.width * progress, height: 6)
+            }
+        }
+        .frame(height: 6)
     }
 }
 ```

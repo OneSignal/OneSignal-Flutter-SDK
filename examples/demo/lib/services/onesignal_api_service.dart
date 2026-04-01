@@ -109,9 +109,9 @@ class OneSignalApiService {
 
       LogManager().i(
         'API',
-        'Update live activity response: ${response.statusCode}',
+        'Update live activity response: ${response.statusCode} ${response.body}',
       );
-      return response.statusCode == 200;
+      return response.statusCode >= 200 && response.statusCode < 300;
     } catch (e) {
       LogManager().e('API', 'Update live activity error: $e');
       return false;
@@ -133,6 +133,7 @@ class OneSignalApiService {
         },
         body: jsonEncode({
           'event': 'end',
+          'event_updates': {'message': 'Ended'},
           'dismissal_date': dismissalDate,
           'name': 'live_activity_end',
         }),
@@ -140,9 +141,9 @@ class OneSignalApiService {
 
       LogManager().i(
         'API',
-        'End live activity response: ${response.statusCode}',
+        'End live activity response: ${response.statusCode} ${response.body}',
       );
-      return response.statusCode == 200;
+      return response.statusCode >= 200 && response.statusCode < 300;
     } catch (e) {
       LogManager().e('API', 'End live activity error: $e');
       return false;
