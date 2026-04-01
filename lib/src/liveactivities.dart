@@ -19,7 +19,8 @@ class OneSignalLiveActivities {
   /// Indicate this device has exited a live activity, identified within OneSignal by the [activityId].
   ///
   /// Only applies to iOS.
-  @Deprecated('This API is no longer supported and will be removed in a future release.')
+  @Deprecated(
+      'This API is no longer supported and will be removed in a future release.')
   Future<void> exitLiveActivity(String activityId) async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return await _channel.invokeMethod(
