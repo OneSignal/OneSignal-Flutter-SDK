@@ -22,6 +22,7 @@ let package = Package(
                 .product(name: "OneSignalInAppMessages", package: "OneSignal-XCFramework"),
                 .product(name: "OneSignalLocation", package: "OneSignal-XCFramework"),
                 .product(name: "OneSignalExtension", package: "OneSignal-XCFramework"),
+                .product(name: "OneSignalLiveActivities", package: "OneSignal-XCFramework"),
             ],
             cSettings: [
                 .headerSearchPath("include/onesignal_flutter")
