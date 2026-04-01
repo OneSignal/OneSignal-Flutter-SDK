@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../services/tooltip_helper.dart';
 import '../theme.dart';
+import 'app_text_field.dart';
 
 // Single input dialog (login, email, sms)
 class SingleInputDialog extends StatefulWidget {
@@ -42,7 +43,7 @@ class _SingleInputDialogState extends State<SingleInputDialog> {
         width: double.maxFinite,
         child: Semantics(
           label: '${widget.fieldLabel}_input',
-          child: TextField(
+          child: AppTextField(
             controller: _controller,
             decoration: InputDecoration(labelText: widget.fieldLabel),
             keyboardType: widget.keyboardType,
@@ -109,7 +110,7 @@ class _PairInputDialogState extends State<PairInputDialog> {
             Expanded(
               child: Semantics(
                 label: '${widget.keyLabel}_input',
-                child: TextField(
+                child: AppTextField(
                   controller: _keyController,
                   decoration: InputDecoration(labelText: widget.keyLabel),
                   onChanged: (_) => setState(() {}),
@@ -120,7 +121,7 @@ class _PairInputDialogState extends State<PairInputDialog> {
             Expanded(
               child: Semantics(
                 label: '${widget.valueLabel}_input',
-                child: TextField(
+                child: AppTextField(
                   controller: _valueController,
                   decoration: InputDecoration(labelText: widget.valueLabel),
                   onChanged: (_) => setState(() {}),
@@ -231,7 +232,7 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
                 Row(
                 children: [
                   Expanded(
-                    child: TextField(
+                    child: AppTextField(
                       controller: _keyControllers[i],
                       decoration: InputDecoration(
                         labelText: widget.keyLabel,
@@ -241,7 +242,7 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: TextField(
+                    child: AppTextField(
                       controller: _valueControllers[i],
                       decoration: InputDecoration(
                         labelText: widget.valueLabel,
@@ -380,7 +381,7 @@ class _LoginDialogState extends State<LoginDialog> {
         width: double.maxFinite,
         child: Semantics(
           label: 'external_user_id_input',
-          child: TextField(
+          child: AppTextField(
             controller: _controller,
             decoration: const InputDecoration(labelText: 'External User Id'),
             onChanged: (_) => setState(() {}),
@@ -468,14 +469,14 @@ class _OutcomeDialogState extends State<OutcomeDialog> {
                 ),
               ),
               const SizedBox(height: 8),
-              TextField(
+              AppTextField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Outcome Name'),
                 onChanged: (_) => setState(() {}),
               ),
               if (_type == OutcomeType.withValue) ...[
                 const SizedBox(height: 12),
-                TextField(
+                AppTextField(
                   controller: _valueController,
                   decoration: const InputDecoration(labelText: 'Value'),
                   keyboardType:
@@ -563,13 +564,13 @@ class _TrackEventDialogState extends State<TrackEventDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              TextField(
+              AppTextField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Event Name'),
                 onChanged: (_) => setState(() {}),
               ),
               const SizedBox(height: 12),
-              TextField(
+              AppTextField(
                 controller: _propsController,
                 decoration: InputDecoration(
                   labelText: 'Properties (optional, JSON)',
@@ -642,13 +643,13 @@ class _CustomNotificationDialogState extends State<CustomNotificationDialog> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
+            AppTextField(
               controller: _titleController,
               decoration: const InputDecoration(labelText: 'Title'),
               onChanged: (_) => setState(() {}),
             ),
             const SizedBox(height: 12),
-            TextField(
+            AppTextField(
               controller: _bodyController,
               decoration: const InputDecoration(labelText: 'Body'),
               onChanged: (_) => setState(() {}),

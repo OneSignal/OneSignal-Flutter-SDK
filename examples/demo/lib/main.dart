@@ -78,7 +78,12 @@ Future<void> main() async {
   });
 
   // Set up API service
-  final apiKey = dotenv.env['ONESIGNAL_API_KEY'] ?? '';
+  String apiKey = '';
+  try {
+    apiKey = dotenv.env['ONESIGNAL_API_KEY'] ?? '';
+  } catch (_) {
+    LogManager().w('App', 'API key not found, continuing without it');
+  }
   final apiService = OneSignalApiService()
     ..setAppId(appId)
     ..setApiKey(apiKey);
