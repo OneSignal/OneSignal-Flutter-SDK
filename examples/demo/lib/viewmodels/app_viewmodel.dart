@@ -488,7 +488,8 @@ class AppViewModel extends ChangeNotifier {
 
     final nextIndex = (_statusIndex + 1) % _orderStatuses.length;
     final content = Map<String, dynamic>.from(_orderStatuses[nextIndex]);
-    final success = await _repository.updateLiveActivity(_activityId, content);
+    final eventUpdates = {'data': content};
+    final success = await _repository.updateLiveActivity(_activityId, eventUpdates);
 
     _isLaUpdating = false;
     if (success) {

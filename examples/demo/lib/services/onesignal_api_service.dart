@@ -89,7 +89,7 @@ class OneSignalApiService {
 
   Future<bool> updateLiveActivity(
     String activityId,
-    Map<String, dynamic> contentState,
+    Map<String, dynamic> eventUpdates,
   ) async {
     try {
       final response = await http.post(
@@ -102,8 +102,9 @@ class OneSignalApiService {
         },
         body: jsonEncode({
           'event': 'update',
-          'event_updates': contentState,
+          'event_updates': eventUpdates,
           'name': 'live_activity_update',
+          'priority': 10,
         }),
       );
 

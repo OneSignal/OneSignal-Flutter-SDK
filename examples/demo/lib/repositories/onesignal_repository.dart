@@ -199,9 +199,9 @@ class OneSignalRepository {
 
   Future<bool> updateLiveActivity(
     String activityId,
-    Map<String, dynamic> contentState,
+    Map<String, dynamic> eventUpdates,
   ) async {
-    return _apiService.updateLiveActivity(activityId, contentState);
+    return _apiService.updateLiveActivity(activityId, eventUpdates);
   }
 
   Future<bool> endLiveActivity(String activityId) async {
