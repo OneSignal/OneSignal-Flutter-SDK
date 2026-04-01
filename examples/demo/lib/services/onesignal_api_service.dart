@@ -8,9 +8,13 @@ import '../services/log_manager.dart';
 
 class OneSignalApiService {
   String _appId = '';
+  String _apiKey = '';
 
   void setAppId(String appId) => _appId = appId;
   String get appId => _appId;
+
+  void setApiKey(String apiKey) => _apiKey = apiKey;
+  bool hasApiKey() => _apiKey.isNotEmpty && _apiKey != 'your_rest_api_key';
 
   Future<bool> sendNotification(
     NotificationType type,
@@ -79,6 +83,70 @@ class OneSignalApiService {
       return response.statusCode == 200;
     } catch (e) {
       LogManager().e('API', 'Send custom notification error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> updateLiveActivity(
+    String activityId,
+    Map<String, dynamic> eventUpdates,
+  ) async {
+    try {
+      final response = await http.post(
+        Uri.parse(
+          'https://api.onesignal.com/apps/$_appId/live_activities/$activityId/notifications',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Key $_apiKey',
+        },
+        body: jsonEncode({
+          'event': 'update',
+          'event_updates': eventUpdates,
+          'name': 'live_activity_update',
+          'priority': 10,
+        }),
+      );
+
+      LogManager().i(
+        'API',
+        'Update live activity response: ${response.statusCode} ${response.body}',
+      );
+      return response.statusCode >= 200 && response.statusCode < 300;
+    } catch (e) {
+      LogManager().e('API', 'Update live activity error: $e');
+      return false;
+    }
+  }
+
+  Future<bool> endLiveActivity(String activityId) async {
+    try {
+      final dismissalDate =
+          DateTime.now().add(const Duration(seconds: 5)).millisecondsSinceEpoch ~/
+              1000;
+      final response = await http.post(
+        Uri.parse(
+          'https://api.onesignal.com/apps/$_appId/live_activities/$activityId/notifications',
+        ),
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Key $_apiKey',
+        },
+        body: jsonEncode({
+          'event': 'end',
+          'event_updates': {'message': 'Ended'},
+          'dismissal_date': dismissalDate,
+          'name': 'live_activity_end',
+        }),
+      );
+
+      LogManager().i(
+        'API',
+        'End live activity response: ${response.statusCode} ${response.body}',
+      );
+      return response.statusCode >= 200 && response.statusCode < 300;
+    } catch (e) {
+      LogManager().e('API', 'End live activity error: $e');
       return false;
     }
   }

@@ -1,4 +1,6 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 
@@ -16,6 +18,13 @@ const String oneSignalAppId = '77e32082-ea27-42e3-a898-c72e141824ef';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
+  // Load environment variables
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (_) {
+    LogManager().w('App', '.env file not found, continuing without API key');
+  }
+
   // Initialize preferences
   final prefs = PreferencesService();
   await prefs.init();
@@ -27,6 +36,13 @@ Future<void> main() async {
   OneSignal.consentRequired(prefs.consentRequired);
   OneSignal.consentGiven(prefs.privacyConsent);
   await OneSignal.initialize(appId);
+
+  OneSignal.LiveActivities.setupDefault(
+    options: LiveActivitySetupOptions(
+      enablePushToStart: true,
+      enablePushToUpdate: true,
+    ),
+  );
 
   // Restore cached SDK states after init fully completes
   OneSignal.InAppMessages.paused(prefs.iamPaused);
@@ -62,7 +78,10 @@ Future<void> main() async {
   });
 
   // Set up API service
-  final apiService = OneSignalApiService()..setAppId(appId);
+  final apiKey = dotenv.env['ONESIGNAL_API_KEY'] ?? '';
+  final apiService = OneSignalApiService()
+    ..setAppId(appId)
+    ..setApiKey(apiKey);
   final repository = OneSignalRepository(apiService);
 
   // Fetch tooltips in background
