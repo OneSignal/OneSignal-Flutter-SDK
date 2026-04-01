@@ -11,5 +11,8 @@ class AppTextField extends TextField {
     super.style,
     super.maxLines,
     super.autocorrect = false,
+    super.enableSuggestions = false,
+    super.smartQuotesType = SmartQuotesType.disabled,
+    super.smartDashesType = SmartDashesType.disabled,
   });
 }
