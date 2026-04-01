@@ -1,5 +1,5 @@
 group 'com.onesignal.flutter'
-version '5.3.4'
+version '5.5.0'
 
 buildscript {
     repositories {
