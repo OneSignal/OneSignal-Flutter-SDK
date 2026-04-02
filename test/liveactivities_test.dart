@@ -39,6 +39,7 @@ void main() {
 
     group('exitLiveActivity', () {
       test('invokes OneSignal#exitLiveActivity with activityId', () async {
+        // ignore: deprecated_member_use_from_same_package
         await liveActivities.exitLiveActivity(activityId);
 
         expect(channelController.state.liveActivityExited, true);

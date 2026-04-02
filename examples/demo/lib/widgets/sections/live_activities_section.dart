@@ -85,18 +85,6 @@ class _LiveActivitiesSectionState extends State<LiveActivitiesSection> {
           SizedBox(
             width: double.infinity,
             child: OutlinedButton(
-              onPressed: activityEmpty ? null : () => vm.exitLiveActivity(),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.osPrimary,
-                side: const BorderSide(color: AppColors.osPrimary),
-              ),
-              child: const Text('STOP UPDATING LIVE ACTIVITY'),
-            ),
-          ),
-          AppSpacing.gapBox,
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
               onPressed: activityEmpty || !vm.hasApiKey
                   ? null
                   : () => vm.endLiveActivity(),

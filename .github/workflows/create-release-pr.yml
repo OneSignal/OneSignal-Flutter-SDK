@@ -158,6 +158,14 @@ jobs:
           sed -i '' "s/^version:.*/version: $NEW_VERSION/" pubspec.yaml
           echo "✓ Updated pubspec.yaml version to ${NEW_VERSION}"
 
+          # Update podspec version
+          sed -i '' "s|s\.version[[:space:]]*=[[:space:]]*'[^']*'|s.version          = '${NEW_VERSION}'|" ios/onesignal_flutter.podspec
+          echo "✓ Updated ios/onesignal_flutter.podspec version to ${NEW_VERSION}"
+
+          # Update android build.gradle version
+          sed -i '' "s|^version '[^']*'|version '${NEW_VERSION}'|" android/build.gradle
+          echo "✓ Updated android/build.gradle version to ${NEW_VERSION}"
+
           # Update OneSignalPlugin.java wrapper version
           sed -i '' "s/OneSignalWrapper\.setSdkVersion(\"[^\"]*\")/OneSignalWrapper.setSdkVersion(\"$WRAPPER_VERSION\")/g" android/src/main/java/com/onesignal/flutter/OneSignalPlugin.java
 

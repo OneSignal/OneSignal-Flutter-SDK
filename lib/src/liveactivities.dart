@@ -5,7 +5,7 @@ class OneSignalLiveActivities {
   // private channels used to bridge to ObjC/Java
   MethodChannel _channel = const MethodChannel('OneSignal#liveactivities');
 
-  /// Indicate this device has exited a live activity, identified within OneSignal by the [activityId]. The
+  /// Indicate this device has entered a live activity, identified within OneSignal by the [activityId]. The
   /// [token] is the ActivityKit's update token that will be used to update the live activity.
   ///
   /// Only applies to iOS.
@@ -19,6 +19,7 @@ class OneSignalLiveActivities {
   /// Indicate this device has exited a live activity, identified within OneSignal by the [activityId].
   ///
   /// Only applies to iOS.
+  @Deprecated('Currently unsupported, avoid using this method.')
   Future<void> exitLiveActivity(String activityId) async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return await _channel.invokeMethod(
