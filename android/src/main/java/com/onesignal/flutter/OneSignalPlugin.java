@@ -23,8 +23,8 @@ public class OneSignalPlugin extends FlutterMessengerResponder
         this.context = context;
         this.messenger = messenger;
         OneSignalWrapper.setSdkType("flutter");
-        // For 5.0.0, hard code to reflect SDK version
-        OneSignalWrapper.setSdkVersion("050500");
+        // Keep in sync with pubspec.yaml version
+        OneSignalWrapper.setSdkVersion("050501");
 
         channel = new MethodChannel(messenger, "OneSignal");
         channel.setMethodCallHandler(this);
