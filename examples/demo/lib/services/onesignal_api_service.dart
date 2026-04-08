@@ -33,6 +33,12 @@ class OneSignalApiService {
       if (type.iosAttachments != null) {
         body['ios_attachments'] = type.iosAttachments;
       }
+      if (type.iosSound != null) {
+        body['ios_sound'] = type.iosSound;
+      }
+      if (type.androidChannelId != null) {
+        body['android_channel_id'] = type.androidChannelId;
+      }
 
       final response = await http.post(
         Uri.parse('https://onesignal.com/api/v1/notifications'),

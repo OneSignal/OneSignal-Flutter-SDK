@@ -1,6 +1,6 @@
 PODS:
   - Flutter (1.0.0)
-  - onesignal_flutter (5.5.0):
+  - onesignal_flutter (5.5.1):
     - Flutter
     - OneSignalXCFramework (= 5.5.0)
   - OneSignalXCFramework (5.5.0):
@@ -78,7 +78,7 @@ EXTERNAL SOURCES:
 
 SPEC CHECKSUMS:
   Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
-  onesignal_flutter: 786a2ae8d69120f3041f0f1de326bee63b319e3e
+  onesignal_flutter: e2e682f7c4b0604ddba445d4f8ea6e79c77dabe1
   OneSignalXCFramework: 943852e7d70d719f73e9669d48620aeec1b93022
   shared_preferences_foundation: 7036424c3d8ec98dfe75ff1667cb0cd531ec82bb
   url_launcher_ios: 7a95fa5b60cc718a708b8f2966718e93db0cef1b

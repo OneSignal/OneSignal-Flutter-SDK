@@ -33,6 +33,11 @@ class SendPushSection extends StatelessWidget {
           ),
           AppSpacing.gapBox,
           PrimaryButton(
+            label: 'WITH SOUND',
+            onPressed: () => vm.sendNotification(NotificationType.withSound),
+          ),
+          AppSpacing.gapBox,
+          PrimaryButton(
             label: 'CUSTOM',
             onPressed: () async {
               final result = await showDialog<Map<String, String>>(
