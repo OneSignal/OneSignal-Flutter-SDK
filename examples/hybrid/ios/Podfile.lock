@@ -1,0 +1,22 @@
+PODS:
+  - cocoapods_only_plugin (0.0.1):
+    - Flutter
+  - Flutter (1.0.0)
+
+DEPENDENCIES:
+  - cocoapods_only_plugin (from `.symlinks/plugins/cocoapods_only_plugin/ios`)
+  - Flutter (from `Flutter`)
+
+EXTERNAL SOURCES:
+  cocoapods_only_plugin:
+    :path: ".symlinks/plugins/cocoapods_only_plugin/ios"
+  Flutter:
+    :path: Flutter
+
+SPEC CHECKSUMS:
+  cocoapods_only_plugin: 74c349e676c0f8c2da6835ce2c2f67e55d6173e4
+  Flutter: cabc95a1d2626b1b06e7179b784ebcf0c0cde467
+
+PODFILE CHECKSUM: 35a2496d953b78d5fb37339ae9ffb08c120bebdc
+
+COCOAPODS: 1.16.2
