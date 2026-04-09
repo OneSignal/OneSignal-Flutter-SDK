@@ -1,7 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
 class PreferencesService {
-  static const _keyAppId = 'app_id';
   static const _keyConsentRequired = 'consent_required';
   static const _keyPrivacyConsent = 'privacy_consent';
   static const _keyExternalUserId = 'external_user_id';
@@ -13,10 +12,6 @@ class PreferencesService {
   Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
   }
-
-  // App ID
-  String? get appId => _prefs.getString(_keyAppId);
-  Future<void> setAppId(String value) => _prefs.setString(_keyAppId, value);
 
   // Consent required
   bool get consentRequired => _prefs.getBool(_keyConsentRequired) ?? false;

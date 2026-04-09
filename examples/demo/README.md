@@ -46,7 +46,20 @@ flutter run -d <device_id>
 
 ## Configuration
 
-The app uses a default OneSignal App ID for testing. To use your own, update the `oneSignalAppId` constant in `lib/main.dart`.
+Copy the example environment file and fill in your values:
+
+```bash
+cp .env.example .env
+```
+
+Set your OneSignal credentials in `.env`:
+
+```
+ONESIGNAL_APP_ID=your-onesignal-app-id
+ONESIGNAL_API_KEY=your-onesignal-api-key
+```
+
+If no `.env` is provided, the app falls back to a built-in default App ID.
 
 ## Build Guide
 
