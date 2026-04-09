@@ -1,0 +1,132 @@
+name: E2E Tests
+
+on:
+  push:
+    branches:
+      - rel/**
+  workflow_dispatch:
+    inputs:
+      platform:
+        description: 'Platform to test'
+        required: true
+        default: 'android'
+        type: choice
+        options:
+          - android
+          - ios
+          - both
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-android:
+    if: >-
+      github.event_name == 'push' ||
+      github.event.inputs.platform == 'android' ||
+      github.event.inputs.platform == 'both'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Flutter
+        uses: ./.github/actions/setup-flutter
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Create demo .env
+        working-directory: examples/demo
+        run: echo "ONESIGNAL_APP_ID=${{ secrets.E2E_ONESIGNAL_APP_ID }}" > .env
+
+      - name: Build release APK
+        working-directory: examples/demo
+        run: flutter build apk --release
+
+      - name: Upload APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-apk
+          path: examples/demo/build/app/outputs/flutter-apk/app-release.apk
+          retention-days: 1
+
+  build-ios:
+    if: >-
+      github.event.inputs.platform == 'ios' ||
+      github.event.inputs.platform == 'both'
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Flutter
+        uses: ./.github/actions/setup-flutter
+
+      - name: Create demo .env
+        working-directory: examples/demo
+        run: echo "ONESIGNAL_APP_ID=${{ secrets.E2E_ONESIGNAL_APP_ID }}" > .env
+
+      - name: Install CocoaPods dependencies
+        working-directory: examples/demo/ios
+        run: pod install
+
+      - name: Build iOS app
+        working-directory: examples/demo
+        run: |
+          flutter build ios --release --no-codesign
+          cd build/ios/iphoneos
+          mkdir Payload
+          cp -r Runner.app Payload/
+          zip -r Runner.ipa Payload
+
+      - name: Upload IPA
+        uses: actions/upload-artifact@v4
+        with:
+          name: demo-ipa
+          path: examples/demo/build/ios/iphoneos/Runner.ipa
+          retention-days: 1
+
+  e2e-android:
+    needs: build-android
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download APK
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-apk
+
+      - name: Run Appium E2E (Android)
+        uses: OneSignal/sdk-shared/.github/actions/appium-e2e@main
+        with:
+          platform: android
+          app-path: app-release.apk
+          sdk-type: flutter
+          browserstack-username: ${{ secrets.BROWSERSTACK_USERNAME }}
+          browserstack-access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          onesignal-app-id: ${{ secrets.E2E_ONESIGNAL_APP_ID }}
+          build-name: flutter-android-${{ github.ref_name }}-${{ github.run_number }}
+
+  e2e-ios:
+    needs: build-ios
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download IPA
+        uses: actions/download-artifact@v4
+        with:
+          name: demo-ipa
+
+      - name: Run Appium E2E (iOS)
+        uses: OneSignal/sdk-shared/.github/actions/appium-e2e@main
+        with:
+          platform: ios
+          app-path: Runner.ipa
+          sdk-type: flutter
+          browserstack-username: ${{ secrets.BROWSERSTACK_USERNAME }}
+          browserstack-access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
+          onesignal-app-id: ${{ secrets.E2E_ONESIGNAL_APP_ID }}
+          build-name: flutter-ios-${{ github.ref_name }}-${{ github.run_number }}

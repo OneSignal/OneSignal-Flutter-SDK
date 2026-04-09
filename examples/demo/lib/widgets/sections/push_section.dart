@@ -49,6 +49,7 @@ class PushSection extends StatelessWidget {
                   ToggleRow(
                     label: 'Enabled',
                     value: vm.pushEnabled,
+                    semanticsLabel: 'push_enabled_toggle',
                     onChanged: vm.hasNotificationPermission
                         ? vm.togglePush
                         : null,

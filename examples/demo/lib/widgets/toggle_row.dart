@@ -7,6 +7,7 @@ class ToggleRow extends StatelessWidget {
   final String? description;
   final bool value;
   final ValueChanged<bool>? onChanged;
+  final String? semanticsLabel;
 
   const ToggleRow({
     super.key,
@@ -14,10 +15,19 @@ class ToggleRow extends StatelessWidget {
     this.description,
     required this.value,
     this.onChanged,
+    this.semanticsLabel,
   });
 
   @override
   Widget build(BuildContext context) {
+    Widget toggle = Switch(
+      value: value,
+      onChanged: onChanged,
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+    );
+    if (semanticsLabel != null) {
+      toggle = Semantics(label: semanticsLabel, child: toggle);
+    }
     return Row(
       children: [
         Expanded(
@@ -35,11 +45,7 @@ class ToggleRow extends StatelessWidget {
             ],
           ),
         ),
-        Switch(
-          value: value,
-          onChanged: onChanged,
-          materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-        ),
+        toggle,
       ],
     );
   }

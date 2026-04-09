@@ -66,6 +66,7 @@ class UserSection extends StatelessWidget {
           AppSpacing.gapBox,
           PrimaryButton(
             label: vm.isLoggedIn ? 'SWITCH USER' : 'LOGIN USER',
+            semanticsLabel: 'login_user_button',
             onPressed: () async {
               final result = await showDialog<String>(
                 context: context,
@@ -80,6 +81,7 @@ class UserSection extends StatelessWidget {
             AppSpacing.gapBox,
             DestructiveButton(
               label: 'LOGOUT USER',
+              semanticsLabel: 'logout_user_button',
               onPressed: vm.logoutUser,
             ),
           ],

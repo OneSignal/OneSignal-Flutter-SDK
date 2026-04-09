@@ -72,12 +72,18 @@ class PairInputDialog extends StatefulWidget {
   final String title;
   final String keyLabel;
   final String valueLabel;
+  final String? keySemanticsLabel;
+  final String? valueSemanticsLabel;
+  final String? confirmSemanticsLabel;
 
   const PairInputDialog({
     super.key,
     required this.title,
     this.keyLabel = 'Key',
     this.valueLabel = 'Value',
+    this.keySemanticsLabel,
+    this.valueSemanticsLabel,
+    this.confirmSemanticsLabel,
   });
 
   @override
@@ -109,7 +115,7 @@ class _PairInputDialogState extends State<PairInputDialog> {
           children: [
             Expanded(
               child: Semantics(
-                label: '${widget.keyLabel}_input',
+                label: widget.keySemanticsLabel ?? '${widget.keyLabel}_input',
                 child: AppTextField(
                   controller: _keyController,
                   decoration: InputDecoration(labelText: widget.keyLabel),
@@ -120,7 +126,7 @@ class _PairInputDialogState extends State<PairInputDialog> {
             const SizedBox(width: 12),
             Expanded(
               child: Semantics(
-                label: '${widget.valueLabel}_input',
+                label: widget.valueSemanticsLabel ?? '${widget.valueLabel}_input',
                 child: AppTextField(
                   controller: _valueController,
                   decoration: InputDecoration(labelText: widget.valueLabel),
@@ -136,14 +142,17 @@ class _PairInputDialogState extends State<PairInputDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _isValid
-              ? () => Navigator.pop(
-                    context,
-                    MapEntry(_keyController.text, _valueController.text),
-                  )
-              : null,
-          child: const Text('Add'),
+        Semantics(
+          label: widget.confirmSemanticsLabel,
+          child: TextButton(
+            onPressed: _isValid
+                ? () => Navigator.pop(
+                      context,
+                      MapEntry(_keyController.text, _valueController.text),
+                    )
+                : null,
+            child: const Text('Add'),
+          ),
         ),
       ],
     );
@@ -380,7 +389,7 @@ class _LoginDialogState extends State<LoginDialog> {
       content: SizedBox(
         width: double.maxFinite,
         child: Semantics(
-          label: 'external_user_id_input',
+          label: 'login_user_id_input',
           child: AppTextField(
             controller: _controller,
             decoration: const InputDecoration(labelText: 'External User Id'),
@@ -393,11 +402,14 @@ class _LoginDialogState extends State<LoginDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _controller.text.isEmpty
-              ? null
-              : () => Navigator.pop(context, _controller.text),
-          child: const Text('Login'),
+        Semantics(
+          label: 'login_confirm_button',
+          child: TextButton(
+            onPressed: _controller.text.isEmpty
+                ? null
+                : () => Navigator.pop(context, _controller.text),
+            child: const Text('Login'),
+          ),
         ),
       ],
     );

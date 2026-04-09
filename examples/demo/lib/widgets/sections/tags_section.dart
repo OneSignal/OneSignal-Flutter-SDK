@@ -36,10 +36,16 @@ class TagsSection extends StatelessWidget {
           AppSpacing.gapBox,
           PrimaryButton(
             label: 'ADD',
+            semanticsLabel: 'add_tag_button',
             onPressed: () async {
               final result = await showDialog<MapEntry<String, String>>(
                 context: context,
-                builder: (_) => const PairInputDialog(title: 'Add Tag'),
+                builder: (_) => const PairInputDialog(
+                  title: 'Add Tag',
+                  keySemanticsLabel: 'multi_pair_key_0',
+                  valueSemanticsLabel: 'multi_pair_value_0',
+                  confirmSemanticsLabel: 'multi_pair_confirm_button',
+                ),
               );
               if (result != null) {
                 vm.addTag(result.key, result.value);
