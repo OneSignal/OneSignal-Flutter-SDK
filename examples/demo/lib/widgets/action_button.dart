@@ -39,7 +39,7 @@ class PrimaryButton extends StatelessWidget {
       ),
     );
     if (semanticsLabel != null) {
-      button = Semantics(label: semanticsLabel, child: button);
+      button = Semantics(identifier: semanticsLabel, container: true, child: button);
     }
     return button;
   }
@@ -71,7 +71,7 @@ class DestructiveButton extends StatelessWidget {
       ),
     );
     if (semanticsLabel != null) {
-      button = Semantics(label: semanticsLabel, child: button);
+      button = Semantics(identifier: semanticsLabel, container: true, child: button);
     }
     return button;
   }

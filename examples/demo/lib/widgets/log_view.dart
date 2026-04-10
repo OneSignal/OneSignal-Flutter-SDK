@@ -55,139 +55,131 @@ class _LogViewState extends State<LogView> {
     const logBackground = AppColors.osLogBackground;
 
     return Semantics(
-      label: 'log_view_container',
+      identifier: 'log_view_container',
+      container: true,
       child: Card(
         margin: EdgeInsets.zero,
         color: logBackground,
         shape: const RoundedRectangleBorder(),
         child: Column(
           children: [
-            Semantics(
-              label: 'log_view_header',
-              child: InkWell(
-                onTap: () => setState(() => _expanded = !_expanded),
-                borderRadius: BorderRadius.zero,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 12,
-                  ),
-                  child: Row(
-                    children: [
-                      Text(
-                        'LOGS',
+            InkWell(
+              onTap: () => setState(() => _expanded = !_expanded),
+              excludeFromSemantics: true,
+              borderRadius: BorderRadius.zero,
+              child: Padding(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
+                ),
+                child: Row(
+                  children: [
+                    Text(
+                      'LOGS',
+                      style: textTheme.labelSmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Semantics(
+                      identifier: 'log_view_count',
+                      container: true,
+                      child: Text(
+                        '${logs.length}',
                         style: textTheme.labelSmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: AppColors.osGrey500,
                         ),
                       ),
-                      const SizedBox(width: 8),
+                    ),
+                    const Spacer(),
+                    if (logs.isNotEmpty)
                       Semantics(
-                        label: 'log_view_count',
-                        child: Text(
-                          '(${logs.length})',
-                          style: textTheme.labelSmall?.copyWith(
+                        identifier: 'log_view_clear_button',
+                        container: true,
+                        child: GestureDetector(
+                          excludeFromSemantics: true,
+                          onTap: () => LogManager().clear(),
+                          child: const Icon(
+                            Icons.delete,
+                            size: 18,
                             color: AppColors.osGrey500,
                           ),
                         ),
                       ),
-                      const Spacer(),
-                      if (logs.isNotEmpty)
-                        Semantics(
-                          label: 'log_view_clear_button',
-                          child: GestureDetector(
-                            onTap: () => LogManager().clear(),
-                            child: const Icon(
-                              Icons.delete,
-                              size: 18,
-                              color: AppColors.osGrey500,
-                            ),
-                          ),
-                        ),
-                      const SizedBox(width: 8),
-                      Icon(
-                        _expanded
-                            ? Icons.expand_less
-                            : Icons.expand_more,
-                        size: 18,
-                        color: AppColors.osGrey500,
-                      ),
-                    ],
-                  ),
+                    const SizedBox(width: 8),
+                    Icon(
+                      _expanded
+                          ? Icons.expand_less
+                          : Icons.expand_more,
+                      size: 18,
+                      color: AppColors.osGrey500,
+                    ),
+                  ],
                 ),
               ),
             ),
             if (_expanded)
-              Semantics(
-                label: 'log_view_list',
-                child: SizedBox(
-                  height: 100,
-                  child: logs.isEmpty
-                      ? Semantics(
-                          label: 'log_view_empty',
-                          child: Center(
-                            child: Text(
-                              'No logs yet',
-                              style: textTheme.bodyMedium?.copyWith(
-                                color: AppColors.osGrey500,
-                              ),
-                            ),
+              SizedBox(
+                height: 100,
+                child: logs.isEmpty
+                    ? Center(
+                        child: Text(
+                          'No logs yet',
+                          style: textTheme.bodyMedium?.copyWith(
+                            color: AppColors.osGrey500,
                           ),
-                        )
-                      : ListView.builder(
-                          controller: _scrollController,
-                          itemCount: logs.length,
-                          padding: const EdgeInsets.symmetric(horizontal: 12),
-                          itemBuilder: (context, index) {
-                            final entry = logs[logs.length - 1 - index];
-                            return Semantics(
-                              label: 'log_entry_$index',
-                              child: Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 1,
-                                ),
-                                child: Row(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Semantics(
-                                      label: 'log_entry_${index}_timestamp',
-                                      child: Text(
-                                        entry.formattedTime,
-                                        style: logEntryStyle?.copyWith(
-                                          color: AppColors.osLogTimestamp,
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Semantics(
-                                      label: 'log_entry_${index}_level',
-                                      child: Text(
-                                        entry.levelLabel,
-                                        style: logEntryStyle?.copyWith(
-                                          fontWeight: FontWeight.bold,
-                                          color: _levelColor(entry.level),
-                                        ),
-                                      ),
-                                    ),
-                                    const SizedBox(width: 4),
-                                    Expanded(
-                                      child: Semantics(
-                                        label: 'log_entry_${index}_message',
-                                        child: Text(
-                                          '${entry.tag}: ${entry.message}',
-                                          style: logEntryStyle?.copyWith(
-                                            color: Colors.white,
-                                          ),
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            );
-                          },
                         ),
-                ),
+                      )
+                    : ListView.builder(
+                        controller: _scrollController,
+                        itemCount: logs.length,
+                        padding: const EdgeInsets.symmetric(horizontal: 12),
+                        itemBuilder: (context, index) {
+                          final entry = logs[logs.length - 1 - index];
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 1,
+                            ),
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  entry.formattedTime,
+                                  style: logEntryStyle?.copyWith(
+                                    color: AppColors.osLogTimestamp,
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Semantics(
+                                  identifier: 'log_entry_${index}_level',
+                                  container: true,
+                                  child: Text(
+                                    entry.levelLabel,
+                                    style: logEntryStyle?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: _levelColor(entry.level),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(width: 4),
+                                Expanded(
+                                  child: Semantics(
+                                    identifier: 'log_entry_${index}_message',
+                                    container: true,
+                                    child: Text(
+                                      '${entry.tag}: ${entry.message}',
+                                      style: logEntryStyle?.copyWith(
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                      ),
               ),
           ],
         ),

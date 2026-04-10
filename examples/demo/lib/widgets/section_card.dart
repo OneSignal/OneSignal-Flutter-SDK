@@ -5,12 +5,14 @@ import '../theme.dart';
 class SectionCard extends StatelessWidget {
   final String title;
   final VoidCallback? onInfoTap;
+  final String? sectionKey;
   final Widget child;
 
   const SectionCard({
     super.key,
     required this.title,
     this.onInfoTap,
+    this.sectionKey,
     required this.child,
   });
 
@@ -37,12 +39,16 @@ class SectionCard extends StatelessWidget {
                   ),
                 ),
                 if (onInfoTap != null)
-                  GestureDetector(
-                    onTap: onInfoTap,
-                    child: Icon(
-                      Icons.info_outline,
-                      size: 18,
-                      color: AppColors.osGrey500,
+                  Semantics(
+                    identifier: sectionKey != null ? '${sectionKey}_info_icon' : null,
+                    container: true,
+                    child: GestureDetector(
+                      onTap: onInfoTap,
+                      child: Icon(
+                        Icons.info_outline,
+                        size: 18,
+                        color: AppColors.osGrey500,
+                      ),
                     ),
                   ),
               ],

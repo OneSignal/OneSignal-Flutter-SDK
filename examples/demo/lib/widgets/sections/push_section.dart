@@ -18,6 +18,7 @@ class PushSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Push',
+      sectionKey: 'push',
       onInfoTap: onInfoTap,
       child: Column(
         children: [
@@ -35,12 +36,16 @@ class PushSection extends StatelessWidget {
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: SelectableText(
-                          vm.pushSubscriptionId ?? 'N/A',
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                                fontFamily: 'monospace',
-                              ),
-                          textAlign: TextAlign.end,
+                        child: Semantics(
+                          identifier: 'push_id_value',
+                          container: true,
+                          child: SelectableText(
+                            vm.pushSubscriptionId ?? 'N/A',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontFamily: 'monospace',
+                                ),
+                            textAlign: TextAlign.end,
+                          ),
                         ),
                       ),
                     ],

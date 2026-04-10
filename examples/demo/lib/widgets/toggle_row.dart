@@ -26,7 +26,7 @@ class ToggleRow extends StatelessWidget {
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
     );
     if (semanticsLabel != null) {
-      toggle = Semantics(label: semanticsLabel, child: toggle);
+      toggle = Semantics(identifier: semanticsLabel, container: true, child: toggle);
     }
     return Row(
       children: [

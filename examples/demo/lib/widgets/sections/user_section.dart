@@ -32,14 +32,18 @@ class UserSection extends StatelessWidget {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text('Status', style: Theme.of(context).textTheme.bodyMedium),
-                      Text(
-                        vm.isLoggedIn ? 'Logged In' : 'Anonymous',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              fontFamily: 'monospace',
-                              color: vm.isLoggedIn
-                                  ? AppColors.osSuccess
-                                  : AppColors.osGrey600,
-                            ),
+                      Semantics(
+                        identifier: 'user_status_value',
+                        container: true,
+                        child: Text(
+                          vm.isLoggedIn ? 'Logged In' : 'Anonymous',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontFamily: 'monospace',
+                                color: vm.isLoggedIn
+                                    ? AppColors.osSuccess
+                                    : AppColors.osGrey600,
+                              ),
+                        ),
                       ),
                     ],
                   ),
@@ -51,11 +55,15 @@ class UserSection extends StatelessWidget {
                         'External ID',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
-                      SelectableText(
-                        vm.isLoggedIn ? (vm.externalUserId ?? '') : '–',
-                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                              fontFamily: 'monospace',
-                            ),
+                      Semantics(
+                        identifier: 'user_external_id_value',
+                        container: true,
+                        child: SelectableText(
+                          vm.isLoggedIn ? (vm.externalUserId ?? '') : '–',
+                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                fontFamily: 'monospace',
+                              ),
+                        ),
                       ),
                     ],
                   ),

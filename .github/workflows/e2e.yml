@@ -42,7 +42,9 @@ jobs:
 
       - name: Create demo .env
         working-directory: examples/demo
-        run: echo "ONESIGNAL_APP_ID=${{ secrets.E2E_ONESIGNAL_APP_ID }}" > .env
+        run: |
+          echo "ONESIGNAL_APP_ID=${{ secrets.APPIUM_ONESIGNAL_APP_ID }}" > .env
+          echo "ONESIGNAL_API_KEY=${{ secrets.APPIUM_ONESIGNAL_API_KEY }}" >> .env
 
       - name: Build release APK
         working-directory: examples/demo
@@ -69,7 +71,9 @@ jobs:
 
       - name: Create demo .env
         working-directory: examples/demo
-        run: echo "ONESIGNAL_APP_ID=${{ secrets.E2E_ONESIGNAL_APP_ID }}" > .env
+        run: |
+          echo "ONESIGNAL_APP_ID=${{ secrets.APPIUM_ONESIGNAL_APP_ID }}" > .env
+          echo "ONESIGNAL_API_KEY=${{ secrets.APPIUM_ONESIGNAL_API_KEY }}" >> .env
 
       - name: Install CocoaPods dependencies
         working-directory: examples/demo/ios
@@ -108,7 +112,8 @@ jobs:
           sdk-type: flutter
           browserstack-username: ${{ secrets.BROWSERSTACK_USERNAME }}
           browserstack-access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-          onesignal-app-id: ${{ secrets.E2E_ONESIGNAL_APP_ID }}
+          onesignal-app-id: ${{ secrets.APPIUM_ONESIGNAL_APP_ID }}
+          onesignal-api-key: ${{ secrets.APPIUM_ONESIGNAL_API_KEY }}
           build-name: flutter-android-${{ github.ref_name }}-${{ github.run_number }}
 
   e2e-ios:
@@ -128,5 +133,6 @@ jobs:
           sdk-type: flutter
           browserstack-username: ${{ secrets.BROWSERSTACK_USERNAME }}
           browserstack-access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-          onesignal-app-id: ${{ secrets.E2E_ONESIGNAL_APP_ID }}
+          onesignal-app-id: ${{ secrets.APPIUM_ONESIGNAL_APP_ID }}
+          onesignal-api-key: ${{ secrets.APPIUM_ONESIGNAL_API_KEY }}
           build-name: flutter-ios-${{ github.ref_name }}-${{ github.run_number }}

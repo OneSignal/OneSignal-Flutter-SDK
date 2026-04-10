@@ -42,7 +42,8 @@ class _SingleInputDialogState extends State<SingleInputDialog> {
       content: SizedBox(
         width: double.maxFinite,
         child: Semantics(
-          label: '${widget.fieldLabel}_input',
+          identifier: '${widget.fieldLabel}_input',
+          container: true,
           child: AppTextField(
             controller: _controller,
             decoration: InputDecoration(labelText: widget.fieldLabel),
@@ -115,7 +116,8 @@ class _PairInputDialogState extends State<PairInputDialog> {
           children: [
             Expanded(
               child: Semantics(
-                label: widget.keySemanticsLabel ?? '${widget.keyLabel}_input',
+                identifier: widget.keySemanticsLabel ?? '${widget.keyLabel}_input',
+                container: true,
                 child: AppTextField(
                   controller: _keyController,
                   decoration: InputDecoration(labelText: widget.keyLabel),
@@ -126,7 +128,8 @@ class _PairInputDialogState extends State<PairInputDialog> {
             const SizedBox(width: 12),
             Expanded(
               child: Semantics(
-                label: widget.valueSemanticsLabel ?? '${widget.valueLabel}_input',
+                identifier: widget.valueSemanticsLabel ?? '${widget.valueLabel}_input',
+                container: true,
                 child: AppTextField(
                   controller: _valueController,
                   decoration: InputDecoration(labelText: widget.valueLabel),
@@ -143,7 +146,8 @@ class _PairInputDialogState extends State<PairInputDialog> {
           child: const Text('Cancel'),
         ),
         Semantics(
-          label: widget.confirmSemanticsLabel,
+          identifier: widget.confirmSemanticsLabel,
+          container: true,
           child: TextButton(
             onPressed: _isValid
                 ? () => Navigator.pop(
@@ -389,7 +393,8 @@ class _LoginDialogState extends State<LoginDialog> {
       content: SizedBox(
         width: double.maxFinite,
         child: Semantics(
-          label: 'login_user_id_input',
+          identifier: 'login_user_id_input',
+          container: true,
           child: AppTextField(
             controller: _controller,
             decoration: const InputDecoration(labelText: 'External User Id'),
@@ -403,7 +408,8 @@ class _LoginDialogState extends State<LoginDialog> {
           child: const Text('Cancel'),
         ),
         Semantics(
-          label: 'login_confirm_button',
+          identifier: 'login_confirm_button',
+          container: true,
           child: TextButton(
             onPressed: _controller.text.isEmpty
                 ? null
@@ -698,7 +704,11 @@ class TooltipDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: Text(tooltip.title),
+      title: Semantics(
+        identifier: 'tooltip_title',
+        container: true,
+        child: Text(tooltip.title),
+      ),
       content: SizedBox(
         width: double.maxFinite,
         child: SingleChildScrollView(
@@ -706,7 +716,11 @@ class TooltipDialog extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(tooltip.description),
+              Semantics(
+                identifier: 'tooltip_description',
+                container: true,
+                child: Text(tooltip.description),
+              ),
               if (tooltip.options != null && tooltip.options!.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 ...tooltip.options!.map((option) => Padding(
