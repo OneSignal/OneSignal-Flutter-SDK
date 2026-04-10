@@ -43,7 +43,7 @@ jobs:
       - name: Create demo .env
         working-directory: examples/demo
         run: |
-          echo "ONESIGNAL_APP_ID=${{ secrets.APPIUM_ONESIGNAL_APP_ID }}" > .env
+          echo "ONESIGNAL_APP_ID=${{ vars.APPIUM_ONESIGNAL_APP_ID }}" > .env
           echo "ONESIGNAL_API_KEY=${{ secrets.APPIUM_ONESIGNAL_API_KEY }}" >> .env
 
       - name: Build release APK
@@ -72,7 +72,7 @@ jobs:
       - name: Create demo .env
         working-directory: examples/demo
         run: |
-          echo "ONESIGNAL_APP_ID=${{ secrets.APPIUM_ONESIGNAL_APP_ID }}" > .env
+          echo "ONESIGNAL_APP_ID=${{ vars.APPIUM_ONESIGNAL_APP_ID }}" > .env
           echo "ONESIGNAL_API_KEY=${{ secrets.APPIUM_ONESIGNAL_API_KEY }}" >> .env
 
       - name: Install CocoaPods dependencies
@@ -97,42 +97,22 @@ jobs:
 
   e2e-android:
     needs: build-android
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download APK
-        uses: actions/download-artifact@v4
-        with:
-          name: demo-apk
-
-      - name: Run Appium E2E (Android)
-        uses: OneSignal/sdk-shared/.github/actions/appium-e2e@main
-        with:
-          platform: android
-          app-path: app-release.apk
-          sdk-type: flutter
-          browserstack-username: ${{ secrets.BROWSERSTACK_USERNAME }}
-          browserstack-access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-          onesignal-app-id: ${{ secrets.APPIUM_ONESIGNAL_APP_ID }}
-          onesignal-api-key: ${{ secrets.APPIUM_ONESIGNAL_API_KEY }}
-          build-name: flutter-android-${{ github.ref_name }}-${{ github.run_number }}
+    uses: OneSignal/sdk-shared/.github/workflows/appium-e2e.yml@main
+    secrets: inherit
+    with:
+      platform: android
+      app-artifact: demo-apk
+      app-filename: app-release.apk
+      sdk-type: flutter
+      build-name: flutter-android-${{ github.ref_name }}-${{ github.run_number }}
 
   e2e-ios:
     needs: build-ios
-    runs-on: ubuntu-latest
-    steps:
-      - name: Download IPA
-        uses: actions/download-artifact@v4
-        with:
-          name: demo-ipa
-
-      - name: Run Appium E2E (iOS)
-        uses: OneSignal/sdk-shared/.github/actions/appium-e2e@main
-        with:
-          platform: ios
-          app-path: Runner.ipa
-          sdk-type: flutter
-          browserstack-username: ${{ secrets.BROWSERSTACK_USERNAME }}
-          browserstack-access-key: ${{ secrets.BROWSERSTACK_ACCESS_KEY }}
-          onesignal-app-id: ${{ secrets.APPIUM_ONESIGNAL_APP_ID }}
-          onesignal-api-key: ${{ secrets.APPIUM_ONESIGNAL_API_KEY }}
-          build-name: flutter-ios-${{ github.ref_name }}-${{ github.run_number }}
+    uses: OneSignal/sdk-shared/.github/workflows/appium-e2e.yml@main
+    secrets: inherit
+    with:
+      platform: ios
+      app-artifact: demo-ipa
+      app-filename: Runner.ipa
+      sdk-type: flutter
+      build-name: flutter-ios-${{ github.ref_name }}-${{ github.run_number }}

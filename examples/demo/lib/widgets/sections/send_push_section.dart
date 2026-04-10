@@ -24,21 +24,25 @@ class SendPushSection extends StatelessWidget {
         children: [
           PrimaryButton(
             label: 'SIMPLE',
+            semanticsLabel: 'send_simple_button',
             onPressed: () => vm.sendNotification(NotificationType.simple),
           ),
           AppSpacing.gapBox,
           PrimaryButton(
             label: 'WITH IMAGE',
+            semanticsLabel: 'send_image_button',
             onPressed: () => vm.sendNotification(NotificationType.withImage),
           ),
           AppSpacing.gapBox,
           PrimaryButton(
             label: 'WITH SOUND',
+            semanticsLabel: 'send_sound_button',
             onPressed: () => vm.sendNotification(NotificationType.withSound),
           ),
           AppSpacing.gapBox,
           PrimaryButton(
             label: 'CUSTOM',
+            semanticsLabel: 'send_custom_button',
             onPressed: () async {
               final result = await showDialog<Map<String, String>>(
                 context: context,
@@ -52,6 +56,7 @@ class SendPushSection extends StatelessWidget {
           AppSpacing.gapBox,
           DestructiveButton(
             label: 'CLEAR ALL',
+            semanticsLabel: 'clear_all_button',
             onPressed: vm.clearAllNotifications,
           ),
         ],

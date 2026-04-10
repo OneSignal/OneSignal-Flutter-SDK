@@ -57,17 +57,6 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final vm = context.watch<AppViewModel>();
 
-    // Listen for snackbar messages
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final message = vm.snackBarMessage;
-      if (message != null) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(SnackBar(content: Text(message)));
-        vm.clearSnackBar();
-      }
-    });
-
     return Scaffold(
       appBar: AppBar(
         centerTitle: true,

@@ -35,19 +35,6 @@ class AppViewModel extends ChangeNotifier {
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  // SnackBar message
-  String? _snackBarMessage;
-  String? get snackBarMessage => _snackBarMessage;
-  void clearSnackBar() {
-    _snackBarMessage = null;
-  }
-
-  void _showSnackBar(String message) {
-    _snackBarMessage = message;
-    LogManager().i('App', message);
-    notifyListeners();
-  }
-
   // App state
   String _appId = '';
   String get appId => _appId;
@@ -223,12 +210,12 @@ class AppViewModel extends ChangeNotifier {
 
       _isLoading = false;
       notifyListeners();
-      _showSnackBar('Logged in as: $externalUserId');
+      LogManager().i('App', 'Logged in as: $externalUserId');
     } catch (e) {
       _isLoading = false;
       notifyListeners();
       LogManager().e('App', 'Login error: $e');
-      _showSnackBar('Login failed');
+      LogManager().e('App', 'Login failed');
     }
   }
 
@@ -248,7 +235,7 @@ class AppViewModel extends ChangeNotifier {
 
       _isLoading = false;
       notifyListeners();
-      _showSnackBar('Logged out');
+      LogManager().i('App', 'Logged out');
     } catch (e) {
       _isLoading = false;
       notifyListeners();
@@ -284,7 +271,7 @@ class AppViewModel extends ChangeNotifier {
     }
     _pushEnabled = enabled;
     notifyListeners();
-    _showSnackBar('Push ${enabled ? "enabled" : "disabled"}');
+    LogManager().i('App', 'Push ${enabled ? "enabled" : "disabled"}');
   }
 
   Future<void> promptPush() async {
@@ -296,20 +283,25 @@ class AppViewModel extends ChangeNotifier {
   // Notifications
   Future<void> sendNotification(NotificationType type) async {
     final success = await _repository.sendNotification(type);
-    _showSnackBar(success
-        ? 'Notification sent: ${type.name}'
-        : 'Failed to send notification');
+    if (success) {
+      LogManager().i('App', 'Notification sent: ${type.name}');
+    } else {
+      LogManager().e('App', 'Failed to send notification');
+    }
   }
 
   Future<void> sendCustomNotification(String title, String body) async {
     final success = await _repository.sendCustomNotification(title, body);
-    _showSnackBar(
-        success ? 'Custom notification sent' : 'Failed to send notification');
+    if (success) {
+      LogManager().i('App', 'Custom notification sent');
+    } else {
+      LogManager().e('App', 'Failed to send notification');
+    }
   }
 
   void clearAllNotifications() {
     _repository.clearAllNotifications();
-    _showSnackBar('All notifications cleared');
+    LogManager().i('App', 'All notifications cleared');
   }
 
   // IAM
@@ -326,7 +318,7 @@ class AppViewModel extends ChangeNotifier {
       ..removeWhere((e) => e.key == 'iam_type')
       ..add(MapEntry('iam_type', type.triggerValue));
     notifyListeners();
-    _showSnackBar('Sent In-App Message: ${type.label}');
+    LogManager().i('App', 'Sent In-App Message: ${type.label}');
   }
 
   // Aliases
@@ -334,14 +326,14 @@ class AppViewModel extends ChangeNotifier {
     _repository.addAlias(label, id);
     _aliasesList = List.from(_aliasesList)..add(MapEntry(label, id));
     notifyListeners();
-    _showSnackBar('Alias added: $label');
+    LogManager().i('App', 'Alias added: $label');
   }
 
   void addAliases(Map<String, String> aliases) {
     _repository.addAliases(aliases);
     _aliasesList = List.from(_aliasesList)..addAll(aliases.entries);
     notifyListeners();
-    _showSnackBar('${aliases.length} alias(es) added');
+    LogManager().i('App', '${aliases.length} alias(es) added');
   }
 
   // Emails
@@ -349,14 +341,14 @@ class AppViewModel extends ChangeNotifier {
     _repository.addEmail(email);
     _emailsList = List.from(_emailsList)..add(email);
     notifyListeners();
-    _showSnackBar('Email added: $email');
+    LogManager().i('App', 'Email added: $email');
   }
 
   void removeEmail(String email) {
     _repository.removeEmail(email);
     _emailsList = List.from(_emailsList)..remove(email);
     notifyListeners();
-    _showSnackBar('Email removed: $email');
+    LogManager().i('App', 'Email removed: $email');
   }
 
   // SMS
@@ -364,14 +356,14 @@ class AppViewModel extends ChangeNotifier {
     _repository.addSms(smsNumber);
     _smsNumbersList = List.from(_smsNumbersList)..add(smsNumber);
     notifyListeners();
-    _showSnackBar('SMS added: $smsNumber');
+    LogManager().i('App', 'SMS added: $smsNumber');
   }
 
   void removeSms(String smsNumber) {
     _repository.removeSms(smsNumber);
     _smsNumbersList = List.from(_smsNumbersList)..remove(smsNumber);
     notifyListeners();
-    _showSnackBar('SMS removed: $smsNumber');
+    LogManager().i('App', 'SMS removed: $smsNumber');
   }
 
   // Tags
@@ -379,28 +371,28 @@ class AppViewModel extends ChangeNotifier {
     _repository.addTag(key, value);
     _tagsList = List.from(_tagsList)..add(MapEntry(key, value));
     notifyListeners();
-    _showSnackBar('Tag added: $key');
+    LogManager().i('App', 'Tag added: $key');
   }
 
   void addTags(Map<String, String> tags) {
     _repository.addTags(tags);
     _tagsList = List.from(_tagsList)..addAll(tags.entries);
     notifyListeners();
-    _showSnackBar('${tags.length} tag(s) added');
+    LogManager().i('App', '${tags.length} tag(s) added');
   }
 
   void removeTag(String key) {
     _repository.removeTag(key);
     _tagsList = List.from(_tagsList)..removeWhere((e) => e.key == key);
     notifyListeners();
-    _showSnackBar('Tag removed: $key');
+    LogManager().i('App', 'Tag removed: $key');
   }
 
   void removeSelectedTags(List<String> keys) {
     _repository.removeTags(keys);
     _tagsList = List.from(_tagsList)..removeWhere((e) => keys.contains(e.key));
     notifyListeners();
-    _showSnackBar('${keys.length} tag(s) removed');
+    LogManager().i('App', '${keys.length} tag(s) removed');
   }
 
   // Triggers (in-memory only)
@@ -408,21 +400,21 @@ class AppViewModel extends ChangeNotifier {
     _repository.addTrigger(key, value);
     _triggersList = List.from(_triggersList)..add(MapEntry(key, value));
     notifyListeners();
-    _showSnackBar('Trigger added: $key');
+    LogManager().i('App', 'Trigger added: $key');
   }
 
   void addTriggers(Map<String, String> triggers) {
     _repository.addTriggers(triggers);
     _triggersList = List.from(_triggersList)..addAll(triggers.entries);
     notifyListeners();
-    _showSnackBar('${triggers.length} trigger(s) added');
+    LogManager().i('App', '${triggers.length} trigger(s) added');
   }
 
   void removeTrigger(String key) {
     _repository.removeTrigger(key);
     _triggersList = List.from(_triggersList)..removeWhere((e) => e.key == key);
     notifyListeners();
-    _showSnackBar('Trigger removed: $key');
+    LogManager().i('App', 'Trigger removed: $key');
   }
 
   void removeSelectedTriggers(List<String> keys) {
@@ -430,36 +422,36 @@ class AppViewModel extends ChangeNotifier {
     _triggersList = List.from(_triggersList)
       ..removeWhere((e) => keys.contains(e.key));
     notifyListeners();
-    _showSnackBar('${keys.length} trigger(s) removed');
+    LogManager().i('App', '${keys.length} trigger(s) removed');
   }
 
   void clearAllTriggers() {
     _repository.clearTriggers();
     _triggersList = [];
     notifyListeners();
-    _showSnackBar('All triggers cleared');
+    LogManager().i('App', 'All triggers cleared');
   }
 
   // Outcomes
   void sendOutcome(String name) {
     _repository.sendOutcome(name);
-    _showSnackBar('Outcome sent: $name');
+    LogManager().i('App', 'Outcome sent: $name');
   }
 
   void sendUniqueOutcome(String name) {
     _repository.sendUniqueOutcome(name);
-    _showSnackBar('Unique outcome sent: $name');
+    LogManager().i('App', 'Unique outcome sent: $name');
   }
 
   void sendOutcomeWithValue(String name, double value) {
     _repository.sendOutcomeWithValue(name, value);
-    _showSnackBar('Outcome sent: $name = $value');
+    LogManager().i('App', 'Outcome sent: $name = $value');
   }
 
   // Track Event
   void trackEvent(String name, Map<String, dynamic>? properties) {
     _repository.trackEvent(name, properties);
-    _showSnackBar('Event tracked: $name');
+    LogManager().i('App', 'Event tracked: $name');
   }
 
   // Live Activities
@@ -479,7 +471,7 @@ class AppViewModel extends ChangeNotifier {
     _statusIndex = 0;
     await _repository.startDefaultLiveActivity(_activityId, attributes, content);
     notifyListeners();
-    _showSnackBar('Started Live Activity: $_activityId');
+    LogManager().i('App', 'Started Live Activity: $_activityId');
   }
 
   Future<void> updateLiveActivity() async {
@@ -494,25 +486,25 @@ class AppViewModel extends ChangeNotifier {
     _isLaUpdating = false;
     if (success) {
       _statusIndex = nextIndex;
-      _showSnackBar('Updated Live Activity: $_activityId');
+      LogManager().i('App', 'Updated Live Activity: $_activityId');
     } else {
-      _showSnackBar('Failed to update Live Activity');
+      LogManager().e('App', 'Failed to update Live Activity');
     }
     notifyListeners();
   }
 
   Future<void> exitLiveActivity() async {
     await _repository.exitLiveActivity(_activityId);
-    _showSnackBar('Exited Live Activity: $_activityId');
+    LogManager().i('App', 'Exited Live Activity: $_activityId');
   }
 
   Future<void> endLiveActivity() async {
     final success = await _repository.endLiveActivity(_activityId);
     if (success) {
       _statusIndex = 0;
-      _showSnackBar('Ended Live Activity: $_activityId');
+      LogManager().i('App', 'Ended Live Activity: $_activityId');
     } else {
-      _showSnackBar('Failed to end Live Activity');
+      LogManager().e('App', 'Failed to end Live Activity');
     }
     notifyListeners();
   }
@@ -523,7 +515,7 @@ class AppViewModel extends ChangeNotifier {
     _repository.setLocationShared(shared);
     await _prefs.setLocationShared(shared);
     notifyListeners();
-    _showSnackBar('Location sharing ${shared ? "enabled" : "disabled"}');
+    LogManager().i('App', 'Location sharing ${shared ? "enabled" : "disabled"}');
   }
 
   void promptLocation() {
