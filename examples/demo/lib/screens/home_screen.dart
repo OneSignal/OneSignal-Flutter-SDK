@@ -87,78 +87,83 @@ class _HomeScreenState extends State<HomeScreen> {
           children: [
             const LogView(),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.only(bottom: 24),
-                children: [
-                  const AppSection(),
-                  const UserSection(),
-                  PushSection(
-                    onInfoTap: () => _showTooltipDialog(context, 'push'),
-                  ),
-                  SendPushSection(
-                    onInfoTap: () =>
-                        _showTooltipDialog(context, 'sendPushNotification'),
-                  ),
-                  InAppSection(
-                    onInfoTap: () =>
-                        _showTooltipDialog(context, 'inAppMessaging'),
-                  ),
-                  SendIamSection(
-                    onInfoTap: () =>
-                        _showTooltipDialog(context, 'sendInAppMessage'),
-                  ),
-                  AliasesSection(
-                    onInfoTap: () => _showTooltipDialog(context, 'aliases'),
-                  ),
-                  EmailsSection(
-                    onInfoTap: () => _showTooltipDialog(context, 'emails'),
-                  ),
-                  SmsSection(
-                    onInfoTap: () => _showTooltipDialog(context, 'sms'),
-                  ),
-                  TagsSection(
-                    onInfoTap: () => _showTooltipDialog(context, 'tags'),
-                  ),
-                  OutcomesSection(
-                    onInfoTap: () =>
-                        _showTooltipDialog(context, 'outcomes'),
-                  ),
-                  TriggersSection(
-                    onInfoTap: () => _showTooltipDialog(context, 'triggers'),
-                  ),
-                  TrackEventSection(
-                    onInfoTap: () =>
-                        _showTooltipDialog(context, 'trackEvent'),
-                  ),
-                  LocationSection(
-                    onInfoTap: () => _showTooltipDialog(context, 'location'),
-                  ),
-                  if (defaultTargetPlatform == TargetPlatform.iOS)
-                    LiveActivitiesSection(
+              child: Semantics(
+                identifier: 'main_scroll_view',
+                child: ListView(
+                  padding: const EdgeInsets.only(bottom: 24),
+                  children: [
+                    const AppSection(),
+                    const UserSection(),
+                    PushSection(
+                      onInfoTap: () => _showTooltipDialog(context, 'push'),
+                    ),
+                    SendPushSection(
                       onInfoTap: () =>
-                          _showTooltipDialog(context, 'liveActivities'),
+                          _showTooltipDialog(context, 'sendPushNotification'),
                     ),
-                  const SizedBox(height: 8),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => const SecondaryScreen(),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.osPrimary,
-                        foregroundColor: Colors.white,
+                    InAppSection(
+                      onInfoTap: () =>
+                          _showTooltipDialog(context, 'inAppMessaging'),
+                    ),
+                    SendIamSection(
+                      onInfoTap: () =>
+                          _showTooltipDialog(context, 'sendInAppMessage'),
+                    ),
+                    AliasesSection(
+                      onInfoTap: () => _showTooltipDialog(context, 'aliases'),
+                    ),
+                    EmailsSection(
+                      onInfoTap: () => _showTooltipDialog(context, 'emails'),
+                    ),
+                    SmsSection(
+                      onInfoTap: () => _showTooltipDialog(context, 'sms'),
+                    ),
+                    TagsSection(
+                      onInfoTap: () => _showTooltipDialog(context, 'tags'),
+                    ),
+                    OutcomesSection(
+                      onInfoTap: () =>
+                          _showTooltipDialog(context, 'outcomes'),
+                    ),
+                    TriggersSection(
+                      onInfoTap: () =>
+                          _showTooltipDialog(context, 'triggers'),
+                    ),
+                    TrackEventSection(
+                      onInfoTap: () =>
+                          _showTooltipDialog(context, 'trackEvent'),
+                    ),
+                    LocationSection(
+                      onInfoTap: () =>
+                          _showTooltipDialog(context, 'location'),
+                    ),
+                    if (defaultTargetPlatform == TargetPlatform.iOS)
+                      LiveActivitiesSection(
+                        onInfoTap: () =>
+                            _showTooltipDialog(context, 'liveActivities'),
                       ),
-                      child: const Text('NEXT ACTIVITY'),
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const SecondaryScreen(),
+                            ),
+                          );
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.osPrimary,
+                          foregroundColor: Colors.white,
+                        ),
+                        child: const Text('NEXT ACTIVITY'),
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
+                    const SizedBox(height: 16),
+                  ],
+                ),
               ),
             ),
           ],
