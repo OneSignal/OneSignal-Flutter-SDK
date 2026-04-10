@@ -31,19 +31,6 @@ class _LogViewState extends State<LogView> {
     setState(() {});
   }
 
-  Color _levelColor(LogLevel level) {
-    switch (level) {
-      case LogLevel.debug:
-        return AppColors.osLogDebug;
-      case LogLevel.info:
-        return AppColors.osLogInfo;
-      case LogLevel.warn:
-        return AppColors.osLogWarn;
-      case LogLevel.error:
-        return AppColors.osLogError;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final logs = LogManager().logs;
@@ -148,18 +135,6 @@ class _LogViewState extends State<LogView> {
                                   entry.formattedTime,
                                   style: logEntryStyle?.copyWith(
                                     color: AppColors.osLogTimestamp,
-                                  ),
-                                ),
-                                const SizedBox(width: 4),
-                                Semantics(
-                                  identifier: 'log_entry_${index}_level',
-                                  container: true,
-                                  child: Text(
-                                    entry.levelLabel,
-                                    style: logEntryStyle?.copyWith(
-                                      fontWeight: FontWeight.bold,
-                                      color: _levelColor(entry.level),
-                                    ),
                                   ),
                                 ),
                                 const SizedBox(width: 4),
