@@ -25,29 +25,39 @@ class SectionCard extends StatelessWidget {
         children: [
           // Section header (outside card, ALL CAPS like reference)
           Padding(
-            padding: EdgeInsets.only(bottom: AppSpacing.gap),
+            padding: EdgeInsets.only(bottom: onInfoTap != null ? 0 : AppSpacing.gap),
             child: Row(
               children: [
                 Expanded(
                   child: Text(
                     title.toUpperCase(),
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: AppColors.osGrey700,
-                          letterSpacing: 0.5,
-                        ),
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.osGrey700,
+                      letterSpacing: 0.5,
+                    ),
                   ),
                 ),
                 if (onInfoTap != null)
-                  Semantics(
-                    identifier: sectionKey != null ? '${sectionKey}_info_icon' : null,
-                    container: true,
-                    child: GestureDetector(
-                      onTap: onInfoTap,
-                      child: Icon(
-                        Icons.info_outline,
-                        size: 18,
-                        color: AppColors.osGrey500,
+                  Transform.translate(
+                    offset: const Offset(16, 0),
+                    child: Semantics(
+                      identifier: sectionKey != null
+                          ? '${sectionKey}_info_icon'
+                          : null,
+                      container: true,
+                      child: IconButton(
+                        onPressed: onInfoTap,
+                        icon: Icon(
+                          Icons.info_outline,
+                          size: 18,
+                          color: AppColors.osGrey500,
+                        ),
+                        padding: EdgeInsets.zero,
+                        constraints: const BoxConstraints(
+                          minWidth: 32,
+                          minHeight: 32,
+                        ),
                       ),
                     ),
                   ),
