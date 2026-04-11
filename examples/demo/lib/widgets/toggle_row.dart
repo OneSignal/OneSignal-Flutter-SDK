@@ -20,33 +20,27 @@ class ToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    Widget toggle = Switch(
-      value: value,
-      onChanged: onChanged,
-      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-    );
-    if (semanticsLabel != null) {
-      toggle = Semantics(identifier: semanticsLabel, container: true, child: toggle);
-    }
-    return Row(
-      children: [
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: Theme.of(context).textTheme.bodyMedium),
-              if (description != null)
-                Text(
-                  description!,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.osGrey600,
-                      ),
-                ),
-            ],
-          ),
+    return Theme(
+      data: Theme.of(context).copyWith(
+        listTileTheme: const ListTileThemeData(
+          minVerticalPadding: 0,
         ),
-        toggle,
-      ],
+      ),
+      child: SwitchListTile(
+        title: Text(label, style: Theme.of(context).textTheme.bodyMedium),
+        subtitle: description != null
+            ? Text(
+                description!,
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: AppColors.osGrey600,
+                    ),
+              )
+            : null,
+        value: value,
+        onChanged: onChanged != null ? (v) => onChanged!(v) : null,
+        contentPadding: EdgeInsets.zero,
+        dense: true,
+      ),
     );
   }
 }
