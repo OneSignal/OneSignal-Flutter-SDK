@@ -19,6 +19,7 @@ class SmsSection extends StatelessWidget {
 
     return SectionCard(
       title: 'SMS',
+      sectionKey: 'sms',
       onInfoTap: onInfoTap,
       child: Column(
         children: [

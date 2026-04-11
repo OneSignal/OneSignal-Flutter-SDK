@@ -17,6 +17,7 @@ class TrackEventSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Track Event',
+      sectionKey: 'track_event',
       onInfoTap: onInfoTap,
       child: PrimaryButton(
         label: 'TRACK EVENT',

@@ -17,6 +17,7 @@ class InAppSection extends StatelessWidget {
 
     return SectionCard(
       title: 'In-App Messaging',
+      sectionKey: 'iam',
       onInfoTap: onInfoTap,
       child: Card(
         margin: EdgeInsets.zero,
@@ -25,6 +26,7 @@ class InAppSection extends StatelessWidget {
           child: ToggleRow(
             label: 'Pause In-App Messages',
             description: 'Toggle in-app message display',
+            semanticsLabel: 'pause_iam_toggle',
             value: vm.iamPaused,
             onChanged: vm.setIamPaused,
           ),

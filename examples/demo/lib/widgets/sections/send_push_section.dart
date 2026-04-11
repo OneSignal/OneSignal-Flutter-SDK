@@ -19,6 +19,7 @@ class SendPushSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Send Push Notification',
+      sectionKey: 'send_push',
       onInfoTap: onInfoTap,
       child: Column(
         children: [

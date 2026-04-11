@@ -19,6 +19,7 @@ class EmailsSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Emails',
+      sectionKey: 'emails',
       onInfoTap: onInfoTap,
       child: Column(
         children: [

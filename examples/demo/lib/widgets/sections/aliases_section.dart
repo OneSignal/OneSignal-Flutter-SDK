@@ -19,6 +19,7 @@ class AliasesSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Aliases',
+      sectionKey: 'aliases',
       onInfoTap: onInfoTap,
       child: Column(
         children: [

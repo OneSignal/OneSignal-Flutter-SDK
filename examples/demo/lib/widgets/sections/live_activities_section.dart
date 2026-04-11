@@ -42,6 +42,7 @@ class _LiveActivitiesSectionState extends State<LiveActivitiesSection> {
 
     return SectionCard(
       title: 'Live Activities',
+      sectionKey: 'live_activities',
       onInfoTap: widget.onInfoTap,
       child: Column(
         children: [

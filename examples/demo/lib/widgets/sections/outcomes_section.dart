@@ -17,6 +17,7 @@ class OutcomesSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Outcome Events',
+      sectionKey: 'outcomes',
       onInfoTap: onInfoTap,
       child: PrimaryButton(
         label: 'SEND OUTCOME',

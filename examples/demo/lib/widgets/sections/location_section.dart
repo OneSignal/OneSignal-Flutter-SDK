@@ -18,6 +18,7 @@ class LocationSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Location',
+      sectionKey: 'location',
       onInfoTap: onInfoTap,
       child: Column(
         children: [

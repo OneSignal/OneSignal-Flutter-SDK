@@ -19,6 +19,7 @@ class TagsSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Tags',
+      sectionKey: 'tags',
       onInfoTap: onInfoTap,
       child: Column(
         children: [

@@ -17,6 +17,7 @@ class SendIamSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Send In-App Message',
+      sectionKey: 'send_iam',
       onInfoTap: onInfoTap,
       child: Column(
         spacing: AppSpacing.gap,

@@ -19,6 +19,7 @@ class TriggersSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Triggers',
+      sectionKey: 'triggers',
       onInfoTap: onInfoTap,
       child: Column(
         children: [
