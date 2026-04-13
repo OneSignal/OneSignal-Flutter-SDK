@@ -18,9 +18,12 @@ class SectionCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Column(
+    return Semantics(
+      identifier: sectionKey != null ? '${sectionKey}_section' : null,
+      container: true,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // Section header (outside card, ALL CAPS like reference)
@@ -67,6 +70,7 @@ class SectionCard extends StatelessWidget {
           // Card content
           child,
         ],
+      ),
       ),
     );
   }
