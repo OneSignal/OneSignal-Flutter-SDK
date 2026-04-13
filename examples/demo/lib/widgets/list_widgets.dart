@@ -38,9 +38,13 @@ class PairItem extends StatelessWidget {
             ),
           ),
           if (onDelete != null)
-            GestureDetector(
-              onTap: onDelete,
-              child: Icon(Icons.close, size: 18, color: AppColors.osPrimary),
+            Semantics(
+              identifier: 'remove_$keyText',
+              container: true,
+              child: GestureDetector(
+                onTap: onDelete,
+                child: Icon(Icons.close, size: 18, color: AppColors.osPrimary),
+              ),
             ),
         ],
       ),
