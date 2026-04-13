@@ -62,10 +62,10 @@ class TooltipHelper {
             ),
           );
         });
-        LogManager().i('Tooltip', 'Loaded ${_tooltips.length} tooltips');
+        LogManager().i('Loaded ${_tooltips.length} tooltips');
       }
     } catch (e) {
-      LogManager().w('Tooltip', 'Failed to load tooltips: $e');
+      LogManager().w('Failed to load tooltips: $e');
     }
 
     _initialized = true;

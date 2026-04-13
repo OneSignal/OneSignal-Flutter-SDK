@@ -143,7 +143,7 @@ class _LogViewState extends State<LogView> {
                                     identifier: 'log_entry_${index}_message',
                                     container: true,
                                     child: Text(
-                                      '${entry.tag}: ${entry.message}',
+                                      entry.message,
                                       style: logEntryStyle?.copyWith(
                                         color: Colors.white,
                                       ),

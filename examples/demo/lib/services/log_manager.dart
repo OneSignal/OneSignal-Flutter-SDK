@@ -5,13 +5,11 @@ enum LogLevel { debug, info, warn, error }
 class LogEntry {
   final DateTime timestamp;
   final LogLevel level;
-  final String tag;
   final String message;
 
   const LogEntry({
     required this.timestamp,
     required this.level,
-    required this.tag,
     required this.message,
   });
 
@@ -45,22 +43,21 @@ class LogManager extends ChangeNotifier {
 
   List<LogEntry> get logs => List.unmodifiable(_logs);
 
-  void _log(LogLevel level, String tag, String message) {
+  void _log(LogLevel level, String message) {
     final entry = LogEntry(
       timestamp: DateTime.now(),
       level: level,
-      tag: tag,
       message: message,
     );
     _logs.add(entry);
-    debugPrint('[${entry.levelLabel}] $tag: $message');
+    debugPrint('[${entry.levelLabel}] $message');
     notifyListeners();
   }
 
-  void d(String tag, String message) => _log(LogLevel.debug, tag, message);
-  void i(String tag, String message) => _log(LogLevel.info, tag, message);
-  void w(String tag, String message) => _log(LogLevel.warn, tag, message);
-  void e(String tag, String message) => _log(LogLevel.error, tag, message);
+  void d(String message) => _log(LogLevel.debug, message);
+  void i(String message) => _log(LogLevel.info, message);
+  void w(String message) => _log(LogLevel.warn, message);
+  void e(String message) => _log(LogLevel.error, message);
 
   void clear() {
     _logs.clear();

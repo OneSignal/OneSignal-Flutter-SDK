@@ -123,7 +123,7 @@ class OneSignalRepository {
   bool hasPermission() => OneSignal.Notifications.permission;
 
   Future<bool> requestPermission(bool fallbackToSettings) async {
-    LogManager().i('SDK', 'Request permission (fallback: $fallbackToSettings)');
+    LogManager().i('Request permission (fallback: $fallbackToSettings)');
     return await OneSignal.Notifications.requestPermission(fallbackToSettings);
   }
 
@@ -133,7 +133,7 @@ class OneSignalRepository {
 
   // In-app messages
   void setInAppMessagesPaused(bool paused) {
-    LogManager().i('SDK', 'Set IAM paused: $paused');
+    LogManager().i('Set IAM paused: $paused');
     OneSignal.InAppMessages.paused(paused);
   }
 
@@ -151,7 +151,7 @@ class OneSignalRepository {
   }
 
   void requestLocationPermission() {
-    LogManager().i('SDK', 'Request location permission');
+    LogManager().i('Request location permission');
     OneSignal.Location.requestPermission();
   }
 
@@ -184,12 +184,12 @@ class OneSignalRepository {
 
   // Privacy consent
   void setConsentRequired(bool required) {
-    LogManager().i('SDK', 'Set consent required: $required');
+    LogManager().i('Set consent required: $required');
     OneSignal.consentRequired(required);
   }
 
   void setConsentGiven(bool granted) {
-    LogManager().i('SDK', 'Set consent given: $granted');
+    LogManager().i('Set consent given: $granted');
     OneSignal.consentGiven(granted);
   }
 
@@ -206,7 +206,7 @@ class OneSignalRepository {
   Future<bool> sendNotification(NotificationType type) async {
     final subscriptionId = getPushSubscriptionId();
     if (subscriptionId == null) {
-      LogManager().w('SDK', 'No subscription ID for notification');
+      LogManager().w('No subscription ID for notification');
       return false;
     }
     return _apiService.sendNotification(type, subscriptionId);
@@ -215,7 +215,7 @@ class OneSignalRepository {
   Future<bool> sendCustomNotification(String title, String body) async {
     final subscriptionId = getPushSubscriptionId();
     if (subscriptionId == null) {
-      LogManager().w('SDK', 'No subscription ID for custom notification');
+      LogManager().w('No subscription ID for custom notification');
       return false;
     }
     return _apiService.sendCustomNotification(title, body, subscriptionId);

@@ -49,13 +49,10 @@ class OneSignalApiService {
         body: jsonEncode(body),
       );
 
-      LogManager().i(
-        'API',
-        'Send notification response: ${response.statusCode}',
-      );
+      LogManager().i('Send notification response: ${response.statusCode}');
       return response.statusCode == 200;
     } catch (e) {
-      LogManager().e('API', 'Send notification error: $e');
+      LogManager().e('Send notification error: $e');
       return false;
     }
   }
@@ -82,13 +79,10 @@ class OneSignalApiService {
         body: jsonEncode(payload),
       );
 
-      LogManager().i(
-        'API',
-        'Send custom notification response: ${response.statusCode}',
-      );
+      LogManager().i('Send custom notification response: ${response.statusCode}');
       return response.statusCode == 200;
     } catch (e) {
-      LogManager().e('API', 'Send custom notification error: $e');
+      LogManager().e('Send custom notification error: $e');
       return false;
     }
   }
@@ -115,12 +109,11 @@ class OneSignalApiService {
       );
 
       LogManager().i(
-        'API',
         'Update live activity response: ${response.statusCode} ${response.body}',
       );
       return response.statusCode >= 200 && response.statusCode < 300;
     } catch (e) {
-      LogManager().e('API', 'Update live activity error: $e');
+      LogManager().e('Update live activity error: $e');
       return false;
     }
   }
@@ -147,12 +140,11 @@ class OneSignalApiService {
       );
 
       LogManager().i(
-        'API',
         'End live activity response: ${response.statusCode} ${response.body}',
       );
       return response.statusCode >= 200 && response.statusCode < 300;
     } catch (e) {
-      LogManager().e('API', 'End live activity error: $e');
+      LogManager().e('End live activity error: $e');
       return false;
     }
   }
@@ -170,10 +162,10 @@ class OneSignalApiService {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
         return UserData.fromJson(json);
       }
-      LogManager().w('API', 'Fetch user returned ${response.statusCode}');
+      LogManager().w('Fetch user returned ${response.statusCode}');
       return null;
     } catch (e) {
-      LogManager().e('API', 'Fetch user error: $e');
+      LogManager().e('Fetch user error: $e');
       return null;
     }
   }
