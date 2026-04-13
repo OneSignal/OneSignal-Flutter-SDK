@@ -3,12 +3,14 @@ import 'package:flutter/material.dart';
 import '../theme.dart';
 
 class PairItem extends StatelessWidget {
+  final String sectionKey;
   final String keyText;
   final String valueText;
   final VoidCallback? onDelete;
 
   const PairItem({
     super.key,
+    required this.sectionKey,
     required this.keyText,
     required this.valueText,
     this.onDelete,
@@ -25,7 +27,7 @@ class PairItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Semantics(
-                  identifier: 'pair_key_$keyText',
+                  identifier: '${sectionKey}_pair_key_$keyText',
                   container: true,
                   child: Text(
                     keyText,
@@ -33,7 +35,7 @@ class PairItem extends StatelessWidget {
                   ),
                 ),
                 Semantics(
-                  identifier: 'pair_value_$keyText',
+                  identifier: '${sectionKey}_pair_value_$keyText',
                   container: true,
                   child: Text(
                     valueText,
@@ -47,7 +49,7 @@ class PairItem extends StatelessWidget {
           ),
           if (onDelete != null)
             Semantics(
-              identifier: 'remove_$keyText',
+              identifier: '${sectionKey}_remove_$keyText',
               container: true,
               child: GestureDetector(
                 onTap: onDelete,
@@ -114,12 +116,14 @@ class EmptyState extends StatelessWidget {
 }
 
 class PairList extends StatelessWidget {
+  final String sectionKey;
   final List<MapEntry<String, String>> items;
   final String emptyText;
   final void Function(String key)? onDelete;
 
   const PairList({
     super.key,
+    required this.sectionKey,
     required this.items,
     required this.emptyText,
     this.onDelete,
@@ -134,6 +138,7 @@ class PairList extends StatelessWidget {
         for (var i = 0; i < items.length; i++) ...[
           PairItem(
             key: ValueKey('${items[i].key}_${items[i].value}'),
+            sectionKey: sectionKey,
             keyText: items[i].key,
             valueText: items[i].value,
             onDelete:

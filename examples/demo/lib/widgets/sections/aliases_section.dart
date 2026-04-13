@@ -28,6 +28,7 @@ class AliasesSection extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: PairList(
+                sectionKey: 'aliases',
                 items: vm.aliasesList,
                 emptyText: 'No aliases added',
               ),

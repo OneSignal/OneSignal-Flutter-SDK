@@ -28,6 +28,7 @@ class TriggersSection extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: PairList(
+                sectionKey: 'triggers',
                 items: vm.triggersList,
                 emptyText: 'No triggers added',
                 onDelete: vm.removeTrigger,
@@ -65,7 +66,7 @@ class TriggersSection extends StatelessWidget {
           if (vm.triggersList.isNotEmpty) ...[
             AppSpacing.gapBox,
             DestructiveButton(
-              label: 'REMOVE SELECTED',
+              label: 'REMOVE TRIGGERS',
               onPressed: () async {
                 final result = await showDialog<List<String>>(
                   context: context,

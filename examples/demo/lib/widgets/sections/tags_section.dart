@@ -28,6 +28,7 @@ class TagsSection extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: PairList(
+                sectionKey: 'tags',
                 items: vm.tagsList,
                 emptyText: 'No tags added',
                 onDelete: vm.removeTag,
@@ -70,7 +71,7 @@ class TagsSection extends StatelessWidget {
           if (vm.tagsList.isNotEmpty) ...[
             AppSpacing.gapBox,
             DestructiveButton(
-              label: 'REMOVE SELECTED',
+              label: 'REMOVE TAGS',
               onPressed: () async {
                 final result = await showDialog<List<String>>(
                   context: context,
