@@ -24,15 +24,23 @@ class PairItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  keyText,
-                  style: Theme.of(context).textTheme.bodyMedium,
+                Semantics(
+                  identifier: 'pair_key_$keyText',
+                  container: true,
+                  child: Text(
+                    keyText,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
                 ),
-                Text(
-                  valueText,
-                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                        color: AppColors.osGrey600,
-                      ),
+                Semantics(
+                  identifier: 'pair_value_$keyText',
+                  container: true,
+                  child: Text(
+                    valueText,
+                    style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                          color: AppColors.osGrey600,
+                        ),
+                  ),
                 ),
               ],
             ),
