@@ -12,66 +12,54 @@ class OneSignalRepository {
 
   // User operations
   Future<void> loginUser(String externalUserId) async {
-    LogManager().i('SDK', 'Login user: $externalUserId');
     await OneSignal.login(externalUserId);
   }
 
   Future<void> logoutUser() async {
-    LogManager().i('SDK', 'Logout user');
     await OneSignal.logout();
   }
 
   // Alias operations
   void addAlias(String label, String id) {
-    LogManager().i('SDK', 'Add alias: $label = $id');
     OneSignal.User.addAlias(label, id);
   }
 
   void addAliases(Map<String, dynamic> aliases) {
-    LogManager().i('SDK', 'Add aliases: $aliases');
     OneSignal.User.addAliases(aliases);
   }
 
   // Email operations
   void addEmail(String email) {
-    LogManager().i('SDK', 'Add email: $email');
     OneSignal.User.addEmail(email);
   }
 
   void removeEmail(String email) {
-    LogManager().i('SDK', 'Remove email: $email');
     OneSignal.User.removeEmail(email);
   }
 
   // SMS operations
   void addSms(String smsNumber) {
-    LogManager().i('SDK', 'Add SMS: $smsNumber');
     OneSignal.User.addSms(smsNumber);
   }
 
   void removeSms(String smsNumber) {
-    LogManager().i('SDK', 'Remove SMS: $smsNumber');
     OneSignal.User.removeSms(smsNumber);
   }
 
   // Tag operations
   void addTag(String key, String value) {
-    LogManager().i('SDK', 'Add tag: $key = $value');
     OneSignal.User.addTagWithKey(key, value);
   }
 
   void addTags(Map<String, dynamic> tags) {
-    LogManager().i('SDK', 'Add tags: $tags');
     OneSignal.User.addTags(tags);
   }
 
   void removeTag(String key) {
-    LogManager().i('SDK', 'Remove tag: $key');
     OneSignal.User.removeTag(key);
   }
 
   void removeTags(List<String> keys) {
-    LogManager().i('SDK', 'Remove tags: $keys');
     OneSignal.User.removeTags(keys);
   }
 
@@ -81,49 +69,40 @@ class OneSignalRepository {
 
   // Trigger operations
   void addTrigger(String key, String value) {
-    LogManager().i('SDK', 'Add trigger: $key = $value');
     OneSignal.InAppMessages.addTrigger(key, value);
   }
 
   void addTriggers(Map<String, String> triggers) {
-    LogManager().i('SDK', 'Add triggers: $triggers');
     OneSignal.InAppMessages.addTriggers(triggers);
   }
 
   void removeTrigger(String key) {
-    LogManager().i('SDK', 'Remove trigger: $key');
     OneSignal.InAppMessages.removeTrigger(key);
   }
 
   void removeTriggers(List<String> keys) {
-    LogManager().i('SDK', 'Remove triggers: $keys');
     OneSignal.InAppMessages.removeTriggers(keys);
   }
 
   void clearTriggers() {
-    LogManager().i('SDK', 'Clear all triggers');
     OneSignal.InAppMessages.clearTriggers();
   }
 
   // Outcome operations
   void sendOutcome(String name) {
-    LogManager().i('SDK', 'Send outcome: $name');
     OneSignal.Session.addOutcome(name);
   }
 
   void sendUniqueOutcome(String name) {
-    LogManager().i('SDK', 'Send unique outcome: $name');
     OneSignal.Session.addUniqueOutcome(name);
   }
 
   void sendOutcomeWithValue(String name, double value) {
-    LogManager().i('SDK', 'Send outcome with value: $name = $value');
     OneSignal.Session.addOutcomeWithValue(name, value);
   }
 
   // Track event
   void trackEvent(String name, Map<String, dynamic>? properties) {
-    LogManager().i('SDK', 'Track event: $name, properties: $properties');
     OneSignal.User.trackEvent(name, properties);
   }
 
@@ -133,12 +112,10 @@ class OneSignalRepository {
   bool? isPushOptedIn() => OneSignal.User.pushSubscription.optedIn;
 
   void optInPush() {
-    LogManager().i('SDK', 'Opt in push');
     OneSignal.User.pushSubscription.optIn();
   }
 
   void optOutPush() {
-    LogManager().i('SDK', 'Opt out push');
     OneSignal.User.pushSubscription.optOut();
   }
 
@@ -151,7 +128,6 @@ class OneSignalRepository {
   }
 
   void clearAllNotifications() {
-    LogManager().i('SDK', 'Clear all notifications');
     OneSignal.Notifications.clearAll();
   }
 
@@ -167,7 +143,6 @@ class OneSignalRepository {
 
   // Location
   void setLocationShared(bool shared) {
-    LogManager().i('SDK', 'Set location shared: $shared');
     OneSignal.Location.setShared(shared);
   }
 
@@ -188,12 +163,11 @@ class OneSignalRepository {
     Map<String, dynamic> attributes,
     Map<String, dynamic> content,
   ) async {
-    LogManager().i('SDK', 'Start default live activity: $activityId');
     await OneSignal.LiveActivities.startDefault(activityId, attributes, content);
   }
 
   Future<void> exitLiveActivity(String activityId) async {
-    LogManager().i('SDK', 'Exit live activity: $activityId');
+    // ignore: deprecated_member_use
     await OneSignal.LiveActivities.exitLiveActivity(activityId);
   }
 

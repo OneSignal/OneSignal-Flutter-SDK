@@ -20,27 +20,21 @@ class ToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        listTileTheme: const ListTileThemeData(
-          minVerticalPadding: 0,
-        ),
-      ),
-      child: SwitchListTile(
-        title: Text(label, style: Theme.of(context).textTheme.bodyMedium),
-        subtitle: description != null
-            ? Text(
-                description!,
-                style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.osGrey600,
-                    ),
-              )
-            : null,
-        value: value,
-        onChanged: onChanged != null ? (v) => onChanged!(v) : null,
-        contentPadding: EdgeInsets.zero,
-        dense: true,
-      ),
+    return SwitchListTile(
+      title: Text(label, style: Theme.of(context).textTheme.bodyMedium),
+      subtitle: description != null
+          ? Text(
+              description!,
+              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: AppColors.osGrey600,
+                  ),
+            )
+          : null,
+      value: value,
+      onChanged: onChanged != null ? (v) => onChanged!(v) : null,
+      contentPadding: EdgeInsets.zero,
+      dense: true,
+      visualDensity: VisualDensity.compact,
     );
   }
 }

@@ -66,9 +66,13 @@ class SingleItem extends StatelessWidget {
         children: [
           Expanded(child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
           if (onDelete != null)
-            GestureDetector(
-              onTap: onDelete,
-              child: Icon(Icons.close, size: 18, color: AppColors.osPrimary),
+            Semantics(
+              identifier: 'remove_$text',
+              container: true,
+              child: GestureDetector(
+                onTap: onDelete,
+                child: Icon(Icons.close, size: 18, color: AppColors.osPrimary),
+              ),
             ),
         ],
       ),

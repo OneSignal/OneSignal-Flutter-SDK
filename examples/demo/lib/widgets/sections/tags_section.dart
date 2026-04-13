@@ -36,7 +36,7 @@ class TagsSection extends StatelessWidget {
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD',
+            label: 'ADD TAG',
             semanticsLabel: 'add_tag_button',
             onPressed: () async {
               final result = await showDialog<MapEntry<String, String>>(
@@ -55,7 +55,7 @@ class TagsSection extends StatelessWidget {
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD MULTIPLE',
+            label: 'ADD MULTIPLE TAGS',
             onPressed: () async {
               final result = await showDialog<Map<String, String>>(
                 context: context,

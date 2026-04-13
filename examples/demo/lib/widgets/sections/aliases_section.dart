@@ -35,7 +35,7 @@ class AliasesSection extends StatelessWidget {
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD',
+            label: 'ADD ALIAS',
             onPressed: () async {
               final result = await showDialog<MapEntry<String, String>>(
                 context: context,
@@ -43,6 +43,9 @@ class AliasesSection extends StatelessWidget {
                   title: 'Add Alias',
                   keyLabel: 'Label',
                   valueLabel: 'ID',
+                  keySemanticsLabel: 'alias_label_input',
+                  valueSemanticsLabel: 'alias_id_input',
+                  confirmSemanticsLabel: 'alias_confirm_button',
                 ),
               );
               if (result != null) {
@@ -52,7 +55,7 @@ class AliasesSection extends StatelessWidget {
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD MULTIPLE',
+            label: 'ADD MULTIPLE ALIASES',
             onPressed: () async {
               final result = await showDialog<Map<String, String>>(
                 context: context,

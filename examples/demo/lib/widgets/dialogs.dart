@@ -245,21 +245,29 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
                 Row(
                 children: [
                   Expanded(
-                    child: AppTextField(
-                      controller: _keyControllers[i],
-                      decoration: InputDecoration(
-                        labelText: widget.keyLabel,
-                        isDense: true,
+                    child: Semantics(
+                      identifier: '${widget.keyLabel}_input_$i',
+                      container: true,
+                      child: AppTextField(
+                        controller: _keyControllers[i],
+                        decoration: InputDecoration(
+                          labelText: widget.keyLabel,
+                          isDense: true,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: AppTextField(
-                      controller: _valueControllers[i],
-                      decoration: InputDecoration(
-                        labelText: widget.valueLabel,
-                        isDense: true,
+                    child: Semantics(
+                      identifier: '${widget.valueLabel}_input_$i',
+                      container: true,
+                      child: AppTextField(
+                        controller: _valueControllers[i],
+                        decoration: InputDecoration(
+                          labelText: widget.valueLabel,
+                          isDense: true,
+                        ),
                       ),
                     ),
                   ),

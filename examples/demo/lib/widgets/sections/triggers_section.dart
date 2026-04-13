@@ -36,7 +36,7 @@ class TriggersSection extends StatelessWidget {
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD',
+            label: 'ADD TRIGGER',
             onPressed: () async {
               final result = await showDialog<MapEntry<String, String>>(
                 context: context,
@@ -49,7 +49,7 @@ class TriggersSection extends StatelessWidget {
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD MULTIPLE',
+            label: 'ADD MULTIPLE TRIGGERS',
             onPressed: () async {
               final result = await showDialog<Map<String, String>>(
                 context: context,
