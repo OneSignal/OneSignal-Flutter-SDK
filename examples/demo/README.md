@@ -1,53 +1,16 @@
-# OneSignal Flutter SDK Demo
+# demo
 
-A demo app showcasing all OneSignal Flutter SDK features including push notifications, in-app messaging, user management, tags, triggers, outcomes, and more.
+A new Flutter project.
 
-## Prerequisites
+## Getting Started
 
-- Flutter 3.7+
-- Android emulator or iOS simulator (or a physical device)
-- For iOS: Xcode with a valid signing configuration
+This project is a starting point for a Flutter application.
 
-## Setup
+A few resources to get you started if this is your first Flutter project:
 
-```bash
-flutter pub get
-```
+- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
+- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
 
-For iOS, install CocoaPods dependencies:
-
-```bash
-cd ios && pod install && cd ..
-```
-
-## Run
-
-```bash
-flutter run
-```
-
-For Android with multiple emulators, use the helper script to pick by AVD name:
-
-```bash
-../run-android.sh
-```
-
-For iOS with multiple simulators:
-
-```bash
-../run-ios.sh
-```
-
-Or specify a device directly:
-
-```bash
-flutter run -d <device_id>
-```
-
-## Configuration
-
-The app uses a default OneSignal App ID for testing. To use your own, update the `oneSignalAppId` constant in `lib/main.dart`.
-
-## Build Guide
-
-See [../build.md](../build.md) for the full set of prompts and requirements used to build this app.
+For help getting started with Flutter development, view the
+[online documentation](https://docs.flutter.dev/), which offers tutorials,
+samples, guidance on mobile development, and a full API reference.

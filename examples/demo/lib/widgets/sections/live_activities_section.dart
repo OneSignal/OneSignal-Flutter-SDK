@@ -42,6 +42,7 @@ class _LiveActivitiesSectionState extends State<LiveActivitiesSection> {
 
     return SectionCard(
       title: 'Live Activities',
+      sectionKey: 'live_activities',
       onInfoTap: widget.onInfoTap,
       child: Column(
         children: [
@@ -72,28 +73,24 @@ class _LiveActivitiesSectionState extends State<LiveActivitiesSection> {
           AppSpacing.gapBox,
           PrimaryButton(
             label: 'START LIVE ACTIVITY',
+            semanticsLabel: 'start_live_activity_button',
             onPressed: activityEmpty ? null : () => vm.startLiveActivity(),
           ),
           AppSpacing.gapBox,
           PrimaryButton(
             label: 'UPDATE → ${vm.nextStatusLabel}',
+            semanticsLabel: 'update_live_activity_button',
             onPressed: activityEmpty || vm.isLaUpdating || !vm.hasApiKey
                 ? null
                 : () => vm.updateLiveActivity(),
           ),
           AppSpacing.gapBox,
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: activityEmpty || !vm.hasApiKey
-                  ? null
-                  : () => vm.endLiveActivity(),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.osPrimary,
-                side: const BorderSide(color: AppColors.osPrimary),
-              ),
-              child: const Text('END LIVE ACTIVITY'),
-            ),
+          DestructiveButton(
+            label: 'END LIVE ACTIVITY',
+            semanticsLabel: 'end_live_activity_button',
+            onPressed: activityEmpty || !vm.hasApiKey
+                ? null
+                : () => vm.endLiveActivity(),
           ),
         ],
       ),

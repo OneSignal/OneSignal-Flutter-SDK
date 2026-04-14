@@ -19,6 +19,7 @@ class EmailsSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Emails',
+      sectionKey: 'emails',
       onInfoTap: onInfoTap,
       child: Column(
         children: [
@@ -27,8 +28,10 @@ class EmailsSection extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: CollapsibleList(
+                sectionKey: 'emails',
                 items: vm.emailsList,
                 emptyText: 'No emails added',
+                loading: vm.isLoading,
                 onDelete: vm.removeEmail,
               ),
             ),
@@ -36,14 +39,17 @@ class EmailsSection extends StatelessWidget {
           AppSpacing.gapBox,
           PrimaryButton(
             label: 'ADD EMAIL',
+            semanticsLabel: 'add_email_button',
             onPressed: () async {
               final result = await showDialog<String>(
                 context: context,
-                builder: (_) => const SingleInputDialog(
-                  title: 'Add Email',
-                  fieldLabel: 'Email',
-                  keyboardType: TextInputType.emailAddress,
-                ),
+                builder:
+                    (_) => const SingleInputDialog(
+                      title: 'Add Email',
+                      fieldLabel: 'Email',
+                      keyboardType: TextInputType.emailAddress,
+                      semanticsLabel: 'email_input',
+                    ),
               );
               if (result != null) {
                 vm.addEmail(result);

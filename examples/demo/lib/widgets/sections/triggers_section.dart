@@ -19,6 +19,7 @@ class TriggersSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Triggers',
+      sectionKey: 'triggers',
       onInfoTap: onInfoTap,
       child: Column(
         children: [
@@ -27,6 +28,7 @@ class TriggersSection extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: PairList(
+                sectionKey: 'triggers',
                 items: vm.triggersList,
                 emptyText: 'No triggers added',
                 onDelete: vm.removeTrigger,
@@ -35,11 +37,17 @@ class TriggersSection extends StatelessWidget {
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD',
+            label: 'ADD TRIGGER',
+            semanticsLabel: 'add_trigger_button',
             onPressed: () async {
               final result = await showDialog<MapEntry<String, String>>(
                 context: context,
-                builder: (_) => const PairInputDialog(title: 'Add Trigger'),
+                builder: (_) => const PairInputDialog(
+                  title: 'Add Trigger',
+                  keySemanticsLabel: 'trigger_key_input',
+                  valueSemanticsLabel: 'trigger_value_input',
+                  confirmSemanticsLabel: 'trigger_confirm_button',
+                ),
               );
               if (result != null) {
                 vm.addTrigger(result.key, result.value);
@@ -48,7 +56,8 @@ class TriggersSection extends StatelessWidget {
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD MULTIPLE',
+            label: 'ADD MULTIPLE TRIGGERS',
+            semanticsLabel: 'add_multiple_triggers_button',
             onPressed: () async {
               final result = await showDialog<Map<String, String>>(
                 context: context,
@@ -64,7 +73,8 @@ class TriggersSection extends StatelessWidget {
           if (vm.triggersList.isNotEmpty) ...[
             AppSpacing.gapBox,
             DestructiveButton(
-              label: 'REMOVE SELECTED',
+              label: 'REMOVE TRIGGERS',
+              semanticsLabel: 'remove_triggers_button',
               onPressed: () async {
                 final result = await showDialog<List<String>>(
                   context: context,
@@ -80,7 +90,8 @@ class TriggersSection extends StatelessWidget {
             ),
             AppSpacing.gapBox,
             DestructiveButton(
-              label: 'CLEAR ALL',
+              label: 'CLEAR ALL TRIGGERS',
+              semanticsLabel: 'clear_triggers_button',
               onPressed: vm.clearAllTriggers,
             ),
           ],

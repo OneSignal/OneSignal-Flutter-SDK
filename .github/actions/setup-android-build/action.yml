@@ -1,0 +1,21 @@
+name: "Setup Android build"
+description: "Sets up Java, Gradle, and caches the Android SDK NDK + CMake versions used by the demo app"
+runs:
+  using: "composite"
+  steps:
+    - name: Set up Java
+      uses: actions/setup-java@v5
+      with:
+        distribution: temurin
+        java-version: '17'
+
+    - name: Set up Gradle
+      uses: gradle/actions/setup-gradle@v6
+
+    - name: Cache Android SDK NDK + CMake
+      uses: actions/cache@v5
+      with:
+        path: |
+          /usr/local/lib/android/sdk/ndk/27.0.12077973
+          /usr/local/lib/android/sdk/cmake/3.22.1
+        key: android-sdk-ndk-27.0.12077973-cmake-3.22.1

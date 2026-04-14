@@ -33,8 +33,6 @@ flutter_launcher_icons:
   adaptive_icon_foreground: "assets/onesignal_logo_icon_padded.png"
 
 flutter:
-  config:
-    enable-swift-package-manager: false
   uses-material-design: true
   assets:
     - assets/onesignal_logo.svg

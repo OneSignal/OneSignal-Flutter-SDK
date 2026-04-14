@@ -12,6 +12,7 @@ class SingleInputDialog extends StatefulWidget {
   final String fieldLabel;
   final String confirmLabel;
   final TextInputType keyboardType;
+  final String? semanticsLabel;
 
   const SingleInputDialog({
     super.key,
@@ -19,6 +20,7 @@ class SingleInputDialog extends StatefulWidget {
     required this.fieldLabel,
     this.confirmLabel = 'Add',
     this.keyboardType = TextInputType.text,
+    this.semanticsLabel,
   });
 
   @override
@@ -42,7 +44,8 @@ class _SingleInputDialogState extends State<SingleInputDialog> {
       content: SizedBox(
         width: double.maxFinite,
         child: Semantics(
-          label: '${widget.fieldLabel}_input',
+          identifier: widget.semanticsLabel ?? '${widget.fieldLabel}_input',
+          container: true,
           child: AppTextField(
             controller: _controller,
             decoration: InputDecoration(labelText: widget.fieldLabel),
@@ -72,12 +75,18 @@ class PairInputDialog extends StatefulWidget {
   final String title;
   final String keyLabel;
   final String valueLabel;
+  final String? keySemanticsLabel;
+  final String? valueSemanticsLabel;
+  final String? confirmSemanticsLabel;
 
   const PairInputDialog({
     super.key,
     required this.title,
     this.keyLabel = 'Key',
     this.valueLabel = 'Value',
+    this.keySemanticsLabel,
+    this.valueSemanticsLabel,
+    this.confirmSemanticsLabel,
   });
 
   @override
@@ -109,7 +118,8 @@ class _PairInputDialogState extends State<PairInputDialog> {
           children: [
             Expanded(
               child: Semantics(
-                label: '${widget.keyLabel}_input',
+                identifier: widget.keySemanticsLabel ?? '${widget.keyLabel}_input',
+                container: true,
                 child: AppTextField(
                   controller: _keyController,
                   decoration: InputDecoration(labelText: widget.keyLabel),
@@ -120,7 +130,8 @@ class _PairInputDialogState extends State<PairInputDialog> {
             const SizedBox(width: 12),
             Expanded(
               child: Semantics(
-                label: '${widget.valueLabel}_input',
+                identifier: widget.valueSemanticsLabel ?? '${widget.valueLabel}_input',
+                container: true,
                 child: AppTextField(
                   controller: _valueController,
                   decoration: InputDecoration(labelText: widget.valueLabel),
@@ -136,14 +147,18 @@ class _PairInputDialogState extends State<PairInputDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _isValid
-              ? () => Navigator.pop(
-                    context,
-                    MapEntry(_keyController.text, _valueController.text),
-                  )
-              : null,
-          child: const Text('Add'),
+        Semantics(
+          identifier: widget.confirmSemanticsLabel ?? 'confirm_button',
+          container: true,
+          child: TextButton(
+            onPressed: _isValid
+                ? () => Navigator.pop(
+                      context,
+                      MapEntry(_keyController.text, _valueController.text),
+                    )
+                : null,
+            child: const Text('Add'),
+          ),
         ),
       ],
     );
@@ -232,21 +247,29 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
                 Row(
                 children: [
                   Expanded(
-                    child: AppTextField(
-                      controller: _keyControllers[i],
-                      decoration: InputDecoration(
-                        labelText: widget.keyLabel,
-                        isDense: true,
+                    child: Semantics(
+                      identifier: 'multipair_key_$i',
+                      container: true,
+                      child: AppTextField(
+                        controller: _keyControllers[i],
+                        decoration: InputDecoration(
+                          labelText: widget.keyLabel,
+                          isDense: true,
+                        ),
                       ),
                     ),
                   ),
                   const SizedBox(width: 8),
                   Expanded(
-                    child: AppTextField(
-                      controller: _valueControllers[i],
-                      decoration: InputDecoration(
-                        labelText: widget.valueLabel,
-                        isDense: true,
+                    child: Semantics(
+                      identifier: 'multipair_value_$i',
+                      container: true,
+                      child: AppTextField(
+                        controller: _valueControllers[i],
+                        decoration: InputDecoration(
+                          labelText: widget.valueLabel,
+                          isDense: true,
+                        ),
                       ),
                     ),
                   ),
@@ -258,10 +281,14 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
                 ],
               ),
             ],
-              TextButton.icon(
-                onPressed: _addRow,
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('Add Row'),
+              Semantics(
+                identifier: 'multipair_add_row_button',
+                button: true,
+                child: TextButton.icon(
+                  onPressed: _addRow,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add Row'),
+                ),
               ),
             ],
           ),
@@ -272,18 +299,22 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _allValid
-              ? () {
-                  final pairs = <String, String>{};
-                  for (var i = 0; i < _keyControllers.length; i++) {
-                    pairs[_keyControllers[i].text] =
-                        _valueControllers[i].text;
+        Semantics(
+          identifier: 'multipair_confirm_button',
+          button: true,
+          child: TextButton(
+            onPressed: _allValid
+                ? () {
+                    final pairs = <String, String>{};
+                    for (var i = 0; i < _keyControllers.length; i++) {
+                      pairs[_keyControllers[i].text] =
+                          _valueControllers[i].text;
+                    }
+                    Navigator.pop(context, pairs);
                   }
-                  Navigator.pop(context, pairs);
-                }
-              : null,
-          child: const Text('Add All'),
+                : null,
+            child: const Text('Add All'),
+          ),
         ),
       ],
     );
@@ -320,20 +351,24 @@ class _MultiSelectRemoveDialogState extends State<MultiSelectRemoveDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: widget.items.map((item) {
-              return CheckboxListTile(
-                title: Text(item.key),
-                value: _selected.contains(item.key),
-                controlAffinity: ListTileControlAffinity.leading,
-                onChanged: (checked) {
-                  setState(() {
-                    if (checked == true) {
-                      _selected.add(item.key);
-                    } else {
-                      _selected.remove(item.key);
-                    }
-                  });
-                },
-                contentPadding: EdgeInsets.zero,
+              return Semantics(
+                identifier: 'remove_checkbox_${item.key}',
+                container: true,
+                child: CheckboxListTile(
+                  title: Text(item.key),
+                  value: _selected.contains(item.key),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  onChanged: (checked) {
+                    setState(() {
+                      if (checked == true) {
+                        _selected.add(item.key);
+                      } else {
+                        _selected.remove(item.key);
+                      }
+                    });
+                  },
+                  contentPadding: EdgeInsets.zero,
+                ),
               );
             }).toList(),
           ),
@@ -380,7 +415,8 @@ class _LoginDialogState extends State<LoginDialog> {
       content: SizedBox(
         width: double.maxFinite,
         child: Semantics(
-          label: 'external_user_id_input',
+          identifier: 'login_user_id_input',
+          container: true,
           child: AppTextField(
             controller: _controller,
             decoration: const InputDecoration(labelText: 'External User Id'),
@@ -393,11 +429,15 @@ class _LoginDialogState extends State<LoginDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _controller.text.isEmpty
-              ? null
-              : () => Navigator.pop(context, _controller.text),
-          child: const Text('Login'),
+        Semantics(
+          identifier: 'login_confirm_button',
+          container: true,
+          child: TextButton(
+            onPressed: _controller.text.isEmpty
+                ? null
+                : () => Navigator.pop(context, _controller.text),
+            child: const Text('Login'),
+          ),
         ),
       ],
     );
@@ -469,19 +509,27 @@ class _OutcomeDialogState extends State<OutcomeDialog> {
                 ),
               ),
               const SizedBox(height: 8),
-              AppTextField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Outcome Name'),
-                onChanged: (_) => setState(() {}),
+              Semantics(
+                identifier: 'outcome_name_input',
+                container: true,
+                child: AppTextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Outcome Name'),
+                  onChanged: (_) => setState(() {}),
+                ),
               ),
               if (_type == OutcomeType.withValue) ...[
                 const SizedBox(height: 12),
-                AppTextField(
-                  controller: _valueController,
-                  decoration: const InputDecoration(labelText: 'Value'),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: (_) => setState(() {}),
+                Semantics(
+                  identifier: 'outcome_value_input',
+                  container: true,
+                  child: AppTextField(
+                    controller: _valueController,
+                    decoration: const InputDecoration(labelText: 'Value'),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (_) => setState(() {}),
+                  ),
                 ),
               ],
             ],
@@ -493,19 +541,23 @@ class _OutcomeDialogState extends State<OutcomeDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _isValid
-              ? () {
-                  Navigator.pop(context, {
-                    'type': _type,
-                    'name': _nameController.text,
-                    'value': _type == OutcomeType.withValue
-                        ? double.parse(_valueController.text)
-                        : null,
-                  });
-                }
-              : null,
-          child: const Text('Send'),
+        Semantics(
+          identifier: 'outcome_send_button',
+          container: true,
+          child: TextButton(
+            onPressed: _isValid
+                ? () {
+                    Navigator.pop(context, {
+                      'type': _type,
+                      'name': _nameController.text,
+                      'value': _type == OutcomeType.withValue
+                          ? double.parse(_valueController.text)
+                          : null,
+                    });
+                  }
+                : null,
+            child: const Text('Send'),
+          ),
         ),
       ],
     );
@@ -557,28 +609,36 @@ class _TrackEventDialogState extends State<TrackEventDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: const Text('Track Event'),
+      title: const Text('Custom Event'),
       content: SizedBox(
         width: double.maxFinite,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AppTextField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Event Name'),
-                onChanged: (_) => setState(() {}),
+              Semantics(
+                identifier: 'event_name_input',
+                container: true,
+                child: AppTextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Event Name'),
+                  onChanged: (_) => setState(() {}),
+                ),
               ),
               const SizedBox(height: 12),
-              AppTextField(
-                controller: _propsController,
-                decoration: InputDecoration(
-                  labelText: 'Properties (optional, JSON)',
-                  hintText: '{"key": "value"}',
-                  errorText: _jsonError,
+              Semantics(
+                identifier: 'event_properties_input',
+                container: true,
+                child: AppTextField(
+                  controller: _propsController,
+                  decoration: InputDecoration(
+                    labelText: 'Properties (optional, JSON)',
+                    hintText: '{"key": "value"}',
+                    errorText: _jsonError,
+                  ),
+                  maxLines: 3,
+                  onChanged: _validateJson,
                 ),
-                maxLines: 3,
-                onChanged: _validateJson,
               ),
             ],
           ),
@@ -589,21 +649,25 @@ class _TrackEventDialogState extends State<TrackEventDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _isValid
-              ? () {
-                  Map<String, dynamic>? props;
-                  if (_propsController.text.isNotEmpty) {
-                    props = jsonDecode(_propsController.text)
-                        as Map<String, dynamic>;
+        Semantics(
+          identifier: 'event_track_button',
+          container: true,
+          child: TextButton(
+            onPressed: _isValid
+                ? () {
+                    Map<String, dynamic>? props;
+                    if (_propsController.text.isNotEmpty) {
+                      props = jsonDecode(_propsController.text)
+                          as Map<String, dynamic>;
+                    }
+                    Navigator.pop(context, {
+                      'name': _nameController.text,
+                      'properties': props,
+                    });
                   }
-                  Navigator.pop(context, {
-                    'name': _nameController.text,
-                    'properties': props,
-                  });
-                }
-              : null,
-          child: const Text('Track'),
+                : null,
+            child: const Text('Track'),
+          ),
         ),
       ],
     );
@@ -686,7 +750,11 @@ class TooltipDialog extends StatelessWidget {
   Widget build(BuildContext context) {
     return AlertDialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: Text(tooltip.title),
+      title: Semantics(
+        identifier: 'tooltip_title',
+        container: true,
+        child: Text(tooltip.title),
+      ),
       content: SizedBox(
         width: double.maxFinite,
         child: SingleChildScrollView(
@@ -694,7 +762,11 @@ class TooltipDialog extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(tooltip.description),
+              Semantics(
+                identifier: 'tooltip_description',
+                container: true,
+                child: Text(tooltip.description),
+              ),
               if (tooltip.options != null && tooltip.options!.isNotEmpty) ...[
                 const SizedBox(height: 16),
                 ...tooltip.options!.map((option) => Padding(

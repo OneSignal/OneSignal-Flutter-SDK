@@ -1,0 +1,57 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../../theme.dart';
+import '../../viewmodels/app_viewmodel.dart';
+import '../action_button.dart';
+import '../section_card.dart';
+import '../toggle_row.dart';
+
+class LocationSection extends StatelessWidget {
+  final VoidCallback? onInfoTap;
+
+  const LocationSection({super.key, this.onInfoTap});
+
+  @override
+  Widget build(BuildContext context) {
+    final vm = context.watch<AppViewModel>();
+
+    return SectionCard(
+      title: 'Location',
+      sectionKey: 'location',
+      onInfoTap: onInfoTap,
+      child: Column(
+        children: [
+          Card(
+            margin: EdgeInsets.zero,
+            child: Padding(
+              padding: AppSpacing.cardPadding,
+              child: ToggleRow(
+                label: 'Location Shared',
+                description: 'Share device location with OneSignal',
+                semanticsLabel: 'location_shared_toggle',
+                value: vm.locationShared,
+                onChanged: vm.setLocationShared,
+              ),
+            ),
+          ),
+          AppSpacing.gapBox,
+          PrimaryButton(
+            label: 'PROMPT LOCATION',
+            onPressed: vm.promptLocation,
+          ),
+          AppSpacing.gapBox,
+          PrimaryButton(
+            label: 'CHECK LOCATION SHARED',
+            onPressed: () async {
+              final shared = await vm.checkLocationShared();
+              if (context.mounted) {
+                context.showSnackBar('Location shared: $shared');
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+}

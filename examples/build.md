@@ -119,9 +119,9 @@ OneSignal.User.addObserver(...)
 - Use `await Future.delayed(const Duration(milliseconds: 100))` after setting state for render delay
 
 ### SnackBar Messages
-- `AppViewModel` exposes a `snackBarMessage` stream or `ValueNotifier<String?>`
-- `HomeScreen` shows via `ScaffoldMessenger.of(context).showSnackBar()`
-- Clear previous SnackBar with `ScaffoldMessenger.of(context).clearSnackBars()`
+- `AppSnackBar` extension on `BuildContext` defined in `theme.dart`
+- Call `context.showSnackBar(message)` directly from widget callbacks
+- Automatically hides the current SnackBar before showing the new one
 
 ### Send In-App Message Icons
 - TOP BANNER: `Icons.vertical_align_top`
@@ -134,17 +134,6 @@ OneSignal.User.addObserver(...)
 - `MultiSelectRemoveDialog` uses `CheckboxListTile`
 - `TextEditingController`s are properly disposed in `StatefulWidget`s
 - JSON parsing via `jsonDecode` returns `Map<String, dynamic>` for Track Event
-
-### Accessibility (Appium)
-- Use `Semantics` widget with `label` property:
-  ```dart
-  Semantics(label: 'log_entry_${index}_message', child: Text(entry.message))
-  ```
-
-### Log Manager
-- Singleton with `ChangeNotifier` for reactive UI updates
-- `LogManager().d(tag, message)`, `.i()`, `.w()`, `.e()`
-- Also prints via `debugPrint` for development
 
 ---
 
@@ -162,8 +151,7 @@ examples/demo/
 │   ├── services/
 │   │   ├── onesignal_api_service.dart
 │   │   ├── preferences_service.dart
-│   │   ├── tooltip_helper.dart
-│   │   └── log_manager.dart
+│   │   └── tooltip_helper.dart
 │   ├── repositories/
 │   │   └── onesignal_repository.dart
 │   ├── viewmodels/
@@ -175,9 +163,9 @@ examples/demo/
 │       ├── section_card.dart
 │       ├── toggle_row.dart
 │       ├── action_button.dart
+│       ├── app_text_field.dart
 │       ├── list_widgets.dart
 │       ├── loading_overlay.dart
-│       ├── log_view.dart
 │       ├── dialogs.dart
 │       └── sections/
 │           ├── app_section.dart
@@ -192,7 +180,8 @@ examples/demo/
 │           ├── tags_section.dart
 │           ├── outcomes_section.dart
 │           ├── triggers_section.dart
-│           ├── track_event_section.dart
+│           ├── custom_events_section.dart
+│           ├── live_activities_section.dart
 │           └── location_section.dart
 ├── android/
 ├── ios/

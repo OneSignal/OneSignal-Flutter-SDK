@@ -1,0 +1,32 @@
+name: "Setup iOS build"
+description: "Caches Swift Package Manager and Xcode DerivedData for the demo app"
+runs:
+  using: "composite"
+  steps:
+    - name: Cache Swift Package Manager
+      uses: actions/cache@v5
+      with:
+        path: |
+          ~/Library/Caches/org.swift.swiftpm
+          ~/Library/org.swift.swiftpm
+        key: spm-${{ runner.os }}-${{ hashFiles('examples/demo/ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
+        restore-keys: |
+          spm-${{ runner.os }}-
+
+    - name: Cache Xcode DerivedData
+      uses: actions/cache@v5
+      with:
+        path: ~/Library/Developer/Xcode/DerivedData
+        key: deriveddata-ios-${{ runner.os }}-${{ hashFiles('examples/demo/ios/Runner.xcworkspace/xcshareddata/swiftpm/Package.resolved', 'examples/demo/pubspec.lock') }}
+        restore-keys: |
+          deriveddata-ios-${{ runner.os }}-
+
+    - name: Cache Flutter iOS build outputs
+      uses: actions/cache@v5
+      with:
+        path: |
+          examples/demo/.dart_tool
+          examples/demo/build
+        key: flutter-ios-build-${{ runner.os }}-${{ hashFiles('examples/demo/pubspec.lock') }}
+        restore-keys: |
+          flutter-ios-build-${{ runner.os }}-

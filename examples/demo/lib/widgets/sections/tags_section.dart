@@ -19,6 +19,7 @@ class TagsSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Tags',
+      sectionKey: 'tags',
       onInfoTap: onInfoTap,
       child: Column(
         children: [
@@ -27,19 +28,28 @@ class TagsSection extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: PairList(
+                sectionKey: 'tags',
                 items: vm.tagsList,
                 emptyText: 'No tags added',
+                loading: vm.isLoading,
                 onDelete: vm.removeTag,
               ),
             ),
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD',
+            label: 'ADD TAG',
+            semanticsLabel: 'add_tag_button',
             onPressed: () async {
               final result = await showDialog<MapEntry<String, String>>(
                 context: context,
-                builder: (_) => const PairInputDialog(title: 'Add Tag'),
+                builder:
+                    (_) => const PairInputDialog(
+                      title: 'Add Tag',
+                      keySemanticsLabel: 'tag_key_input',
+                      valueSemanticsLabel: 'tag_value_input',
+                      confirmSemanticsLabel: 'tag_confirm_button',
+                    ),
               );
               if (result != null) {
                 vm.addTag(result.key, result.value);
@@ -48,12 +58,14 @@ class TagsSection extends StatelessWidget {
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD MULTIPLE',
+            label: 'ADD MULTIPLE TAGS',
+            semanticsLabel: 'add_multiple_tags_button',
             onPressed: () async {
               final result = await showDialog<Map<String, String>>(
                 context: context,
-                builder: (_) =>
-                    const MultiPairInputDialog(title: 'Add Multiple Tags'),
+                builder:
+                    (_) =>
+                        const MultiPairInputDialog(title: 'Add Multiple Tags'),
               );
               if (result != null) {
                 vm.addTags(result);
@@ -63,14 +75,16 @@ class TagsSection extends StatelessWidget {
           if (vm.tagsList.isNotEmpty) ...[
             AppSpacing.gapBox,
             DestructiveButton(
-              label: 'REMOVE SELECTED',
+              label: 'REMOVE TAGS',
+              semanticsLabel: 'remove_tags_button',
               onPressed: () async {
                 final result = await showDialog<List<String>>(
                   context: context,
-                  builder: (_) => MultiSelectRemoveDialog(
-                    title: 'Remove Tags',
-                    items: vm.tagsList,
-                  ),
+                  builder:
+                      (_) => MultiSelectRemoveDialog(
+                        title: 'Remove Tags',
+                        items: vm.tagsList,
+                      ),
                 );
                 if (result != null) {
                   vm.removeSelectedTags(result);

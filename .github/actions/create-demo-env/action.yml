@@ -1,0 +1,25 @@
+name: "Create demo .env"
+description: "Writes the demo app's .env file used by E2E builds"
+inputs:
+  onesignal-app-id:
+    description: "OneSignal App ID for the demo app"
+    required: true
+  onesignal-api-key:
+    description: "OneSignal REST API key for the demo app"
+    required: true
+  e2e-mode:
+    description: "Whether to enable E2E_MODE in the demo app"
+    required: false
+    default: "true"
+runs:
+  using: "composite"
+  steps:
+    - name: Write .env
+      working-directory: examples/demo
+      shell: bash
+      run: |
+        {
+          echo "ONESIGNAL_APP_ID=${{ inputs.onesignal-app-id }}"
+          echo "ONESIGNAL_API_KEY=${{ inputs.onesignal-api-key }}"
+          echo "E2E_MODE=${{ inputs.e2e-mode }}"
+        } > .env

@@ -18,6 +18,7 @@ class LocationSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Location',
+      sectionKey: 'location',
       onInfoTap: onInfoTap,
       child: Column(
         children: [
@@ -28,6 +29,7 @@ class LocationSection extends StatelessWidget {
               child: ToggleRow(
                 label: 'Location Shared',
                 description: 'Share device location with OneSignal',
+                semanticsLabel: 'location_shared_toggle',
                 value: vm.locationShared,
                 onChanged: vm.setLocationShared,
               ),
@@ -36,7 +38,19 @@ class LocationSection extends StatelessWidget {
           AppSpacing.gapBox,
           PrimaryButton(
             label: 'PROMPT LOCATION',
+            semanticsLabel: 'prompt_location_button',
             onPressed: vm.promptLocation,
+          ),
+          AppSpacing.gapBox,
+          PrimaryButton(
+            label: 'CHECK LOCATION SHARED',
+            semanticsLabel: 'check_location_button',
+            onPressed: () async {
+              final shared = await vm.checkLocationShared();
+              if (context.mounted) {
+                context.showSnackBar('Location shared: $shared');
+              }
+            },
           ),
         ],
       ),

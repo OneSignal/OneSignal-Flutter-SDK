@@ -4,7 +4,6 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 import '../models/in_app_message_type.dart';
 import '../models/notification_type.dart';
 import '../repositories/onesignal_repository.dart';
-import '../services/log_manager.dart';
 import '../services/preferences_service.dart';
 
 class AppViewModel extends ChangeNotifier {
@@ -24,29 +23,17 @@ class AppViewModel extends ChangeNotifier {
       'message': 'Driver is heading your way',
       'estimatedTime': '10 min',
     },
-    {
-      'status': 'delivered',
-      'message': 'Order delivered!',
-      'estimatedTime': '',
-    },
+    {'status': 'delivered', 'message': 'Order delivered!', 'estimatedTime': ''},
   ];
 
   // Loading state
   bool _isLoading = false;
   bool get isLoading => _isLoading;
 
-  // SnackBar message
-  String? _snackBarMessage;
-  String? get snackBarMessage => _snackBarMessage;
-  void clearSnackBar() {
-    _snackBarMessage = null;
-  }
-
-  void _showSnackBar(String message) {
-    _snackBarMessage = message;
-    LogManager().i('App', message);
-    notifyListeners();
-  }
+  // Increments per fetchUserDataFromApi() call so stale results are dropped
+  // when a newer fetch is already in flight (e.g. cold-start fetch racing the
+  // user-change observer's fetch right after login).
+  int _fetchSequence = 0;
 
   // App state
   String _appId = '';
@@ -140,22 +127,11 @@ class AppViewModel extends ChangeNotifier {
 
     notifyListeners();
 
-    // Fetch user data if we have a OneSignal ID
-    try {
-      final onesignalId = await _repository.getOnesignalId();
-      if (onesignalId != null) {
-        _isLoading = true;
-        notifyListeners();
-        await fetchUserDataFromApi();
-        await Future.delayed(const Duration(milliseconds: 100));
-        _isLoading = false;
-        notifyListeners();
-      }
-    } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      LogManager().e('App', 'Error fetching initial user data: $e');
-    }
+    final onesignalId = await _repository.getOnesignalId();
+    if (onesignalId == null) return;
+
+    // fetchUserDataFromApi owns _isLoading + notifyListeners.
+    await fetchUserDataFromApi();
   }
 
   // Observers
@@ -163,96 +139,109 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.pushSubscription.addObserver((state) {
       _pushSubscriptionId = state.current.id;
       _pushEnabled = state.current.optedIn;
-      LogManager().i('Observer',
-          'Push subscription changed: id=${state.current.id}, optedIn=${state.current.optedIn}');
+      debugPrint(
+        'Push subscription changed: id=${state.current.id}, optedIn=${state.current.optedIn}',
+      );
       notifyListeners();
     });
 
     OneSignal.Notifications.addPermissionObserver((permission) {
       _hasNotificationPermission = permission;
-      LogManager().i('Observer', 'Permission changed: $permission');
+      debugPrint('Permission changed: $permission');
       notifyListeners();
     });
 
     OneSignal.User.addObserver((state) {
-      LogManager().i('Observer', 'User state changed');
+      final nextOnesignalId = state.current.onesignalId;
+      debugPrint(
+        'User changed: onesignalId=${nextOnesignalId ?? 'null'}, externalId=${state.current.externalId ?? 'null'}',
+      );
+
+      // Drive the post-login fetch from the observer so it runs only once the
+      // SDK has actually assigned a new onesignalId. Logout clears it to null;
+      // skip the fetch in that case (logoutUser already clears local lists).
+      if (nextOnesignalId == null) return;
       fetchUserDataFromApi();
     });
   }
 
-  // Fetch user data from API
+  // Fetch user data from API. Owns the isLoading toggle and uses a
+  // request-sequence guard so stale results are dropped if a newer fetch
+  // started before this one finishes.
   Future<void> fetchUserDataFromApi() async {
+    final requestId = ++_fetchSequence;
+    _isLoading = true;
+    notifyListeners();
+
     try {
       final onesignalId = await _repository.getOnesignalId();
+      debugPrint('1-onesignalId: $onesignalId');
       if (onesignalId == null) return;
 
       final userData = await _repository.fetchUser(onesignalId);
-      if (userData != null) {
-        _aliasesList = userData.aliases.entries.toList();
-        _tagsList = userData.tags.entries.toList();
-        _emailsList = List.from(userData.emails);
-        _smsNumbersList = List.from(userData.smsNumbers);
+      debugPrint('2-userData: $userData');
+      if (userData == null) return;
 
-        if (userData.externalId != null) {
-          _externalUserId = userData.externalId;
-          await _prefs.setExternalUserId(userData.externalId);
-        }
+      if (_fetchSequence != requestId) return;
 
-        notifyListeners();
+      _aliasesList = userData.aliases.entries.toList();
+      _tagsList = userData.tags.entries.toList();
+      _emailsList = List.from(userData.emails);
+      _smsNumbersList = List.from(userData.smsNumbers);
+
+      if (userData.externalId != null) {
+        _externalUserId = userData.externalId;
+        await _prefs.setExternalUserId(userData.externalId);
       }
     } catch (e) {
-      LogManager().e('App', 'Error fetching user data: $e');
+      debugPrint('fetchUserDataFromApi error: $e');
+    } finally {
+      if (_fetchSequence == requestId) {
+        _isLoading = false;
+      }
+      notifyListeners();
     }
   }
 
   // Login / Logout
   Future<void> loginUser(String externalUserId) async {
+    _aliasesList = [];
+    _emailsList = [];
+    _smsNumbersList = [];
+    _tagsList = [];
+    _triggersList = [];
+    _externalUserId = externalUserId;
     _isLoading = true;
     notifyListeners();
 
     try {
-      _aliasesList = [];
-      _emailsList = [];
-      _smsNumbersList = [];
-      _tagsList = [];
-      _triggersList = [];
-
       await _repository.loginUser(externalUserId);
-      _externalUserId = externalUserId;
       await _prefs.setExternalUserId(externalUserId);
-
-      _isLoading = false;
-      notifyListeners();
-      _showSnackBar('Logged in as: $externalUserId');
+      debugPrint('Logged in as: $externalUserId');
+      // The User observer runs fetchUserDataFromApi once the new onesignalId
+      // is assigned; that call clears _isLoading in its finally.
     } catch (e) {
+      debugPrint('Login error: $e');
       _isLoading = false;
       notifyListeners();
-      LogManager().e('App', 'Login error: $e');
-      _showSnackBar('Login failed');
     }
   }
 
   Future<void> logoutUser() async {
-    _isLoading = true;
+    _externalUserId = null;
+    _aliasesList = [];
+    _emailsList = [];
+    _smsNumbersList = [];
+    _tagsList = [];
+    _triggersList = [];
     notifyListeners();
 
     try {
       await _repository.logoutUser();
-      _externalUserId = null;
-      _aliasesList = [];
-      _emailsList = [];
-      _smsNumbersList = [];
-      _tagsList = [];
-      _triggersList = [];
       await _prefs.setExternalUserId(null);
-
-      _isLoading = false;
-      notifyListeners();
-      _showSnackBar('Logged out');
+      debugPrint('Logged out');
     } catch (e) {
-      _isLoading = false;
-      notifyListeners();
-      LogManager().e('App', 'Logout error: $e');
+      debugPrint('Logout error: $e');
     }
   }
 
@@ -284,7 +273,7 @@ class AppViewModel extends ChangeNotifier {
     }
     _pushEnabled = enabled;
     notifyListeners();
-    _showSnackBar('Push ${enabled ? "enabled" : "disabled"}');
+    debugPrint('Push ${enabled ? "enabled" : "disabled"}');
   }
 
   Future<void> promptPush() async {
@@ -296,20 +285,25 @@ class AppViewModel extends ChangeNotifier {
   // Notifications
   Future<void> sendNotification(NotificationType type) async {
     final success = await _repository.sendNotification(type);
-    _showSnackBar(success
-        ? 'Notification sent: ${type.name}'
-        : 'Failed to send notification');
+    if (success) {
+      debugPrint('Notification sent: ${type.name}');
+    } else {
+      debugPrint('Failed to send notification');
+    }
   }
 
   Future<void> sendCustomNotification(String title, String body) async {
     final success = await _repository.sendCustomNotification(title, body);
-    _showSnackBar(
-        success ? 'Custom notification sent' : 'Failed to send notification');
+    if (success) {
+      debugPrint('Custom notification sent');
+    } else {
+      debugPrint('Failed to send notification');
+    }
   }
 
   void clearAllNotifications() {
     _repository.clearAllNotifications();
-    _showSnackBar('All notifications cleared');
+    debugPrint('All notifications cleared');
   }
 
   // IAM
@@ -322,11 +316,12 @@ class AppViewModel extends ChangeNotifier {
 
   void sendInAppMessage(InAppMessageType type) {
     _repository.addTrigger('iam_type', type.triggerValue);
-    _triggersList = List.from(_triggersList)
-      ..removeWhere((e) => e.key == 'iam_type')
-      ..add(MapEntry('iam_type', type.triggerValue));
+    _triggersList =
+        List.from(_triggersList)
+          ..removeWhere((e) => e.key == 'iam_type')
+          ..add(MapEntry('iam_type', type.triggerValue));
     notifyListeners();
-    _showSnackBar('Sent In-App Message: ${type.label}');
+    debugPrint('Sent In-App Message: ${type.label}');
   }
 
   // Aliases
@@ -334,14 +329,14 @@ class AppViewModel extends ChangeNotifier {
     _repository.addAlias(label, id);
     _aliasesList = List.from(_aliasesList)..add(MapEntry(label, id));
     notifyListeners();
-    _showSnackBar('Alias added: $label');
+    debugPrint('Alias added: $label');
   }
 
   void addAliases(Map<String, String> aliases) {
     _repository.addAliases(aliases);
     _aliasesList = List.from(_aliasesList)..addAll(aliases.entries);
     notifyListeners();
-    _showSnackBar('${aliases.length} alias(es) added');
+    debugPrint('${aliases.length} alias(es) added');
   }
 
   // Emails
@@ -349,14 +344,14 @@ class AppViewModel extends ChangeNotifier {
     _repository.addEmail(email);
     _emailsList = List.from(_emailsList)..add(email);
     notifyListeners();
-    _showSnackBar('Email added: $email');
+    debugPrint('Email added: $email');
   }
 
   void removeEmail(String email) {
     _repository.removeEmail(email);
     _emailsList = List.from(_emailsList)..remove(email);
     notifyListeners();
-    _showSnackBar('Email removed: $email');
+    debugPrint('Email removed: $email');
   }
 
   // SMS
@@ -364,14 +359,14 @@ class AppViewModel extends ChangeNotifier {
     _repository.addSms(smsNumber);
     _smsNumbersList = List.from(_smsNumbersList)..add(smsNumber);
     notifyListeners();
-    _showSnackBar('SMS added: $smsNumber');
+    debugPrint('SMS added: $smsNumber');
   }
 
   void removeSms(String smsNumber) {
     _repository.removeSms(smsNumber);
     _smsNumbersList = List.from(_smsNumbersList)..remove(smsNumber);
     notifyListeners();
-    _showSnackBar('SMS removed: $smsNumber');
+    debugPrint('SMS removed: $smsNumber');
   }
 
   // Tags
@@ -379,28 +374,28 @@ class AppViewModel extends ChangeNotifier {
     _repository.addTag(key, value);
     _tagsList = List.from(_tagsList)..add(MapEntry(key, value));
     notifyListeners();
-    _showSnackBar('Tag added: $key');
+    debugPrint('Tag added: $key');
   }
 
   void addTags(Map<String, String> tags) {
     _repository.addTags(tags);
     _tagsList = List.from(_tagsList)..addAll(tags.entries);
     notifyListeners();
-    _showSnackBar('${tags.length} tag(s) added');
+    debugPrint('${tags.length} tag(s) added');
   }
 
   void removeTag(String key) {
     _repository.removeTag(key);
     _tagsList = List.from(_tagsList)..removeWhere((e) => e.key == key);
     notifyListeners();
-    _showSnackBar('Tag removed: $key');
+    debugPrint('Tag removed: $key');
   }
 
   void removeSelectedTags(List<String> keys) {
     _repository.removeTags(keys);
     _tagsList = List.from(_tagsList)..removeWhere((e) => keys.contains(e.key));
     notifyListeners();
-    _showSnackBar('${keys.length} tag(s) removed');
+    debugPrint('${keys.length} tag(s) removed');
   }
 
   // Triggers (in-memory only)
@@ -408,21 +403,21 @@ class AppViewModel extends ChangeNotifier {
     _repository.addTrigger(key, value);
     _triggersList = List.from(_triggersList)..add(MapEntry(key, value));
     notifyListeners();
-    _showSnackBar('Trigger added: $key');
+    debugPrint('Trigger added: $key');
   }
 
   void addTriggers(Map<String, String> triggers) {
     _repository.addTriggers(triggers);
     _triggersList = List.from(_triggersList)..addAll(triggers.entries);
     notifyListeners();
-    _showSnackBar('${triggers.length} trigger(s) added');
+    debugPrint('${triggers.length} trigger(s) added');
   }
 
   void removeTrigger(String key) {
     _repository.removeTrigger(key);
     _triggersList = List.from(_triggersList)..removeWhere((e) => e.key == key);
     notifyListeners();
-    _showSnackBar('Trigger removed: $key');
+    debugPrint('Trigger removed: $key');
   }
 
   void removeSelectedTriggers(List<String> keys) {
@@ -430,36 +425,36 @@ class AppViewModel extends ChangeNotifier {
     _triggersList = List.from(_triggersList)
       ..removeWhere((e) => keys.contains(e.key));
     notifyListeners();
-    _showSnackBar('${keys.length} trigger(s) removed');
+    debugPrint('${keys.length} trigger(s) removed');
   }
 
   void clearAllTriggers() {
     _repository.clearTriggers();
     _triggersList = [];
     notifyListeners();
-    _showSnackBar('All triggers cleared');
+    debugPrint('All triggers cleared');
   }
 
   // Outcomes
   void sendOutcome(String name) {
     _repository.sendOutcome(name);
-    _showSnackBar('Outcome sent: $name');
+    debugPrint('Outcome sent: $name');
   }
 
   void sendUniqueOutcome(String name) {
     _repository.sendUniqueOutcome(name);
-    _showSnackBar('Unique outcome sent: $name');
+    debugPrint('Unique outcome sent: $name');
   }
 
   void sendOutcomeWithValue(String name, double value) {
     _repository.sendOutcomeWithValue(name, value);
-    _showSnackBar('Outcome sent: $name = $value');
+    debugPrint('Outcome sent: $name = $value');
   }
 
-  // Track Event
+  // Custom Events
   void trackEvent(String name, Map<String, dynamic>? properties) {
     _repository.trackEvent(name, properties);
-    _showSnackBar('Event tracked: $name');
+    debugPrint('Event tracked: $name');
   }
 
   // Live Activities
@@ -477,9 +472,13 @@ class AppViewModel extends ChangeNotifier {
     final attributes = {'orderNumber': _orderNumber};
     final content = Map<String, dynamic>.from(_orderStatuses[0]);
     _statusIndex = 0;
-    await _repository.startDefaultLiveActivity(_activityId, attributes, content);
+    await _repository.startDefaultLiveActivity(
+      _activityId,
+      attributes,
+      content,
+    );
     notifyListeners();
-    _showSnackBar('Started Live Activity: $_activityId');
+    debugPrint('Started Live Activity: $_activityId');
   }
 
   Future<void> updateLiveActivity() async {
@@ -489,30 +488,33 @@ class AppViewModel extends ChangeNotifier {
     final nextIndex = (_statusIndex + 1) % _orderStatuses.length;
     final content = Map<String, dynamic>.from(_orderStatuses[nextIndex]);
     final eventUpdates = {'data': content};
-    final success = await _repository.updateLiveActivity(_activityId, eventUpdates);
+    final success = await _repository.updateLiveActivity(
+      _activityId,
+      eventUpdates,
+    );
 
     _isLaUpdating = false;
     if (success) {
       _statusIndex = nextIndex;
-      _showSnackBar('Updated Live Activity: $_activityId');
+      debugPrint('Updated Live Activity: $_activityId');
     } else {
-      _showSnackBar('Failed to update Live Activity');
+      debugPrint('Failed to update Live Activity');
     }
     notifyListeners();
   }
 
   Future<void> exitLiveActivity() async {
     await _repository.exitLiveActivity(_activityId);
-    _showSnackBar('Exited Live Activity: $_activityId');
+    debugPrint('Exited Live Activity: $_activityId');
   }
 
   Future<void> endLiveActivity() async {
     final success = await _repository.endLiveActivity(_activityId);
     if (success) {
       _statusIndex = 0;
-      _showSnackBar('Ended Live Activity: $_activityId');
+      debugPrint('Ended Live Activity: $_activityId');
     } else {
-      _showSnackBar('Failed to end Live Activity');
+      debugPrint('Failed to end Live Activity');
     }
     notifyListeners();
   }
@@ -523,18 +525,14 @@ class AppViewModel extends ChangeNotifier {
     _repository.setLocationShared(shared);
     await _prefs.setLocationShared(shared);
     notifyListeners();
-    _showSnackBar('Location sharing ${shared ? "enabled" : "disabled"}');
+    debugPrint('Location sharing ${shared ? "enabled" : "disabled"}');
   }
 
   void promptLocation() {
     _repository.requestLocationPermission();
   }
 
-  // Dismiss loading (called from user state change observer)
-  void dismissLoading() {
-    if (_isLoading) {
-      _isLoading = false;
-      notifyListeners();
-    }
+  Future<bool> checkLocationShared() async {
+    return await _repository.isLocationShared();
   }
 }

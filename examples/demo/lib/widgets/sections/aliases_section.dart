@@ -19,6 +19,7 @@ class AliasesSection extends StatelessWidget {
 
     return SectionCard(
       title: 'Aliases',
+      sectionKey: 'aliases',
       onInfoTap: onInfoTap,
       child: Column(
         children: [
@@ -27,22 +28,29 @@ class AliasesSection extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: PairList(
+                sectionKey: 'aliases',
                 items: vm.aliasesList,
                 emptyText: 'No aliases added',
+                loading: vm.isLoading,
               ),
             ),
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD',
+            label: 'ADD ALIAS',
+            semanticsLabel: 'add_alias_button',
             onPressed: () async {
               final result = await showDialog<MapEntry<String, String>>(
                 context: context,
-                builder: (_) => const PairInputDialog(
-                  title: 'Add Alias',
-                  keyLabel: 'Label',
-                  valueLabel: 'ID',
-                ),
+                builder:
+                    (_) => const PairInputDialog(
+                      title: 'Add Alias',
+                      keyLabel: 'Label',
+                      valueLabel: 'ID',
+                      keySemanticsLabel: 'alias_label_input',
+                      valueSemanticsLabel: 'alias_id_input',
+                      confirmSemanticsLabel: 'alias_confirm_button',
+                    ),
               );
               if (result != null) {
                 vm.addAlias(result.key, result.value);
@@ -51,15 +59,17 @@ class AliasesSection extends StatelessWidget {
           ),
           AppSpacing.gapBox,
           PrimaryButton(
-            label: 'ADD MULTIPLE',
+            label: 'ADD MULTIPLE ALIASES',
+            semanticsLabel: 'add_multiple_aliases_button',
             onPressed: () async {
               final result = await showDialog<Map<String, String>>(
                 context: context,
-                builder: (_) => const MultiPairInputDialog(
-                  title: 'Add Multiple Aliases',
-                  keyLabel: 'Label',
-                  valueLabel: 'ID',
-                ),
+                builder:
+                    (_) => const MultiPairInputDialog(
+                      title: 'Add Multiple Aliases',
+                      keyLabel: 'Label',
+                      valueLabel: 'ID',
+                    ),
               );
               if (result != null) {
                 vm.addAliases(result);

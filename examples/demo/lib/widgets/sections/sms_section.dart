@@ -19,6 +19,7 @@ class SmsSection extends StatelessWidget {
 
     return SectionCard(
       title: 'SMS',
+      sectionKey: 'sms',
       onInfoTap: onInfoTap,
       child: Column(
         children: [
@@ -27,8 +28,10 @@ class SmsSection extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: CollapsibleList(
+                sectionKey: 'sms',
                 items: vm.smsNumbersList,
                 emptyText: 'No SMS added',
+                loading: vm.isLoading,
                 onDelete: vm.removeSms,
               ),
             ),
@@ -36,14 +39,17 @@ class SmsSection extends StatelessWidget {
           AppSpacing.gapBox,
           PrimaryButton(
             label: 'ADD SMS',
+            semanticsLabel: 'add_sms_button',
             onPressed: () async {
               final result = await showDialog<String>(
                 context: context,
-                builder: (_) => const SingleInputDialog(
-                  title: 'Add SMS',
-                  fieldLabel: 'SMS Number',
-                  keyboardType: TextInputType.phone,
-                ),
+                builder:
+                    (_) => const SingleInputDialog(
+                      title: 'Add SMS',
+                      fieldLabel: 'SMS Number',
+                      keyboardType: TextInputType.phone,
+                      semanticsLabel: 'sms_input',
+                    ),
               );
               if (result != null) {
                 vm.addSms(result);
