@@ -7,12 +7,12 @@ class SecondaryScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Secondary Activity'),
+        title: const Text('Secondary Screen'),
         centerTitle: true,
       ),
       body: Center(
         child: Text(
-          'Secondary Activity',
+          'Secondary Screen',
           style: Theme.of(context).textTheme.headlineMedium,
         ),
       ),

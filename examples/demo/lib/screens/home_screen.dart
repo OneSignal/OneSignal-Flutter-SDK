@@ -149,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     backgroundColor: AppColors.osPrimary,
                     foregroundColor: Colors.white,
                   ),
-                  child: const Text('NEXT ACTIVITY'),
+                  child: const Text('NEXT SCREEN'),
                 ),
               ),
               const SizedBox(height: 16),
