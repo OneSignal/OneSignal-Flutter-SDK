@@ -63,11 +63,13 @@ class PairItem extends StatelessWidget {
 }
 
 class SingleItem extends StatelessWidget {
+  final String sectionKey;
   final String text;
   final VoidCallback? onDelete;
 
   const SingleItem({
     super.key,
+    required this.sectionKey,
     required this.text,
     this.onDelete,
   });
@@ -81,7 +83,7 @@ class SingleItem extends StatelessWidget {
           Expanded(child: Text(text, style: Theme.of(context).textTheme.bodyMedium)),
           if (onDelete != null)
             Semantics(
-              identifier: 'remove_$text',
+              identifier: '${sectionKey}_remove_$text',
               container: true,
               child: GestureDetector(
                 onTap: onDelete,
@@ -152,6 +154,7 @@ class PairList extends StatelessWidget {
 }
 
 class CollapsibleList extends StatefulWidget {
+  final String sectionKey;
   final List<String> items;
   final String emptyText;
   final void Function(String item) onDelete;
@@ -159,6 +162,7 @@ class CollapsibleList extends StatefulWidget {
 
   const CollapsibleList({
     super.key,
+    required this.sectionKey,
     required this.items,
     required this.emptyText,
     required this.onDelete,
@@ -186,6 +190,7 @@ class _CollapsibleListState extends State<CollapsibleList> {
         for (var i = 0; i < visibleItems.length; i++) ...[
           SingleItem(
             key: ValueKey(visibleItems[i]),
+            sectionKey: widget.sectionKey,
             text: visibleItems[i],
             onDelete: () => widget.onDelete(visibleItems[i]),
           ),

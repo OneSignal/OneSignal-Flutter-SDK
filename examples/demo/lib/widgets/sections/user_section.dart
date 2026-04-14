@@ -82,7 +82,10 @@ class UserSection extends StatelessWidget {
                 builder: (_) => const LoginDialog(),
               );
               if (result != null && context.mounted) {
-                vm.loginUser(result);
+                await vm.loginUser(result);
+                if (context.mounted) {
+                  context.showSnackBar('Logged in as $result');
+                }
               }
             },
           ),
@@ -91,7 +94,12 @@ class UserSection extends StatelessWidget {
             DestructiveButton(
               label: 'LOGOUT USER',
               semanticsLabel: 'logout_user_button',
-              onPressed: vm.logoutUser,
+              onPressed: () async {
+                await vm.logoutUser();
+                if (context.mounted) {
+                  context.showSnackBar('User logged out');
+                }
+              },
             ),
           ],
         ],

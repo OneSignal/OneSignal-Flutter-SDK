@@ -26,7 +26,8 @@ Future<void> main() async {
   final prefs = PreferencesService();
   await prefs.init();
 
-  final appId = dotenv.env['ONESIGNAL_APP_ID'] ?? _defaultAppId;
+  final envAppId = dotenv.env['ONESIGNAL_APP_ID'];
+  final appId = (envAppId != null && envAppId.isNotEmpty) ? envAppId : _defaultAppId;
 
   // Initialize OneSignal SDK
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);

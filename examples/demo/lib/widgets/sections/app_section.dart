@@ -21,6 +21,7 @@ class AppSection extends StatelessWidget {
 
     return SectionCard(
       title: 'App',
+      sectionKey: 'app',
       onInfoTap: onInfoTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -35,12 +36,16 @@ class AppSection extends StatelessWidget {
                   Text('App ID', style: Theme.of(context).textTheme.bodyMedium),
                   const SizedBox(width: 12),
                   Expanded(
-                    child: SelectableText(
-                      _isE2E ? '••••••••-••••-••••-••••-••••••••••••' : vm.appId,
-                      style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            fontFamily: 'monospace',
-                          ),
-                      textAlign: TextAlign.end,
+                    child: Semantics(
+                      identifier: 'app_id_value',
+                      container: true,
+                      child: SelectableText(
+                        _isE2E ? '••••••••-••••-••••-••••-••••••••••••' : vm.appId,
+                        style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                              fontFamily: 'monospace',
+                            ),
+                        textAlign: TextAlign.end,
+                      ),
                     ),
                   ),
                 ],

@@ -83,18 +83,11 @@ class _LiveActivitiesSectionState extends State<LiveActivitiesSection> {
                 : () => vm.updateLiveActivity(),
           ),
           AppSpacing.gapBox,
-          SizedBox(
-            width: double.infinity,
-            child: OutlinedButton(
-              onPressed: activityEmpty || !vm.hasApiKey
-                  ? null
-                  : () => vm.endLiveActivity(),
-              style: OutlinedButton.styleFrom(
-                foregroundColor: AppColors.osPrimary,
-                side: const BorderSide(color: AppColors.osPrimary),
-              ),
-              child: const Text('END LIVE ACTIVITY'),
-            ),
+          DestructiveButton(
+            label: 'END LIVE ACTIVITY',
+            onPressed: activityEmpty || !vm.hasApiKey
+                ? null
+                : () => vm.endLiveActivity(),
           ),
         ],
       ),

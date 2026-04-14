@@ -63,6 +63,7 @@ jobs:
 
   build-ios:
     if: >-
+      github.event_name == 'push' ||
       github.event.inputs.platform == 'ios' ||
       github.event.inputs.platform == 'both'
     runs-on: macos-latest
