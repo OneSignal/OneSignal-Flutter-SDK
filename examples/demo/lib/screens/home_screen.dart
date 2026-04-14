@@ -123,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 onInfoTap: () => _showTooltipDialog(context, 'triggers'),
               ),
               CustomEventsSection(
-                onInfoTap: () => _showTooltipDialog(context, 'trackEvent'),
+                onInfoTap: () => _showTooltipDialog(context, 'customEvents'),
               ),
               LocationSection(
                 onInfoTap: () => _showTooltipDialog(context, 'location'),
