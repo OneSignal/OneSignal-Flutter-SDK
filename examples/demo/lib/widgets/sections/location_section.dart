@@ -45,9 +45,14 @@ class LocationSection extends StatelessWidget {
             onPressed: () async {
               final shared = await vm.checkLocationShared();
               if (context.mounted) {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Location shared: $shared')),
-                );
+                ScaffoldMessenger.of(context)
+                  ..hideCurrentSnackBar()
+                  ..showSnackBar(
+                    SnackBar(
+                      content: Text('Location shared: $shared'),
+                      dismissDirection: DismissDirection.horizontal,
+                    ),
+                  );
               }
             },
           ),

@@ -40,7 +40,9 @@ class AppTheme {
       appBarTheme: const AppBarTheme(
         backgroundColor: AppColors.osPrimary,
         foregroundColor: Colors.white,
-        elevation: 0,
+        elevation: 2,
+        scrolledUnderElevation: 2,
+        shadowColor: Colors.black,
       ),
       cardTheme: CardThemeData(
         color: AppColors.osCardBackground,
