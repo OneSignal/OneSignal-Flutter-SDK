@@ -87,7 +87,7 @@ class TriggersSection extends StatelessWidget {
             ),
             AppSpacing.gapBox,
             DestructiveButton(
-              label: 'CLEAR ALL',
+              label: 'CLEAR ALL TRIGGERS',
               onPressed: vm.clearAllTriggers,
             ),
           ],
