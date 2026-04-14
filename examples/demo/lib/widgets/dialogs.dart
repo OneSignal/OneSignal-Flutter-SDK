@@ -146,7 +146,7 @@ class _PairInputDialogState extends State<PairInputDialog> {
           child: const Text('Cancel'),
         ),
         Semantics(
-          identifier: widget.confirmSemanticsLabel,
+          identifier: widget.confirmSemanticsLabel ?? 'confirm_button',
           container: true,
           child: TextButton(
             onPressed: _isValid

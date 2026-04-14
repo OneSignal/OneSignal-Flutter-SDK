@@ -41,7 +41,12 @@ class TriggersSection extends StatelessWidget {
             onPressed: () async {
               final result = await showDialog<MapEntry<String, String>>(
                 context: context,
-                builder: (_) => const PairInputDialog(title: 'Add Trigger'),
+                builder: (_) => const PairInputDialog(
+                  title: 'Add Trigger',
+                  keySemanticsLabel: 'trigger_key_input',
+                  valueSemanticsLabel: 'trigger_value_input',
+                  confirmSemanticsLabel: 'trigger_confirm_button',
+                ),
               );
               if (result != null) {
                 vm.addTrigger(result.key, result.value);

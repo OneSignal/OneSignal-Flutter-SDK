@@ -44,9 +44,9 @@ class TagsSection extends StatelessWidget {
                 context: context,
                 builder: (_) => const PairInputDialog(
                   title: 'Add Tag',
-                  keySemanticsLabel: 'multi_pair_key_0',
-                  valueSemanticsLabel: 'multi_pair_value_0',
-                  confirmSemanticsLabel: 'multi_pair_confirm_button',
+                  keySemanticsLabel: 'tag_key_input',
+                  valueSemanticsLabel: 'tag_value_input',
+                  confirmSemanticsLabel: 'tag_confirm_button',
                 ),
               );
               if (result != null) {
