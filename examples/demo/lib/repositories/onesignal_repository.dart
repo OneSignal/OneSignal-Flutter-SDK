@@ -1,8 +1,8 @@
+import 'package:flutter/foundation.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import '../models/notification_type.dart';
 import '../models/user_data.dart';
-import '../services/log_manager.dart';
 import '../services/onesignal_api_service.dart';
 
 class OneSignalRepository {
@@ -123,7 +123,7 @@ class OneSignalRepository {
   bool hasPermission() => OneSignal.Notifications.permission;
 
   Future<bool> requestPermission(bool fallbackToSettings) async {
-    LogManager().i('Request permission (fallback: $fallbackToSettings)');
+    debugPrint('Request permission (fallback: $fallbackToSettings)');
     return await OneSignal.Notifications.requestPermission(fallbackToSettings);
   }
 
@@ -133,7 +133,7 @@ class OneSignalRepository {
 
   // In-app messages
   void setInAppMessagesPaused(bool paused) {
-    LogManager().i('Set IAM paused: $paused');
+    debugPrint('Set IAM paused: $paused');
     OneSignal.InAppMessages.paused(paused);
   }
 
@@ -151,7 +151,7 @@ class OneSignalRepository {
   }
 
   void requestLocationPermission() {
-    LogManager().i('Request location permission');
+    debugPrint('Request location permission');
     OneSignal.Location.requestPermission();
   }
 
@@ -184,12 +184,12 @@ class OneSignalRepository {
 
   // Privacy consent
   void setConsentRequired(bool required) {
-    LogManager().i('Set consent required: $required');
+    debugPrint('Set consent required: $required');
     OneSignal.consentRequired(required);
   }
 
   void setConsentGiven(bool granted) {
-    LogManager().i('Set consent given: $granted');
+    debugPrint('Set consent given: $granted');
     OneSignal.consentGiven(granted);
   }
 
@@ -206,7 +206,7 @@ class OneSignalRepository {
   Future<bool> sendNotification(NotificationType type) async {
     final subscriptionId = getPushSubscriptionId();
     if (subscriptionId == null) {
-      LogManager().w('No subscription ID for notification');
+      debugPrint('No subscription ID for notification');
       return false;
     }
     return _apiService.sendNotification(type, subscriptionId);
@@ -215,7 +215,7 @@ class OneSignalRepository {
   Future<bool> sendCustomNotification(String title, String body) async {
     final subscriptionId = getPushSubscriptionId();
     if (subscriptionId == null) {
-      LogManager().w('No subscription ID for custom notification');
+      debugPrint('No subscription ID for custom notification');
       return false;
     }
     return _apiService.sendCustomNotification(title, body, subscriptionId);

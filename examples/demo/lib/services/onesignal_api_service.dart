@@ -1,10 +1,10 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/notification_type.dart';
 import '../models/user_data.dart';
-import '../services/log_manager.dart';
 
 class OneSignalApiService {
   String _appId = '';
@@ -49,10 +49,10 @@ class OneSignalApiService {
         body: jsonEncode(body),
       );
 
-      LogManager().i('Send notification response: ${response.statusCode}');
+      debugPrint('Send notification response: ${response.statusCode}');
       return response.statusCode == 200;
     } catch (e) {
-      LogManager().e('Send notification error: $e');
+      debugPrint('Send notification error: $e');
       return false;
     }
   }
@@ -79,10 +79,10 @@ class OneSignalApiService {
         body: jsonEncode(payload),
       );
 
-      LogManager().i('Send custom notification response: ${response.statusCode}');
+      debugPrint('Send custom notification response: ${response.statusCode}');
       return response.statusCode == 200;
     } catch (e) {
-      LogManager().e('Send custom notification error: $e');
+      debugPrint('Send custom notification error: $e');
       return false;
     }
   }
@@ -108,12 +108,12 @@ class OneSignalApiService {
         }),
       );
 
-      LogManager().i(
+      debugPrint(
         'Update live activity response: ${response.statusCode} ${response.body}',
       );
       return response.statusCode >= 200 && response.statusCode < 300;
     } catch (e) {
-      LogManager().e('Update live activity error: $e');
+      debugPrint('Update live activity error: $e');
       return false;
     }
   }
@@ -139,12 +139,12 @@ class OneSignalApiService {
         }),
       );
 
-      LogManager().i(
+      debugPrint(
         'End live activity response: ${response.statusCode} ${response.body}',
       );
       return response.statusCode >= 200 && response.statusCode < 300;
     } catch (e) {
-      LogManager().e('End live activity error: $e');
+      debugPrint('End live activity error: $e');
       return false;
     }
   }
@@ -162,10 +162,10 @@ class OneSignalApiService {
         final json = jsonDecode(response.body) as Map<String, dynamic>;
         return UserData.fromJson(json);
       }
-      LogManager().w('Fetch user returned ${response.statusCode}');
+      debugPrint('Fetch user returned ${response.statusCode}');
       return null;
     } catch (e) {
-      LogManager().e('Fetch user error: $e');
+      debugPrint('Fetch user error: $e');
       return null;
     }
   }

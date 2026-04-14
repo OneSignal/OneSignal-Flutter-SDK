@@ -1,8 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
-
-import 'log_manager.dart';
 
 class TooltipData {
   final String title;
@@ -62,10 +61,10 @@ class TooltipHelper {
             ),
           );
         });
-        LogManager().i('Loaded ${_tooltips.length} tooltips');
+        debugPrint('Loaded ${_tooltips.length} tooltips');
       }
     } catch (e) {
-      LogManager().w('Failed to load tooltips: $e');
+      debugPrint('Failed to load tooltips: $e');
     }
 
     _initialized = true;

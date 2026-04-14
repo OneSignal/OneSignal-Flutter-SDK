@@ -135,17 +135,6 @@ OneSignal.User.addObserver(...)
 - `TextEditingController`s are properly disposed in `StatefulWidget`s
 - JSON parsing via `jsonDecode` returns `Map<String, dynamic>` for Track Event
 
-### Accessibility (Appium)
-- Use `Semantics` widget with `label` property:
-  ```dart
-  Semantics(label: 'log_entry_${index}_message', child: Text(entry.message))
-  ```
-
-### Log Manager
-- Singleton with `ChangeNotifier` for reactive UI updates
-- `LogManager().d(tag, message)`, `.i()`, `.w()`, `.e()`
-- Also prints via `debugPrint` for development
-
 ---
 
 ## File Structure
@@ -162,8 +151,7 @@ examples/demo/
 │   ├── services/
 │   │   ├── onesignal_api_service.dart
 │   │   ├── preferences_service.dart
-│   │   ├── tooltip_helper.dart
-│   │   └── log_manager.dart
+│   │   └── tooltip_helper.dart
 │   ├── repositories/
 │   │   └── onesignal_repository.dart
 │   ├── viewmodels/

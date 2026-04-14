@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 
 import 'repositories/onesignal_repository.dart';
 import 'screens/home_screen.dart';
-import 'services/log_manager.dart';
 import 'services/onesignal_api_service.dart';
 import 'services/preferences_service.dart';
 import 'services/tooltip_helper.dart';
@@ -21,7 +20,7 @@ Future<void> main() async {
   try {
     await dotenv.load(fileName: '.env');
   } catch (_) {
-    LogManager().w('.env file not found, using defaults');
+    debugPrint('.env file not found, using defaults');
   }
 
   final prefs = PreferencesService();
@@ -48,27 +47,29 @@ Future<void> main() async {
 
   // Register IAM listeners
   OneSignal.InAppMessages.addWillDisplayListener((event) {
-    LogManager().i('IAM will display: ${event.message.messageId}');
+    debugPrint('IAM will display: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addDidDisplayListener((event) {
-    LogManager().i('IAM did display: ${event.message.messageId}');
+    debugPrint('IAM did display: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addWillDismissListener((event) {
-    LogManager().i('IAM will dismiss: ${event.message.messageId}');
+    debugPrint('IAM will dismiss: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addDidDismissListener((event) {
-    LogManager().i('IAM did dismiss: ${event.message.messageId}');
+    debugPrint('IAM did dismiss: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addClickListener((event) {
-    LogManager().i('IAM clicked: ${event.result.actionId}');
+    debugPrint('IAM clicked: ${event.result.actionId}');
   });
 
   // Register notification listeners
   OneSignal.Notifications.addClickListener((event) {
-    LogManager().i('Notification clicked: ${event.notification.title}');
+    debugPrint('Notification clicked: ${event.notification.title}');
   });
   OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-    LogManager().i('Notification foreground will display: ${event.notification.title}');
+    debugPrint(
+      'Notification foreground will display: ${event.notification.title}',
+    );
     event.notification.display();
   });
 
@@ -77,7 +78,7 @@ Future<void> main() async {
   try {
     apiKey = dotenv.env['ONESIGNAL_API_KEY'] ?? '';
   } catch (_) {
-    LogManager().w('API key not found, continuing without it');
+    debugPrint('API key not found, continuing without it');
   }
   final apiService = OneSignalApiService()
     ..setAppId(appId)
@@ -87,7 +88,7 @@ Future<void> main() async {
   // Fetch tooltips in background
   TooltipHelper().init();
 
-  LogManager().i('OneSignal initialized with app ID: $appId');
+  debugPrint('OneSignal initialized with app ID: $appId');
 
   runApp(
     ChangeNotifierProvider(
