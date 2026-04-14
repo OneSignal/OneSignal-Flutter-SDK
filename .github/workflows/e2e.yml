@@ -23,9 +23,6 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions:
-  contents: read
-
 jobs:
   build-android:
     if: >-
@@ -51,6 +48,7 @@ jobs:
         run: |
           echo "ONESIGNAL_APP_ID=${{ vars.APPIUM_ONESIGNAL_APP_ID }}" > .env
           echo "ONESIGNAL_API_KEY=${{ secrets.APPIUM_ONESIGNAL_API_KEY }}" >> .env
+          echo "E2E_MODE=true" >> .env
 
       - name: Build release APK
         working-directory: examples/demo
@@ -80,6 +78,7 @@ jobs:
         run: |
           echo "ONESIGNAL_APP_ID=${{ vars.APPIUM_ONESIGNAL_APP_ID }}" > .env
           echo "ONESIGNAL_API_KEY=${{ secrets.APPIUM_ONESIGNAL_API_KEY }}" >> .env
+          echo "E2E_MODE=true" >> .env
 
       - name: Install CocoaPods dependencies
         working-directory: examples/demo/ios

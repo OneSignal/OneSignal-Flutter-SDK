@@ -119,9 +119,9 @@ OneSignal.User.addObserver(...)
 - Use `await Future.delayed(const Duration(milliseconds: 100))` after setting state for render delay
 
 ### SnackBar Messages
-- `AppViewModel` exposes a `snackBarMessage` stream or `ValueNotifier<String?>`
-- `HomeScreen` shows via `ScaffoldMessenger.of(context).showSnackBar()`
-- Clear previous SnackBar with `ScaffoldMessenger.of(context).clearSnackBars()`
+- `AppSnackBar` extension on `BuildContext` defined in `theme.dart`
+- Call `context.showSnackBar(message)` directly from widget callbacks
+- Automatically hides the current SnackBar before showing the new one
 
 ### Send In-App Message Icons
 - TOP BANNER: `Icons.vertical_align_top`
@@ -163,9 +163,9 @@ examples/demo/
 │       ├── section_card.dart
 │       ├── toggle_row.dart
 │       ├── action_button.dart
+│       ├── app_text_field.dart
 │       ├── list_widgets.dart
 │       ├── loading_overlay.dart
-│       ├── log_view.dart
 │       ├── dialogs.dart
 │       └── sections/
 │           ├── app_section.dart
@@ -180,7 +180,8 @@ examples/demo/
 │           ├── tags_section.dart
 │           ├── outcomes_section.dart
 │           ├── triggers_section.dart
-│           ├── track_event_section.dart
+│           ├── custom_events_section.dart
+│           ├── live_activities_section.dart
 │           └── location_section.dart
 ├── android/
 ├── ios/

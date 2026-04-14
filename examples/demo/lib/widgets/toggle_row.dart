@@ -20,7 +20,7 @@ class ToggleRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SwitchListTile(
+    Widget tile = SwitchListTile(
       title: Text(label, style: Theme.of(context).textTheme.bodyMedium),
       subtitle: description != null
           ? Text(
@@ -36,5 +36,10 @@ class ToggleRow extends StatelessWidget {
       dense: true,
       visualDensity: VisualDensity.compact,
     );
+    if (semanticsLabel != null) {
+      tile = Semantics(
+          identifier: semanticsLabel, container: true, child: tile);
+    }
+    return tile;
   }
 }
