@@ -6,18 +6,18 @@ import '../action_button.dart';
 import '../dialogs.dart';
 import '../section_card.dart';
 
-class TrackEventSection extends StatelessWidget {
+class CustomEventsSection extends StatelessWidget {
   final VoidCallback? onInfoTap;
 
-  const TrackEventSection({super.key, this.onInfoTap});
+  const CustomEventsSection({super.key, this.onInfoTap});
 
   @override
   Widget build(BuildContext context) {
     final vm = context.read<AppViewModel>();
 
     return SectionCard(
-      title: 'Track Event',
-      sectionKey: 'track_event',
+      title: 'Custom Events',
+      sectionKey: 'custom_events',
       onInfoTap: onInfoTap,
       child: PrimaryButton(
         label: 'TRACK EVENT',

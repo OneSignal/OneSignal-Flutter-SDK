@@ -447,7 +447,7 @@ class AppViewModel extends ChangeNotifier {
     LogManager().i('Outcome sent: $name = $value');
   }
 
-  // Track Event
+  // Custom Events
   void trackEvent(String name, Map<String, dynamic>? properties) {
     _repository.trackEvent(name, properties);
     LogManager().i('Event tracked: $name');

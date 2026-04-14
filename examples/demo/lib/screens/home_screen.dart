@@ -22,7 +22,7 @@ import '../widgets/sections/send_iam_section.dart';
 import '../widgets/sections/send_push_section.dart';
 import '../widgets/sections/sms_section.dart';
 import '../widgets/sections/tags_section.dart';
-import '../widgets/sections/track_event_section.dart';
+import '../widgets/sections/custom_events_section.dart';
 import '../widgets/sections/triggers_section.dart';
 import 'secondary_screen.dart';
 
@@ -129,7 +129,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       onInfoTap: () =>
                           _showTooltipDialog(context, 'triggers'),
                     ),
-                    TrackEventSection(
+                    CustomEventsSection(
                       onInfoTap: () =>
                           _showTooltipDialog(context, 'trackEvent'),
                     ),

@@ -499,19 +499,27 @@ class _OutcomeDialogState extends State<OutcomeDialog> {
                 ),
               ),
               const SizedBox(height: 8),
-              AppTextField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Outcome Name'),
-                onChanged: (_) => setState(() {}),
+              Semantics(
+                identifier: 'outcome_name_input',
+                container: true,
+                child: AppTextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Outcome Name'),
+                  onChanged: (_) => setState(() {}),
+                ),
               ),
               if (_type == OutcomeType.withValue) ...[
                 const SizedBox(height: 12),
-                AppTextField(
-                  controller: _valueController,
-                  decoration: const InputDecoration(labelText: 'Value'),
-                  keyboardType:
-                      const TextInputType.numberWithOptions(decimal: true),
-                  onChanged: (_) => setState(() {}),
+                Semantics(
+                  identifier: 'outcome_value_input',
+                  container: true,
+                  child: AppTextField(
+                    controller: _valueController,
+                    decoration: const InputDecoration(labelText: 'Value'),
+                    keyboardType:
+                        const TextInputType.numberWithOptions(decimal: true),
+                    onChanged: (_) => setState(() {}),
+                  ),
                 ),
               ],
             ],
@@ -523,19 +531,23 @@ class _OutcomeDialogState extends State<OutcomeDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _isValid
-              ? () {
-                  Navigator.pop(context, {
-                    'type': _type,
-                    'name': _nameController.text,
-                    'value': _type == OutcomeType.withValue
-                        ? double.parse(_valueController.text)
-                        : null,
-                  });
-                }
-              : null,
-          child: const Text('Send'),
+        Semantics(
+          identifier: 'outcome_send_button',
+          container: true,
+          child: TextButton(
+            onPressed: _isValid
+                ? () {
+                    Navigator.pop(context, {
+                      'type': _type,
+                      'name': _nameController.text,
+                      'value': _type == OutcomeType.withValue
+                          ? double.parse(_valueController.text)
+                          : null,
+                    });
+                  }
+                : null,
+            child: const Text('Send'),
+          ),
         ),
       ],
     );
@@ -587,28 +599,36 @@ class _TrackEventDialogState extends State<TrackEventDialog> {
   Widget build(BuildContext context) {
     return AlertDialog(
       insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: const Text('Track Event'),
+      title: const Text('Custom Event'),
       content: SizedBox(
         width: double.maxFinite,
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              AppTextField(
-                controller: _nameController,
-                decoration: const InputDecoration(labelText: 'Event Name'),
-                onChanged: (_) => setState(() {}),
+              Semantics(
+                identifier: 'event_name_input',
+                container: true,
+                child: AppTextField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Event Name'),
+                  onChanged: (_) => setState(() {}),
+                ),
               ),
               const SizedBox(height: 12),
-              AppTextField(
-                controller: _propsController,
-                decoration: InputDecoration(
-                  labelText: 'Properties (optional, JSON)',
-                  hintText: '{"key": "value"}',
-                  errorText: _jsonError,
+              Semantics(
+                identifier: 'event_properties_input',
+                container: true,
+                child: AppTextField(
+                  controller: _propsController,
+                  decoration: InputDecoration(
+                    labelText: 'Properties (optional, JSON)',
+                    hintText: '{"key": "value"}',
+                    errorText: _jsonError,
+                  ),
+                  maxLines: 3,
+                  onChanged: _validateJson,
                 ),
-                maxLines: 3,
-                onChanged: _validateJson,
               ),
             ],
           ),
@@ -619,21 +639,25 @@ class _TrackEventDialogState extends State<TrackEventDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _isValid
-              ? () {
-                  Map<String, dynamic>? props;
-                  if (_propsController.text.isNotEmpty) {
-                    props = jsonDecode(_propsController.text)
-                        as Map<String, dynamic>;
+        Semantics(
+          identifier: 'event_track_button',
+          container: true,
+          child: TextButton(
+            onPressed: _isValid
+                ? () {
+                    Map<String, dynamic>? props;
+                    if (_propsController.text.isNotEmpty) {
+                      props = jsonDecode(_propsController.text)
+                          as Map<String, dynamic>;
+                    }
+                    Navigator.pop(context, {
+                      'name': _nameController.text,
+                      'properties': props,
+                    });
                   }
-                  Navigator.pop(context, {
-                    'name': _nameController.text,
-                    'properties': props,
-                  });
-                }
-              : null,
-          child: const Text('Track'),
+                : null,
+            child: const Text('Track'),
+          ),
         ),
       ],
     );

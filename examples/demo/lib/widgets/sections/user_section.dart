@@ -18,6 +18,7 @@ class UserSection extends StatelessWidget {
 
     return SectionCard(
       title: 'User',
+      sectionKey: 'user',
       onInfoTap: onInfoTap,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,

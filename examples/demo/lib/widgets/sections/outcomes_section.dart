@@ -16,7 +16,7 @@ class OutcomesSection extends StatelessWidget {
     final vm = context.read<AppViewModel>();
 
     return SectionCard(
-      title: 'Outcome Events',
+      title: 'Outcomes',
       sectionKey: 'outcomes',
       onInfoTap: onInfoTap,
       child: PrimaryButton(
