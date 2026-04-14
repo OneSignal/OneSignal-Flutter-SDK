@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../theme.dart';
 import '../../viewmodels/app_viewmodel.dart';
 import '../action_button.dart';
 import '../dialogs.dart';
@@ -27,10 +28,14 @@ class CustomEventsSection extends StatelessWidget {
             builder: (_) => const TrackEventDialog(),
           );
           if (result != null) {
+            final name = result['name'] as String;
             vm.trackEvent(
-              result['name'] as String,
+              name,
               result['properties'] as Map<String, dynamic>?,
             );
+            if (context.mounted) {
+              context.showSnackBar('Event tracked: $name');
+            }
           }
         },
       ),

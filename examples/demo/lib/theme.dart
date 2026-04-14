@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class AppSpacing {
   static const double gap = 8;
@@ -38,11 +39,16 @@ class AppTheme {
       ).copyWith(primary: AppColors.osPrimary),
       scaffoldBackgroundColor: AppColors.osLightBackground,
       appBarTheme: const AppBarTheme(
-        backgroundColor: AppColors.osPrimary,
+        backgroundColor: Colors.black,
         foregroundColor: Colors.white,
         elevation: 2,
         scrolledUnderElevation: 2,
         shadowColor: Colors.black,
+        systemOverlayStyle: SystemUiOverlayStyle(
+          statusBarColor: Colors.black,
+          statusBarIconBrightness: Brightness.light,
+          statusBarBrightness: Brightness.dark,
+        ),
       ),
       cardTheme: CardThemeData(
         color: AppColors.osCardBackground,
@@ -106,4 +112,17 @@ class AppTheme {
   }
 
   AppTheme._();
+}
+
+extension AppSnackBar on BuildContext {
+  void showSnackBar(String message) {
+    ScaffoldMessenger.of(this)
+      ..hideCurrentSnackBar()
+      ..showSnackBar(
+        SnackBar(
+          content: Text(message),
+          dismissDirection: DismissDirection.horizontal,
+        ),
+      );
+  }
 }

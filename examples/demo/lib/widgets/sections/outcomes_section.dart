@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../theme.dart';
 import '../../viewmodels/app_viewmodel.dart';
 import '../action_button.dart';
 import '../dialogs.dart';
@@ -29,13 +30,21 @@ class OutcomesSection extends StatelessWidget {
           if (result != null) {
             final type = result['type'] as OutcomeType;
             final name = result['name'] as String;
+            String snackbarMessage;
             switch (type) {
               case OutcomeType.normal:
                 vm.sendOutcome(name);
+                snackbarMessage = 'Outcome sent: $name';
               case OutcomeType.unique:
                 vm.sendUniqueOutcome(name);
+                snackbarMessage = 'Unique outcome sent: $name';
               case OutcomeType.withValue:
-                vm.sendOutcomeWithValue(name, result['value'] as double);
+                final value = result['value'] as double;
+                vm.sendOutcomeWithValue(name, value);
+                snackbarMessage = 'Outcome sent: $name = $value';
+            }
+            if (context.mounted) {
+              context.showSnackBar(snackbarMessage);
             }
           }
         },
