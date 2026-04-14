@@ -39,6 +39,18 @@ class LocationSection extends StatelessWidget {
             label: 'PROMPT LOCATION',
             onPressed: vm.promptLocation,
           ),
+          AppSpacing.gapBox,
+          PrimaryButton(
+            label: 'CHECK LOCATION SHARED',
+            onPressed: () async {
+              final shared = await vm.checkLocationShared();
+              if (context.mounted) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('Location shared: $shared')),
+                );
+              }
+            },
+          ),
         ],
       ),
     );

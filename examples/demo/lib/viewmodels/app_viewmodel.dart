@@ -522,6 +522,10 @@ class AppViewModel extends ChangeNotifier {
     _repository.requestLocationPermission();
   }
 
+  Future<bool> checkLocationShared() async {
+    return await _repository.isLocationShared();
+  }
+
   // Dismiss loading (called from user state change observer)
   void dismissLoading() {
     if (_isLoading) {
