@@ -28,6 +28,7 @@ class SmsSection extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: CollapsibleList(
+                sectionKey: 'sms',
                 items: vm.smsNumbersList,
                 emptyText: 'No SMS added',
                 onDelete: vm.removeSms,

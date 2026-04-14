@@ -28,6 +28,7 @@ class EmailsSection extends StatelessWidget {
             child: Padding(
               padding: AppSpacing.cardPadding,
               child: CollapsibleList(
+                sectionKey: 'emails',
                 items: vm.emailsList,
                 emptyText: 'No emails added',
                 onDelete: vm.removeEmail,
