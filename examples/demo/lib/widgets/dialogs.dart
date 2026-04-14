@@ -341,20 +341,24 @@ class _MultiSelectRemoveDialogState extends State<MultiSelectRemoveDialog> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: widget.items.map((item) {
-              return CheckboxListTile(
-                title: Text(item.key),
-                value: _selected.contains(item.key),
-                controlAffinity: ListTileControlAffinity.leading,
-                onChanged: (checked) {
-                  setState(() {
-                    if (checked == true) {
-                      _selected.add(item.key);
-                    } else {
-                      _selected.remove(item.key);
-                    }
-                  });
-                },
-                contentPadding: EdgeInsets.zero,
+              return Semantics(
+                identifier: 'remove_checkbox_${item.key}',
+                container: true,
+                child: CheckboxListTile(
+                  title: Text(item.key),
+                  value: _selected.contains(item.key),
+                  controlAffinity: ListTileControlAffinity.leading,
+                  onChanged: (checked) {
+                    setState(() {
+                      if (checked == true) {
+                        _selected.add(item.key);
+                      } else {
+                        _selected.remove(item.key);
+                      }
+                    });
+                  },
+                  contentPadding: EdgeInsets.zero,
+                ),
               );
             }).toList(),
           ),
