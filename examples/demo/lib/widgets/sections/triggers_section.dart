@@ -46,7 +46,6 @@ class TriggersSection extends StatelessWidget {
                   title: 'Add Trigger',
                   keySemanticsLabel: 'trigger_key_input',
                   valueSemanticsLabel: 'trigger_value_input',
-                  confirmSemanticsLabel: 'trigger_confirm_button',
                 ),
               );
               if (result != null) {

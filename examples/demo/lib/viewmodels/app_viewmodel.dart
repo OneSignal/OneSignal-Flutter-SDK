@@ -6,6 +6,20 @@ import '../models/notification_type.dart';
 import '../repositories/onesignal_repository.dart';
 import '../services/preferences_service.dart';
 
+List<MapEntry<String, String>> _mergePairs(
+  List<MapEntry<String, String>> prev,
+  Map<String, String> next,
+) {
+  final merged = <String, String>{
+    for (final e in prev) e.key: e.value,
+    ...next,
+  };
+  return merged.entries.toList();
+}
+
+List<T> _mergeUnique<T>(List<T> prev, List<T> next) =>
+    {...prev, ...next}.toList();
+
 class AppViewModel extends ChangeNotifier {
   final OneSignalRepository _repository;
   final PreferencesService _prefs;
@@ -184,10 +198,10 @@ class AppViewModel extends ChangeNotifier {
 
       if (_fetchSequence != requestId) return;
 
-      _aliasesList = userData.aliases.entries.toList();
-      _tagsList = userData.tags.entries.toList();
-      _emailsList = List.from(userData.emails);
-      _smsNumbersList = List.from(userData.smsNumbers);
+      _aliasesList = _mergePairs(_aliasesList, userData.aliases);
+      _tagsList = _mergePairs(_tagsList, userData.tags);
+      _emailsList = _mergeUnique(_emailsList, userData.emails);
+      _smsNumbersList = _mergeUnique(_smsNumbersList, userData.smsNumbers);
 
       if (userData.externalId != null) {
         _externalUserId = userData.externalId;

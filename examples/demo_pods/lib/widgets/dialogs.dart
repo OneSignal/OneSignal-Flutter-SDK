@@ -785,9 +785,14 @@ class TooltipDialog extends StatelessWidget {
         ),
       ),
       actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('OK'),
+        Semantics(
+          identifier: 'tooltip_ok_button',
+          container: true,
+          button: true,
+          child: TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text('OK'),
+          ),
         ),
       ],
     );

@@ -48,7 +48,6 @@ class TagsSection extends StatelessWidget {
                       title: 'Add Tag',
                       keySemanticsLabel: 'tag_key_input',
                       valueSemanticsLabel: 'tag_value_input',
-                      confirmSemanticsLabel: 'tag_confirm_button',
                     ),
               );
               if (result != null) {

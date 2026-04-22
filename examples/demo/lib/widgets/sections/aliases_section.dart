@@ -49,7 +49,6 @@ class AliasesSection extends StatelessWidget {
                       valueLabel: 'ID',
                       keySemanticsLabel: 'alias_label_input',
                       valueSemanticsLabel: 'alias_id_input',
-                      confirmSemanticsLabel: 'alias_confirm_button',
                     ),
               );
               if (result != null) {

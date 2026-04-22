@@ -81,7 +81,11 @@ class SingleItem extends StatelessWidget {
       child: Row(
         children: [
           Expanded(
-            child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+            child: Semantics(
+              identifier: '${sectionKey}_value_$text',
+              container: true,
+              child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+            ),
           ),
           if (onDelete != null)
             Semantics(
@@ -100,20 +104,28 @@ class SingleItem extends StatelessWidget {
 
 class EmptyState extends StatelessWidget {
   final String text;
+  final String? sectionKey;
 
-  const EmptyState({super.key, required this.text});
+  const EmptyState({super.key, required this.text, this.sectionKey});
 
   @override
   Widget build(BuildContext context) {
+    final label = Text(
+      text,
+      style: Theme.of(
+        context,
+      ).textTheme.bodyMedium?.copyWith(color: AppColors.osGrey600),
+    );
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 12),
       child: Center(
-        child: Text(
-          text,
-          style: Theme.of(
-            context,
-          ).textTheme.bodyMedium?.copyWith(color: AppColors.osGrey600),
-        ),
+        child: sectionKey == null
+            ? label
+            : Semantics(
+                identifier: '${sectionKey}_empty',
+                container: true,
+                child: label,
+              ),
       ),
     );
   }
@@ -171,7 +183,7 @@ class PairList extends StatelessWidget {
     if (items.isEmpty) {
       return loading
           ? LoadingState(sectionKey: sectionKey)
-          : EmptyState(text: emptyText);
+          : EmptyState(text: emptyText, sectionKey: sectionKey);
     }
 
     return Column(
@@ -221,7 +233,7 @@ class _CollapsibleListState extends State<CollapsibleList> {
     if (widget.items.isEmpty) {
       return widget.loading
           ? LoadingState(sectionKey: widget.sectionKey)
-          : EmptyState(text: widget.emptyText);
+          : EmptyState(text: widget.emptyText, sectionKey: widget.sectionKey);
     }
 
     final showAll = _expanded || widget.items.length <= widget.maxVisible;

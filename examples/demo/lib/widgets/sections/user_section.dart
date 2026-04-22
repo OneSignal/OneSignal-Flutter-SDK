@@ -79,7 +79,12 @@ class UserSection extends StatelessWidget {
             onPressed: () async {
               final result = await showDialog<String>(
                 context: context,
-                builder: (_) => const LoginDialog(),
+                builder: (_) => const SingleInputDialog(
+                  title: 'Login User',
+                  fieldLabel: 'External User Id',
+                  confirmLabel: 'Login',
+                  semanticsLabel: 'login_user_id_input',
+                ),
               );
               if (result != null && context.mounted) {
                 await vm.loginUser(result);
