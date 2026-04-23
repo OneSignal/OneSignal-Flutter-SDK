@@ -66,16 +66,18 @@ Use **Provider** for dependency injection and **ChangeNotifier** for reactive st
 - `ChangeNotifierProvider<AppViewModel>` at the root widget tree in `main.dart`
 - `AppViewModel extends ChangeNotifier` holds all UI state as private fields with public getters
 - Exposes action methods that update state and call `notifyListeners()`
-- Receives `OneSignalRepository` and `PreferencesService` via constructor injection
+- Receives `OneSignalApiService` and `PreferencesService` via constructor injection
 - Initialize OneSignal SDK before `runApp()`
 - Use `Consumer`/`Selector` from Provider to scope rebuilds and minimize re-renders
-- `OneSignalRepository` is a plain Dart class (not a ChangeNotifier)
+- SDK calls (`OneSignal.User.*`, `OneSignal.Notifications.*`, `OneSignal.InAppMessages.*`, etc.) are invoked directly from `AppViewModel`. There is no repository wrapper.
+- `OneSignalApiService` is a plain Dart class that owns the OneSignal REST API calls (send notification, live activity update/end, fetch user). Not a ChangeNotifier.
 
 ### Persistence
 
 - `PreferencesService` wraps `SharedPreferences`
 - In-memory lists use `List<MapEntry<String, String>>` for triggers, aliases, tags
 - Triggers list (`triggersList`) is NOT persisted to `SharedPreferences`
+- After fetching the user from the REST API, merge results into existing in-memory lists (`_mergePairs` for tag/alias maps, `_mergeUnique` for emails/SMS) so locally-added entries that have not yet round-tripped through the API are preserved.
 
 ### SDK State Restoration
 
@@ -113,10 +115,9 @@ OneSignal.User.addObserver(...)
 ### Notification Permission
 - Call `viewModel.promptPush()` in `initState()` of `HomeScreen`
 
-### Loading Overlay
-- `CircularProgressIndicator` centered in a full-screen semi-transparent overlay
-- `Stack` + `Visibility` based on `isLoading` state
-- Use `await Future.delayed(const Duration(milliseconds: 100))` after setting state for render delay
+### Loading State
+- No global loading overlay; render an inline `CircularProgressIndicator` inside the section that owns the in-flight work (e.g. user section while `isLoading` is true).
+- The viewmodel uses a request-sequence counter (`_fetchSequence`) so stale REST results are dropped when a newer fetch is already in flight.
 
 ### SnackBar Messages
 - `AppSnackBar` extension on `BuildContext` defined in `theme.dart`
@@ -134,6 +135,7 @@ OneSignal.User.addObserver(...)
 - `MultiSelectRemoveDialog` uses `CheckboxListTile`
 - `TextEditingController`s are properly disposed in `StatefulWidget`s
 - JSON parsing via `jsonDecode` returns `Map<String, dynamic>` for Track Event
+- Single-field input prompts (e.g. login, add email/SMS, add trigger) reuse a single `SingleInputDialog` widget that takes `title`, `fieldLabel`, `confirmLabel`, and `semanticsLabel`. Avoid creating a per-screen dialog widget when one input is needed.
 
 ---
 
@@ -152,8 +154,6 @@ examples/demo/
 │   │   ├── onesignal_api_service.dart
 │   │   ├── preferences_service.dart
 │   │   └── tooltip_helper.dart
-│   ├── repositories/
-│   │   └── onesignal_repository.dart
 │   ├── viewmodels/
 │   │   └── app_viewmodel.dart
 │   ├── screens/
@@ -165,7 +165,6 @@ examples/demo/
 │       ├── action_button.dart
 │       ├── app_text_field.dart
 │       ├── list_widgets.dart
-│       ├── loading_overlay.dart
 │       ├── dialogs.dart
 │       └── sections/
 │           ├── app_section.dart

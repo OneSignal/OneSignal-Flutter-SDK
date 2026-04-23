@@ -3,7 +3,7 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import '../models/in_app_message_type.dart';
 import '../models/notification_type.dart';
-import '../repositories/onesignal_repository.dart';
+import '../services/onesignal_api_service.dart';
 import '../services/preferences_service.dart';
 
 List<MapEntry<String, String>> _mergePairs(
@@ -21,10 +21,10 @@ List<T> _mergeUnique<T>(List<T> prev, List<T> next) =>
     {...prev, ...next}.toList();
 
 class AppViewModel extends ChangeNotifier {
-  final OneSignalRepository _repository;
+  final OneSignalApiService _apiService;
   final PreferencesService _prefs;
 
-  AppViewModel(this._repository, this._prefs);
+  AppViewModel(this._apiService, this._prefs);
 
   static const _orderStatuses = [
     {
@@ -89,7 +89,7 @@ class AppViewModel extends ChangeNotifier {
   bool _isLaUpdating = false;
   bool get isLaUpdating => _isLaUpdating;
 
-  bool get hasApiKey => _repository.hasApiKey();
+  bool get hasApiKey => _apiService.hasApiKey();
 
   String get nextStatusLabel {
     final nextIndex = (_statusIndex + 1) % _orderStatuses.length;
@@ -127,16 +127,16 @@ class AppViewModel extends ChangeNotifier {
     _locationShared = _prefs.locationShared;
 
     if (_externalUserId != null) {
-      _repository.loginUser(_externalUserId!);
+      OneSignal.login(_externalUserId!);
     }
 
-    _pushSubscriptionId = _repository.getPushSubscriptionId();
-    _pushEnabled = _repository.isPushOptedIn() ?? false;
-    _hasNotificationPermission = _repository.hasPermission();
+    _pushSubscriptionId = OneSignal.User.pushSubscription.id;
+    _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? false;
+    _hasNotificationPermission = OneSignal.Notifications.permission;
 
     notifyListeners();
 
-    final onesignalId = await _repository.getOnesignalId();
+    final onesignalId = await OneSignal.User.getOnesignalId();
     if (onesignalId == null) return;
 
     _isLoading = true;
@@ -177,10 +177,10 @@ class AppViewModel extends ChangeNotifier {
 
   // Fetch user data from API. Caller owns the isLoading toggle (try/finally).
   Future<void> fetchUserDataFromApi() async {
-    final onesignalId = await _repository.getOnesignalId();
+    final onesignalId = await OneSignal.User.getOnesignalId();
     if (onesignalId == null) return;
 
-    final userData = await _repository.fetchUser(onesignalId);
+    final userData = await _apiService.fetchUser(onesignalId);
     if (userData == null) return;
 
     _aliasesList = _mergePairs(_aliasesList, userData.aliases);
@@ -208,7 +208,7 @@ class AppViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _repository.loginUser(externalUserId);
+      await OneSignal.login(externalUserId);
       await _prefs.setExternalUserId(externalUserId);
       debugPrint('Logged in as: $externalUserId');
       // Drive the post-login fetch ourselves so isLoading always clears,
@@ -233,7 +233,7 @@ class AppViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      await _repository.logoutUser();
+      await OneSignal.logout();
       await _prefs.setExternalUserId(null);
       debugPrint('Logged out');
     } catch (e) {
@@ -244,7 +244,7 @@ class AppViewModel extends ChangeNotifier {
   // Consent
   Future<void> setConsentRequired(bool value) async {
     _consentRequired = value;
-    _repository.setConsentRequired(value);
+    OneSignal.consentRequired(value);
     await _prefs.setConsentRequired(value);
     if (!value) {
       _privacyConsentGiven = false;
@@ -255,7 +255,7 @@ class AppViewModel extends ChangeNotifier {
 
   Future<void> setPrivacyConsent(bool value) async {
     _privacyConsentGiven = value;
-    _repository.setConsentGiven(value);
+    OneSignal.consentGiven(value);
     await _prefs.setPrivacyConsent(value);
     notifyListeners();
   }
@@ -263,24 +263,25 @@ class AppViewModel extends ChangeNotifier {
   // Push
   void togglePush(bool enabled) {
     if (enabled) {
-      _repository.optInPush();
+      OneSignal.User.pushSubscription.optIn();
     } else {
-      _repository.optOutPush();
+      OneSignal.User.pushSubscription.optOut();
     }
     _pushEnabled = enabled;
     notifyListeners();
     debugPrint('Push ${enabled ? "enabled" : "disabled"}');
   }
 
-  Future<void> promptPush() async {
-    final granted = await _repository.requestPermission(true);
-    _hasNotificationPermission = granted;
-    notifyListeners();
-  }
+  Future<void> promptPush() => OneSignal.Notifications.requestPermission(true);
 
   // Notifications
   Future<void> sendNotification(NotificationType type) async {
-    final success = await _repository.sendNotification(type);
+    final subscriptionId = OneSignal.User.pushSubscription.id;
+    if (subscriptionId == null) {
+      debugPrint('No subscription ID for notification');
+      return;
+    }
+    final success = await _apiService.sendNotification(type, subscriptionId);
     if (success) {
       debugPrint('Notification sent: ${type.name}');
     } else {
@@ -289,7 +290,16 @@ class AppViewModel extends ChangeNotifier {
   }
 
   Future<void> sendCustomNotification(String title, String body) async {
-    final success = await _repository.sendCustomNotification(title, body);
+    final subscriptionId = OneSignal.User.pushSubscription.id;
+    if (subscriptionId == null) {
+      debugPrint('No subscription ID for custom notification');
+      return;
+    }
+    final success = await _apiService.sendCustomNotification(
+      title,
+      body,
+      subscriptionId,
+    );
     if (success) {
       debugPrint('Custom notification sent');
     } else {
@@ -298,20 +308,20 @@ class AppViewModel extends ChangeNotifier {
   }
 
   void clearAllNotifications() {
-    _repository.clearAllNotifications();
+    OneSignal.Notifications.clearAll();
     debugPrint('All notifications cleared');
   }
 
   // IAM
   Future<void> setIamPaused(bool paused) async {
     _iamPaused = paused;
-    _repository.setInAppMessagesPaused(paused);
+    OneSignal.InAppMessages.paused(paused);
     await _prefs.setIamPaused(paused);
     notifyListeners();
   }
 
   void sendInAppMessage(InAppMessageType type) {
-    _repository.addTrigger('iam_type', type.triggerValue);
+    OneSignal.InAppMessages.addTrigger('iam_type', type.triggerValue);
     _triggersList =
         List.from(_triggersList)
           ..removeWhere((e) => e.key == 'iam_type')
@@ -322,14 +332,14 @@ class AppViewModel extends ChangeNotifier {
 
   // Aliases
   void addAlias(String label, String id) {
-    _repository.addAlias(label, id);
+    OneSignal.User.addAlias(label, id);
     _aliasesList = List.from(_aliasesList)..add(MapEntry(label, id));
     notifyListeners();
     debugPrint('Alias added: $label');
   }
 
   void addAliases(Map<String, String> aliases) {
-    _repository.addAliases(aliases);
+    OneSignal.User.addAliases(aliases);
     _aliasesList = List.from(_aliasesList)..addAll(aliases.entries);
     notifyListeners();
     debugPrint('${aliases.length} alias(es) added');
@@ -337,14 +347,14 @@ class AppViewModel extends ChangeNotifier {
 
   // Emails
   void addEmail(String email) {
-    _repository.addEmail(email);
+    OneSignal.User.addEmail(email);
     _emailsList = List.from(_emailsList)..add(email);
     notifyListeners();
     debugPrint('Email added: $email');
   }
 
   void removeEmail(String email) {
-    _repository.removeEmail(email);
+    OneSignal.User.removeEmail(email);
     _emailsList = List.from(_emailsList)..remove(email);
     notifyListeners();
     debugPrint('Email removed: $email');
@@ -352,14 +362,14 @@ class AppViewModel extends ChangeNotifier {
 
   // SMS
   void addSms(String smsNumber) {
-    _repository.addSms(smsNumber);
+    OneSignal.User.addSms(smsNumber);
     _smsNumbersList = List.from(_smsNumbersList)..add(smsNumber);
     notifyListeners();
     debugPrint('SMS added: $smsNumber');
   }
 
   void removeSms(String smsNumber) {
-    _repository.removeSms(smsNumber);
+    OneSignal.User.removeSms(smsNumber);
     _smsNumbersList = List.from(_smsNumbersList)..remove(smsNumber);
     notifyListeners();
     debugPrint('SMS removed: $smsNumber');
@@ -367,28 +377,28 @@ class AppViewModel extends ChangeNotifier {
 
   // Tags
   void addTag(String key, String value) {
-    _repository.addTag(key, value);
+    OneSignal.User.addTagWithKey(key, value);
     _tagsList = List.from(_tagsList)..add(MapEntry(key, value));
     notifyListeners();
     debugPrint('Tag added: $key');
   }
 
   void addTags(Map<String, String> tags) {
-    _repository.addTags(tags);
+    OneSignal.User.addTags(tags);
     _tagsList = List.from(_tagsList)..addAll(tags.entries);
     notifyListeners();
     debugPrint('${tags.length} tag(s) added');
   }
 
   void removeTag(String key) {
-    _repository.removeTag(key);
+    OneSignal.User.removeTag(key);
     _tagsList = List.from(_tagsList)..removeWhere((e) => e.key == key);
     notifyListeners();
     debugPrint('Tag removed: $key');
   }
 
   void removeSelectedTags(List<String> keys) {
-    _repository.removeTags(keys);
+    OneSignal.User.removeTags(keys);
     _tagsList = List.from(_tagsList)..removeWhere((e) => keys.contains(e.key));
     notifyListeners();
     debugPrint('${keys.length} tag(s) removed');
@@ -396,28 +406,28 @@ class AppViewModel extends ChangeNotifier {
 
   // Triggers (in-memory only)
   void addTrigger(String key, String value) {
-    _repository.addTrigger(key, value);
+    OneSignal.InAppMessages.addTrigger(key, value);
     _triggersList = List.from(_triggersList)..add(MapEntry(key, value));
     notifyListeners();
     debugPrint('Trigger added: $key');
   }
 
   void addTriggers(Map<String, String> triggers) {
-    _repository.addTriggers(triggers);
+    OneSignal.InAppMessages.addTriggers(triggers);
     _triggersList = List.from(_triggersList)..addAll(triggers.entries);
     notifyListeners();
     debugPrint('${triggers.length} trigger(s) added');
   }
 
   void removeTrigger(String key) {
-    _repository.removeTrigger(key);
+    OneSignal.InAppMessages.removeTrigger(key);
     _triggersList = List.from(_triggersList)..removeWhere((e) => e.key == key);
     notifyListeners();
     debugPrint('Trigger removed: $key');
   }
 
   void removeSelectedTriggers(List<String> keys) {
-    _repository.removeTriggers(keys);
+    OneSignal.InAppMessages.removeTriggers(keys);
     _triggersList = List.from(_triggersList)
       ..removeWhere((e) => keys.contains(e.key));
     notifyListeners();
@@ -425,7 +435,7 @@ class AppViewModel extends ChangeNotifier {
   }
 
   void clearAllTriggers() {
-    _repository.clearTriggers();
+    OneSignal.InAppMessages.clearTriggers();
     _triggersList = [];
     notifyListeners();
     debugPrint('All triggers cleared');
@@ -433,23 +443,23 @@ class AppViewModel extends ChangeNotifier {
 
   // Outcomes
   void sendOutcome(String name) {
-    _repository.sendOutcome(name);
+    OneSignal.Session.addOutcome(name);
     debugPrint('Outcome sent: $name');
   }
 
   void sendUniqueOutcome(String name) {
-    _repository.sendUniqueOutcome(name);
+    OneSignal.Session.addUniqueOutcome(name);
     debugPrint('Unique outcome sent: $name');
   }
 
   void sendOutcomeWithValue(String name, double value) {
-    _repository.sendOutcomeWithValue(name, value);
+    OneSignal.Session.addOutcomeWithValue(name, value);
     debugPrint('Outcome sent: $name = $value');
   }
 
   // Custom Events
   void trackEvent(String name, Map<String, dynamic>? properties) {
-    _repository.trackEvent(name, properties);
+    OneSignal.User.trackEvent(name, properties);
     debugPrint('Event tracked: $name');
   }
 
@@ -468,7 +478,7 @@ class AppViewModel extends ChangeNotifier {
     final attributes = {'orderNumber': _orderNumber};
     final content = Map<String, dynamic>.from(_orderStatuses[0]);
     _statusIndex = 0;
-    await _repository.startDefaultLiveActivity(
+    await OneSignal.LiveActivities.startDefault(
       _activityId,
       attributes,
       content,
@@ -484,7 +494,7 @@ class AppViewModel extends ChangeNotifier {
     final nextIndex = (_statusIndex + 1) % _orderStatuses.length;
     final content = Map<String, dynamic>.from(_orderStatuses[nextIndex]);
     final eventUpdates = {'data': content};
-    final success = await _repository.updateLiveActivity(
+    final success = await _apiService.updateLiveActivity(
       _activityId,
       eventUpdates,
     );
@@ -499,13 +509,8 @@ class AppViewModel extends ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> exitLiveActivity() async {
-    await _repository.exitLiveActivity(_activityId);
-    debugPrint('Exited Live Activity: $_activityId');
-  }
-
   Future<void> endLiveActivity() async {
-    final success = await _repository.endLiveActivity(_activityId);
+    final success = await _apiService.endLiveActivity(_activityId);
     if (success) {
       _statusIndex = 0;
       debugPrint('Ended Live Activity: $_activityId');
@@ -518,17 +523,17 @@ class AppViewModel extends ChangeNotifier {
   // Location
   Future<void> setLocationShared(bool shared) async {
     _locationShared = shared;
-    _repository.setLocationShared(shared);
+    OneSignal.Location.setShared(shared);
     await _prefs.setLocationShared(shared);
     notifyListeners();
     debugPrint('Location sharing ${shared ? "enabled" : "disabled"}');
   }
 
   void promptLocation() {
-    _repository.requestLocationPermission();
+    OneSignal.Location.requestPermission();
   }
 
   Future<bool> checkLocationShared() async {
-    return await _repository.isLocationShared();
+    return await OneSignal.Location.isShared();
   }
 }

@@ -4,7 +4,6 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:provider/provider.dart';
 
-import 'repositories/onesignal_repository.dart';
 import 'screens/home_screen.dart';
 import 'services/onesignal_api_service.dart';
 import 'services/preferences_service.dart';
@@ -84,7 +83,6 @@ Future<void> main() async {
   final apiService = OneSignalApiService()
     ..setAppId(appId)
     ..setApiKey(apiKey);
-  final repository = OneSignalRepository(apiService);
 
   // Fetch tooltips in background
   TooltipHelper().init();
@@ -94,7 +92,7 @@ Future<void> main() async {
   runApp(
     ChangeNotifierProvider(
       create: (_) {
-        final vm = AppViewModel(repository, prefs);
+        final vm = AppViewModel(apiService, prefs);
         vm.setupObservers();
         vm.loadInitialState(appId);
         return vm;
