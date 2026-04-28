@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme.dart';
+import '../../utils/mask_value.dart';
 import '../../viewmodels/app_viewmodel.dart';
 import '../section_card.dart';
 import '../toggle_row.dart';
-
-final bool _isE2E = dotenv.env['E2E_MODE'] == 'true';
 
 class AppSection extends StatelessWidget {
   final VoidCallback? onInfoTap;
@@ -40,7 +38,7 @@ class AppSection extends StatelessWidget {
                       identifier: 'app_id_value',
                       container: true,
                       child: SelectableText(
-                        _isE2E ? '••••••••-••••-••••-••••-••••••••••••' : vm.appId,
+                        maskValue(vm.appId),
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               fontFamily: 'monospace',
                             ),

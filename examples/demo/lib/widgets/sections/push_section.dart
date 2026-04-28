@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:provider/provider.dart';
 
 import '../../theme.dart';
+import '../../utils/mask_value.dart';
 import '../../viewmodels/app_viewmodel.dart';
 import '../action_button.dart';
 import '../section_card.dart';
 import '../toggle_row.dart';
-
-final bool _isE2E = dotenv.env['E2E_MODE'] == 'true';
 
 class PushSection extends StatelessWidget {
   final VoidCallback? onInfoTap;
@@ -43,7 +41,7 @@ class PushSection extends StatelessWidget {
                           identifier: 'push_id_value',
                           container: true,
                           child: SelectableText(
-                            _isE2E ? '••••••••-••••-••••-••••-••••••••••••' : (vm.pushSubscriptionId ?? 'N/A'),
+                            maskValue(vm.pushSubscriptionId ?? 'N/A'),
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                   fontFamily: 'monospace',
                                 ),
