@@ -3,7 +3,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'onesignal_flutter'
-  s.version          = '5.5.1'
+  s.version          = '5.5.2'
   s.summary          = 'The OneSignal Flutter SDK'
   s.description      = 'Allows you to easily add OneSignal to your flutter projects, to make sending and handling push notifications easy'
   s.homepage         = 'https://www.onesignal.com'
@@ -13,7 +13,7 @@ Pod::Spec.new do |s|
   s.source_files = 'onesignal_flutter/Sources/onesignal_flutter/**/*.{h,m}'
   s.public_header_files = 'onesignal_flutter/Sources/onesignal_flutter/include/**/*.h'
   s.dependency 'Flutter'
-  s.dependency 'OneSignalXCFramework', '5.5.0'
+  s.dependency 'OneSignalXCFramework', '5.5.1'
   s.ios.deployment_target = '11.0'
   s.static_framework = true
 end
