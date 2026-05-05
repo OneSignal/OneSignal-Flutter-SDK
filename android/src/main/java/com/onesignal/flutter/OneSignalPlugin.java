@@ -48,7 +48,9 @@ public class OneSignalPlugin extends FlutterMessengerResponder
         onDetachedFromEngine();
     }
 
-    private void onDetachedFromEngine() {}
+    private void onDetachedFromEngine() {
+        OneSignalNotifications.getSharedInstance().onDetachedFromEngine();
+    }
 
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {

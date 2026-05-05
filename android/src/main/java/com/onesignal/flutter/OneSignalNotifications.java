@@ -227,6 +227,12 @@ public class OneSignalNotifications extends FlutterMessengerResponder
         invokeMethodOnUiThread("OneSignal#onNotificationPermissionDidChange", hash);
     }
 
+    void onDetachedFromEngine() {
+        // Unsubscribe so clicks while the engine is dead get queued by the native SDK
+        // instead of dispatched on a detached channel.
+        OneSignal.getNotifications().removeClickListener(this);
+    }
+
     private void lifecycleInit(Result result) {
         OneSignal.getNotifications().removeForegroundLifecycleListener(this);
         OneSignal.getNotifications().addForegroundLifecycleListener(this);
