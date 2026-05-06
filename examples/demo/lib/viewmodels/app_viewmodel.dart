@@ -338,10 +338,7 @@ class AppViewModel extends ChangeNotifier {
 
   void sendInAppMessage(InAppMessageType type) {
     OneSignal.InAppMessages.addTrigger('iam_type', type.triggerValue);
-    _triggersList =
-        List.from(_triggersList)
-          ..removeWhere((e) => e.key == 'iam_type')
-          ..add(MapEntry('iam_type', type.triggerValue));
+    _triggersList = _mergePairs(_triggersList, {'iam_type': type.triggerValue});
     notifyListeners();
     debugPrint('Sent In-App Message: ${type.label}');
   }
@@ -349,14 +346,14 @@ class AppViewModel extends ChangeNotifier {
   // Aliases
   void addAlias(String label, String id) {
     OneSignal.User.addAlias(label, id);
-    _aliasesList = List.from(_aliasesList)..add(MapEntry(label, id));
+    _aliasesList = _mergePairs(_aliasesList, {label: id});
     notifyListeners();
     debugPrint('Alias added: $label');
   }
 
   void addAliases(Map<String, String> aliases) {
     OneSignal.User.addAliases(aliases);
-    _aliasesList = List.from(_aliasesList)..addAll(aliases.entries);
+    _aliasesList = _mergePairs(_aliasesList, aliases);
     notifyListeners();
     debugPrint('${aliases.length} alias(es) added');
   }
@@ -364,7 +361,7 @@ class AppViewModel extends ChangeNotifier {
   // Emails
   void addEmail(String email) {
     OneSignal.User.addEmail(email);
-    _emailsList = List.from(_emailsList)..add(email);
+    _emailsList = _mergeUnique(_emailsList, [email]);
     notifyListeners();
     debugPrint('Email added: $email');
   }
@@ -379,7 +376,7 @@ class AppViewModel extends ChangeNotifier {
   // SMS
   void addSms(String smsNumber) {
     OneSignal.User.addSms(smsNumber);
-    _smsNumbersList = List.from(_smsNumbersList)..add(smsNumber);
+    _smsNumbersList = _mergeUnique(_smsNumbersList, [smsNumber]);
     notifyListeners();
     debugPrint('SMS added: $smsNumber');
   }
@@ -394,14 +391,14 @@ class AppViewModel extends ChangeNotifier {
   // Tags
   void addTag(String key, String value) {
     OneSignal.User.addTagWithKey(key, value);
-    _tagsList = List.from(_tagsList)..add(MapEntry(key, value));
+    _tagsList = _mergePairs(_tagsList, {key: value});
     notifyListeners();
     debugPrint('Tag added: $key');
   }
 
   void addTags(Map<String, String> tags) {
     OneSignal.User.addTags(tags);
-    _tagsList = List.from(_tagsList)..addAll(tags.entries);
+    _tagsList = _mergePairs(_tagsList, tags);
     notifyListeners();
     debugPrint('${tags.length} tag(s) added');
   }
@@ -423,14 +420,14 @@ class AppViewModel extends ChangeNotifier {
   // Triggers (in-memory only)
   void addTrigger(String key, String value) {
     OneSignal.InAppMessages.addTrigger(key, value);
-    _triggersList = List.from(_triggersList)..add(MapEntry(key, value));
+    _triggersList = _mergePairs(_triggersList, {key: value});
     notifyListeners();
     debugPrint('Trigger added: $key');
   }
 
   void addTriggers(Map<String, String> triggers) {
     OneSignal.InAppMessages.addTriggers(triggers);
-    _triggersList = List.from(_triggersList)..addAll(triggers.entries);
+    _triggersList = _mergePairs(_triggersList, triggers);
     notifyListeners();
     debugPrint('${triggers.length} trigger(s) added');
   }
