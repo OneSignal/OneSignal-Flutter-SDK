@@ -17,7 +17,7 @@ enum NotificationType {
     title: 'Sound Notification',
     body: 'This notification plays a custom sound',
     iosSound: 'vine_boom.wav',
-    androidChannelId: 'b3b015d9-c050-4042-8548-dcc34aa44aa4',
+    useAndroidChannel: true,
   );
 
   final String title;
@@ -25,7 +25,7 @@ enum NotificationType {
   final String? bigPicture;
   final Map<String, String>? iosAttachments;
   final String? iosSound;
-  final String? androidChannelId;
+  final bool useAndroidChannel;
 
   const NotificationType({
     required this.title,
@@ -33,6 +33,6 @@ enum NotificationType {
     this.bigPicture,
     this.iosAttachments,
     this.iosSound,
-    this.androidChannelId,
+    this.useAndroidChannel = false,
   });
 }

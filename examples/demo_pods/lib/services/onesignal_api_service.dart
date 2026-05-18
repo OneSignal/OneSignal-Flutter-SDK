@@ -1,10 +1,25 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/notification_type.dart';
 import '../models/user_data.dart';
+
+const String _defaultAndroidChannelId = 'b3b015d9-c050-4042-8548-dcc34aa44aa4';
+
+String _resolveAndroidChannelId() {
+  String? envValue;
+  try {
+    envValue = dotenv.env['ONESIGNAL_ANDROID_CHANNEL_ID']?.trim();
+  } catch (_) {
+    envValue = null;
+  }
+  return (envValue != null && envValue.isNotEmpty)
+      ? envValue
+      : _defaultAndroidChannelId;
+}
 
 class OneSignalApiService {
   String _appId = '';
@@ -36,8 +51,8 @@ class OneSignalApiService {
       if (type.iosSound != null) {
         body['ios_sound'] = type.iosSound;
       }
-      if (type.androidChannelId != null) {
-        body['android_channel_id'] = type.androidChannelId;
+      if (type.useAndroidChannel) {
+        body['android_channel_id'] = _resolveAndroidChannelId();
       }
 
       final response = await http.post(
