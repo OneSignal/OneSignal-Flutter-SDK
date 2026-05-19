@@ -110,7 +110,9 @@ jobs:
           flutter build ipa --release \
             --export-options-plist=ios/ExportOptions.plist \
             --split-debug-info=build/symbols
-          cp build/ios/ipa/*.ipa build/ios/ipa/Runner.ipa
+          for f in build/ios/ipa/*.ipa; do
+            cp "$f" build/ios/ipa/Runner.ipa
+          done
 
       - name: Verify aps-environment in IPA
         working-directory: examples/demo
