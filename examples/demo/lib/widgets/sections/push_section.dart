@@ -41,7 +41,7 @@ class PushSection extends StatelessWidget {
                           identifier: 'push_id_value',
                           container: true,
                           child: SelectableText(
-                            maskValue(vm.pushSubscriptionId ?? 'N/A'),
+                            maskValue(vm.pushSubscriptionId ?? '—'),
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                   fontFamily: 'monospace',
                                 ),

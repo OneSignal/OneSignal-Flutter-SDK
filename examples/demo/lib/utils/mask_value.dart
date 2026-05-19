@@ -7,7 +7,7 @@ final bool _isE2E = dotenv.env['E2E_MODE'] == 'true';
 /// real app/push IDs don't leak into screenshots or Appium element captures.
 /// Returns [value] unchanged otherwise.
 String maskValue(String value) {
-  if (_isE2E) {
+  if (_isE2E && value != '—') {
     return _maskChar * value.length;
   }
   return value;

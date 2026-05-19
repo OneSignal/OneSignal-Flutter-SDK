@@ -110,9 +110,17 @@ jobs:
           flutter build ipa --release \
             --export-options-plist=ios/ExportOptions.plist \
             --split-debug-info=build/symbols
-          for f in build/ios/ipa/*.ipa; do
-            cp "$f" build/ios/ipa/Runner.ipa
-          done
+          shopt -s nullglob
+          ipas=(build/ios/ipa/*.ipa)
+          if [ ${#ipas[@]} -eq 0 ]; then
+            echo "::error::No IPA was produced in build/ios/ipa"
+            exit 1
+          fi
+          src="${ipas[0]}"
+          dst="build/ios/ipa/Runner.ipa"
+          if [ "$src" != "$dst" ]; then
+            cp "$src" "$dst"
+          fi
 
       - name: Verify aps-environment in IPA
         working-directory: examples/demo
