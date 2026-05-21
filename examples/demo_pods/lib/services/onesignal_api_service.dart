@@ -35,41 +35,26 @@ class OneSignalApiService {
     NotificationType type,
     String subscriptionId,
   ) async {
-    try {
-      final body = <String, dynamic>{
-        'app_id': _appId,
-        'include_subscription_ids': [subscriptionId],
-        'headings': {'en': type.title},
-        'contents': {'en': type.body},
-      };
-      if (type.bigPicture != null) {
-        body['big_picture'] = type.bigPicture;
-      }
-      if (type.iosAttachments != null) {
-        body['ios_attachments'] = type.iosAttachments;
-      }
-      if (type.iosSound != null) {
-        body['ios_sound'] = type.iosSound;
-      }
-      if (type.useAndroidChannel) {
-        body['android_channel_id'] = _resolveAndroidChannelId();
-      }
-
-      final response = await http.post(
-        Uri.parse('https://onesignal.com/api/v1/notifications'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.onesignal.v1+json',
-        },
-        body: jsonEncode(body),
-      );
-
-      debugPrint('Send notification response: ${response.statusCode}');
-      return response.statusCode == 200;
-    } catch (e) {
-      debugPrint('Send notification error: $e');
-      return false;
+    final body = <String, dynamic>{
+      'app_id': _appId,
+      'include_subscription_ids': [subscriptionId],
+      'headings': {'en': type.title},
+      'contents': {'en': type.body},
+    };
+    if (type.bigPicture != null) {
+      body['big_picture'] = type.bigPicture;
     }
+    if (type.iosAttachments != null) {
+      body['ios_attachments'] = type.iosAttachments;
+    }
+    if (type.iosSound != null) {
+      body['ios_sound'] = type.iosSound;
+    }
+    if (type.useAndroidChannel) {
+      body['android_channel_id'] = _resolveAndroidChannelId();
+    }
+
+    return _postNotification(body);
   }
 
   Future<bool> sendCustomNotification(
@@ -77,29 +62,64 @@ class OneSignalApiService {
     String body,
     String subscriptionId,
   ) async {
-    try {
-      final payload = <String, dynamic>{
-        'app_id': _appId,
-        'include_subscription_ids': [subscriptionId],
-        'headings': {'en': title},
-        'contents': {'en': body},
-      };
+    final payload = <String, dynamic>{
+      'app_id': _appId,
+      'include_subscription_ids': [subscriptionId],
+      'headings': {'en': title},
+      'contents': {'en': body},
+    };
 
-      final response = await http.post(
-        Uri.parse('https://onesignal.com/api/v1/notifications'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.onesignal.v1+json',
-        },
-        body: jsonEncode(payload),
-      );
+    return _postNotification(payload);
+  }
 
-      debugPrint('Send custom notification response: ${response.statusCode}');
-      return response.statusCode == 200;
-    } catch (e) {
-      debugPrint('Send custom notification error: $e');
-      return false;
+  // Retry on `invalid_player_ids` to absorb the brief race where the
+  // subscription has been created locally but is not yet visible to the
+  // /notifications endpoint.
+  Future<bool> _postNotification(Map<String, dynamic> payload) async {
+    const maxAttempts = 3;
+
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        final response = await http.post(
+          Uri.parse('https://onesignal.com/api/v1/notifications'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.onesignal.v1+json',
+          },
+          body: jsonEncode(payload),
+        );
+
+        debugPrint('Send notification response: ${response.statusCode}');
+        if (response.statusCode != 200) {
+          return false;
+        }
+
+        final decoded = jsonDecode(response.body);
+        if (decoded is Map<String, dynamic>) {
+          final errors = decoded['errors'];
+          if (errors is Map<String, dynamic>) {
+            final invalidIds = errors['invalid_player_ids'];
+            if (invalidIds is List && invalidIds.isNotEmpty) {
+              if (attempt < maxAttempts) {
+                await Future<void>.delayed(Duration(seconds: 3 * attempt));
+                continue;
+              }
+              debugPrint(
+                'Send notification failed: invalid_player_ids $invalidIds',
+              );
+              return false;
+            }
+          }
+        }
+
+        return true;
+      } catch (e) {
+        debugPrint('Send notification error: $e');
+        return false;
+      }
     }
+
+    return false;
   }
 
   Future<bool> updateLiveActivity(
