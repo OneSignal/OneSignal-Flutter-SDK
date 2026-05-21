@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../theme.dart';
-import '../../utils/mask_value.dart';
 import '../../viewmodels/app_viewmodel.dart';
 import '../action_button.dart';
 import '../section_card.dart';
@@ -41,7 +40,7 @@ class PushSection extends StatelessWidget {
                           identifier: 'push_id_value',
                           container: true,
                           child: SelectableText(
-                            maskValue(vm.pushSubscriptionId ?? '—'),
+                            vm.pushSubscriptionId ?? '—',
                             style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                   fontFamily: 'monospace',
                                 ),
