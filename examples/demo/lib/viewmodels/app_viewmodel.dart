@@ -64,6 +64,9 @@ class AppViewModel extends ChangeNotifier {
 
   bool get isLoggedIn => _externalUserId != null;
 
+  String? _oneSignalId;
+  String? get oneSignalId => _oneSignalId;
+
   // Push state
   String? _pushSubscriptionId;
   String? get pushSubscriptionId => _pushSubscriptionId;
@@ -139,9 +142,11 @@ class AppViewModel extends ChangeNotifier {
     _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? false;
     _hasNotificationPermission = OneSignal.Notifications.permission;
 
+    final onesignalId = await OneSignal.User.getOnesignalId();
+    _oneSignalId = onesignalId;
+
     notifyListeners();
 
-    final onesignalId = await OneSignal.User.getOnesignalId();
     if (onesignalId == null) return;
 
     // fetchUserDataFromApi owns _isLoading + notifyListeners.
@@ -170,6 +175,9 @@ class AppViewModel extends ChangeNotifier {
       debugPrint(
         'User changed: onesignalId=${nextOnesignalId ?? 'null'}, externalId=${state.current.externalId ?? 'null'}',
       );
+
+      _oneSignalId = nextOnesignalId;
+      notifyListeners();
 
       // Drive the post-login fetch from the observer so it runs only once the
       // SDK has actually assigned a new onesignalId. Logout clears it to null;

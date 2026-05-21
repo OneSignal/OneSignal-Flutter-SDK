@@ -31,6 +31,29 @@ class PushSection extends StatelessWidget {
                   Row(
                     children: [
                       Text(
+                        'OneSignal ID',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Semantics(
+                          identifier: 'onesignal_id_value',
+                          container: true,
+                          child: SelectableText(
+                            vm.oneSignalId ?? '—',
+                            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                  fontFamily: 'monospace',
+                                ),
+                            textAlign: TextAlign.end,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  Row(
+                    children: [
+                      Text(
                         'Push ID',
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
