@@ -72,12 +72,13 @@ class OneSignalApiService {
     return _postNotification(payload);
   }
 
-  // Retry on `invalid_player_ids` to absorb the brief race where the
-  // subscription has been created locally but is not yet visible to the
-  // /notifications endpoint.
   Future<bool> _postNotification(Map<String, dynamic> payload) async {
-    const maxAttempts = 3;
+    const maxAttempts = 5;
+    int backoffMs(int n) => 2000 * (1 << (n - 1));
 
+    // Retry on `invalid_player_ids` to absorb the brief race where the
+    // subscription has been created locally but is not yet visible to the
+    // /notifications endpoint.
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         final response = await http.post(
@@ -89,8 +90,8 @@ class OneSignalApiService {
           body: jsonEncode(payload),
         );
 
-        debugPrint('Send notification response: ${response.statusCode}');
-        if (response.statusCode != 200) {
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          debugPrint('Send notification failed: ${response.body}');
           return false;
         }
 
@@ -101,7 +102,9 @@ class OneSignalApiService {
             final invalidIds = errors['invalid_player_ids'];
             if (invalidIds is List && invalidIds.isNotEmpty) {
               if (attempt < maxAttempts) {
-                await Future<void>.delayed(Duration(seconds: 3 * attempt));
+                await Future<void>.delayed(
+                  Duration(milliseconds: backoffMs(attempt)),
+                );
                 continue;
               }
               debugPrint(
