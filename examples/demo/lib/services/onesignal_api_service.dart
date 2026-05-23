@@ -76,9 +76,13 @@ class OneSignalApiService {
     const maxAttempts = 5;
     int backoffMs(int n) => 2000 * (1 << (n - 1));
 
-    // Retry on `invalid_player_ids` to absorb the brief race where the
-    // subscription has been created locally but is not yet visible to the
-    // /notifications endpoint.
+    // Retry while the OneSignal backend hasn't yet indexed the freshly
+    // created subscription. The /notifications endpoint reports this race in a
+    // few different shapes, all of which return HTTP 200:
+    //   - {"errors":{"invalid_player_ids":[...]}}
+    //   - {"id":"","errors":["All included players are not subscribed"]}
+    //   - {"id":"","errors":[...]}
+    // Treat any 200 response without a real notification id as transient.
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         final response = await http.post(
@@ -96,23 +100,13 @@ class OneSignalApiService {
         }
 
         final decoded = jsonDecode(response.body);
-        if (decoded is Map<String, dynamic>) {
-          final errors = decoded['errors'];
-          if (errors is Map<String, dynamic>) {
-            final invalidIds = errors['invalid_player_ids'];
-            if (invalidIds is List && invalidIds.isNotEmpty) {
-              if (attempt < maxAttempts) {
-                await Future<void>.delayed(
-                  Duration(milliseconds: backoffMs(attempt)),
-                );
-                continue;
-              }
-              debugPrint(
-                'Send notification failed: invalid_player_ids $invalidIds',
-              );
-              return false;
-            }
+        if (_isTransientSendFailure(decoded)) {
+          if (attempt < maxAttempts) {
+            await Future<void>.delayed(Duration(milliseconds: backoffMs(attempt)));
+            continue;
           }
+          debugPrint('Send notification failed: ${response.body}');
+          return false;
         }
 
         return true;
@@ -123,6 +117,17 @@ class OneSignalApiService {
     }
 
     return false;
+  }
+
+  bool _isTransientSendFailure(dynamic decoded) {
+    if (decoded is! Map<String, dynamic>) return false;
+    final id = decoded['id'];
+    final errors = decoded['errors'];
+    final hasErrors =
+        (errors is List && errors.isNotEmpty) ||
+        (errors is Map && errors.isNotEmpty);
+    final missingId = id is! String || id.isEmpty;
+    return hasErrors || missingId;
   }
 
   Future<bool> updateLiveActivity(

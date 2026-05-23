@@ -69,7 +69,11 @@ class AppViewModel extends ChangeNotifier {
 
   // Push state
   String? _pushSubscriptionId;
-  String? get pushSubscriptionId => _pushSubscriptionId;
+  // The native bridge can hand back an empty string before the subscription
+  // id is provisioned. Treat that as "no id yet" so the UI's `?? '—'`
+  // fallback renders the placeholder instead of an empty cell.
+  String? get pushSubscriptionId =>
+      (_pushSubscriptionId?.isEmpty ?? true) ? null : _pushSubscriptionId;
 
   bool _pushEnabled = false;
   bool get pushEnabled => _pushEnabled;
