@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../theme.dart';
-import '../../utils/mask_value.dart';
 import '../../viewmodels/app_viewmodel.dart';
 import '../section_card.dart';
 import '../toggle_row.dart';
@@ -38,7 +37,7 @@ class AppSection extends StatelessWidget {
                       identifier: 'app_id_value',
                       container: true,
                       child: SelectableText(
-                        maskValue(vm.appId),
+                        vm.appId,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
                               fontFamily: 'monospace',
                             ),

@@ -35,41 +35,26 @@ class OneSignalApiService {
     NotificationType type,
     String subscriptionId,
   ) async {
-    try {
-      final body = <String, dynamic>{
-        'app_id': _appId,
-        'include_subscription_ids': [subscriptionId],
-        'headings': {'en': type.title},
-        'contents': {'en': type.body},
-      };
-      if (type.bigPicture != null) {
-        body['big_picture'] = type.bigPicture;
-      }
-      if (type.iosAttachments != null) {
-        body['ios_attachments'] = type.iosAttachments;
-      }
-      if (type.iosSound != null) {
-        body['ios_sound'] = type.iosSound;
-      }
-      if (type.useAndroidChannel) {
-        body['android_channel_id'] = _resolveAndroidChannelId();
-      }
-
-      final response = await http.post(
-        Uri.parse('https://onesignal.com/api/v1/notifications'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.onesignal.v1+json',
-        },
-        body: jsonEncode(body),
-      );
-
-      debugPrint('Send notification response: ${response.statusCode}');
-      return response.statusCode == 200;
-    } catch (e) {
-      debugPrint('Send notification error: $e');
-      return false;
+    final body = <String, dynamic>{
+      'app_id': _appId,
+      'include_subscription_ids': [subscriptionId],
+      'headings': {'en': type.title},
+      'contents': {'en': type.body},
+    };
+    if (type.bigPicture != null) {
+      body['big_picture'] = type.bigPicture;
     }
+    if (type.iosAttachments != null) {
+      body['ios_attachments'] = type.iosAttachments;
+    }
+    if (type.iosSound != null) {
+      body['ios_sound'] = type.iosSound;
+    }
+    if (type.useAndroidChannel) {
+      body['android_channel_id'] = _resolveAndroidChannelId();
+    }
+
+    return _postNotification(body);
   }
 
   Future<bool> sendCustomNotification(
@@ -77,29 +62,72 @@ class OneSignalApiService {
     String body,
     String subscriptionId,
   ) async {
-    try {
-      final payload = <String, dynamic>{
-        'app_id': _appId,
-        'include_subscription_ids': [subscriptionId],
-        'headings': {'en': title},
-        'contents': {'en': body},
-      };
+    final payload = <String, dynamic>{
+      'app_id': _appId,
+      'include_subscription_ids': [subscriptionId],
+      'headings': {'en': title},
+      'contents': {'en': body},
+    };
 
-      final response = await http.post(
-        Uri.parse('https://onesignal.com/api/v1/notifications'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/vnd.onesignal.v1+json',
-        },
-        body: jsonEncode(payload),
-      );
+    return _postNotification(payload);
+  }
 
-      debugPrint('Send custom notification response: ${response.statusCode}');
-      return response.statusCode == 200;
-    } catch (e) {
-      debugPrint('Send custom notification error: $e');
-      return false;
+  Future<bool> _postNotification(Map<String, dynamic> payload) async {
+    const maxAttempts = 5;
+    int backoffMs(int n) => 2000 * (1 << (n - 1));
+
+    // Retry while the OneSignal backend hasn't yet indexed the freshly
+    // created subscription. The /notifications endpoint reports this race in a
+    // few different shapes, all of which return HTTP 200:
+    //   - {"errors":{"invalid_player_ids":[...]}}
+    //   - {"id":"","errors":["All included players are not subscribed"]}
+    //   - {"id":"","errors":[...]}
+    // Treat any 200 response without a real notification id as transient.
+    for (var attempt = 1; attempt <= maxAttempts; attempt++) {
+      try {
+        final response = await http.post(
+          Uri.parse('https://onesignal.com/api/v1/notifications'),
+          headers: {
+            'Content-Type': 'application/json',
+            'Accept': 'application/vnd.onesignal.v1+json',
+          },
+          body: jsonEncode(payload),
+        );
+
+        if (response.statusCode < 200 || response.statusCode >= 300) {
+          debugPrint('Send notification failed: ${response.body}');
+          return false;
+        }
+
+        final decoded = jsonDecode(response.body);
+        if (_isTransientSendFailure(decoded)) {
+          if (attempt < maxAttempts) {
+            await Future<void>.delayed(Duration(milliseconds: backoffMs(attempt)));
+            continue;
+          }
+          debugPrint('Send notification failed: ${response.body}');
+          return false;
+        }
+
+        return true;
+      } catch (e) {
+        debugPrint('Send notification error: $e');
+        return false;
+      }
     }
+
+    return false;
+  }
+
+  bool _isTransientSendFailure(dynamic decoded) {
+    if (decoded is! Map<String, dynamic>) return false;
+    final id = decoded['id'];
+    final errors = decoded['errors'];
+    final hasErrors =
+        (errors is List && errors.isNotEmpty) ||
+        (errors is Map && errors.isNotEmpty);
+    final missingId = id is! String || id.isEmpty;
+    return hasErrors || missingId;
   }
 
   Future<bool> updateLiveActivity(

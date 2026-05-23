@@ -60,7 +60,7 @@ class UserSection extends StatelessWidget {
                         identifier: 'user_external_id_value',
                         container: true,
                         child: SelectableText(
-                          vm.isLoggedIn ? (vm.externalUserId ?? '') : '–',
+                          vm.isLoggedIn ? (vm.externalUserId ?? '') : '—',
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 fontFamily: 'monospace',
                               ),

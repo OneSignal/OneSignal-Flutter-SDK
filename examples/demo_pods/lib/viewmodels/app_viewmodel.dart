@@ -59,9 +59,16 @@ class AppViewModel extends ChangeNotifier {
 
   bool get isLoggedIn => _externalUserId != null;
 
+  String? _oneSignalId;
+  String? get oneSignalId => _oneSignalId;
+
   // Push state
   String? _pushSubscriptionId;
-  String? get pushSubscriptionId => _pushSubscriptionId;
+  // The native bridge can hand back an empty string before the subscription
+  // id is provisioned. Treat that as "no id yet" so the UI's `?? '—'`
+  // fallback renders the placeholder instead of an empty cell.
+  String? get pushSubscriptionId =>
+      (_pushSubscriptionId?.isEmpty ?? true) ? null : _pushSubscriptionId;
 
   bool _pushEnabled = false;
   bool get pushEnabled => _pushEnabled;
@@ -134,9 +141,11 @@ class AppViewModel extends ChangeNotifier {
     _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? false;
     _hasNotificationPermission = OneSignal.Notifications.permission;
 
+    final onesignalId = await OneSignal.User.getOnesignalId();
+    _oneSignalId = onesignalId;
+
     notifyListeners();
 
-    final onesignalId = await OneSignal.User.getOnesignalId();
     if (onesignalId == null) return;
 
     _isLoading = true;
@@ -172,6 +181,8 @@ class AppViewModel extends ChangeNotifier {
       debugPrint(
         'User changed: onesignalId=${state.current.onesignalId ?? 'null'}, externalId=${state.current.externalId ?? 'null'}',
       );
+      _oneSignalId = state.current.onesignalId;
+      notifyListeners();
     });
   }
 
