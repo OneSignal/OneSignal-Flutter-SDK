@@ -108,6 +108,8 @@ class AppTheme {
   AppTheme._();
 }
 
+const Duration _toastDuration = Duration(seconds: 3);
+
 extension AppSnackBar on BuildContext {
   void showSnackBar(String message) {
     ScaffoldMessenger.of(this)
@@ -115,6 +117,7 @@ extension AppSnackBar on BuildContext {
       ..showSnackBar(
         SnackBar(
           content: Text(message),
+          duration: _toastDuration,
           dismissDirection: DismissDirection.horizontal,
         ),
       );

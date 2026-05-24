@@ -79,10 +79,11 @@ class OneSignalApiService {
     // Retry while the OneSignal backend hasn't yet indexed the freshly
     // created subscription. The /notifications endpoint reports this race in a
     // few different shapes, all of which return HTTP 200:
-    //   - {"errors":{"invalid_player_ids":[...]}}
+    //   - {"id":"...","recipients":0}                       (user just switched, push token not yet attached)
+    //   - {"id":"...","errors":{"invalid_player_ids":[...]}}
     //   - {"id":"","errors":["All included players are not subscribed"]}
     //   - {"id":"","errors":[...]}
-    // Treat any 200 response without a real notification id as transient.
+    // Treat any 200 response with no real id, populated errors, or recipients=0 as transient.
     for (var attempt = 1; attempt <= maxAttempts; attempt++) {
       try {
         final response = await http.post(
@@ -123,11 +124,13 @@ class OneSignalApiService {
     if (decoded is! Map<String, dynamic>) return false;
     final id = decoded['id'];
     final errors = decoded['errors'];
+    final recipients = decoded['recipients'];
     final hasErrors =
         (errors is List && errors.isNotEmpty) ||
         (errors is Map && errors.isNotEmpty);
     final missingId = id is! String || id.isEmpty;
-    return hasErrors || missingId;
+    final zeroRecipients = recipients is num && recipients == 0;
+    return hasErrors || missingId || zeroRecipients;
   }
 
   Future<bool> updateLiveActivity(

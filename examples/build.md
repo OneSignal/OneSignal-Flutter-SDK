@@ -36,11 +36,14 @@ rm assets/onesignal_logo_icon_padded.png
 dependencies:
   flutter:
     sdk: flutter
-  onesignal_flutter: ^5.4.0
+  onesignal_flutter:
+    path: ../../
   provider: ^6.1.0
   shared_preferences: ^2.3.0
   http: ^1.2.0
+  url_launcher: ^6.2.0
   flutter_svg: ^2.0.0
+  flutter_dotenv: ^5.2.1
 
 dev_dependencies:
   flutter_test:
@@ -57,6 +60,20 @@ flutter_launcher_icons:
   adaptive_icon_foreground: "assets/onesignal_logo_icon_padded.png"
 ```
 
+`assets/onesignal_logo_icon_padded.png` is referenced in `pubspec.yaml` but is not checked in -- it is generated via `flutter_launcher_icons` from `assets/onesignal_logo.svg`. Remove the generated PNG after icon generation if desired.
+
+### Environment variables
+
+- `flutter_dotenv` loads `.env` from the `pubspec.yaml` `assets:` block (`.env` is listed alongside `assets/onesignal_logo.svg`).
+- `ONESIGNAL_APP_ID` -- OneSignal app id. Falls back to the hard-coded `_defaultAppId` in `main.dart` when unset or empty.
+- `ONESIGNAL_API_KEY` -- REST API key used by `OneSignalApiService` for Live Activity update/end and notification sends.
+- `ONESIGNAL_ANDROID_CHANNEL_ID` -- optional Android notification channel id used by the REST send paths.
+
+### Theme types
+
+- `lib/theme.dart` exports `AppSpacing`, `AppColors`, and `AppTheme` classes alongside the `AppSnackBar` extension on `BuildContext`.
+- `AppTheme.light` is the Material 3 `ThemeData` applied to `MaterialApp`.
+
 ---
 
 ## State Management
@@ -68,9 +85,12 @@ Use **Provider** for dependency injection and **ChangeNotifier** for reactive st
 - Exposes action methods that update state and call `notifyListeners()`
 - Receives `OneSignalApiService` and `PreferencesService` via constructor injection
 - Initialize OneSignal SDK before `runApp()`
-- Use `Consumer`/`Selector` from Provider to scope rebuilds and minimize re-renders
+- Section widgets read the viewmodel via `context.watch<AppViewModel>()` (for rebuilds) or `context.read<AppViewModel>()` (one-shot, for callbacks). No `Consumer`/`Selector` usage anywhere in `lib/`.
 - SDK calls (`OneSignal.User.*`, `OneSignal.Notifications.*`, `OneSignal.InAppMessages.*`, etc.) are invoked directly from `AppViewModel`. There is no repository wrapper.
-- `OneSignalApiService` is a plain Dart class that owns the OneSignal REST API calls (send notification, live activity update/end, fetch user). Not a ChangeNotifier.
+
+### REST client
+
+- `OneSignalApiService` is a plain Dart class (not a `ChangeNotifier`) that owns the OneSignal REST API calls -- send notification, fetch user, Live Activity update/end.
 
 ### Persistence
 
@@ -83,21 +103,44 @@ Use **Provider** for dependency injection and **ChangeNotifier** for reactive st
 
 In `main.dart`, restore SDK state from `SharedPreferences` cache BEFORE `initialize`:
 ```dart
-OneSignal.consentRequired(cachedConsentRequired);
-OneSignal.consentGiven(cachedPrivacyConsent);
-OneSignal.initialize(appId);
+OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
+OneSignal.consentRequired(prefs.consentRequired);
+OneSignal.consentGiven(prefs.privacyConsent);
+await OneSignal.initialize(appId);
 ```
 
 Then AFTER initialize:
 ```dart
-OneSignal.InAppMessages.paused(cachedPausedStatus);
-OneSignal.Location.setShared(cachedLocationShared);
+OneSignal.LiveActivities.setupDefault(
+  options: LiveActivitySetupOptions(
+    enablePushToStart: true,
+    enablePushToUpdate: true,
+  ),
+);
+OneSignal.InAppMessages.paused(prefs.iamPaused);
+OneSignal.Location.setShared(prefs.locationShared);
 ```
 
-In `AppViewModel.loadInitialState()`, read UI state from the SDK (not cached prefs):
-- `OneSignal.InAppMessages.arePaused()` for IAM paused state
-- `OneSignal.Location.isShared()` for location state
-- `OneSignal.User.getExternalId()` for external user ID
+`main.dart` also registers listeners before `runApp()`:
+- IAM: `addWillDisplayListener`, `addDidDisplayListener`, `addWillDismissListener`, `addDidDismissListener`, `addClickListener`
+- Notifications: `addClickListener`, `addForegroundWillDisplayListener` (calls `event.notification.display()`)
+- `TooltipHelper().init()` fetches tooltip content in the background.
+- `appId` falls back to a hard-coded `_defaultAppId` constant when `ONESIGNAL_APP_ID` is not set in `.env`.
+
+`PreferencesService` is the source of truth for restored UI state. In `AppViewModel.loadInitialState(appId)`, read UI state from `_prefs` (not from the SDK):
+```dart
+_consentRequired = _prefs.consentRequired;
+_privacyConsentGiven = _prefs.privacyConsent;
+_externalUserId = _prefs.externalUserId;
+_iamPaused = _prefs.iamPaused;
+_locationShared = _prefs.locationShared;
+
+if (_externalUserId != null) {
+  OneSignal.login(_externalUserId!);
+}
+```
+
+The cached `externalUserId` is the only value that drives an SDK call inside `loadInitialState()` -- it triggers `OneSignal.login(...)` so the SDK identity matches the persisted UI state. Push subscription id, opted-in flag, and permission are then read from the live SDK state, and the OneSignal ID is fetched via `OneSignal.User.getOnesignalId()`.
 
 ### Observers
 
@@ -113,29 +156,42 @@ OneSignal.User.addObserver(...)
 ## Flutter-Specific UI Details
 
 ### Notification Permission
-- Call `viewModel.promptPush()` in `initState()` of `HomeScreen`
+- Wraps the call in `WidgetsBinding.instance.addPostFrameCallback` inside `initState()` (`home_screen.dart` lines ~39-41) so the prompt fires after the first frame.
 
 ### Loading State
-- No global loading overlay; render an inline `CircularProgressIndicator` inside the section that owns the in-flight work (e.g. user section while `isLoading` is true).
+- No global loading overlay. `vm.isLoading` is passed to `PairList(loading: ...)` in **aliases**, **emails**, **sms**, and **tags** sections only. `user_section.dart` has no loading UI.
 - The viewmodel uses a request-sequence counter (`_fetchSequence`) so stale REST results are dropped when a newer fetch is already in flight.
 
 ### SnackBar Messages
-- `AppSnackBar` extension on `BuildContext` defined in `theme.dart`
-- Call `context.showSnackBar(message)` directly from widget callbacks
-- Automatically hides the current SnackBar before showing the new one
-
-### Send In-App Message Icons
-- TOP BANNER: `Icons.vertical_align_top`
-- BOTTOM BANNER: `Icons.vertical_align_bottom`
-- CENTER MODAL: `Icons.crop_square`
-- FULL SCREEN: `Icons.fullscreen`
+- `AppSnackBar` extension on `BuildContext` defined in `lib/theme.dart` exposes `context.showSnackBar(message)`.
+- The extension calls `ScaffoldMessenger.of(this)..hideCurrentSnackBar()..showSnackBar(SnackBar(content: Text(message), duration: _toastDuration))` for replace-on-show behavior.
+- Duration is the file-private constant `const Duration _toastDuration = Duration(seconds: 3);` in `theme.dart`.
+- Section widgets call `context.showSnackBar(...)` from button callbacks, guarded by `if (context.mounted)`. Only Outcomes, Custom Events, and Location check trigger snackbars; everything else uses `debugPrint(...)`. Outcomes and Custom Events call synchronous viewmodel methods then show the snackbar (no `await` on the SDK). Only Location's `CHECK LOCATION SHARED` button truly awaits (`vm.checkLocationShared()`) before showing the result.
+- The `ChangeNotifier` / viewmodel must not hold snackbar state or expose snackbar messages.
 
 ### Dialogs
-- All dialogs use `insetPadding: EdgeInsets.symmetric(horizontal: 16)` and `SizedBox(width: double.maxFinite)` on content for full-width layout
-- `MultiSelectRemoveDialog` uses `CheckboxListTile`
-- `TextEditingController`s are properly disposed in `StatefulWidget`s
-- JSON parsing via `jsonDecode` returns `Map<String, dynamic>` for Track Event
-- Single-field input prompts (e.g. login, add email/SMS, add trigger) reuse a single `SingleInputDialog` widget that takes `title`, `fieldLabel`, `confirmLabel`, and `semanticsLabel`. Avoid creating a per-screen dialog widget when one input is needed.
+- The home screen widget owns layout + the tooltip dialog only. Tooltip presentation is via a private method `_showTooltipDialog(BuildContext, String key)` on the home state (`home_screen.dart` line ~44), wired to each section through an `onInfoTap` callback. No `_activeTooltipKey` field, no `ChangeNotifier` involvement.
+- Section action dialogs call `showDialog<T>(context: context, builder: ...)` inline inside each button's `onPressed` handler (see `aliases_section.dart`, `outcomes_section.dart`) and `await` the typed result. Only `HomeScreen` has a private `_show*Dialog` method, and only for the tooltip. No `*Open` booleans are required because Flutter presents dialogs imperatively; the awaited result drives the SDK call + optional `context.showSnackBar(...)`.
+- Shared dialog widgets live in `lib/widgets/dialogs.dart` (or `lib/widgets/dialogs/`). Reuse the single `SingleInputDialog` widget for any one-field input (takes `title`, `fieldLabel`, `confirmLabel`, `semanticsLabel`) -- do not create per-screen one-field dialogs.
+- All dialogs use `insetPadding: EdgeInsets.symmetric(horizontal: 16)` and `SizedBox(width: double.maxFinite)` on content for full-width layout. `MultiSelectRemoveDialog` uses `CheckboxListTile`. `TextEditingController`s are disposed in the dialog's `StatefulWidget`. JSON parsing via `jsonDecode` returns `Map<String, dynamic>` for Track Event.
+- `dialogs.dart` also defines `PairInputDialog`, `MultiPairInputDialog`, `OutcomeDialog`, `TrackEventDialog`, `CustomNotificationDialog`, and `TooltipDialog` beyond `SingleInputDialog` and `MultiSelectRemoveDialog`.
+- The viewmodel must not hold dialog visibility flags or dialog input drafts.
+
+### Live Activities (iOS only)
+- `LiveActivitiesSection` is rendered only when `defaultTargetPlatform == TargetPlatform.iOS` (`home_screen.dart` line ~118).
+- `OneSignal.LiveActivities.setupDefault(options: LiveActivitySetupOptions(enablePushToStart: true, enablePushToUpdate: true))` is called in `main.dart` after `OneSignal.initialize`.
+- REST update/end is performed via `OneSignalApiService` using `ONESIGNAL_API_KEY`. The update/end buttons are disabled when `vm.hasApiKey` is false.
+- While an update is in flight, `isLaUpdating` disables the update button rather than showing a spinner (`live_activities_section.dart`).
+- Native sources live at `ios/OneSignalWidget/` (Live Activity widget extension) and `ios/OneSignalNotificationServiceExtension/`.
+
+---
+
+## iOS native config
+
+- `ios/Runner/Info.plist` includes:
+  - `NSSupportsLiveActivities` (enables ActivityKit-backed Live Activities).
+  - Location usage strings (`NSLocationWhenInUseUsageDescription`, etc.).
+  - `UIBackgroundModes` containing `remote-notification` for silent push handling.
 
 ---
 
@@ -182,11 +238,16 @@ examples/demo/
 │           ├── custom_events_section.dart
 │           ├── live_activities_section.dart
 │           └── location_section.dart
+├── assets/
+│   └── onesignal_logo.svg
 ├── android/
+│   └── app/
+│       └── build.gradle.kts
 ├── ios/
-├── pubspec.yaml
-├── google-services.json
-└── agconnect-services.json
+│   ├── OneSignalWidget/
+│   └── OneSignalNotificationServiceExtension/
+├── .env
+└── pubspec.yaml
 ```
 
 ---
@@ -201,5 +262,11 @@ examples/demo/
 - **Semantics** widgets for accessibility and Appium test automation
 - **Immutable state** where possible; lists exposed as unmodifiable views from the ViewModel
 - **Material 3** theming with `ColorScheme.fromSeed`
-- **Minimal rebuilds** via `Consumer`/`Selector` from Provider
+- **Scoped rebuilds** via `context.watch<AppViewModel>()` in `build`, `context.read<AppViewModel>()` in callbacks
 - **No platform channels needed** since the OneSignal Flutter SDK handles all bridging
+
+---
+
+## Sibling examples
+
+- `examples/demo_pods/` exists alongside the pub-based `examples/demo/` in the SDK repo. It is a separate sample whose dependency wiring differs from `demo/`.

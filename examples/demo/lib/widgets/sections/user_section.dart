@@ -88,9 +88,6 @@ class UserSection extends StatelessWidget {
               );
               if (result != null && context.mounted) {
                 await vm.loginUser(result);
-                if (context.mounted) {
-                  context.showSnackBar('Logged in as $result');
-                }
               }
             },
           ),
@@ -101,9 +98,6 @@ class UserSection extends StatelessWidget {
               semanticsLabel: 'logout_user_button',
               onPressed: () async {
                 await vm.logoutUser();
-                if (context.mounted) {
-                  context.showSnackBar('User logged out');
-                }
               },
             ),
           ],

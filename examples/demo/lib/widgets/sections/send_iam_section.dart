@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import '../../models/in_app_message_type.dart';
 import '../../theme.dart';
 import '../../viewmodels/app_viewmodel.dart';
+import '../action_button.dart';
 import '../section_card.dart';
 
 class SendIamSection extends StatelessWidget {
@@ -22,32 +23,10 @@ class SendIamSection extends StatelessWidget {
       child: Column(
         spacing: AppSpacing.gap,
         children: InAppMessageType.values.map((type) {
-          return Semantics(
-            identifier: 'send_iam_${type.triggerValue}_button',
-            container: true,
-            button: true,
-            child: SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => vm.sendInAppMessage(type),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.osPrimary,
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(double.infinity, 48),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  children: [
-                    Icon(type.icon, size: 18),
-                    const SizedBox(width: 8),
-                    Text(type.label.toUpperCase()),
-                  ],
-                ),
-              ),
-            ),
+          return PrimaryButton(
+            label: type.label.toUpperCase(),
+            onPressed: () => vm.sendInAppMessage(type),
+            semanticsLabel: 'send_iam_${type.triggerValue}_button',
           );
         }).toList(),
       ),
