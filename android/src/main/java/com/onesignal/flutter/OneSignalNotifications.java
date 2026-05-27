@@ -228,6 +228,12 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     }
 
     void onDetachedFromEngine() {
+        // The Flutter engine can be torn down before OneSignal.initialize() has been
+        // called from Dart (cold start, fast finish, etc.). Calling getNotifications()
+        // in that state throws IllegalStateException from the native SDK. See #1149.
+        if (!OneSignal.isInitialized()) {
+            return;
+        }
         // Unsubscribe so clicks while the engine is dead get queued by the native SDK
         // instead of dispatched on a detached channel.
         OneSignal.getNotifications().removeClickListener(this);
