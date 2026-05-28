@@ -1,0 +1,46 @@
+name: demo
+description: OneSignal Flutter SDK Demo App
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  # Issue #1138 reproduction: use the in-tree SDK (currently 5.5.5) — this
+  # is the "broken" combo where the affected users report
+  # addClickListener never firing on Android background/killed taps.
+  onesignal_flutter:
+    path: ../../
+  # Firebase Messaging added to mimic the affected users' setup
+  # (they use FCM alongside OneSignal for a chat feature).
+  firebase_core: ^3.8.0
+  firebase_messaging: ^15.1.5
+  provider: ^6.1.0
+  shared_preferences: ^2.3.0
+  http: ^1.2.0
+  url_launcher: ^6.2.0
+  flutter_svg: ^2.0.0
+  flutter_dotenv: ^5.2.1
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter_launcher_icons:
+  android: true
+  ios: true
+  remove_alpha_ios: true
+  image_path: "assets/onesignal_logo_icon_padded.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/onesignal_logo_icon_padded.png"
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/onesignal_logo.svg
+    - .env

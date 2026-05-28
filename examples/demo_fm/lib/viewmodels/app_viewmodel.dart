@@ -1,0 +1,564 @@
+import 'package:flutter/foundation.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+
+import '../models/in_app_message_type.dart';
+import '../models/notification_type.dart';
+import '../services/onesignal_api_service.dart';
+import '../services/preferences_service.dart';
+
+List<MapEntry<String, String>> _mergePairs(
+  List<MapEntry<String, String>> prev,
+  Map<String, String> next,
+) {
+  final merged = <String, String>{
+    for (final e in prev) e.key: e.value,
+    ...next,
+  };
+  return merged.entries.toList();
+}
+
+List<T> _mergeUnique<T>(List<T> prev, List<T> next) =>
+    {...prev, ...next}.toList();
+
+class AppViewModel extends ChangeNotifier {
+  final OneSignalApiService _apiService;
+  final PreferencesService _prefs;
+
+  AppViewModel(this._apiService, this._prefs);
+
+  static const _orderStatuses = [
+    {
+      'status': 'preparing',
+      'message': 'Your order is being prepared',
+      'estimatedTime': '15 min',
+    },
+    {
+      'status': 'on_the_way',
+      'message': 'Driver is heading your way',
+      'estimatedTime': '10 min',
+    },
+    {'status': 'delivered', 'message': 'Order delivered!', 'estimatedTime': ''},
+  ];
+
+  // Loading state
+  bool _isLoading = false;
+  bool get isLoading => _isLoading;
+
+  // Increments per fetchUserDataFromApi() call so stale results are dropped
+  // when a newer fetch is already in flight (e.g. cold-start fetch racing the
+  // user-change observer's fetch right after login).
+  int _fetchSequence = 0;
+
+  // App state
+  String _appId = '';
+  String get appId => _appId;
+
+  bool _consentRequired = false;
+  bool get consentRequired => _consentRequired;
+
+  bool _privacyConsentGiven = false;
+  bool get privacyConsentGiven => _privacyConsentGiven;
+
+  String? _externalUserId;
+  String? get externalUserId => _externalUserId;
+
+  bool get isLoggedIn => _externalUserId != null;
+
+  String? _oneSignalId;
+  String? get oneSignalId => _oneSignalId;
+
+  // Push state
+  String? _pushSubscriptionId;
+  // The native bridge can hand back an empty string before the subscription
+  // id is provisioned. Treat that as "no id yet" so the UI's `?? '—'`
+  // fallback renders the placeholder instead of an empty cell.
+  String? get pushSubscriptionId =>
+      (_pushSubscriptionId?.isEmpty ?? true) ? null : _pushSubscriptionId;
+
+  bool _pushEnabled = false;
+  bool get pushEnabled => _pushEnabled;
+
+  bool _hasNotificationPermission = false;
+  bool get hasNotificationPermission => _hasNotificationPermission;
+
+  // IAM state
+  bool _iamPaused = false;
+  bool get iamPaused => _iamPaused;
+
+  // Location state
+  bool _locationShared = false;
+  bool get locationShared => _locationShared;
+
+  // Live Activity state
+  String _activityId = 'order-1';
+  String get activityId => _activityId;
+
+  String _orderNumber = 'ORD-1234';
+  String get orderNumber => _orderNumber;
+
+  int _statusIndex = 0;
+
+  bool _isLaUpdating = false;
+  bool get isLaUpdating => _isLaUpdating;
+
+  bool get hasApiKey => _apiService.hasApiKey();
+
+  String get nextStatusLabel {
+    final nextIndex = (_statusIndex + 1) % _orderStatuses.length;
+    final status = _orderStatuses[nextIndex]['status']!;
+    return status.toUpperCase().replaceAll('_', ' ');
+  }
+
+  // Data lists
+  List<MapEntry<String, String>> _aliasesList = [];
+  List<MapEntry<String, String>> get aliasesList =>
+      List.unmodifiable(_aliasesList);
+
+  List<String> _emailsList = [];
+  List<String> get emailsList => List.unmodifiable(_emailsList);
+
+  List<String> _smsNumbersList = [];
+  List<String> get smsNumbersList => List.unmodifiable(_smsNumbersList);
+
+  List<MapEntry<String, String>> _tagsList = [];
+  List<MapEntry<String, String>> get tagsList => List.unmodifiable(_tagsList);
+
+  List<MapEntry<String, String>> _triggersList = [];
+  List<MapEntry<String, String>> get triggersList =>
+      List.unmodifiable(_triggersList);
+
+  // Initialize
+  Future<void> loadInitialState(String appId) async {
+    _appId = appId;
+
+    _consentRequired = _prefs.consentRequired;
+    _privacyConsentGiven = _prefs.privacyConsent;
+    _externalUserId = _prefs.externalUserId;
+
+    _iamPaused = _prefs.iamPaused;
+    _locationShared = _prefs.locationShared;
+
+    if (_externalUserId != null) {
+      OneSignal.login(_externalUserId!);
+    }
+
+    _pushSubscriptionId = OneSignal.User.pushSubscription.id;
+    _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? false;
+    _hasNotificationPermission = OneSignal.Notifications.permission;
+
+    final onesignalId = await OneSignal.User.getOnesignalId();
+    _oneSignalId = onesignalId;
+
+    notifyListeners();
+
+    if (onesignalId == null) return;
+
+    // fetchUserDataFromApi owns _isLoading + notifyListeners.
+    await fetchUserDataFromApi();
+  }
+
+  // Observers
+  void setupObservers() {
+    OneSignal.User.pushSubscription.addObserver((state) {
+      _pushSubscriptionId = state.current.id;
+      _pushEnabled = state.current.optedIn;
+      debugPrint(
+        'Push subscription changed: id=${state.current.id}, optedIn=${state.current.optedIn}',
+      );
+      notifyListeners();
+    });
+
+    OneSignal.Notifications.addPermissionObserver((permission) {
+      _hasNotificationPermission = permission;
+      debugPrint('Permission changed: $permission');
+      notifyListeners();
+    });
+
+    OneSignal.User.addObserver((state) {
+      final nextOnesignalId = state.current.onesignalId;
+      debugPrint(
+        'User changed: onesignalId=${nextOnesignalId ?? 'null'}, externalId=${state.current.externalId ?? 'null'}',
+      );
+
+      _oneSignalId = nextOnesignalId;
+      notifyListeners();
+
+      // Drive the post-login fetch from the observer so it runs only once the
+      // SDK has actually assigned a new onesignalId. Logout clears it to null;
+      // skip the fetch in that case (logoutUser already clears local lists).
+      if (nextOnesignalId == null) return;
+      fetchUserDataFromApi();
+    });
+  }
+
+  // Fetch user data from API. Owns the isLoading toggle and uses a
+  // request-sequence guard so stale results are dropped if a newer fetch
+  // started before this one finishes.
+  Future<void> fetchUserDataFromApi() async {
+    final requestId = ++_fetchSequence;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      final onesignalId = await OneSignal.User.getOnesignalId();
+      if (onesignalId == null) return;
+
+      final userData = await _apiService.fetchUser(onesignalId);
+      if (userData == null) return;
+
+      if (_fetchSequence != requestId) return;
+
+      _aliasesList = _mergePairs(_aliasesList, userData.aliases);
+      _tagsList = _mergePairs(_tagsList, userData.tags);
+      _emailsList = _mergeUnique(_emailsList, userData.emails);
+      _smsNumbersList = _mergeUnique(_smsNumbersList, userData.smsNumbers);
+
+      if (userData.externalId != null) {
+        _externalUserId = userData.externalId;
+        await _prefs.setExternalUserId(userData.externalId);
+      }
+    } catch (e) {
+      debugPrint('fetchUserDataFromApi error: $e');
+    } finally {
+      if (_fetchSequence == requestId) {
+        _isLoading = false;
+      }
+      notifyListeners();
+    }
+  }
+
+  // Login / Logout
+  Future<void> loginUser(String externalUserId) async {
+    _aliasesList = [];
+    _emailsList = [];
+    _smsNumbersList = [];
+    _tagsList = [];
+    _triggersList = [];
+    _externalUserId = externalUserId;
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await OneSignal.login(externalUserId);
+      await _prefs.setExternalUserId(externalUserId);
+      debugPrint('Logged in as: $externalUserId');
+      // The User observer runs fetchUserDataFromApi once the new onesignalId
+      // is assigned; that call clears _isLoading in its finally.
+    } catch (e) {
+      debugPrint('Login error: $e');
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<void> logoutUser() async {
+    _externalUserId = null;
+    _aliasesList = [];
+    _emailsList = [];
+    _smsNumbersList = [];
+    _tagsList = [];
+    _triggersList = [];
+    notifyListeners();
+
+    try {
+      await OneSignal.logout();
+      await _prefs.setExternalUserId(null);
+      debugPrint('Logged out');
+    } catch (e) {
+      debugPrint('Logout error: $e');
+    }
+  }
+
+  // Consent
+  Future<void> setConsentRequired(bool value) async {
+    _consentRequired = value;
+    OneSignal.consentRequired(value);
+    await _prefs.setConsentRequired(value);
+    if (!value) {
+      _privacyConsentGiven = false;
+      await _prefs.setPrivacyConsent(false);
+    }
+    notifyListeners();
+  }
+
+  Future<void> setPrivacyConsent(bool value) async {
+    _privacyConsentGiven = value;
+    OneSignal.consentGiven(value);
+    await _prefs.setPrivacyConsent(value);
+    notifyListeners();
+  }
+
+  // Push
+  void togglePush(bool enabled) {
+    if (enabled) {
+      OneSignal.User.pushSubscription.optIn();
+    } else {
+      OneSignal.User.pushSubscription.optOut();
+    }
+    _pushEnabled = enabled;
+    notifyListeners();
+    debugPrint('Push ${enabled ? "enabled" : "disabled"}');
+  }
+
+  Future<void> promptPush() => OneSignal.Notifications.requestPermission(true);
+
+  // Notifications
+  Future<void> sendNotification(NotificationType type) async {
+    final subscriptionId = OneSignal.User.pushSubscription.id;
+    if (subscriptionId == null) {
+      debugPrint('No subscription ID for notification');
+      return;
+    }
+    final success = await _apiService.sendNotification(type, subscriptionId);
+    if (success) {
+      debugPrint('Notification sent: ${type.name}');
+    } else {
+      debugPrint('Failed to send notification');
+    }
+  }
+
+  Future<void> sendCustomNotification(String title, String body) async {
+    final subscriptionId = OneSignal.User.pushSubscription.id;
+    if (subscriptionId == null) {
+      debugPrint('No subscription ID for custom notification');
+      return;
+    }
+    final success = await _apiService.sendCustomNotification(
+      title,
+      body,
+      subscriptionId,
+    );
+    if (success) {
+      debugPrint('Custom notification sent');
+    } else {
+      debugPrint('Failed to send notification');
+    }
+  }
+
+  void clearAllNotifications() {
+    OneSignal.Notifications.clearAll();
+    debugPrint('All notifications cleared');
+  }
+
+  // IAM
+  Future<void> setIamPaused(bool paused) async {
+    _iamPaused = paused;
+    OneSignal.InAppMessages.paused(paused);
+    await _prefs.setIamPaused(paused);
+    notifyListeners();
+  }
+
+  void sendInAppMessage(InAppMessageType type) {
+    OneSignal.InAppMessages.addTrigger('iam_type', type.triggerValue);
+    _triggersList = _mergePairs(_triggersList, {'iam_type': type.triggerValue});
+    notifyListeners();
+    debugPrint('Sent In-App Message: ${type.label}');
+  }
+
+  // Aliases
+  void addAlias(String label, String id) {
+    OneSignal.User.addAlias(label, id);
+    _aliasesList = _mergePairs(_aliasesList, {label: id});
+    notifyListeners();
+    debugPrint('Alias added: $label');
+  }
+
+  void addAliases(Map<String, String> aliases) {
+    OneSignal.User.addAliases(aliases);
+    _aliasesList = _mergePairs(_aliasesList, aliases);
+    notifyListeners();
+    debugPrint('${aliases.length} alias(es) added');
+  }
+
+  // Emails
+  void addEmail(String email) {
+    OneSignal.User.addEmail(email);
+    _emailsList = _mergeUnique(_emailsList, [email]);
+    notifyListeners();
+    debugPrint('Email added: $email');
+  }
+
+  void removeEmail(String email) {
+    OneSignal.User.removeEmail(email);
+    _emailsList = List.from(_emailsList)..remove(email);
+    notifyListeners();
+    debugPrint('Email removed: $email');
+  }
+
+  // SMS
+  void addSms(String smsNumber) {
+    OneSignal.User.addSms(smsNumber);
+    _smsNumbersList = _mergeUnique(_smsNumbersList, [smsNumber]);
+    notifyListeners();
+    debugPrint('SMS added: $smsNumber');
+  }
+
+  void removeSms(String smsNumber) {
+    OneSignal.User.removeSms(smsNumber);
+    _smsNumbersList = List.from(_smsNumbersList)..remove(smsNumber);
+    notifyListeners();
+    debugPrint('SMS removed: $smsNumber');
+  }
+
+  // Tags
+  void addTag(String key, String value) {
+    OneSignal.User.addTagWithKey(key, value);
+    _tagsList = _mergePairs(_tagsList, {key: value});
+    notifyListeners();
+    debugPrint('Tag added: $key');
+  }
+
+  void addTags(Map<String, String> tags) {
+    OneSignal.User.addTags(tags);
+    _tagsList = _mergePairs(_tagsList, tags);
+    notifyListeners();
+    debugPrint('${tags.length} tag(s) added');
+  }
+
+  void removeTag(String key) {
+    OneSignal.User.removeTag(key);
+    _tagsList = List.from(_tagsList)..removeWhere((e) => e.key == key);
+    notifyListeners();
+    debugPrint('Tag removed: $key');
+  }
+
+  void removeSelectedTags(List<String> keys) {
+    OneSignal.User.removeTags(keys);
+    _tagsList = List.from(_tagsList)..removeWhere((e) => keys.contains(e.key));
+    notifyListeners();
+    debugPrint('${keys.length} tag(s) removed');
+  }
+
+  // Triggers (in-memory only)
+  void addTrigger(String key, String value) {
+    OneSignal.InAppMessages.addTrigger(key, value);
+    _triggersList = _mergePairs(_triggersList, {key: value});
+    notifyListeners();
+    debugPrint('Trigger added: $key');
+  }
+
+  void addTriggers(Map<String, String> triggers) {
+    OneSignal.InAppMessages.addTriggers(triggers);
+    _triggersList = _mergePairs(_triggersList, triggers);
+    notifyListeners();
+    debugPrint('${triggers.length} trigger(s) added');
+  }
+
+  void removeTrigger(String key) {
+    OneSignal.InAppMessages.removeTrigger(key);
+    _triggersList = List.from(_triggersList)..removeWhere((e) => e.key == key);
+    notifyListeners();
+    debugPrint('Trigger removed: $key');
+  }
+
+  void removeSelectedTriggers(List<String> keys) {
+    OneSignal.InAppMessages.removeTriggers(keys);
+    _triggersList = List.from(_triggersList)
+      ..removeWhere((e) => keys.contains(e.key));
+    notifyListeners();
+    debugPrint('${keys.length} trigger(s) removed');
+  }
+
+  void clearAllTriggers() {
+    OneSignal.InAppMessages.clearTriggers();
+    _triggersList = [];
+    notifyListeners();
+    debugPrint('All triggers cleared');
+  }
+
+  // Outcomes
+  void sendOutcome(String name) {
+    OneSignal.Session.addOutcome(name);
+    debugPrint('Outcome sent: $name');
+  }
+
+  void sendUniqueOutcome(String name) {
+    OneSignal.Session.addUniqueOutcome(name);
+    debugPrint('Unique outcome sent: $name');
+  }
+
+  void sendOutcomeWithValue(String name, double value) {
+    OneSignal.Session.addOutcomeWithValue(name, value);
+    debugPrint('Outcome sent: $name = $value');
+  }
+
+  // Custom Events
+  void trackEvent(String name, Map<String, dynamic>? properties) {
+    OneSignal.User.trackEvent(name, properties);
+    debugPrint('Event tracked: $name');
+  }
+
+  // Live Activities
+  void setActivityId(String id) {
+    _activityId = id;
+    notifyListeners();
+  }
+
+  void setOrderNumber(String number) {
+    _orderNumber = number;
+    notifyListeners();
+  }
+
+  Future<void> startLiveActivity() async {
+    final attributes = {'orderNumber': _orderNumber};
+    final content = Map<String, dynamic>.from(_orderStatuses[0]);
+    _statusIndex = 0;
+    await OneSignal.LiveActivities.startDefault(
+      _activityId,
+      attributes,
+      content,
+    );
+    notifyListeners();
+    debugPrint('Started Live Activity: $_activityId');
+  }
+
+  Future<void> updateLiveActivity() async {
+    _isLaUpdating = true;
+    notifyListeners();
+
+    final nextIndex = (_statusIndex + 1) % _orderStatuses.length;
+    final content = Map<String, dynamic>.from(_orderStatuses[nextIndex]);
+    final eventUpdates = {'data': content};
+    final success = await _apiService.updateLiveActivity(
+      _activityId,
+      eventUpdates,
+    );
+
+    _isLaUpdating = false;
+    if (success) {
+      _statusIndex = nextIndex;
+      debugPrint('Updated Live Activity: $_activityId');
+    } else {
+      debugPrint('Failed to update Live Activity');
+    }
+    notifyListeners();
+  }
+
+  Future<void> endLiveActivity() async {
+    final success = await _apiService.endLiveActivity(_activityId);
+    if (success) {
+      _statusIndex = 0;
+      debugPrint('Ended Live Activity: $_activityId');
+    } else {
+      debugPrint('Failed to end Live Activity');
+    }
+    notifyListeners();
+  }
+
+  // Location
+  Future<void> setLocationShared(bool shared) async {
+    _locationShared = shared;
+    OneSignal.Location.setShared(shared);
+    await _prefs.setLocationShared(shared);
+    notifyListeners();
+    debugPrint('Location sharing ${shared ? "enabled" : "disabled"}');
+  }
+
+  void promptLocation() {
+    OneSignal.Location.requestPermission();
+  }
+
+  Future<bool> checkLocationShared() async {
+    return await OneSignal.Location.isShared();
+  }
+}

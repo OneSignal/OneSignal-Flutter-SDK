@@ -1,0 +1,6 @@
+#include "Generated.xcconfig"
+
+// Skip dSYM emission in release builds. We don't ship to the App Store from
+// this app and don't need symbolicated crash reports, so DWARF-only saves
+// build time.
+DEBUG_INFORMATION_FORMAT = dwarf
