@@ -45,26 +45,45 @@ public class OneSignalPlugin extends FlutterMessengerResponder
 
     @Override
     public void onDetachedFromEngine(@NonNull FlutterPlugin.FlutterPluginBinding binding) {
-        onDetachedFromEngine();
-    }
-
-    private void onDetachedFromEngine() {
-        OneSignalNotifications.getSharedInstance().onDetachedFromEngine();
+        // #1138: pass the detaching engine's messenger so a background (FlutterFire)
+        // engine detaching doesn't tear down the listener bound to the UI engine.
+        OneSignalNotifications.getSharedInstance().onDetachedFromEngine(binding.getBinaryMessenger());
     }
 
     @Override
     public void onAttachedToActivity(@NonNull ActivityPluginBinding binding) {
         this.context = binding.getActivity();
+        rebindChannelsToActivityEngine();
     }
 
     @Override
-    public void onDetachedFromActivity() {}
+    public void onDetachedFromActivity() {
+        // #1138: unregister so the native SDK queues clicks until a new activity attaches.
+        OneSignalNotifications.getSharedInstance().onDetachedFromActivity();
+    }
 
     @Override
-    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {}
+    public void onReattachedToActivityForConfigChanges(@NonNull ActivityPluginBinding binding) {
+        this.context = binding.getActivity();
+        rebindChannelsToActivityEngine();
+    }
+
+    /**
+     * #1138: (re)bind the process-global singleton channels to the engine that
+     * hosts the activity (the UI isolate), so native callbacks aren't routed to a
+     * FlutterFire background engine that has no listeners.
+     */
+    private void rebindChannelsToActivityEngine() {
+        OneSignalNotifications.getSharedInstance().onAttachedToActivity(this.messenger);
+        OneSignalUser.getSharedInstance().onAttachedToActivity(this.messenger);
+        OneSignalPushSubscription.getSharedInstance().onAttachedToActivity(this.messenger);
+        OneSignalInAppMessages.getSharedInstance().onAttachedToActivity(this.messenger);
+    }
 
     @Override
-    public void onDetachedFromActivityForConfigChanges() {}
+    public void onDetachedFromActivityForConfigChanges() {
+        OneSignalNotifications.getSharedInstance().onDetachedFromActivity();
+    }
 
     @Override
     public void onMethodCall(MethodCall call, Result result) {

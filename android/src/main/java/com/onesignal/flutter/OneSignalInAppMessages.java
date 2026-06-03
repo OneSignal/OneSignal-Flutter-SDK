@@ -11,7 +11,6 @@ import com.onesignal.inAppMessages.IInAppMessageWillDismissEvent;
 import com.onesignal.inAppMessages.IInAppMessageWillDisplayEvent;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
-import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import java.util.Collection;
@@ -33,10 +32,11 @@ public class OneSignalInAppMessages extends FlutterMessengerResponder
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalInAppMessages controller = getSharedInstance();
+        controller.bindChannelIfUnbound(messenger, "OneSignal#inappmessages", controller);
+    }
 
-        controller.messenger = messenger;
-        controller.channel = new MethodChannel(messenger, "OneSignal#inappmessages");
-        controller.channel.setMethodCallHandler(controller);
+    void onAttachedToActivity(BinaryMessenger activityMessenger) {
+        rebindChannelToEngine(activityMessenger, "OneSignal#inappmessages", this);
     }
 
     @Override

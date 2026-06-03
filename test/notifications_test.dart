@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onesignal_flutter/src/defines.dart';
@@ -269,6 +271,134 @@ void main() {
 
         // One listener should still be in the list
         expect(true, true);
+      });
+    });
+
+    group('Click Buffering', () {
+      final clickData = {
+        'notification': {
+          'notificationId': 'buffered-click-id',
+          'title': 'Test',
+          'body': 'Test body'
+        },
+        'result': {'action_id': null, 'url': null}
+      };
+
+      test('click arriving before any listener is buffered and delivered',
+          () async {
+        channelController.simulateNotificationEvent(
+            'OneSignal#onClickNotification', clickData);
+
+        final received = <OSNotificationClickEvent>[];
+        notifications.addClickListener(received.add);
+
+        // The drain is deferred to a microtask.
+        await Future<void>.delayed(Duration.zero);
+
+        expect(received.length, 1);
+        expect(received.first.notification.notificationId, 'buffered-click-id');
+      });
+
+      test(
+          'buffered click fans out to all listeners registered before the drain',
+          () async {
+        channelController.simulateNotificationEvent(
+            'OneSignal#onClickNotification', clickData);
+
+        // Both listeners register synchronously (e.g. analytics then nav) before
+        // the deferred drain runs, so both receive the cold-start click.
+        var firstReceived = 0;
+        var secondReceived = 0;
+        notifications.addClickListener((event) => firstReceived++);
+        notifications.addClickListener((event) => secondReceived++);
+
+        await Future<void>.delayed(Duration.zero);
+
+        expect(firstReceived, 1);
+        expect(secondReceived, 1);
+      });
+
+      test('drain survives a listener that removes itself during its callback',
+          () async {
+        channelController.simulateNotificationEvent(
+            'OneSignal#onClickNotification', clickData);
+
+        var received = 0;
+        late OnNotificationClickListener oneShot;
+        oneShot = (event) {
+          received++;
+          notifications.removeClickListener(oneShot);
+        };
+        notifications.addClickListener(oneShot);
+
+        // Mutating _clickListeners mid-drain must not throw
+        // ConcurrentModificationError or drop the event.
+        await Future<void>.delayed(Duration.zero);
+
+        expect(received, 1);
+      });
+
+      test('drain continues after a listener throws for one event', () async {
+        final firstClickData = {
+          'notification': {
+            'notificationId': 'first-click-id',
+            'title': 'First',
+            'body': 'Test body'
+          },
+          'result': {'action_id': null, 'url': null}
+        };
+        final secondClickData = {
+          'notification': {
+            'notificationId': 'second-click-id',
+            'title': 'Second',
+            'body': 'Test body'
+          },
+          'result': {'action_id': null, 'url': null}
+        };
+        channelController.simulateNotificationEvent(
+            'OneSignal#onClickNotification', firstClickData);
+        channelController.simulateNotificationEvent(
+            'OneSignal#onClickNotification', secondClickData);
+
+        final received = <String>[];
+        final errors = <Object>[];
+        final guarded = runZonedGuarded<Future<void>>(() async {
+          notifications.addClickListener((event) {
+            final notificationId = event.notification.notificationId;
+            received.add(notificationId);
+            if (notificationId == 'first-click-id') {
+              throw StateError('boom');
+            }
+          });
+
+          await Future<void>.delayed(Duration.zero);
+        }, (error, stackTrace) {
+          errors.add(error);
+        });
+
+        await guarded;
+
+        expect(received, ['first-click-id', 'second-click-id']);
+        expect(errors, hasLength(1));
+        expect(errors.single, isA<StateError>());
+      });
+
+      test('clicks are not buffered after the first listener has registered',
+          () async {
+        var firstReceived = 0;
+        notifications.addClickListener((event) => firstReceived++);
+
+        // A click after registration is delivered live, not buffered.
+        channelController.simulateNotificationEvent(
+            'OneSignal#onClickNotification', clickData);
+        expect(firstReceived, 1);
+
+        // A later listener does not receive the earlier (already delivered)
+        // click; nothing is buffered once a listener has registered.
+        var secondReceived = 0;
+        notifications.addClickListener((event) => secondReceived++);
+        await Future<void>.delayed(Duration.zero);
+        expect(secondReceived, 0);
       });
     });
 

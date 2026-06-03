@@ -6,7 +6,6 @@ import com.onesignal.user.subscriptions.IPushSubscriptionObserver;
 import com.onesignal.user.subscriptions.PushSubscriptionChangedState;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
-import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import org.json.JSONException;
@@ -26,9 +25,11 @@ public class OneSignalPushSubscription extends FlutterMessengerResponder
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalPushSubscription controller = getSharedInstance();
-        controller.messenger = messenger;
-        controller.channel = new MethodChannel(messenger, "OneSignal#pushsubscription");
-        controller.channel.setMethodCallHandler(controller);
+        controller.bindChannelIfUnbound(messenger, "OneSignal#pushsubscription", controller);
+    }
+
+    void onAttachedToActivity(BinaryMessenger activityMessenger) {
+        rebindChannelToEngine(activityMessenger, "OneSignal#pushsubscription", this);
     }
 
     @Override

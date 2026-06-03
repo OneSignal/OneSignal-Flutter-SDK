@@ -39,6 +39,7 @@
     sharedInstance = [OSFlutterNotifications new];
     sharedInstance.onWillDisplayEventCache = [NSMutableDictionary new];
     sharedInstance.preventedDefaultCache = [NSMutableDictionary new];
+    sharedInstance.willDisplayDispatchingIds = [NSMutableSet new];
   });
   return sharedInstance;
 }
@@ -120,6 +121,9 @@
   [OneSignal.Notifications addForegroundLifecycleListener:self];
   [OneSignal.Notifications removePermissionObserver:self];
   [OneSignal.Notifications addPermissionObserver:self];
+  [self.onWillDisplayEventCache removeAllObjects];
+  [self.preventedDefaultCache removeAllObjects];
+  [self.willDisplayDispatchingIds removeAllObjects];
   result(nil);
 }
 
@@ -138,12 +142,37 @@
 #pragma mark Received in Notification Lifecycle Event
 
 - (void)onWillDisplayNotification:(OSNotificationWillDisplayEvent *)event {
-  self.onWillDisplayEventCache[event.notification.notificationId] = event;
+  NSString *notificationId = event.notification.notificationId;
+  // An id still mid-dispatch means this is a re-entrant willDisplay caused by
+  // another UNUserNotificationCenterDelegate (e.g. firebase_messaging)
+  // forwarding the original willPresent back into OneSignal's swizzled handler.
+  // Tracked separately from the event cache so the cache can outlive the
+  // dispatch (a prevented notification may be displayed later) without a stale
+  // entry suppressing a genuinely new notification that reuses the id.
+  BOOL isReentrantDuplicate =
+      [self.willDisplayDispatchingIds containsObject:notificationId];
   /// Our bridge layer needs to preventDefault so that the Flutter listener has
   /// time to preventDefault before the notification is displayed
   [event preventDefault];
+  // Only forward the first dispatch to Flutter so the listener fires once.
+  if (isReentrantDuplicate) {
+    return;
+  }
+  [self.willDisplayDispatchingIds addObject:notificationId];
+  self.onWillDisplayEventCache[notificationId] = event;
   [self.channel invokeMethod:@"OneSignal#onWillDisplayNotification"
                    arguments:event.toJson];
+  // The re-entrant willPresent forwarding (e.g. firebase_messaging) happens
+  // synchronously within this same runloop iteration, so deferring removal to
+  // the next iteration keeps the guard live for exactly that window. Pinning it
+  // to the dispatch end (rather than proceedWithWillDisplay:, which depends on
+  // a Dart round-trip that can be slow or never complete if a listener throws)
+  // avoids both misclassifying a genuinely new same-id push and leaking the id
+  // permanently.
+  __weak typeof(self) weakSelf = self;
+  dispatch_async(dispatch_get_main_queue(), ^{
+    [weakSelf.willDisplayDispatchingIds removeObject:notificationId];
+  });
 }
 
 /// Our bridge layer needs to preventDefault so that the Flutter listener has
@@ -154,22 +183,27 @@
 - (void)proceedWithWillDisplay:(FlutterMethodCall *)call
                     withResult:(FlutterResult)result {
   NSString *notificationId = call.arguments[@"notificationId"];
+  // Defensive: the id is normally cleared on the runloop iteration after the
+  // willDisplay dispatch (see onWillDisplayNotification:). This catches any
+  // case where that hasn't happened yet.
+  [self.willDisplayDispatchingIds removeObject:notificationId];
   OSNotificationWillDisplayEvent *event =
       self.onWillDisplayEventCache[notificationId];
   if (!event) {
-    [OneSignalLog
-        onesignalLog:ONE_S_LL_ERROR
-             message:[NSString
-                         stringWithFormat:
-                             @"OneSignal (objc): could not find notification "
-                             @"will display event for notification with id: %@",
-                             notificationId]];
+    // Already consumed for this id, typically because a listener called
+    // notification.display() (which displays and evicts) before this automatic
+    // proceed ran. Nothing left to do.
+    result(nil);
     return;
   }
   if (self.preventedDefaultCache[notificationId]) {
+    // Keep the cached event so the app can still call display() later.
+    result(nil);
     return;
   }
   [event.notification display];
+  // Displayed: evict so the cache doesn't grow without bound.
+  [self.onWillDisplayEventCache removeObjectForKey:notificationId];
   result(nil);
 }
 
@@ -201,16 +235,17 @@
       self.onWillDisplayEventCache[notificationId];
 
   if (!event) {
-    [OneSignalLog
-        onesignalLog:ONE_S_LL_ERROR
-             message:[NSString
-                         stringWithFormat:
-                             @"OneSignal (objc): could not find notification "
-                             @"will display event for notification with id: %@",
-                             notificationId]];
+    // Already consumed for this id, typically because a sibling willDisplay
+    // listener already called display() (which displays and evicts). The
+    // OneSignal-iOS display is idempotent, so this is a benign no-op rather
+    // than an error.
+    result(nil);
     return;
   }
   [event.notification display];
+  // Manual display ends this notification's lifecycle; drop both cache entries.
+  [self.onWillDisplayEventCache removeObjectForKey:notificationId];
+  [self.preventedDefaultCache removeObjectForKey:notificationId];
   result(nil);
 }
 

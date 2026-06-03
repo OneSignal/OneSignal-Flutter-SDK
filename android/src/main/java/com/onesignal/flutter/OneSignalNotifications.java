@@ -29,6 +29,10 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
     private final HashMap<String, INotificationWillDisplayEvent> preventedDefaultCache = new HashMap<>();
 
+    // #1138: tracks if Dart requested clicks, so we can queue (not drop) them
+    // while the channel is detached across engine/activity lifecycles.
+    private boolean clickListenerRequested = false;
+
     public static OneSignalNotifications getSharedInstance() {
         if (sharedInstance == null) {
             sharedInstance = new OneSignalNotifications();
@@ -73,9 +77,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalNotifications controller = getSharedInstance();
-        controller.messenger = messenger;
-        controller.channel = new MethodChannel(messenger, "OneSignal#notifications");
-        controller.channel.setMethodCallHandler(controller);
+        controller.bindChannelIfUnbound(messenger, "OneSignal#notifications", controller);
     }
 
     @Override
@@ -227,16 +229,51 @@ public class OneSignalNotifications extends FlutterMessengerResponder
         invokeMethodOnUiThread("OneSignal#onNotificationPermissionDidChange", hash);
     }
 
-    void onDetachedFromEngine() {
-        // The Flutter engine can be torn down before OneSignal.initialize() has been
-        // called from Dart (cold start, fast finish, etc.). Calling getNotifications()
-        // in that state throws IllegalStateException from the native SDK. See #1149.
+    void onDetachedFromEngine(BinaryMessenger detachingMessenger) {
+        // #1138: ignore a FlutterFire background engine detaching — removing the
+        // listener bound to the live UI engine would drop the next click (the UI
+        // engine fires no activity event, so nothing re-adds it).
+        if (detachingMessenger != null && detachingMessenger != this.messenger) {
+            return;
+        }
+        // #1149: engine can be torn down before Dart calls initialize().
         if (!OneSignal.isInitialized()) {
             return;
         }
-        // Unsubscribe so clicks while the engine is dead get queued by the native SDK
-        // instead of dispatched on a detached channel.
+        // Unsubscribe so clicks get queued by the native SDK, not dropped.
         OneSignal.getNotifications().removeClickListener(this);
+    }
+
+    /**
+     * Same as {@link #onDetachedFromEngine} but for when the engine survives and
+     * only the host activity is destroyed (e.g. back-pressed out of MainActivity).
+     */
+    void onDetachedFromActivity() {
+        if (!OneSignal.isInitialized()) {
+            return;
+        }
+        OneSignal.getNotifications().removeClickListener(this);
+    }
+
+    /**
+     * #1138: rebind the shared channel to the UI engine on (re)attach and drain
+     * any clicks the native SDK queued while detached.
+     */
+    void onAttachedToActivity(BinaryMessenger activityMessenger) {
+        // Rebind the shared channel so callbacks hit the now-foreground engine.
+        rebindChannelToEngine(activityMessenger, "OneSignal#notifications", this);
+        // Re-add the listener so the native SDK drains any clicks queued while
+        // detached. Works for fresh, FCM-background, and pre-warmed cached engines
+        // alike: a pre-warmed engine's Dart already ran main() and won't re-call
+        // OneSignal#addNativeClickListener, so the rebind alone wouldn't restore it.
+        // Draining before this engine's Dart listeners exist is safe — the Dart
+        // bridge buffers clicks that arrive with no listeners and flushes them once
+        // addClickListener runs.
+        if (!clickListenerRequested || !OneSignal.isInitialized()) {
+            return;
+        }
+        OneSignal.getNotifications().removeClickListener(this);
+        OneSignal.getNotifications().addClickListener(this);
     }
 
     private void lifecycleInit(Result result) {
@@ -250,6 +287,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     }
 
     private void registerClickListener() {
+        clickListenerRequested = true;
         OneSignal.getNotifications().removeClickListener(this);
         OneSignal.getNotifications().addClickListener(this);
     }

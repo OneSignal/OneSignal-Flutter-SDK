@@ -9,9 +9,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  # Issue #1138 reproduction: use the in-tree SDK (currently 5.5.5) — this
-  # is the "broken" combo where the affected users report
-  # addClickListener never firing on Android background/killed taps.
+  # Issue #1138 reproduction: use the in-tree SDK — this is the "broken" combo
+  # where the affected users report addClickListener never firing on Android
+  # background/killed taps.
   onesignal_flutter:
     path: ../../
   # Firebase Messaging added to mimic the affected users' setup
