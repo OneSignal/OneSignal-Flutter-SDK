@@ -39,6 +39,11 @@ Future<void> main() async {
   // intercepting push payloads (matches the affected users' setup).
   try {
     await Firebase.initializeApp();
+    final fcmToken = await FirebaseMessaging.instance.getToken();
+    debugPrint('[FCM token] $fcmToken');
+    FirebaseMessaging.instance.onTokenRefresh.listen((token) {
+      debugPrint('[FCM token] $token');
+    });
     FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
       debugPrint('[FCM fg] received: ${message.messageId} data=${message.data}');
