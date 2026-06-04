@@ -104,12 +104,7 @@ Future<void> main() async {
   OneSignal.InAppMessages.addClickListener((event) {
     debugPrint('IAM clicked: ${event.message.messageId}');
   });
-
-  // Register notification listeners (second, "late" listener — kept to verify
-  // both early and late-registered listeners behave the same for issue #1138).
-  OneSignal.Notifications.addClickListener((event) {
-    debugPrint('[ISSUE-1138 late] addClickListener fired: ${event.notification.title}');
-  });
+  
   OneSignal.Notifications.addForegroundWillDisplayListener((event) {
     debugPrint(
       'Notification foreground will display: ${event.notification.title}',
