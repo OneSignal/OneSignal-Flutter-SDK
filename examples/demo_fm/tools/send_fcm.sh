@@ -93,10 +93,11 @@ case "$mode" in
   data)
     # Data-only message. android.priority=high + apns content-available=1 so the
     # app is woken in the background/killed state on both platforms.
+    # APNs requires apns-push-type=background for silent pushes on modern iOS.
     # NOTE: on iOS this is a silent push and is throttled/unreliable, especially
     # on the simulator and in the foreground. Use 'both' to test data on iOS, or
     # test 'data' on Android where data-only delivery is reliable.
-    payload='{"message":{"token":"'"$token"'","android":{"priority":"high"},"apns":{"headers":{"apns-priority":"5"},"payload":{"aps":{"content-available":1}}},"data":{"alert":"data only","source":"fcm-direct"}}}'
+    payload='{"message":{"token":"'"$token"'","android":{"priority":"high"},"apns":{"headers":{"apns-priority":"5","apns-push-type":"background"},"payload":{"aps":{"content-available":1}}},"data":{"alert":"data only","source":"fcm-direct"}}}'
     ;;
   both)
     # Notification + data. Delivered as a normal alert (reliable on iOS) while

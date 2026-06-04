@@ -16,8 +16,8 @@ dependencies:
     path: ../../
   # Firebase Messaging added to mimic the affected users' setup
   # (they use FCM alongside OneSignal for a chat feature).
-  firebase_core: ^3.8.0
-  firebase_messaging: ^15.1.5
+  firebase_core: ^4.10.0
+  firebase_messaging: ^16.3.0
   provider: ^6.1.0
   shared_preferences: ^2.3.0
   http: ^1.2.0
