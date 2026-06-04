@@ -162,8 +162,17 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.pushSubscription.addObserver((state) {
       _pushSubscriptionId = state.current.id;
       _pushEnabled = state.current.optedIn;
+
+      String fmtToken(String? t) {
+        if (t == null || t.isEmpty) return 'null';
+        return t.length > 8 ? '${t.substring(0, 8)}…' : t;
+      }
+
       debugPrint(
-        'Push subscription changed: id=${state.current.id}, optedIn=${state.current.optedIn}',
+        'Push subscription changed: '
+        'id=${state.previous.id ?? 'null'} → ${state.current.id ?? 'null'}, '
+        'optedIn=${state.previous.optedIn} → ${state.current.optedIn}, '
+        'token=${fmtToken(state.previous.token)} → ${fmtToken(state.current.token)}',
       );
       notifyListeners();
     });

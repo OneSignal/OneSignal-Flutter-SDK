@@ -59,7 +59,7 @@ Future<void> main() async {
     debugPrint('IAM did dismiss: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addClickListener((event) {
-    debugPrint('IAM clicked: ${event.result.actionId}');
+    debugPrint('IAM clicked: ${event.message.messageId}');
   });
 
   // Register notification listeners

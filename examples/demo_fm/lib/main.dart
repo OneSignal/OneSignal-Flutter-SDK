@@ -42,7 +42,7 @@ Future<void> main() async {
     final fcmToken = await FirebaseMessaging.instance.getToken();
     debugPrint('[FCM token] $fcmToken');
     FirebaseMessaging.instance.onTokenRefresh.listen((token) {
-      debugPrint('[FCM token] $token');
+      debugPrint('[FCM token refresh] $token');
     });
     FirebaseMessaging.onBackgroundMessage(_firebaseBackgroundHandler);
     FirebaseMessaging.onMessage.listen((RemoteMessage message) {
@@ -102,7 +102,7 @@ Future<void> main() async {
     debugPrint('IAM did dismiss: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addClickListener((event) {
-    debugPrint('IAM clicked: ${event.result.actionId}');
+    debugPrint('IAM clicked: ${event.message.messageId}');
   });
 
   // Register notification listeners (second, "late" listener — kept to verify
