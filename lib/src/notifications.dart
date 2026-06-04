@@ -16,6 +16,18 @@ class OneSignalNotifications {
   // event listeners
   List<OnNotificationClickListener> _clickListeners =
       <OnNotificationClickListener>[];
+  // Clicks that arrived before the app's first click listener was registered
+  // (e.g. a cold-start / cached-engine attach drains the native queue before
+  // addClickListener runs). Buffered here instead of dropped, then flushed once
+  // a listener registers. Only filled during this initial window: after the
+  // first registration clicks are delivered or dropped, never buffered again.
+  List<OSNotificationClickEvent> _pendingClickEvents =
+      <OSNotificationClickEvent>[];
+  // Upper bound on buffered pre-registration clicks so the buffer can't grow
+  // unbounded if a listener is never registered. Oldest events drop past this.
+  static const int _maxPendingClickEvents = 50;
+  // Guards against scheduling more than one buffer-drain microtask.
+  bool _pendingClickDrainScheduled = false;
   List<OnNotificationWillDisplayListener> _willDisplayListeners =
       <OnNotificationWillDisplayListener>[];
 
@@ -125,9 +137,20 @@ class OneSignalNotifications {
 
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#onClickNotification') {
-      for (var listener in _clickListeners) {
-        listener(
-            OSNotificationClickEvent(call.arguments.cast<String, dynamic>()));
+      var event =
+          OSNotificationClickEvent(call.arguments.cast<String, dynamic>());
+      if (_clickListeners.isNotEmpty) {
+        for (var listener in _clickListeners) {
+          listener(event);
+        }
+      } else if (!_clickHandlerRegistered) {
+        // Buffer only before the app's first listener registration. Once a
+        // listener has been registered (and possibly removed) drop instead, so
+        // removing a listener doesn't silently accumulate clicks forever.
+        if (_pendingClickEvents.length >= _maxPendingClickEvents) {
+          _pendingClickEvents.removeAt(0);
+        }
+        _pendingClickEvents.add(event);
       }
     } else if (call.method == 'OneSignal#onWillDisplayNotification') {
       for (var listener in _willDisplayListeners) {
@@ -180,6 +203,34 @@ class OneSignalNotifications {
       _channel.invokeMethod("OneSignal#addNativeClickListener");
     }
     _clickListeners.add(listener);
+    // Deliver any clicks that arrived before a listener existed. The drain is
+    // deferred to a microtask so that listeners registered synchronously at
+    // startup (e.g. analytics then navigation) are all enrolled before it runs,
+    // then the buffered clicks fan out to every listener, matching the live
+    // delivery in _handleMethod. The buffer is drained once and never refilled.
+    if (_pendingClickEvents.isNotEmpty && !_pendingClickDrainScheduled) {
+      _pendingClickDrainScheduled = true;
+      scheduleMicrotask(() {
+        _pendingClickDrainScheduled = false;
+        if (_pendingClickEvents.isEmpty) {
+          return;
+        }
+        var pending = _pendingClickEvents;
+        _pendingClickEvents = <OSNotificationClickEvent>[];
+        for (var event in pending) {
+          // Snapshot so a listener that adds/removes a listener during its
+          // callback (e.g. a self-removing one-shot deep-link handler) doesn't
+          // trigger a ConcurrentModificationError mid-drain.
+          for (var clickListener in List.of(_clickListeners)) {
+            try {
+              clickListener(event);
+            } catch (error, stackTrace) {
+              Zone.current.handleUncaughtError(error, stackTrace);
+            }
+          }
+        }
+      });
+    }
   }
 
   void removeClickListener(OnNotificationClickListener listener) {

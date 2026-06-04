@@ -37,5 +37,10 @@
 + (instancetype)sharedInstance;
 @property(strong, nonatomic) NSMutableDictionary *onWillDisplayEventCache;
 @property(strong, nonatomic) NSMutableDictionary *preventedDefaultCache;
+// Notification ids whose willDisplay is still being dispatched to Flutter. Used
+// only to suppress re-entrant willDisplay duplicates (e.g. firebase_messaging
+// forwarding willPresent back into OneSignal's swizzled handler) without keying
+// off the event cache, which must persist for a later display() call.
+@property(strong, nonatomic) NSMutableSet *willDisplayDispatchingIds;
 
 @end

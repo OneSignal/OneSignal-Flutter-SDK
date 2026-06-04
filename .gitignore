@@ -30,3 +30,9 @@ dlcov.log
 **/Package.resolved
 **/.lock
 **/workspace-state.json
+
+# Per-developer Firebase config for issue #1138 repro scaffolding
+# (only needed because firebase_messaging is wired into examples/demo;
+# OneSignal itself does NOT need this file).
+**/google-services.json
+**/GoogleService-Info.plist

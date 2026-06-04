@@ -6,7 +6,6 @@ import com.onesignal.user.state.IUserStateObserver;
 import com.onesignal.user.state.UserChangedState;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
-import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import java.util.List;
@@ -27,9 +26,11 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
 
     static void registerWith(BinaryMessenger messenger) {
         OneSignalUser controller = getSharedInstance();
-        controller.messenger = messenger;
-        controller.channel = new MethodChannel(messenger, "OneSignal#user");
-        controller.channel.setMethodCallHandler(controller);
+        controller.bindChannelIfUnbound(messenger, "OneSignal#user", controller);
+    }
+
+    void onAttachedToActivity(BinaryMessenger activityMessenger) {
+        rebindChannelToEngine(activityMessenger, "OneSignal#user", this);
     }
 
     @Override

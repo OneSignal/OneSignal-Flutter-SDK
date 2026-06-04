@@ -1,0 +1,272 @@
+import 'package:flutter/material.dart';
+
+import '../theme.dart';
+
+class PairItem extends StatelessWidget {
+  final String sectionKey;
+  final String keyText;
+  final String valueText;
+  final VoidCallback? onDelete;
+
+  const PairItem({
+    super.key,
+    required this.sectionKey,
+    required this.keyText,
+    required this.valueText,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Semantics(
+                  identifier: '${sectionKey}_pair_key_$keyText',
+                  container: true,
+                  child: Text(
+                    keyText,
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                ),
+                Semantics(
+                  identifier: '${sectionKey}_pair_value_$keyText',
+                  container: true,
+                  child: Text(
+                    valueText,
+                    style: Theme.of(
+                      context,
+                    ).textTheme.bodySmall?.copyWith(color: AppColors.osGrey600),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (onDelete != null)
+            Semantics(
+              identifier: '${sectionKey}_remove_$keyText',
+              container: true,
+              child: GestureDetector(
+                onTap: onDelete,
+                child: Icon(Icons.close, size: 18, color: AppColors.osPrimary),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class SingleItem extends StatelessWidget {
+  final String sectionKey;
+  final String text;
+  final VoidCallback? onDelete;
+
+  const SingleItem({
+    super.key,
+    required this.sectionKey,
+    required this.text,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 4),
+      child: Row(
+        children: [
+          Expanded(
+            child: Semantics(
+              identifier: '${sectionKey}_value_$text',
+              container: true,
+              child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+            ),
+          ),
+          if (onDelete != null)
+            Semantics(
+              identifier: '${sectionKey}_remove_$text',
+              container: true,
+              child: GestureDetector(
+                onTap: onDelete,
+                child: Icon(Icons.close, size: 18, color: AppColors.osPrimary),
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+class EmptyState extends StatelessWidget {
+  final String text;
+  final String? sectionKey;
+
+  const EmptyState({super.key, required this.text, this.sectionKey});
+
+  @override
+  Widget build(BuildContext context) {
+    final label = Text(
+      text,
+      style: Theme.of(
+        context,
+      ).textTheme.bodyMedium?.copyWith(color: AppColors.osGrey600),
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Center(
+        child: sectionKey == null
+            ? label
+            : Semantics(
+                identifier: '${sectionKey}_empty',
+                container: true,
+                child: label,
+              ),
+      ),
+    );
+  }
+}
+
+class LoadingState extends StatelessWidget {
+  final String? sectionKey;
+
+  const LoadingState({super.key, this.sectionKey});
+
+  @override
+  Widget build(BuildContext context) {
+    final indicator = SizedBox(
+      width: 20,
+      height: 20,
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: AppColors.osPrimary,
+      ),
+    );
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 12),
+      child: Center(
+        child:
+            sectionKey == null
+                ? indicator
+                : Semantics(
+                  identifier: '${sectionKey}_loading',
+                  container: true,
+                  child: indicator,
+                ),
+      ),
+    );
+  }
+}
+
+class PairList extends StatelessWidget {
+  final String sectionKey;
+  final List<MapEntry<String, String>> items;
+  final String emptyText;
+  final bool loading;
+  final void Function(String key)? onDelete;
+
+  const PairList({
+    super.key,
+    required this.sectionKey,
+    required this.items,
+    required this.emptyText,
+    this.loading = false,
+    this.onDelete,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    if (items.isEmpty) {
+      return loading
+          ? LoadingState(sectionKey: sectionKey)
+          : EmptyState(text: emptyText, sectionKey: sectionKey);
+    }
+
+    return Column(
+      children: [
+        for (var i = 0; i < items.length; i++) ...[
+          PairItem(
+            key: ValueKey('${items[i].key}_${items[i].value}'),
+            sectionKey: sectionKey,
+            keyText: items[i].key,
+            valueText: items[i].value,
+            onDelete: onDelete != null ? () => onDelete!(items[i].key) : null,
+          ),
+          if (i < items.length - 1) const Divider(height: 1),
+        ],
+      ],
+    );
+  }
+}
+
+class CollapsibleList extends StatefulWidget {
+  final String sectionKey;
+  final List<String> items;
+  final String emptyText;
+  final void Function(String item) onDelete;
+  final int maxVisible;
+  final bool loading;
+
+  const CollapsibleList({
+    super.key,
+    required this.sectionKey,
+    required this.items,
+    required this.emptyText,
+    required this.onDelete,
+    this.maxVisible = 5,
+    this.loading = false,
+  });
+
+  @override
+  State<CollapsibleList> createState() => _CollapsibleListState();
+}
+
+class _CollapsibleListState extends State<CollapsibleList> {
+  bool _expanded = false;
+
+  @override
+  Widget build(BuildContext context) {
+    if (widget.items.isEmpty) {
+      return widget.loading
+          ? LoadingState(sectionKey: widget.sectionKey)
+          : EmptyState(text: widget.emptyText, sectionKey: widget.sectionKey);
+    }
+
+    final showAll = _expanded || widget.items.length <= widget.maxVisible;
+    final visibleItems =
+        showAll ? widget.items : widget.items.take(widget.maxVisible).toList();
+    final remaining = widget.items.length - widget.maxVisible;
+
+    return Column(
+      children: [
+        for (var i = 0; i < visibleItems.length; i++) ...[
+          SingleItem(
+            key: ValueKey(visibleItems[i]),
+            sectionKey: widget.sectionKey,
+            text: visibleItems[i],
+            onDelete: () => widget.onDelete(visibleItems[i]),
+          ),
+          if (i < visibleItems.length - 1) const Divider(height: 1),
+        ],
+        if (!showAll && remaining > 0)
+          GestureDetector(
+            onTap: () => setState(() => _expanded = true),
+            child: Padding(
+              padding: const EdgeInsets.symmetric(vertical: 4),
+              child: Text(
+                '$remaining more',
+                style: TextStyle(
+                  color: Theme.of(context).colorScheme.primary,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
+      ],
+    );
+  }
+}
