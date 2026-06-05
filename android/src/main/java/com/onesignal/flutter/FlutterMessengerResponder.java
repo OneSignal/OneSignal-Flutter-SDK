@@ -3,12 +3,25 @@ package com.onesignal.flutter;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import com.onesignal.debug.internal.logging.Logging;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import java.util.HashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 
 abstract class FlutterMessengerResponder {
+    private static final ExecutorService BACKGROUND_EXECUTOR = Executors.newSingleThreadExecutor(new ThreadFactory() {
+        @Override
+        public Thread newThread(Runnable runnable) {
+            Thread thread = new Thread(runnable, "OneSignalFlutterBg");
+            thread.setDaemon(true);
+            return thread;
+        }
+    });
+
     Context context;
     protected MethodChannel channel;
     BinaryMessenger messenger;
@@ -102,6 +115,20 @@ abstract class FlutterMessengerResponder {
             Handler handler = new Handler(Looper.getMainLooper());
             handler.post(runnable);
         }
+    }
+
+    void runOnBackgroundThread(final MethodChannel.Result result, final Runnable runnable) {
+        BACKGROUND_EXECUTOR.execute(new Runnable() {
+            @Override
+            public void run() {
+                try {
+                    runnable.run();
+                } catch (Exception e) {
+                    Logging.error("Encountered an error while handling a Flutter method call: " + e.toString(), e);
+                    replyError(result, "OneSignal", e.getMessage(), null);
+                }
+            }
+        });
     }
 
     void invokeMethodOnUiThread(final String methodName, final HashMap map) {
