@@ -33,7 +33,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder
 
     // #1138: tracks if Dart requested clicks, so we can queue (not drop) them
     // while the channel is detached across engine/activity lifecycles.
-    private boolean clickListenerRequested = false;
+    private volatile boolean clickListenerRequested = false;
 
     public static OneSignalNotifications getSharedInstance() {
         if (sharedInstance == null) {
