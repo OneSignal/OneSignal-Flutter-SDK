@@ -28,7 +28,16 @@ public class OneSignalLocation extends FlutterMessengerResponder implements Meth
     }
 
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
+    public void onMethodCall(final MethodCall call, final Result result) {
+        runOnBackgroundThread(result, new Runnable() {
+            @Override
+            public void run() {
+                handleMethodCall(call, result);
+            }
+        });
+    }
+
+    private void handleMethodCall(MethodCall call, Result result) {
         if (call.method.contentEquals("OneSignal#requestPermission")) this.requestPermission(result);
         else if (call.method.contentEquals("OneSignal#setShared")) this.setShared(call, result);
         else if (call.method.contentEquals("OneSignal#isShared"))

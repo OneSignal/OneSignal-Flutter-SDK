@@ -40,7 +40,16 @@ public class OneSignalInAppMessages extends FlutterMessengerResponder
     }
 
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
+    public void onMethodCall(final MethodCall call, final Result result) {
+        runOnBackgroundThread(result, new Runnable() {
+            @Override
+            public void run() {
+                handleMethodCall(call, result);
+            }
+        });
+    }
+
+    private void handleMethodCall(MethodCall call, Result result) {
         if (call.method.contentEquals("OneSignal#addTrigger")) this.addTriggers(call, result);
         else if (call.method.contentEquals("OneSignal#addTriggers")) this.addTriggers(call, result);
         else if (call.method.contentEquals("OneSignal#removeTrigger")) this.removeTrigger(call, result);

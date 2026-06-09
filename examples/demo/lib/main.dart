@@ -70,7 +70,8 @@ Future<void> main() async {
     debugPrint(
       'Notification foreground will display: ${event.notification.title}',
     );
-    event.notification.display();
+    // event.preventDefault(); // This will prevent the notification from being displayed
+    // event.notification.display(); // This will override the preventDefault and display the notification
   });
 
   // Set up API service

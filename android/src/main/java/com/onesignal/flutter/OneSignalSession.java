@@ -27,7 +27,16 @@ public class OneSignalSession extends FlutterMessengerResponder implements Metho
     }
 
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
+    public void onMethodCall(final MethodCall call, final Result result) {
+        runOnBackgroundThread(result, new Runnable() {
+            @Override
+            public void run() {
+                handleMethodCall(call, result);
+            }
+        });
+    }
+
+    private void handleMethodCall(MethodCall call, Result result) {
         if (call.method.contentEquals("OneSignal#addOutcome")) this.addOutcome(call, result);
         else if (call.method.contentEquals("OneSignal#addUniqueOutcome")) this.addUniqueOutcome(call, result);
         else if (call.method.contentEquals("OneSignal#addOutcomeWithValue")) this.addOutcomeWithValue(call, result);

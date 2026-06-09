@@ -16,6 +16,7 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import kotlin.coroutines.Continuation;
 import kotlin.coroutines.CoroutineContext;
 import kotlinx.coroutines.Dispatchers;
@@ -26,12 +27,13 @@ public class OneSignalNotifications extends FlutterMessengerResponder
         implements MethodCallHandler, INotificationClickListener, INotificationLifecycleListener, IPermissionObserver {
     private static OneSignalNotifications sharedInstance;
 
-    private final HashMap<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache = new HashMap<>();
-    private final HashMap<String, INotificationWillDisplayEvent> preventedDefaultCache = new HashMap<>();
+    private final Map<String, INotificationWillDisplayEvent> notificationOnWillDisplayEventCache =
+            new ConcurrentHashMap<>();
+    private final Map<String, INotificationWillDisplayEvent> preventedDefaultCache = new ConcurrentHashMap<>();
 
     // #1138: tracks if Dart requested clicks, so we can queue (not drop) them
     // while the channel is detached across engine/activity lifecycles.
-    private boolean clickListenerRequested = false;
+    private volatile boolean clickListenerRequested = false;
 
     public static OneSignalNotifications getSharedInstance() {
         if (sharedInstance == null) {
@@ -81,7 +83,23 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     }
 
     @Override
-    public void onMethodCall(MethodCall call, Result result) {
+    public void onMethodCall(final MethodCall call, final Result result) {
+        // These paths only use cached foreground events and must not wait behind
+        // SDK calls that can block during initialization.
+        if (call.method.contentEquals("OneSignal#displayNotification")) this.displayNotification(call, result);
+        else if (call.method.contentEquals("OneSignal#preventDefault")) this.preventDefault(call, result);
+        else if (call.method.contentEquals("OneSignal#proceedWithWillDisplay"))
+            this.proceedWithWillDisplay(call, result);
+        else
+            runOnBackgroundThread(result, new Runnable() {
+                @Override
+                public void run() {
+                    handleMethodCall(call, result);
+                }
+            });
+    }
+
+    private void handleMethodCall(MethodCall call, Result result) {
         if (call.method.contentEquals("OneSignal#permission"))
             replySuccess(result, OneSignal.getNotifications().getPermission());
         else if (call.method.contentEquals("OneSignal#canRequest"))
@@ -91,11 +109,7 @@ public class OneSignalNotifications extends FlutterMessengerResponder
         else if (call.method.contentEquals("OneSignal#removeGroupedNotifications"))
             this.removeGroupedNotifications(call, result);
         else if (call.method.contentEquals("OneSignal#clearAll")) this.clearAll(call, result);
-        else if (call.method.contentEquals("OneSignal#displayNotification")) this.displayNotification(call, result);
-        else if (call.method.contentEquals("OneSignal#preventDefault")) this.preventDefault(call, result);
         else if (call.method.contentEquals("OneSignal#lifecycleInit")) this.lifecycleInit(result);
-        else if (call.method.contentEquals("OneSignal#proceedWithWillDisplay"))
-            this.proceedWithWillDisplay(call, result);
         else if (call.method.contentEquals("OneSignal#addNativeClickListener")) this.registerClickListener();
         else replyNotImplemented(result);
     }
