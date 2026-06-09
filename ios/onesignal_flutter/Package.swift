@@ -21,18 +21,6 @@ if !oneSignalDisableLocation {
     oneSignalDependencies.append(.product(name: "OneSignalLocation", package: "OneSignal-XCFramework"))
 }
 
-let oneSignalDisableLocation = Context.environment["ONESIGNAL_DISABLE_LOCATION"] == "true"
-
-var oneSignalDependencies: [Target.Dependency] = [
-    .product(name: "OneSignalFramework", package: "OneSignal-XCFramework"),
-    .product(name: "OneSignalInAppMessages", package: "OneSignal-XCFramework"),
-    .product(name: "OneSignalExtension", package: "OneSignal-XCFramework"),
-]
-
-if !oneSignalDisableLocation {
-    oneSignalDependencies.append(.product(name: "OneSignalLocation", package: "OneSignal-XCFramework"))
-}
-
 let package = Package(
     name: "onesignal_flutter",
     platforms: [
