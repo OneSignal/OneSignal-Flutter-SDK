@@ -1,6 +1,15 @@
 group 'com.onesignal.flutter'
 version '5.5.8'
 
+def safeEnvFlagGet(prop) {
+    def value = System.getenv(prop)
+    def normalizedValue = value?.toString()?.trim()
+    return normalizedValue != null && (normalizedValue.equalsIgnoreCase('true') || normalizedValue == '1')
+}
+
+def oneSignalVersion = '5.9.3'
+def oneSignalDisableLocation = safeEnvFlagGet('ONESIGNAL_DISABLE_LOCATION')
+
 buildscript {
     repositories {
         google()
@@ -38,5 +47,11 @@ android {
 }
 
 dependencies {
-    implementation 'com.onesignal:OneSignal:5.9.3'
+    if (oneSignalDisableLocation) {
+        implementation "com.onesignal:core:${oneSignalVersion}"
+        implementation "com.onesignal:notifications:${oneSignalVersion}"
+        implementation "com.onesignal:in-app-messages:${oneSignalVersion}"
+    } else {
+        implementation "com.onesignal:OneSignal:${oneSignalVersion}"
+    }
 }
