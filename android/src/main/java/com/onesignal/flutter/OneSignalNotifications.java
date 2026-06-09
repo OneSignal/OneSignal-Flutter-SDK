@@ -84,6 +84,8 @@ public class OneSignalNotifications extends FlutterMessengerResponder
 
     @Override
     public void onMethodCall(final MethodCall call, final Result result) {
+        // These paths only use cached foreground events and must not wait behind
+        // SDK calls that can block during initialization.
         if (call.method.contentEquals("OneSignal#displayNotification")) this.displayNotification(call, result);
         else if (call.method.contentEquals("OneSignal#preventDefault")) this.preventDefault(call, result);
         else if (call.method.contentEquals("OneSignal#proceedWithWillDisplay"))
