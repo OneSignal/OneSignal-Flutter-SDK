@@ -2,17 +2,30 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
-const _oneSignalAppId = String.fromEnvironment(
-  'ONESIGNAL_APP_ID',
-  defaultValue: 'YOUR-ONESIGNAL-APP-ID',
-);
+const _defaultOneSignalAppId = 'YOUR-ONESIGNAL-APP-ID';
 const _brandRed = Color(0xFFE54B4D);
 
-void main() {
+late final String _oneSignalAppId;
+
+Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
+  try {
+    await dotenv.load(fileName: '.env');
+  } catch (_) {
+    debugPrint('.env file not found, using defaults');
+  }
+
+  final envAppId = dotenv.env['ONESIGNAL_APP_ID']?.trim();
+  _oneSignalAppId =
+      envAppId != null && envAppId.isNotEmpty
+          ? envAppId
+          : _defaultOneSignalAppId;
+
   SystemChrome.setSystemUIOverlayStyle(
     const SystemUiOverlayStyle(
       statusBarColor: _brandRed,

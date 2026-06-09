@@ -19,13 +19,20 @@ This demo proves the no-location configuration works in a small app:
   `NSLocationAlwaysAndWhenInUseUsageDescription`
 - Android does not request fine or coarse location permissions
 
+## Setup
+
+Copy `.env.example` to `.env` and set your OneSignal app ID:
+
+```sh
+cp .env.example .env
+```
+
 ## iOS
 
 Run or build with the Swift Package Manager location opt-out in the environment:
 
 ```sh
-ONESIGNAL_DISABLE_LOCATION=true flutter run -d ios \
-  --dart-define=ONESIGNAL_APP_ID=your-onesignal-app-id
+ONESIGNAL_DISABLE_LOCATION=true flutter run -d ios
 ```
 
 The app does not include `NSLocationWhenInUseUsageDescription` or
@@ -36,8 +43,7 @@ The app does not include `NSLocationWhenInUseUsageDescription` or
 Run or build with the same location opt-out in the environment:
 
 ```sh
-ONESIGNAL_DISABLE_LOCATION=true flutter run -d android \
-  --dart-define=ONESIGNAL_APP_ID=your-onesignal-app-id
+ONESIGNAL_DISABLE_LOCATION=true flutter run -d android
 ```
 
 The Android manifest does not request fine or coarse location permissions.
