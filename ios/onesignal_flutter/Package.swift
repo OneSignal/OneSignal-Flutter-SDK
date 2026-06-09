@@ -2,6 +2,24 @@
 // The swift-tools-version declares the minimum version of Swift required to build this package.
 
 import PackageDescription
+import Foundation
+
+func oneSignalEnvFlag(_ name: String) -> Bool {
+    let value = Context.environment[name]?.trimmingCharacters(in: .whitespacesAndNewlines).lowercased()
+    return value == "true" || value == "1"
+}
+
+let oneSignalDisableLocation = oneSignalEnvFlag("ONESIGNAL_DISABLE_LOCATION")
+
+var oneSignalDependencies: [Target.Dependency] = [
+    .product(name: "OneSignalFramework", package: "OneSignal-XCFramework"),
+    .product(name: "OneSignalInAppMessages", package: "OneSignal-XCFramework"),
+    .product(name: "OneSignalExtension", package: "OneSignal-XCFramework"),
+]
+
+if !oneSignalDisableLocation {
+    oneSignalDependencies.append(.product(name: "OneSignalLocation", package: "OneSignal-XCFramework"))
+}
 
 let package = Package(
     name: "onesignal_flutter",
@@ -17,12 +35,7 @@ let package = Package(
     targets: [
         .target(
             name: "onesignal_flutter",
-            dependencies: [
-                .product(name: "OneSignalFramework", package: "OneSignal-XCFramework"),
-                .product(name: "OneSignalInAppMessages", package: "OneSignal-XCFramework"),
-                .product(name: "OneSignalLocation", package: "OneSignal-XCFramework"),
-                .product(name: "OneSignalExtension", package: "OneSignal-XCFramework"),
-            ],
+            dependencies: oneSignalDependencies,
             cSettings: [
                 .headerSearchPath("include/onesignal_flutter")
             ]
