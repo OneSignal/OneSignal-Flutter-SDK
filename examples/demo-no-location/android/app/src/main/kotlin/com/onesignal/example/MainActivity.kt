@@ -1,4 +1,4 @@
-package com.onesignal.demo_no_location
+package com.onesignal.example
 
 import io.flutter.embedding.android.FlutterActivity
 
