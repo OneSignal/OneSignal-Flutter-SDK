@@ -29,10 +29,11 @@ cp .env.example .env
 
 ## iOS
 
-Run or build with the Swift Package Manager location opt-out in the environment:
+Run with the helper script so Flutter resolves native dependencies with
+`ONESIGNAL_DISABLE_LOCATION=true`:
 
 ```sh
-ONESIGNAL_DISABLE_LOCATION=true flutter run -d ios
+./run.sh -d ios
 ```
 
 The app does not include `NSLocationWhenInUseUsageDescription` or
@@ -40,10 +41,10 @@ The app does not include `NSLocationWhenInUseUsageDescription` or
 
 ## Android
 
-Run or build with the same location opt-out in the environment:
+Run with the same helper script:
 
 ```sh
-ONESIGNAL_DISABLE_LOCATION=true flutter run -d android
+./run.sh -d android
 ```
 
 The Android manifest does not request fine or coarse location permissions.
