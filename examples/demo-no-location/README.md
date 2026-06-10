@@ -27,6 +27,12 @@ Copy `.env.example` to `.env` and set your OneSignal app ID:
 cp .env.example .env
 ```
 
+Then edit `.env`:
+
+```sh
+ONESIGNAL_APP_ID=your-onesignal-app-id
+```
+
 ## iOS
 
 Run with the helper script so Flutter resolves native dependencies with
