@@ -12,7 +12,7 @@ runs:
       uses: flutter-actions/setup-flutter@v4
       with:
         channel: stable
-        version: "3.35.5"
+        version: "3.44.1"
         cache: true
     - name: Enable Swift Package Manager
       run: flutter config --enable-swift-package-manager
