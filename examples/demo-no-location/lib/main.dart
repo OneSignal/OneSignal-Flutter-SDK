@@ -66,6 +66,8 @@ class _NoLocationDemoScreenState extends State<NoLocationDemoScreen> {
   String? _pushSubscriptionId;
   bool _requestingPermission = false;
   bool _sending = false;
+  late final OnPushSubscriptionChangeObserver _pushSubscriptionObserver;
+  late final OnNotificationPermissionChangeObserver _permissionObserver;
 
   bool get _isPlaceholderAppId =>
       _oneSignalAppId.toLowerCase().startsWith('your-');
@@ -73,12 +75,45 @@ class _NoLocationDemoScreenState extends State<NoLocationDemoScreen> {
   @override
   void initState() {
     super.initState();
+    _pushSubscriptionObserver = (state) {
+      debugPrint('Push subscription state: ${state.jsonRepresentation()}');
+      if (!mounted) return;
+      setState(() {
+        _pushSubscriptionId = state.current.id;
+      });
+    };
+    _permissionObserver = (permission) {
+      debugPrint('Permission changed: $permission');
+      if (!mounted) return;
+      setState(() {
+        _hasNotificationPermission = permission;
+      });
+    };
+    OneSignal.User.pushSubscription.addObserver(_pushSubscriptionObserver);
+    OneSignal.Notifications.addPermissionObserver(_permissionObserver);
+    _initializeOneSignal();
+  }
+
+  @override
+  void dispose() {
+    OneSignal.User.pushSubscription.removeObserver(_pushSubscriptionObserver);
+    OneSignal.Notifications.removePermissionObserver(_permissionObserver);
+    super.dispose();
+  }
+
+  Future<void> _initializeOneSignal() async {
     OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
-    OneSignal.initialize(_oneSignalAppId);
-    _refreshPushState();
+
+    try {
+      await OneSignal.initialize(_oneSignalAppId);
+      _refreshPushState();
+    } catch (error) {
+      debugPrint('OneSignal initialization failed: $error');
+    }
   }
 
   void _refreshPushState() {
+    if (!mounted) return;
     setState(() {
       _hasNotificationPermission = OneSignal.Notifications.permission;
       _pushSubscriptionId = OneSignal.User.pushSubscription.id;
@@ -92,6 +127,7 @@ class _NoLocationDemoScreenState extends State<NoLocationDemoScreen> {
 
     try {
       final granted = await OneSignal.Notifications.requestPermission(false);
+      if (!mounted) return;
       setState(() {
         _hasNotificationPermission = granted;
         _pushSubscriptionId = OneSignal.User.pushSubscription.id;
