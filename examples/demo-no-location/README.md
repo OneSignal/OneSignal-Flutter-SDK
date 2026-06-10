@@ -1,0 +1,59 @@
+# OneSignal No-Location Demo
+
+Minimal Flutter app for verifying OneSignal push without linking the native
+location module.
+
+## Why This Exists
+
+Some apps use OneSignal for push notifications and in-app messages but do not use
+`OneSignal.Location`. Linking the native location module can still make app
+stores detect location APIs. On iOS, that can lead to App Store Connect warnings
+such as `ITMS-90683` and may require location usage descriptions that the app
+does not actually need.
+
+This demo proves the no-location configuration works in a small app:
+
+- push initialization and notification permission requests still work
+- the native location module is excluded from the build
+- iOS does not need `NSLocationWhenInUseUsageDescription` or
+  `NSLocationAlwaysAndWhenInUseUsageDescription`
+- Android does not request fine or coarse location permissions
+
+## Setup
+
+Copy `.env.example` to `.env` and set your OneSignal app ID:
+
+```sh
+cp .env.example .env
+```
+
+Then edit `.env`:
+
+```sh
+ONESIGNAL_APP_ID=your-onesignal-app-id
+```
+
+The `.env` file must exist before the first build because Flutter bundles it as
+an app asset.
+
+## iOS
+
+Run with the helper script so Flutter resolves native dependencies with
+`ONESIGNAL_DISABLE_LOCATION=true`:
+
+```sh
+./run.sh -d ios
+```
+
+The app does not include `NSLocationWhenInUseUsageDescription` or
+`NSLocationAlwaysAndWhenInUseUsageDescription`.
+
+## Android
+
+Run with the same helper script:
+
+```sh
+./run.sh -d android
+```
+
+The Android manifest does not request fine or coarse location permissions.
