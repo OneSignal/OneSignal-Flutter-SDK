@@ -67,7 +67,8 @@ class _NoLocationDemoScreenState extends State<NoLocationDemoScreen> {
   bool _requestingPermission = false;
   bool _sending = false;
 
-  bool get _isPlaceholderAppId => _oneSignalAppId.startsWith('YOUR-');
+  bool get _isPlaceholderAppId =>
+      _oneSignalAppId.toLowerCase().startsWith('your-');
 
   @override
   void initState() {
@@ -118,7 +119,7 @@ class _NoLocationDemoScreenState extends State<NoLocationDemoScreen> {
   Future<void> _sendTestNotification() async {
     if (_isPlaceholderAppId) {
       _showMessage(
-        'Set ONESIGNAL_APP_ID with --dart-define before sending a test push.',
+        'Set ONESIGNAL_APP_ID in .env before sending a test push.',
       );
       return;
     }

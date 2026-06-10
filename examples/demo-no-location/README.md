@@ -33,6 +33,9 @@ Then edit `.env`:
 ONESIGNAL_APP_ID=your-onesignal-app-id
 ```
 
+The `.env` file must exist before the first build because Flutter bundles it as
+an app asset.
+
 ## iOS
 
 Run with the helper script so Flutter resolves native dependencies with
