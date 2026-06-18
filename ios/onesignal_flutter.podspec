@@ -7,7 +7,7 @@ Pod::Spec.new do |s|
   onesignal_disable_location = ['true', '1'].include?(onesignal_disable_location_env)
 
   s.name             = 'onesignal_flutter'
-  s.version          = '5.6.1'
+  s.version          = '5.6.2'
   s.summary          = 'The OneSignal Flutter SDK'
   s.description      = 'Allows you to easily add OneSignal to your flutter projects, to make sending and handling push notifications easy'
   s.homepage         = 'https://www.onesignal.com'
