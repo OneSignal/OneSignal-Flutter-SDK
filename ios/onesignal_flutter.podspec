@@ -2,7 +2,7 @@
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html
 #
 Pod::Spec.new do |s|
-  onesignal_xcframework_version = '5.5.2'
+  onesignal_xcframework_version = '5.5.3'
   onesignal_disable_location_env = ENV['ONESIGNAL_DISABLE_LOCATION'].to_s.strip.downcase
   onesignal_disable_location = ['true', '1'].include?(onesignal_disable_location_env)
 
