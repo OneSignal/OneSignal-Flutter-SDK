@@ -86,7 +86,7 @@ jobs:
           # Get versions from target branch (not the release branch)
           CURRENT_VERSION=$(git show origin/${{ inputs.target_branch }}:pubspec.yaml | grep "^version:" | sed 's/version: //' | tr -d ' ')
           ANDROID_VERSION=$(git show origin/${{ inputs.target_branch }}:android/build.gradle | sed -n "s/^def oneSignalVersion = ['\"]\([^'\"]*\)['\"].*/\1/p")
-          IOS_VERSION=$(git show origin/${{ inputs.target_branch }}:ios/onesignal_flutter.podspec | sed -n "s/.*OneSignalXCFramework', '\([^']*\)'.*/\1/p")
+          IOS_VERSION=$(git show origin/${{ inputs.target_branch }}:ios/onesignal_flutter.podspec | sed -n "s/^[[:space:]]*onesignal_xcframework_version = ['\"]\([^'\"]*\)['\"].*/\1/p")
 
           echo "flutter_from=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "android_from=$ANDROID_VERSION" >> $GITHUB_OUTPUT
@@ -133,7 +133,7 @@ jobs:
 
           # Update onesignal_flutter.podspec with new version
           # macOS sed syntax
-          sed -i '' "s|s.dependency 'OneSignalXCFramework', '[^']*'|s.dependency 'OneSignalXCFramework', '${VERSION}'|" ios/onesignal_flutter.podspec
+          sed -i '' -E "s|^([[:space:]]*onesignal_xcframework_version = )['\"][^'\"]*['\"]|\\1'${VERSION}'|" ios/onesignal_flutter.podspec
           echo "✓ Updated ios/onesignal_flutter.podspec with iOS SDK ${VERSION}"
 
           # Update Package.swift with new version
