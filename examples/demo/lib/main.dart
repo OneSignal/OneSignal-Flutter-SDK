@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
@@ -13,6 +12,17 @@ import 'viewmodels/app_viewmodel.dart';
 
 const String _defaultAppId = '77e32082-ea27-42e3-a898-c72e141824ef';
 
+Future<String> _fetchAppId() async {
+  debugPrint('Fetching OneSignal app ID...');
+  await Future<void>.delayed(const Duration(seconds: 10));
+
+  final envAppId = dotenv.env['ONESIGNAL_APP_ID'];
+  final appId =
+      (envAppId != null && envAppId.isNotEmpty) ? envAppId : _defaultAppId;
+  debugPrint('Fetched OneSignal app ID');
+  return appId;
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
@@ -25,8 +35,7 @@ Future<void> main() async {
   final prefs = PreferencesService();
   await prefs.init();
 
-  final envAppId = dotenv.env['ONESIGNAL_APP_ID'];
-  final appId = (envAppId != null && envAppId.isNotEmpty) ? envAppId : _defaultAppId;
+  final appId = await _fetchAppId();
 
   // Initialize OneSignal SDK
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);
@@ -81,9 +90,10 @@ Future<void> main() async {
   } catch (_) {
     debugPrint('API key not found, continuing without it');
   }
-  final apiService = OneSignalApiService()
-    ..setAppId(appId)
-    ..setApiKey(apiKey);
+  final apiService =
+      OneSignalApiService()
+        ..setAppId(appId)
+        ..setApiKey(apiKey);
 
   // Fetch tooltips in background
   TooltipHelper().init();
