@@ -51,8 +51,10 @@ public class OneSignalSession extends FlutterMessengerResponder implements Metho
             return;
         }
 
-        OneSignal.getSession().addOutcome(name);
-        replySuccess(result, null);
+        OneSignal.getSessionSuspend(suspendContinuation(result, session -> {
+            session.addOutcome(name);
+            replySuccess(result, null);
+        }));
     }
 
     private void addUniqueOutcome(MethodCall call, Result result) {
@@ -63,8 +65,10 @@ public class OneSignalSession extends FlutterMessengerResponder implements Metho
             return;
         }
 
-        OneSignal.getSession().addUniqueOutcome(name);
-        replySuccess(result, null);
+        OneSignal.getSessionSuspend(suspendContinuation(result, session -> {
+            session.addUniqueOutcome(name);
+            replySuccess(result, null);
+        }));
     }
 
     private void addOutcomeWithValue(MethodCall call, Result result) {
@@ -81,7 +85,9 @@ public class OneSignalSession extends FlutterMessengerResponder implements Metho
             return;
         }
 
-        OneSignal.getSession().addOutcomeWithValue(name, value.floatValue());
-        replySuccess(result, null);
+        OneSignal.getSessionSuspend(suspendContinuation(result, session -> {
+            session.addOutcomeWithValue(name, value.floatValue());
+            replySuccess(result, null);
+        }));
     }
 }

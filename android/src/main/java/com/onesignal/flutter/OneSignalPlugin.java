@@ -107,8 +107,7 @@ public class OneSignalPlugin extends FlutterMessengerResponder
 
     private void initWithContext(MethodCall call, Result reply) {
         String appId = call.argument("appId");
-        OneSignal.initWithContext(context, appId);
-        replySuccess(reply, null);
+        OneSignal.initWithContextSuspend(context, appId, suspendContinuationVoid(reply, () -> replySuccess(reply, null)));
     }
 
     private void setConsentRequired(MethodCall call, Result reply) {
@@ -124,17 +123,20 @@ public class OneSignalPlugin extends FlutterMessengerResponder
     }
 
     private void login(MethodCall call, Result result) {
-        OneSignal.login((String) call.argument("externalId"));
-        replySuccess(result, null);
+        OneSignal.loginSuspend(
+                (String) call.argument("externalId"),
+                null,
+                suspendContinuationVoid(result, () -> replySuccess(result, null)));
     }
 
     private void loginWithJWT(MethodCall call, Result result) {
-        OneSignal.login((String) call.argument("externalId"), (String) call.argument("jwt"));
-        replySuccess(result, null);
+        OneSignal.loginSuspend(
+                (String) call.argument("externalId"),
+                (String) call.argument("jwt"),
+                suspendContinuationVoid(result, () -> replySuccess(result, null)));
     }
 
     private void logout(MethodCall call, Result result) {
-        OneSignal.logout();
-        replySuccess(result, null);
+        OneSignal.logoutSuspend(suspendContinuationVoid(result, () -> replySuccess(result, null)));
     }
 }

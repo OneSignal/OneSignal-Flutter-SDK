@@ -55,8 +55,7 @@ public class OneSignalInAppMessages extends FlutterMessengerResponder
         else if (call.method.contentEquals("OneSignal#removeTrigger")) this.removeTrigger(call, result);
         else if (call.method.contentEquals("OneSignal#removeTriggers")) this.removeTriggers(call, result);
         else if (call.method.contentEquals("OneSignal#clearTriggers")) this.clearTriggers(call, result);
-        else if (call.method.contentEquals("OneSignal#arePaused"))
-            replySuccess(result, OneSignal.getInAppMessages().getPaused());
+        else if (call.method.contentEquals("OneSignal#arePaused")) this.arePaused(result);
         else if (call.method.contentEquals("OneSignal#paused")) this.paused(call, result);
         else if (call.method.contentEquals("OneSignal#lifecycleInit")) this.lifecycleInit(result);
         else replyNotImplemented(result);
@@ -65,8 +64,10 @@ public class OneSignalInAppMessages extends FlutterMessengerResponder
     @SuppressWarnings("unchecked")
     private void addTriggers(MethodCall call, Result result) {
         try {
-            OneSignal.getInAppMessages().addTriggers((Map<String, String>) call.arguments);
-            replySuccess(result, null);
+            OneSignal.getInAppMessagesSuspend(suspendContinuation(result, inAppMessages -> {
+                inAppMessages.addTriggers((Map<String, String>) call.arguments);
+                replySuccess(result, null);
+            }));
         } catch (ClassCastException e) {
             replyError(
                     result,
@@ -77,15 +78,19 @@ public class OneSignalInAppMessages extends FlutterMessengerResponder
     }
 
     private void removeTrigger(MethodCall call, Result result) {
-        OneSignal.getInAppMessages().removeTrigger((String) call.arguments);
-        replySuccess(result, null);
+        OneSignal.getInAppMessagesSuspend(suspendContinuation(result, inAppMessages -> {
+            inAppMessages.removeTrigger((String) call.arguments);
+            replySuccess(result, null);
+        }));
     }
 
     @SuppressWarnings("unchecked")
     private void removeTriggers(MethodCall call, Result result) {
         try {
-            OneSignal.getInAppMessages().removeTriggers((Collection<String>) call.arguments);
-            replySuccess(result, null);
+            OneSignal.getInAppMessagesSuspend(suspendContinuation(result, inAppMessages -> {
+                inAppMessages.removeTriggers((Collection<String>) call.arguments);
+                replySuccess(result, null);
+            }));
         } catch (ClassCastException e) {
             replyError(
                     result,
@@ -96,21 +101,31 @@ public class OneSignalInAppMessages extends FlutterMessengerResponder
     }
 
     private void clearTriggers(MethodCall call, Result result) {
-        OneSignal.getInAppMessages().clearTriggers();
-        replySuccess(result, null);
+        OneSignal.getInAppMessagesSuspend(suspendContinuation(result, inAppMessages -> {
+            inAppMessages.clearTriggers();
+            replySuccess(result, null);
+        }));
+    }
+
+    private void arePaused(Result result) {
+        OneSignal.getInAppMessagesSuspend(suspendContinuation(result, inAppMessages -> replySuccess(result, inAppMessages.getPaused())));
     }
 
     private void paused(MethodCall call, Result result) {
-        OneSignal.getInAppMessages().setPaused((boolean) call.arguments);
-        replySuccess(result, null);
+        OneSignal.getInAppMessagesSuspend(suspendContinuation(result, inAppMessages -> {
+            inAppMessages.setPaused((boolean) call.arguments);
+            replySuccess(result, null);
+        }));
     }
 
     public void lifecycleInit(Result result) {
-        OneSignal.getInAppMessages().removeLifecycleListener(this);
-        OneSignal.getInAppMessages().addLifecycleListener(this);
-        OneSignal.getInAppMessages().removeClickListener(this);
-        OneSignal.getInAppMessages().addClickListener(this);
-        replySuccess(result, null);
+        OneSignal.getInAppMessagesSuspend(suspendContinuation(result, inAppMessages -> {
+            inAppMessages.removeLifecycleListener(this);
+            inAppMessages.addLifecycleListener(this);
+            inAppMessages.removeClickListener(this);
+            inAppMessages.addClickListener(this);
+            replySuccess(result, null);
+        }));
     }
 
     @Override

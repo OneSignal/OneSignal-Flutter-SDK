@@ -45,30 +45,45 @@ public class OneSignalPushSubscription extends FlutterMessengerResponder
     private void handleMethodCall(MethodCall call, Result result) {
         if (call.method.contentEquals("OneSignal#optIn")) this.optIn(call, result);
         else if (call.method.contentEquals("OneSignal#optOut")) this.optOut(call, result);
-        else if (call.method.contentEquals("OneSignal#pushSubscriptionId"))
-            replySuccess(result, OneSignal.getUser().getPushSubscription().getId());
-        else if (call.method.contentEquals("OneSignal#pushSubscriptionToken"))
-            replySuccess(result, OneSignal.getUser().getPushSubscription().getToken());
-        else if (call.method.contentEquals("OneSignal#pushSubscriptionOptedIn"))
-            replySuccess(result, OneSignal.getUser().getPushSubscription().getOptedIn());
+        else if (call.method.contentEquals("OneSignal#pushSubscriptionId")) this.pushSubscriptionId(result);
+        else if (call.method.contentEquals("OneSignal#pushSubscriptionToken")) this.pushSubscriptionToken(result);
+        else if (call.method.contentEquals("OneSignal#pushSubscriptionOptedIn")) this.pushSubscriptionOptedIn(result);
         else if (call.method.contentEquals("OneSignal#lifecycleInit")) this.lifecycleInit(result);
         else replyNotImplemented(result);
     }
 
     private void optIn(MethodCall call, Result reply) {
-        OneSignal.getUser().getPushSubscription().optIn();
-        replySuccess(reply, null);
+        OneSignal.getUserSuspend(suspendContinuation(reply, user -> {
+            user.getPushSubscription().optIn();
+            replySuccess(reply, null);
+        }));
     }
 
     private void optOut(MethodCall call, Result reply) {
-        OneSignal.getUser().getPushSubscription().optOut();
-        replySuccess(reply, null);
+        OneSignal.getUserSuspend(suspendContinuation(reply, user -> {
+            user.getPushSubscription().optOut();
+            replySuccess(reply, null);
+        }));
+    }
+
+    private void pushSubscriptionId(Result result) {
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> replySuccess(result, user.getPushSubscription().getId())));
+    }
+
+    private void pushSubscriptionToken(Result result) {
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> replySuccess(result, user.getPushSubscription().getToken())));
+    }
+
+    private void pushSubscriptionOptedIn(Result result) {
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> replySuccess(result, user.getPushSubscription().getOptedIn())));
     }
 
     private void lifecycleInit(Result result) {
-        OneSignal.getUser().getPushSubscription().removeObserver(this);
-        OneSignal.getUser().getPushSubscription().addObserver(this);
-        replySuccess(result, null);
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+            user.getPushSubscription().removeObserver(this);
+            user.getPushSubscription().addObserver(this);
+            replySuccess(result, null);
+        }));
     }
 
     @Override

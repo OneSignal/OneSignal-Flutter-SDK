@@ -52,29 +52,35 @@ public class OneSignalLocation extends FlutterMessengerResponder implements Meth
     }
 
     private void requestPermission(Result reply) {
-        try {
-            OneSignal.getLocation().requestPermission(Continue.none());
-        } catch (Throwable t) {
-            logLocationModuleNotAvailable(t);
-        }
-        replySuccess(reply, null);
+        OneSignal.getLocationSuspend(suspendContinuation(reply, location -> {
+            try {
+                location.requestPermission(Continue.none());
+            } catch (Throwable t) {
+                logLocationModuleNotAvailable(t);
+            }
+            replySuccess(reply, null);
+        }));
     }
 
     private void setShared(MethodCall call, Result result) {
-        try {
-            OneSignal.getLocation().setShared((boolean) call.arguments);
-        } catch (Throwable t) {
-            logLocationModuleNotAvailable(t);
-        }
-        replySuccess(result, null);
+        OneSignal.getLocationSuspend(suspendContinuation(result, location -> {
+            try {
+                location.setShared((boolean) call.arguments);
+            } catch (Throwable t) {
+                logLocationModuleNotAvailable(t);
+            }
+            replySuccess(result, null);
+        }));
     }
 
     private void isShared(Result result) {
-        try {
-            replySuccess(result, OneSignal.getLocation().isShared());
-        } catch (Throwable t) {
-            logLocationModuleNotAvailable(t);
-            replySuccess(result, false);
-        }
+        OneSignal.getLocationSuspend(suspendContinuation(result, location -> {
+            try {
+                replySuccess(result, location.isShared());
+            } catch (Throwable t) {
+                logLocationModuleNotAvailable(t);
+                replySuccess(result, false);
+            }
+        }));
     }
 }

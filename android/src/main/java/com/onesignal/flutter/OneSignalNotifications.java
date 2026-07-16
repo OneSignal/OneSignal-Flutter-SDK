@@ -100,48 +100,59 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     }
 
     private void handleMethodCall(MethodCall call, Result result) {
-        if (call.method.contentEquals("OneSignal#permission"))
-            replySuccess(result, OneSignal.getNotifications().getPermission());
-        else if (call.method.contentEquals("OneSignal#canRequest"))
-            replySuccess(result, OneSignal.getNotifications().getCanRequestPermission());
+        if (call.method.contentEquals("OneSignal#permission")) this.permission(result);
+        else if (call.method.contentEquals("OneSignal#canRequest")) this.canRequest(result);
         else if (call.method.contentEquals("OneSignal#requestPermission")) this.requestPermission(call, result);
         else if (call.method.contentEquals("OneSignal#removeNotification")) this.removeNotification(call, result);
         else if (call.method.contentEquals("OneSignal#removeGroupedNotifications"))
             this.removeGroupedNotifications(call, result);
         else if (call.method.contentEquals("OneSignal#clearAll")) this.clearAll(call, result);
         else if (call.method.contentEquals("OneSignal#lifecycleInit")) this.lifecycleInit(result);
-        else if (call.method.contentEquals("OneSignal#addNativeClickListener")) this.registerClickListener();
+        else if (call.method.contentEquals("OneSignal#addNativeClickListener")) this.registerClickListener(result);
         else replyNotImplemented(result);
+    }
+
+    private void permission(Result result) {
+        OneSignal.getNotificationsSuspend(suspendContinuation(result, notifications -> replySuccess(result, notifications.getPermission())));
+    }
+
+    private void canRequest(Result result) {
+        OneSignal.getNotificationsSuspend(suspendContinuation(result, notifications -> replySuccess(result, notifications.getCanRequestPermission())));
     }
 
     private void requestPermission(MethodCall call, Result result) {
         boolean fallback = (boolean) call.argument("fallbackToSettings");
-        // if permission already exists, return early as the method call will not resolve
-        if (OneSignal.getNotifications().getPermission()) {
-            replySuccess(result, true);
-            return;
-        }
-
-        OneSignal.getNotifications().requestPermission(fallback, new RequestPermissionContinuation(result));
+        OneSignal.getNotificationsSuspend(suspendContinuation(result, notifications -> {
+            // if permission already exists, return early as the method call will not resolve
+            if (notifications.getPermission()) {
+                replySuccess(result, true);
+                return;
+            }
+            notifications.requestPermission(fallback, new RequestPermissionContinuation(result));
+        }));
     }
 
     private void removeNotification(MethodCall call, Result result) {
         int notificationId = call.argument("notificationId");
-        OneSignal.getNotifications().removeNotification(notificationId);
-
-        replySuccess(result, null);
+        OneSignal.getNotificationsSuspend(suspendContinuation(result, notifications -> {
+            notifications.removeNotification(notificationId);
+            replySuccess(result, null);
+        }));
     }
 
     private void removeGroupedNotifications(MethodCall call, Result result) {
         String notificationGroup = call.argument("notificationGroup");
-        OneSignal.getNotifications().removeGroupedNotifications(notificationGroup);
-
-        replySuccess(result, null);
+        OneSignal.getNotificationsSuspend(suspendContinuation(result, notifications -> {
+            notifications.removeGroupedNotifications(notificationGroup);
+            replySuccess(result, null);
+        }));
     }
 
     private void clearAll(MethodCall call, Result result) {
-        OneSignal.getNotifications().clearAllNotifications();
-        replySuccess(result, null);
+        OneSignal.getNotificationsSuspend(suspendContinuation(result, notifications -> {
+            notifications.clearAllNotifications();
+            replySuccess(result, null);
+        }));
     }
 
     /// Our bridge layer needs to preventDefault() so that the Flutter listener has time to preventDefault() before the
@@ -291,18 +302,23 @@ public class OneSignalNotifications extends FlutterMessengerResponder
     }
 
     private void lifecycleInit(Result result) {
-        OneSignal.getNotifications().removeForegroundLifecycleListener(this);
-        OneSignal.getNotifications().addForegroundLifecycleListener(this);
-        OneSignal.getNotifications().removePermissionObserver(this);
-        OneSignal.getNotifications().addPermissionObserver(this);
-        notificationOnWillDisplayEventCache.clear();
-        preventedDefaultCache.clear();
-        replySuccess(result, null);
+        OneSignal.getNotificationsSuspend(suspendContinuation(result, notifications -> {
+            notifications.removeForegroundLifecycleListener(this);
+            notifications.addForegroundLifecycleListener(this);
+            notifications.removePermissionObserver(this);
+            notifications.addPermissionObserver(this);
+            notificationOnWillDisplayEventCache.clear();
+            preventedDefaultCache.clear();
+            replySuccess(result, null);
+        }));
     }
 
-    private void registerClickListener() {
+    private void registerClickListener(Result result) {
         clickListenerRequested = true;
-        OneSignal.getNotifications().removeClickListener(this);
-        OneSignal.getNotifications().addClickListener(this);
+        OneSignal.getNotificationsSuspend(suspendContinuation(result, notifications -> {
+            notifications.removeClickListener(this);
+            notifications.addClickListener(this);
+            replySuccess(result, null);
+        }));
     }
 }

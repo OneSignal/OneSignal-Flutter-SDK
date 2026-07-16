@@ -66,37 +66,48 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
         if (language != null && language.length() == 0) {
             language = null;
         }
-        OneSignal.getUser().setLanguage(language);
-        replySuccess(result, null);
+        final String finalLanguage = language;
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+            user.setLanguage(finalLanguage);
+            replySuccess(result, null);
+        }));
     }
 
     private void lifecycleInit(Result result) {
-        OneSignal.getUser().removeObserver(this);
-        OneSignal.getUser().addObserver(this);
-        replySuccess(result, null);
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+            user.removeObserver(this);
+            user.addObserver(this);
+            replySuccess(result, null);
+        }));
     }
 
     private void getOnesignalId(MethodCall call, Result result) {
-        String onesignalId = OneSignal.getUser().getOnesignalId();
-        if (onesignalId.isEmpty()) {
-            onesignalId = null;
-        }
-        replySuccess(result, onesignalId);
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+            String onesignalId = user.getOnesignalId();
+            if (onesignalId.isEmpty()) {
+                onesignalId = null;
+            }
+            replySuccess(result, onesignalId);
+        }));
     }
 
     private void getExternalId(MethodCall call, Result result) {
-        String externalId = OneSignal.getUser().getExternalId();
-        if (externalId.isEmpty()) {
-            externalId = null;
-        }
-        replySuccess(result, externalId);
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+            String externalId = user.getExternalId();
+            if (externalId.isEmpty()) {
+                externalId = null;
+            }
+            replySuccess(result, externalId);
+        }));
     }
 
     @SuppressWarnings("unchecked")
     private void addAliases(MethodCall call, Result result) {
         try {
-            OneSignal.getUser().addAliases((Map<String, String>) call.arguments);
-            replySuccess(result, null);
+            OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+                user.addAliases((Map<String, String>) call.arguments);
+                replySuccess(result, null);
+            }));
         } catch (ClassCastException e) {
             replyError(
                     result,
@@ -109,8 +120,10 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
     @SuppressWarnings("unchecked")
     private void removeAliases(MethodCall call, Result result) {
         try {
-            OneSignal.getUser().removeAliases((List<String>) call.arguments);
-            replySuccess(result, null);
+            OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+                user.removeAliases((List<String>) call.arguments);
+                replySuccess(result, null);
+            }));
         } catch (ClassCastException e) {
             replyError(
                     result,
@@ -121,30 +134,40 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
     }
 
     private void addEmail(MethodCall call, Result result) {
-        OneSignal.getUser().addEmail((String) call.arguments);
-        replySuccess(result, null);
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+            user.addEmail((String) call.arguments);
+            replySuccess(result, null);
+        }));
     }
 
     private void removeEmail(MethodCall call, Result result) {
-        OneSignal.getUser().removeEmail((String) call.arguments);
-        replySuccess(result, null);
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+            user.removeEmail((String) call.arguments);
+            replySuccess(result, null);
+        }));
     }
 
     private void addSms(MethodCall call, Result result) {
-        OneSignal.getUser().addSms((String) call.arguments);
-        replySuccess(result, null);
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+            user.addSms((String) call.arguments);
+            replySuccess(result, null);
+        }));
     }
 
     private void removeSms(MethodCall call, Result result) {
-        OneSignal.getUser().removeSms((String) call.arguments);
-        replySuccess(result, null);
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+            user.removeSms((String) call.arguments);
+            replySuccess(result, null);
+        }));
     }
 
     @SuppressWarnings("unchecked")
     private void addTags(MethodCall call, Result result) {
         try {
-            OneSignal.getUser().addTags((Map<String, String>) call.arguments);
-            replySuccess(result, null);
+            OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+                user.addTags((Map<String, String>) call.arguments);
+                replySuccess(result, null);
+            }));
         } catch (ClassCastException e) {
             replyError(
                     result,
@@ -157,8 +180,10 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
     @SuppressWarnings("unchecked")
     private void removeTags(MethodCall call, Result result) {
         try {
-            OneSignal.getUser().removeTags((List<String>) call.arguments);
-            replySuccess(result, null);
+            OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+                user.removeTags((List<String>) call.arguments);
+                replySuccess(result, null);
+            }));
         } catch (ClassCastException e) {
             replyError(
                     result,
@@ -169,14 +194,16 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
     }
 
     private void getTags(MethodCall call, Result result) {
-        replySuccess(result, OneSignal.getUser().getTags());
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> replySuccess(result, user.getTags())));
     }
 
     private void trackEvent(MethodCall call, Result result) {
         String name = call.argument("name");
         Map<String, Object> properties = call.argument("properties");
-        OneSignal.getUser().trackEvent(name, properties);
-        replySuccess(result, null);
+        OneSignal.getUserSuspend(suspendContinuation(result, user -> {
+            user.trackEvent(name, properties);
+            replySuccess(result, null);
+        }));
     }
 
     @Override

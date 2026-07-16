@@ -3,14 +3,19 @@ package com.onesignal.flutter;
 import android.content.Context;
 import android.os.Handler;
 import android.os.Looper;
+import androidx.annotation.NonNull;
 import com.onesignal.debug.internal.logging.Logging;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
+import io.flutter.plugin.common.MethodChannel.Result;
 import java.util.HashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
+import kotlin.coroutines.Continuation;
+import kotlin.coroutines.CoroutineContext;
+import kotlinx.coroutines.Dispatchers;
 
 abstract class FlutterMessengerResponder {
     private static final ExecutorService BACKGROUND_EXECUTOR = Executors.newSingleThreadExecutor(new ThreadFactory() {
@@ -139,5 +144,48 @@ abstract class FlutterMessengerResponder {
                 channel.invokeMethod(methodName, map);
             }
         });
+    }
+
+    /**
+     * Callback for Kotlin suspend accessors invoked from Java via [suspendContinuation].
+     */
+    protected interface SuspendCallback<T> {
+        void onSuccess(T value);
+    }
+
+    /**
+     * Builds a [Continuation] for calling Android suspend SDK APIs from the Flutter bridge
+     * without blocking the calling thread on [waitForInit].
+     */
+    protected <T> Continuation<T> suspendContinuation(final Result result, final SuspendCallback<T> callback) {
+        return new Continuation<T>() {
+            @NonNull
+            @Override
+            public CoroutineContext getContext() {
+                return (CoroutineContext) Dispatchers.getIO();
+            }
+
+            @Override
+            public void resumeWith(@NonNull Object o) {
+                if (o instanceof kotlin.Result.Failure) {
+                    Throwable e = ((kotlin.Result.Failure) o).exception;
+                    replyError(result, "OneSignal", e.getMessage(), null);
+                    return;
+                }
+                @SuppressWarnings("unchecked")
+                T data = (T) o;
+                try {
+                    callback.onSuccess(data);
+                } catch (Exception e) {
+                    Logging.error("Encountered an error while handling a Flutter method call: " + e, e);
+                    replyError(result, "OneSignal", e.getMessage(), null);
+                }
+            }
+        };
+    }
+
+    /** Like [suspendContinuation] but for suspend calls that return [Unit]. */
+    protected Continuation<Object> suspendContinuationVoid(final Result result, final Runnable callback) {
+        return suspendContinuation(result, value -> callback.run());
     }
 }
