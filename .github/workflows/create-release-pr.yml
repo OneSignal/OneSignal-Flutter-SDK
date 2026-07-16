@@ -98,11 +98,10 @@ jobs:
           VERSION="${{ inputs.android_version }}"
 
           # Validate version exists on GitHub
-          RELEASE=$(curl -s -H "Authorization: token ${{ github.token }}" \
-            "https://api.github.com/repos/OneSignal/OneSignal-Android-SDK/releases/tags/${VERSION}")
-
-
-          if [ -z "$RELEASE" ]; then
+          if ! curl --fail --silent --show-error --retry 4 --retry-delay 30 \
+            -H "Authorization: token ${{ github.token }}" \
+            "https://api.github.com/repos/OneSignal/OneSignal-Android-SDK/releases/tags/${VERSION}" \
+            >/dev/null; then
             echo "✗ Android SDK version ${VERSION} not found"
             exit 1
           fi
@@ -123,10 +122,10 @@ jobs:
           VERSION="${{ inputs.ios_version }}"
 
           # Validate version exists on GitHub
-          RELEASE=$(curl -s -H "Authorization: token ${{ github.token }}" \
-            "https://api.github.com/repos/OneSignal/OneSignal-iOS-SDK/releases/tags/${VERSION}")
-
-          if [ -z "$RELEASE" ]; then
+          if ! curl --fail --silent --show-error --retry 4 --retry-delay 30 \
+            -H "Authorization: token ${{ github.token }}" \
+            "https://api.github.com/repos/OneSignal/OneSignal-iOS-SDK/releases/tags/${VERSION}" \
+            >/dev/null; then
             echo "✗ iOS SDK version ${VERSION} not found"
             exit 1
           fi
