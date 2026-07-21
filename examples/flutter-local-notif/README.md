@@ -44,6 +44,12 @@ notification delegates can coexist on iOS.
 Push notifications require a physical iOS device. Without
 `ONESIGNAL_APP_ID`, the app remains usable for local notification testing.
 
+### iOS compatibility handling
+
+`AppDelegate.swift` preserves the foreground presentation options embedded by
+`flutter_local_notifications`. This keeps local banners, sounds, and list
+entries working after OneSignal installs its notification center delegate.
+
 ## Test flow
 
 1. Tap **Request Permissions**.
