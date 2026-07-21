@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.onesignal.flutter_local_notif"
+    namespace = "com.onesignal.example"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -16,7 +16,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.onesignal.flutterLocalNotif"
+        applicationId = "com.onesignal.example"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode

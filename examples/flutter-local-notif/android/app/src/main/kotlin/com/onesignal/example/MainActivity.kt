@@ -1,4 +1,4 @@
-package com.onesignal.flutter_local_notif
+package com.onesignal.example
 
 import io.flutter.embedding.android.FlutterActivity
 

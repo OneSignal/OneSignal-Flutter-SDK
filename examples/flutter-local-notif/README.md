@@ -11,8 +11,7 @@ for notifications created by the app. Its layout and test flow mirror the
 
 1. Create or select an app in the [OneSignal dashboard](https://dashboard.onesignal.com/).
 2. Configure its Android and iOS platforms using bundle ID
-   `com.onesignal.flutterLocalNotif`, or replace the generated application IDs
-   with your own.
+   `com.onesignal.example`.
 3. On iOS, select the `Runner` target in Xcode and choose your development team.
    The Push Notifications entitlement and remote notification background mode
    are already present. Add a OneSignal Notification Service Extension if you
