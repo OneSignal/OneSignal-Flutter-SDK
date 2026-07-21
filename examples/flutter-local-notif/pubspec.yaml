@@ -1,0 +1,22 @@
+name: flutter_local_notif
+description: OneSignal and flutter_local_notifications integration example.
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.12.1
+
+dependencies:
+  flutter:
+    sdk: flutter
+  flutter_local_notifications: ^22.1.0
+  onesignal_flutter:
+    path: ../..
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+flutter:
+  uses-material-design: true
