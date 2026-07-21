@@ -9,9 +9,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_dotenv: ^5.2.1
   flutter_local_notifications: ^22.1.0
+  http: ^1.6.0
   onesignal_flutter:
     path: ../..
+  timezone: ^0.11.1
 
 dev_dependencies:
   flutter_test:
@@ -20,3 +23,5 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  assets:
+    - .env

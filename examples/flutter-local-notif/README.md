@@ -1,10 +1,11 @@
 # OneSignal + Flutter local notifications
 
-Minimal Android and iOS example using both
+Android and iOS compatibility harness using both
 [`onesignal_flutter`](https://pub.dev/packages/onesignal_flutter) for push
 notifications and
 [`flutter_local_notifications`](https://pub.dev/packages/flutter_local_notifications)
-for notifications created by the app.
+for notifications created by the app. Its layout and test flow mirror the
+`examples/expo-notif` app in the OneSignal Expo plugin repository.
 
 ## Setup
 
@@ -16,7 +17,17 @@ for notifications created by the app.
    The Push Notifications entitlement and remote notification background mode
    are already present. Add a OneSignal Notification Service Extension if you
    need rich media and confirmed delivery.
-4. Fetch dependencies:
+4. Copy the environment template and set your OneSignal app ID:
+
+   ```sh
+   cp .env.example .env
+   ```
+
+   ```dotenv
+   ONESIGNAL_APP_ID=your-onesignal-app-id
+   ```
+
+5. Fetch dependencies:
 
    ```sh
    flutter pub get
@@ -24,16 +35,20 @@ for notifications created by the app.
 
 ## Run
 
-Pass your OneSignal app ID with a Dart define:
-
 ```sh
-flutter run --dart-define=ONESIGNAL_APP_ID=YOUR_APP_ID
+flutter run
 ```
 
 The app initializes `flutter_local_notifications` before OneSignal so both
-notification delegates can coexist on iOS. Use the buttons to request the shared
-system notification permission and display a local notification. OneSignal push
-receive/open events and local notification taps appear in the event list.
+notification delegates can coexist on iOS.
 
 Push notifications require a physical iOS device. Without
 `ONESIGNAL_APP_ID`, the app remains usable for local notification testing.
+
+## Test flow
+
+1. Tap **Request Permissions**.
+2. Tap **Schedule Flutter Local Notification**, background the app if needed,
+   then tap the notification. The event log should show `Local response`.
+3. Wait for a OneSignal push ID, then tap **Send OneSignal Push** and tap the
+   push notification. Compare the local and OneSignal response events.
