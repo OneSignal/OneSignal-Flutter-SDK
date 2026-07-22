@@ -4,6 +4,8 @@ import UserNotifications
 
 @main
 @objc class AppDelegate: FlutterAppDelegate, FlutterImplicitEngineDelegate {
+  private var localNotificationResponseChannel: FlutterMethodChannel?
+
   override func application(
     _ application: UIApplication,
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
@@ -58,7 +60,43 @@ import UserNotifications
     completionHandler(options)
   }
 
+  override func userNotificationCenter(
+    _ center: UNUserNotificationCenter,
+    didReceive response: UNNotificationResponse,
+    withCompletionHandler completionHandler: @escaping () -> Void
+  ) {
+    let userInfo = response.notification.request.content.userInfo
+    let isFlutterLocalNotification =
+      userInfo["NotificationId"] != nil &&
+      userInfo["presentAlert"] != nil &&
+      userInfo["presentSound"] != nil &&
+      userInfo["presentBadge"] != nil &&
+      userInfo["payload"] != nil
+
+    guard isFlutterLocalNotification else {
+      super.userNotificationCenter(
+        center,
+        didReceive: response,
+        withCompletionHandler: completionHandler
+      )
+      return
+    }
+
+    localNotificationResponseChannel?.invokeMethod(
+      "didReceiveLocalNotificationResponse",
+      arguments: [
+        "notificationId": response.notification.request.identifier,
+        "payload": userInfo["payload"] as? String ?? "",
+      ]
+    )
+    completionHandler()
+  }
+
   func didInitializeImplicitFlutterEngine(_ engineBridge: FlutterImplicitEngineBridge) {
     GeneratedPluginRegistrant.register(with: engineBridge.pluginRegistry)
+    localNotificationResponseChannel = FlutterMethodChannel(
+      name: "com.onesignal.example/local_notification_response",
+      binaryMessenger: engineBridge.applicationRegistrar.messenger()
+    )
   }
 }

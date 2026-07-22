@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:http/http.dart' as http;
@@ -52,6 +53,10 @@ class NotificationHomePage extends StatefulWidget {
 }
 
 class _NotificationHomePageState extends State<NotificationHomePage> {
+  static const _localNotificationResponseChannel = MethodChannel(
+    'com.onesignal.example/local_notification_response',
+  );
+
   final _localNotifications = FlutterLocalNotificationsPlugin();
   final _events = <_EventLog>[];
 
@@ -73,6 +78,15 @@ class _NotificationHomePageState extends State<NotificationHomePage> {
   @override
   void initState() {
     super.initState();
+    _localNotificationResponseChannel.setMethodCallHandler((call) async {
+      if (call.method != 'didReceiveLocalNotificationResponse') return;
+      final arguments = Map<Object?, Object?>.from(call.arguments as Map);
+      _appendLog(
+        'Local response',
+        'Local notification tapped',
+        arguments['payload'] as String?,
+      );
+    });
     _pushClickListener = (event) {
       _appendLog(
         'OneSignal click',
@@ -363,6 +377,7 @@ class _NotificationHomePageState extends State<NotificationHomePage> {
 
   @override
   void dispose() {
+    _localNotificationResponseChannel.setMethodCallHandler(null);
     if (_oneSignalConfigured) {
       OneSignal.User.pushSubscription.removeObserver(_pushSubscriptionObserver);
       OneSignal.Notifications.removeClickListener(_pushClickListener);
