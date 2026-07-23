@@ -30,7 +30,7 @@ let package = Package(
         .library(name: "onesignal-flutter", targets: ["onesignal_flutter"])
     ],
     dependencies: [
-        .package(url: "https://github.com/OneSignal/OneSignal-XCFramework", exact: "5.5.4"),
+        .package(url: "https://github.com/OneSignal/OneSignal-XCFramework", exact: "5.5.5"),
     ],
     targets: [
         .target(
