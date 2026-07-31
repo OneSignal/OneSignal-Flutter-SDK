@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -66,6 +67,7 @@ class _NoLocationDemoScreenState extends State<NoLocationDemoScreen> {
   String? _pushSubscriptionId;
   bool _requestingPermission = false;
   bool _sending = false;
+  bool _startingLiveActivity = false;
   late final OnPushSubscriptionChangeObserver _pushSubscriptionObserver;
   late final OnNotificationPermissionChangeObserver _permissionObserver;
 
@@ -106,6 +108,12 @@ class _NoLocationDemoScreenState extends State<NoLocationDemoScreen> {
 
     try {
       await OneSignal.initialize(_oneSignalAppId);
+      await OneSignal.LiveActivities.setupDefault(
+        options: LiveActivitySetupOptions(
+          enablePushToStart: true,
+          enablePushToUpdate: true,
+        ),
+      );
       _refreshPushState();
     } catch (error) {
       debugPrint('OneSignal initialization failed: $error');
@@ -152,11 +160,38 @@ class _NoLocationDemoScreenState extends State<NoLocationDemoScreen> {
     }
   }
 
+  Future<void> _startLiveActivity() async {
+    setState(() {
+      _startingLiveActivity = true;
+    });
+
+    try {
+      final activityId =
+          'no-location-demo-${DateTime.now().millisecondsSinceEpoch}';
+      await OneSignal.LiveActivities.startDefault(
+        activityId,
+        {'orderNumber': 'ORD-1234'},
+        {
+          'status': 'preparing',
+          'message': 'Your order is being prepared',
+          'estimatedTime': '15 min',
+        },
+      );
+      _showMessage('Started Live Activity: $activityId');
+    } catch (error) {
+      _showMessage('Failed to start Live Activity: $error');
+    } finally {
+      if (mounted) {
+        setState(() {
+          _startingLiveActivity = false;
+        });
+      }
+    }
+  }
+
   Future<void> _sendTestNotification() async {
     if (_isPlaceholderAppId) {
-      _showMessage(
-        'Set ONESIGNAL_APP_ID in .env before sending a test push.',
-      );
+      _showMessage('Set ONESIGNAL_APP_ID in .env before sending a test push.');
       return;
     }
 
@@ -191,6 +226,12 @@ class _NoLocationDemoScreenState extends State<NoLocationDemoScreen> {
           'contents': {
             'en':
                 'This test push was sent without linking the location module.',
+          },
+          'big_picture':
+              'https://media.onesignal.com/automated_push_templates/ratings_template.png',
+          'ios_attachments': {
+            'image':
+                'https://media.onesignal.com/automated_push_templates/ratings_template.png',
           },
         }),
       );
@@ -267,6 +308,15 @@ class _NoLocationDemoScreenState extends State<NoLocationDemoScreen> {
               ],
             ),
           ),
+          if (defaultTargetPlatform == TargetPlatform.iOS)
+            _Section(
+              title: 'Live Activity',
+              child: _PrimaryButton(
+                label: 'START LIVE ACTIVITY',
+                isLoading: _startingLiveActivity,
+                onPressed: _startLiveActivity,
+              ),
+            ),
           _Section(
             title: 'Location Module',
             child: Column(
