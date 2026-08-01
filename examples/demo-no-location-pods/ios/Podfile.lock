@@ -47,7 +47,7 @@ DEPENDENCIES:
   - Flutter (from `Flutter`)
   - onesignal_flutter (from `.symlinks/plugins/onesignal_flutter/ios`)
   - OneSignalXCFramework/OneSignal (< 6.0, >= 5.0.0)
-  - OneSignalXCFramework/OneSignalLiveActivities (< 6.0, >= 5.0.0)
+  - OneSignalXCFramework/OneSignalInAppMessages (< 6.0, >= 5.0.0)
 
 SPEC REPOS:
   trunk:
@@ -64,6 +64,6 @@ SPEC CHECKSUMS:
   onesignal_flutter: 7c54486bcf26464bee36e75e7f866c2824f9fe5e
   OneSignalXCFramework: 48e5b7c5b51d4e67bab3405229f963efde1a3894
 
-PODFILE CHECKSUM: 54529446f4556256849941004b3ba5b9e04e1b4f
+PODFILE CHECKSUM: ca6bd8db026875e601ab6a118e9b108c0910f5de
 
 COCOAPODS: 1.16.2

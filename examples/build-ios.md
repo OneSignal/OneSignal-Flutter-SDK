@@ -28,6 +28,14 @@ target 'OneSignalWidgetExtension' do
 end
 ```
 
+Every target must request the same subspec set, otherwise CocoaPods builds a
+separate `OneSignalXCFramework` variant per set and the extracted frameworks
+collide with `Multiple commands produce`. If you build with
+`ONESIGNAL_DISABLE_LOCATION=true`, the plugin resolves
+`OneSignalXCFramework/OneSignal` plus `OneSignalXCFramework/OneSignalInAppMessages`,
+so both extension targets must declare those two subspecs instead of the
+umbrella pod.
+
 ---
 
 ## 2. Runner: entitlements + Info.plist

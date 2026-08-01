@@ -44,6 +44,34 @@ env:
 
 With the location module disabled, calls to `OneSignal.Location` are ignored on Android and `OneSignal.Location.isShared()` returns `false`.
 
+##### CocoaPods: app extension targets
+
+CocoaPods only builds `OneSignalXCFramework` once when **every** target in your
+Podfile resolves the same set of subspecs. If the sets differ, it creates one
+pod variant per set, and each variant tries to write the same extracted
+framework, which fails the build with:
+
+```
+error: Multiple commands produce '.../XCFrameworkIntermediates/OneSignalXCFramework/OneSignalCore/OneSignalCore.framework'
+```
+
+With location disabled the plugin resolves `OneSignalXCFramework/OneSignal` and
+`OneSignalXCFramework/OneSignalInAppMessages`, so every Notification Service
+Extension or Widget Extension target must declare those same two subspecs:
+
+```ruby
+target 'OneSignalNotificationServiceExtension' do
+  use_frameworks!
+  pod 'OneSignalXCFramework/OneSignal', '>= 5.0.0', '< 6.0'
+  pod 'OneSignalXCFramework/OneSignalInAppMessages', '>= 5.0.0', '< 6.0'
+end
+```
+
+Without the environment variable set, the plugin resolves the umbrella pod, so
+extension targets should declare `pod 'OneSignalXCFramework'` instead. Either
+way the rule is the same: the app target and every extension target must request
+an identical subspec set.
+
 ##### Applying the change (clearing cached packages)
 
 The environment variable is only read when dependencies are **resolved**, and
