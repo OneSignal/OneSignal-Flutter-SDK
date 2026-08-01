@@ -30,8 +30,8 @@ on:
   workflow_dispatch:
     inputs:
       flutter_version:
-        description: "New Flutter SDK Version (e.g., 5.2.15 or 5.2.15-beta.1)"
-        required: true
+        description: "Override the auto-detected version (e.g., 5.2.15 or 5.2.15-beta.1). Leave blank to auto-detect."
+        required: false
         type: string
       android_version:
         description: "New Android SDK Version (e.g., 2.3.0). Leave blank to skip."
@@ -48,7 +48,25 @@ on:
         default: main
 
 jobs:
+  determine_version:
+    runs-on: ubuntu-latest
+    outputs:
+      flutter_version: ${{ inputs.flutter_version || steps.next_version.outputs.version }}
+      release_needed: ${{ inputs.flutter_version != '' || steps.next_version.outputs.release-needed == 'true' }}
+
+    steps:
+      - name: Determine Flutter SDK version
+        if: github.event_name == 'workflow_dispatch' && inputs.flutter_version == ''
+        id: next_version
+        uses: OneSignal/sdk-shared/.github/actions/determine-next-version@main
+        with:
+          github-token: ${{ secrets.GH_PUSH_TOKEN || github.token }}
+          target-repo: OneSignal/OneSignal-Flutter-SDK
+          target-branch: ${{ inputs.target_branch }}
+
   prep:
+    needs: determine_version
+    if: needs.determine_version.outputs.release_needed == 'true'
     uses: OneSignal/sdk-shared/.github/workflows/prep-release.yml@main
     secrets:
       # Need this cross-repo token (sdk-shared & this repo) to perform changes
@@ -56,10 +74,10 @@ jobs:
     with:
       # Need target_repo otherwise caller would set github.repository to the caller itself (e.g. sdk-shared)
       target_repo: OneSignal/OneSignal-Flutter-SDK
-      version: ${{ inputs.flutter_version }}
+      version: ${{ needs.determine_version.outputs.flutter_version }}
 
   update_version:
-    needs: prep
+    needs: [determine_version, prep]
     runs-on: macos-latest
     outputs:
       flutter_from: ${{ steps.current_versions.outputs.flutter_from }}
@@ -145,9 +163,9 @@ jobs:
           git commit -m "Update iOS SDK to ${VERSION}" && git push
 
       - name: Update sdk version
+        env:
+          NEW_VERSION: ${{ needs.determine_version.outputs.flutter_version }}
         run: |
-          NEW_VERSION="${{ inputs.flutter_version }}"
-
           # Convert version format for OneSignal wrapper (e.g., 5.2.15 -> 050215)
           # For pre-releases, extract base version first (e.g., 5.2.15-alpha.1 -> 5.2.15)
           BASE_VERSION=$(echo "$NEW_VERSION" | sed 's/-[a-z].*//')
