@@ -49,15 +49,16 @@ The helper script installs the CocoaPods dependencies before launching the app.
 The app does not include `NSLocationWhenInUseUsageDescription` or
 `NSLocationAlwaysAndWhenInUseUsageDescription`.
 
-The iOS project includes a `OneSignalNotificationServiceExtension` target like
-the main demo. The extension depends on `OneSignalXCFramework/OneSignal`, while
-the Flutter plugin also resolves `OneSignalInAppMessages`. This currently
-reproduces the duplicate XCFramework output error reported in
-[GitHub issue #1173](https://github.com/OneSignal/OneSignal-Flutter-SDK/issues/1173).
+The iOS project includes `OneSignalNotificationServiceExtension` and
+`OneSignalWidgetExtension` targets like the main demo. On iOS 16.2 or newer, use
+the app's **Start Live Activity** button to launch the sample widget.
 
-It also includes a `OneSignalWidgetExtension` target using the modular
-`OneSignalLiveActivities` subspec. On iOS 16.2 or newer, use the app's
-**Start Live Activity** button to launch the sample widget.
+Both extension targets declare `OneSignalXCFramework/OneSignal` and
+`OneSignalXCFramework/OneSignalInAppMessages`, matching what the Flutter plugin
+resolves when location is disabled. CocoaPods only builds one
+`OneSignalXCFramework` when every target requests the same subspec set;
+mismatched sets produce duplicate framework outputs and the build error reported
+in [GitHub issue #1173](https://github.com/OneSignal/OneSignal-Flutter-SDK/issues/1173).
 
 ## Android
 
