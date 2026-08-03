@@ -1,0 +1,27 @@
+name: demo_no_location_pods
+description: OneSignal Flutter SDK CocoaPods no-location demo app
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.7.0
+
+dependencies:
+  flutter:
+    sdk: flutter
+  onesignal_flutter:
+    path: ../../
+  flutter_dotenv: ^5.2.1
+  http: ^1.2.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^5.0.0
+
+flutter:
+  config:
+    enable-swift-package-manager: false
+  uses-material-design: true
+  assets:
+    - .env

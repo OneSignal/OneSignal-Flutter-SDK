@@ -48,6 +48,10 @@ Run with the helper script so Flutter resolves native dependencies with
 The app does not include `NSLocationWhenInUseUsageDescription` or
 `NSLocationAlwaysAndWhenInUseUsageDescription`.
 
+The iOS project includes a `OneSignalNotificationServiceExtension` and a
+`OneSignalWidgetExtension` using Swift Package Manager. On iOS 16.2 or newer,
+use the app's **Start Live Activity** button to launch the sample widget.
+
 ## Android
 
 Run with the same helper script:
