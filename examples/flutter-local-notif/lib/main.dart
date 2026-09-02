@@ -322,6 +322,7 @@ class _NotificationHomePageState extends State<NotificationHomePage> {
         body: jsonEncode({
           'app_id': _oneSignalAppId,
           'include_subscription_ids': [subscriptionId],
+          'android_group': 'demo-group',
           'headings': {'en': 'OneSignal notification'},
           'contents': {
             'en': 'Tap this to compare local and OneSignal response listeners.',

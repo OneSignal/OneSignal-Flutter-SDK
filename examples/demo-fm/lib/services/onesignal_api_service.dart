@@ -38,6 +38,7 @@ class OneSignalApiService {
     final body = <String, dynamic>{
       'app_id': _appId,
       'include_subscription_ids': [subscriptionId],
+      'android_group': 'demo-group',
       'headings': {'en': type.title},
       'contents': {'en': type.body},
     };
@@ -65,6 +66,7 @@ class OneSignalApiService {
     final payload = <String, dynamic>{
       'app_id': _appId,
       'include_subscription_ids': [subscriptionId],
+      'android_group': 'demo-group',
       'headings': {'en': title},
       'contents': {'en': body},
     };
