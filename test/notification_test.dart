@@ -172,6 +172,30 @@ void main() {
       expect(notification.groupedNotifications![2].title, 'Title 3');
     });
 
+    test('parses grouped notifications from the Android method channel', () {
+      final json = {
+        'notificationId': 'parent-notification',
+        'groupedNotifications': [
+          {
+            'notificationId': 'grouped-1',
+            'title': 'Title 1',
+          },
+          {
+            'notificationId': 'grouped-2',
+            'title': 'Title 2',
+          },
+        ],
+      };
+
+      final notification = OSNotification(json);
+
+      expect(notification.groupedNotifications, hasLength(2));
+      expect(notification.groupedNotifications![0].notificationId, 'grouped-1');
+      expect(notification.groupedNotifications![0].title, 'Title 1');
+      expect(notification.groupedNotifications![1].notificationId, 'grouped-2');
+      expect(notification.groupedNotifications![1].title, 'Title 2');
+    });
+
     test('creates with empty grouped notifications', () {
       final groupedNotificationsJson = '[]';
 

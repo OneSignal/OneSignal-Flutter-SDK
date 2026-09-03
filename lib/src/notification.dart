@@ -225,10 +225,12 @@ class OSNotification extends JSONStringRepresentable {
     }
     if (json.containsKey('groupedNotifications')) {
       final dynamic jsonGroupedNotifications = json['groupedNotifications'];
-      final jsonList =
-          jsonDecode(jsonGroupedNotifications.toString()) as List<dynamic>;
+      final List<dynamic> jsonList = jsonGroupedNotifications is String
+          ? jsonDecode(jsonGroupedNotifications) as List<dynamic>
+          : jsonGroupedNotifications as List<dynamic>;
       this.groupedNotifications = jsonList
-          .map((dynamic item) => OSNotification(item as Map<String, dynamic>))
+          .map((dynamic item) =>
+              OSNotification((item as Map).cast<String, dynamic>()))
           .toList();
     }
 
