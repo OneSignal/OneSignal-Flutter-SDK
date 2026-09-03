@@ -14,6 +14,7 @@
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 		97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FD1CF9000F007C117D /* Assets.xcassets */; };
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
+		9E8040A60FDA0353CA2D6948 /* template-bookmark-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A5EEB34F6DCFDE209974132 /* template-bookmark-icon.png */; };
 		AABB00110000000000000005 /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = AABB00110000000000000001 /* NotificationService.swift */; };
 		B2FEE5FC37F5386D74141E35 /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 495D768A06CDFF67EB9ECFBD /* Pods_Runner.framework */; };
 		BBCC00220000000000000005 /* OneSignalWidgetLiveActivity.swift in Sources */ = {isa = PBXBuildFile; fileRef = BBCC00220000000000000001 /* OneSignalWidgetLiveActivity.swift */; };
@@ -21,9 +22,12 @@
 		BBCC00220000000000000014 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBCC00220000000000000012 /* WidgetKit.framework */; };
 		BBCC00220000000000000015 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = BBCC00220000000000000013 /* SwiftUI.framework */; };
 		CCDD00440000000000000002 /* vine_boom.wav in Resources */ = {isa = PBXBuildFile; fileRef = CCDD00440000000000000001 /* vine_boom.wav */; };
+		CE359A5617DB32244E4779D0 /* template-share-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AE18978C8478FD2CED9139 /* template-share-icon.png */; };
 		DCC74E696EB253DBC854FB79 /* Pods_OneSignalNotificationServiceExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = FA1153E70A142A707DAB6259 /* Pods_OneSignalNotificationServiceExtension.framework */; };
 		DDEE00330000000000000002 /* OneSignalNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AABB00110000000000000004 /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		DDEE00330000000000000003 /* OneSignalWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = BBCC00220000000000000004 /* OneSignalWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		EE23C65AB2815C1497028A7C /* template-share-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 84AE18978C8478FD2CED9139 /* template-share-icon.png */; };
+		FF37A4A159CCB0EE6A18385C /* template-bookmark-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 3A5EEB34F6DCFDE209974132 /* template-bookmark-icon.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -72,6 +76,7 @@
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		214A4923A7D8B53C727C248F /* Pods-OneSignalWidgetExtension.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneSignalWidgetExtension.release.xcconfig"; path = "Target Support Files/Pods-OneSignalWidgetExtension/Pods-OneSignalWidgetExtension.release.xcconfig"; sourceTree = "<group>"; };
+		3A5EEB34F6DCFDE209974132 /* template-bookmark-icon.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "template-bookmark-icon.png"; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		463D6688A6D624CAA2FF3A9B /* Pods-OneSignalWidgetExtension.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneSignalWidgetExtension.debug.xcconfig"; path = "Target Support Files/Pods-OneSignalWidgetExtension/Pods-OneSignalWidgetExtension.debug.xcconfig"; sourceTree = "<group>"; };
 		495D768A06CDFF67EB9ECFBD /* Pods_Runner.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -80,6 +85,7 @@
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		7B6B6AC2646AE48D486BE87C /* Pods-OneSignalNotificationServiceExtension.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneSignalNotificationServiceExtension.profile.xcconfig"; path = "Target Support Files/Pods-OneSignalNotificationServiceExtension/Pods-OneSignalNotificationServiceExtension.profile.xcconfig"; sourceTree = "<group>"; };
+		84AE18978C8478FD2CED9139 /* template-share-icon.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "template-share-icon.png"; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -213,6 +219,8 @@
 				74858FAE1ED2DC5600515810 /* AppDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				CCDD00440000000000000001 /* vine_boom.wav */,
+				3A5EEB34F6DCFDE209974132 /* template-bookmark-icon.png */,
+				84AE18978C8478FD2CED9139 /* template-share-icon.png */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -357,6 +365,8 @@
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
 				CCDD00440000000000000002 /* vine_boom.wav in Resources */,
+				9E8040A60FDA0353CA2D6948 /* template-bookmark-icon.png in Resources */,
+				CE359A5617DB32244E4779D0 /* template-share-icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -364,6 +374,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FF37A4A159CCB0EE6A18385C /* template-bookmark-icon.png in Resources */,
+				EE23C65AB2815C1497028A7C /* template-share-icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -52,6 +52,9 @@ The iOS project includes a `OneSignalNotificationServiceExtension` and a
 `OneSignalWidgetExtension` using Swift Package Manager. On iOS 16.2 or newer,
 use the app's **Start Live Activity** button to launch the sample widget.
 
+To test the bundled notification action icons, follow
+[Testing iOS Action Button Icons](../ios-action-button-icons.md).
+
 ## Android
 
 Run with the same helper script:

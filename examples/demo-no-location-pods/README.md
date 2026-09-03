@@ -60,6 +60,9 @@ resolves when location is disabled. CocoaPods only builds one
 mismatched sets produce duplicate framework outputs and the build error reported
 in [GitHub issue #1173](https://github.com/OneSignal/OneSignal-Flutter-SDK/issues/1173).
 
+To test the bundled notification action icons, follow
+[Testing iOS Action Button Icons](../ios-action-button-icons.md).
+
 ## Android
 
 Run with the same helper script:

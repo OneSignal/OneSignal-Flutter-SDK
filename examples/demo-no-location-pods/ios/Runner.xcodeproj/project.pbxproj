@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
 		192FBDE3E5FC9B1E6BB19FBC /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49248215A15C404DA16328DF /* Foundation.framework */; };
+		22345C06CA4949C3C8AA069B /* template-share-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2E9555FD21E8DFCB65A890A7 /* template-share-icon.png */; };
 		2DFB8DA296AF02A4B363AA3B /* OneSignalWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6539668DF6C89BFDC76FCB84 /* OneSignalWidgetBundle.swift */; };
 		2F288C153791A53B901B7A25 /* Pods_OneSignalWidgetExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E6B16C9B4C335CDE40E0449F /* Pods_OneSignalWidgetExtension.framework */; };
 		3B1B085652E2F6FCF2E0453E /* OneSignalWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = FECE8682DCDD3961E46E889A /* OneSignalWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -18,6 +19,7 @@
 		5EE48FCB903022F3E60E22DD /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 579EE555FAC49FE764750AB8 /* SwiftUI.framework */; };
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
+		8E8A1FA052CF751D7EF03EA3 /* template-bookmark-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 702B7644E4D762408F8A9BE5 /* template-bookmark-icon.png */; };
 		920F75D10B5ACDBBCEBCA71D /* Pods_OneSignalNotificationServiceExtension.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = E0685C57CD35C510FF6DA5C1 /* Pods_OneSignalNotificationServiceExtension.framework */; };
 		96003FFCA81AF7F0D02FF192 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 63245B01345B8BE3A1902785 /* WidgetKit.framework */; };
 		9709DAE0290094C4ED9C37AF /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 49248215A15C404DA16328DF /* Foundation.framework */; };
@@ -26,6 +28,8 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		C0241F15C546B89B6A35090F /* NotificationService.swift in Sources */ = {isa = PBXBuildFile; fileRef = A47701A9BFD5F78B37CB0E87 /* NotificationService.swift */; };
 		E395919D263D3A7EE996872F /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = B5FC8CF448F5485AF9CA242F /* Pods_Runner.framework */; };
+		EC3E995823EDCDFAD7622F57 /* template-bookmark-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 702B7644E4D762408F8A9BE5 /* template-bookmark-icon.png */; };
+		F656A2DEE91710B22FFFDDEA /* template-share-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 2E9555FD21E8DFCB65A890A7 /* template-share-icon.png */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -75,6 +79,7 @@
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
 		283263A4CCECBE70BE46C806 /* OneSignalWidgetLiveActivity.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OneSignalWidgetLiveActivity.swift; sourceTree = "<group>"; };
 		2A5D002B7EAC6DFD6AACEFF6 /* Info.plist */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		2E9555FD21E8DFCB65A890A7 /* template-share-icon.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "template-share-icon.png"; sourceTree = "<group>"; };
 		35CC497FDF78C6584F9271C3 /* Pods-OneSignalNotificationServiceExtension.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-OneSignalNotificationServiceExtension.profile.xcconfig"; path = "Target Support Files/Pods-OneSignalNotificationServiceExtension/Pods-OneSignalNotificationServiceExtension.profile.xcconfig"; sourceTree = "<group>"; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		40066B592891CD9D37812A6C /* OneSignalNotificationServiceExtension.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = OneSignalNotificationServiceExtension.entitlements; sourceTree = "<group>"; };
@@ -83,6 +88,7 @@
 		579EE555FAC49FE764750AB8 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		63245B01345B8BE3A1902785 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
 		6539668DF6C89BFDC76FCB84 /* OneSignalWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OneSignalWidgetBundle.swift; sourceTree = "<group>"; };
+		702B7644E4D762408F8A9BE5 /* template-bookmark-icon.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "template-bookmark-icon.png"; sourceTree = "<group>"; };
 		74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Runner-Bridging-Header.h"; sourceTree = "<group>"; };
 		74858FAE1ED2DC5600515810 /* AppDelegate.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -237,6 +243,8 @@
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				B40000000000000000000001 /* Runner.entitlements */,
+				702B7644E4D762408F8A9BE5 /* template-bookmark-icon.png */,
+				2E9555FD21E8DFCB65A890A7 /* template-share-icon.png */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -363,6 +371,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8E8A1FA052CF751D7EF03EA3 /* template-bookmark-icon.png in Resources */,
+				F656A2DEE91710B22FFFDDEA /* template-share-icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -374,6 +384,8 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				EC3E995823EDCDFAD7622F57 /* template-bookmark-icon.png in Resources */,
+				22345C06CA4949C3C8AA069B /* template-share-icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
