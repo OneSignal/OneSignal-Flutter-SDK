@@ -222,6 +222,7 @@ class _NoLocationDemoScreenState extends State<NoLocationDemoScreen> {
         body: jsonEncode({
           'app_id': _oneSignalAppId,
           'include_subscription_ids': [pushSubscriptionId],
+          'android_group': 'demo-group',
           'headings': {'en': 'OneSignal No-Location Demo'},
           'contents': {
             'en':
