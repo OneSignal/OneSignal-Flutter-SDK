@@ -16,8 +16,8 @@ class OSInAppMessageClickEvent extends JSONStringRepresentable {
 
   String jsonRepresentation() {
     return convertToJsonString({
-      'message': this.message.jsonRepresentation(),
-      'result': this.result.jsonRepresentation(),
+      'message': this.message.mapRepresentation(),
+      'result': this.result.mapRepresentation(),
     });
   }
 }
@@ -41,13 +41,13 @@ class OSInAppMessageClickResult extends JSONStringRepresentable {
     this.closingMessage = json["closing_message"] as bool;
   }
 
-  String jsonRepresentation() {
-    return convertToJsonString({
-      'action_id': this.actionId,
-      'url': this.url,
-      'closing_message': this.closingMessage,
-    });
-  }
+  Map<String, dynamic> mapRepresentation() => {
+        'action_id': this.actionId,
+        'url': this.url,
+        'closing_message': this.closingMessage,
+      };
+
+  String jsonRepresentation() => convertToJsonString(mapRepresentation());
 }
 
 class OSInAppMessage extends JSONStringRepresentable {
@@ -57,9 +57,9 @@ class OSInAppMessage extends JSONStringRepresentable {
     this.messageId = json["message_id"];
   }
 
-  String jsonRepresentation() {
-    return convertToJsonString({'message_id': this.messageId});
-  }
+  Map<String, dynamic> mapRepresentation() => {'message_id': this.messageId};
+
+  String jsonRepresentation() => convertToJsonString(mapRepresentation());
 }
 
 class OSInAppMessageWillDisplayEvent extends JSONStringRepresentable {
@@ -70,7 +70,7 @@ class OSInAppMessageWillDisplayEvent extends JSONStringRepresentable {
   }
 
   String jsonRepresentation() {
-    return convertToJsonString({'message': this.message.jsonRepresentation()});
+    return convertToJsonString({'message': this.message.mapRepresentation()});
   }
 }
 
@@ -82,7 +82,7 @@ class OSInAppMessageDidDisplayEvent extends JSONStringRepresentable {
   }
 
   String jsonRepresentation() {
-    return convertToJsonString({'message': this.message.jsonRepresentation()});
+    return convertToJsonString({'message': this.message.mapRepresentation()});
   }
 }
 
@@ -94,7 +94,7 @@ class OSInAppMessageWillDismissEvent extends JSONStringRepresentable {
   }
 
   String jsonRepresentation() {
-    return convertToJsonString({'message': this.message.jsonRepresentation()});
+    return convertToJsonString({'message': this.message.mapRepresentation()});
   }
 }
 
@@ -106,6 +106,6 @@ class OSInAppMessageDidDismissEvent extends JSONStringRepresentable {
   }
 
   String jsonRepresentation() {
-    return convertToJsonString({'message': this.message.jsonRepresentation()});
+    return convertToJsonString({'message': this.message.mapRepresentation()});
   }
 }

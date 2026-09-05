@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:onesignal_flutter/src/notification.dart';
@@ -212,10 +214,44 @@ void main() {
     test('jsonRepresentation returns correct JSON string', () {
       final notification = OSNotification(validNotificationJson);
       final jsonRep = notification.jsonRepresentation();
+      final decoded = jsonDecode(jsonRep) as Map<String, dynamic>;
 
-      expect(jsonRep, isA<String>());
-      expect(jsonRep, contains('key'));
-      expect(jsonRep, contains('value'));
+      expect(decoded['notificationId'], 'notification-123');
+      expect(decoded['title'], 'Test Title');
+      expect(decoded['body'], 'Test Body');
+      expect(decoded['rawPayload'], {'key': 'value'});
+      expect(decoded['additionalData'], {'custom_key': 'custom_value'});
+      expect(decoded['buttons'], hasLength(2));
+      expect(decoded['buttons'][1], {
+        'id': 'btn2',
+        'text': 'Button 2',
+        'icon': 'icon.png',
+      });
+    });
+
+    test('jsonRepresentation includes grouped notifications as objects', () {
+      final notification = OSNotification({
+        ...androidOnlyJson,
+        'groupedNotifications': [
+          {
+            'notificationId': 'grouped-1',
+            'title': 'Title 1',
+            'rawPayload': '{"grouped":true}',
+          },
+        ],
+      });
+
+      final decoded =
+          jsonDecode(notification.jsonRepresentation()) as Map<String, dynamic>;
+      final grouped = decoded['groupedNotifications'] as List<dynamic>;
+
+      expect(decoded['groupKey'], 'group_key_1');
+      expect(decoded['androidNotificationId'], 1);
+      expect(grouped.single, {
+        'notificationId': 'grouped-1',
+        'title': 'Title 1',
+        'rawPayload': {'grouped': true},
+      });
     });
   });
 
@@ -392,9 +428,11 @@ void main() {
       };
       final event = OSNotificationWillDisplayEvent(json);
       final jsonRep = event.jsonRepresentation();
+      final decoded = jsonDecode(jsonRep) as Map<String, dynamic>;
 
-      expect(jsonRep, isA<String>());
-      expect(jsonRep, contains('notification'));
+      expect(decoded['notification'], isA<Map<String, dynamic>>());
+      expect(decoded['notification']['notificationId'], 'notification-123');
+      expect(decoded['notification']['rawPayload'], {'key': 'value'});
     });
   });
 
@@ -432,10 +470,11 @@ void main() {
       };
       final event = OSNotificationClickEvent(json);
       final jsonRep = event.jsonRepresentation();
+      final decoded = jsonDecode(jsonRep) as Map<String, dynamic>;
 
-      expect(jsonRep, isA<String>());
-      expect(jsonRep, contains('notification'));
-      expect(jsonRep, contains('result'));
+      expect(decoded['notification'], isA<Map<String, dynamic>>());
+      expect(decoded['notification']['notificationId'], 'notification-123');
+      expect(decoded['result'], clickResultJson);
     });
 
     test('jsonRepresentation includes action data from result', () {
@@ -446,8 +485,6 @@ void main() {
       final event = OSNotificationClickEvent(json);
       final jsonRep = event.jsonRepresentation();
 
-      // The notification's jsonRepresentation only includes rawPayload
-      // The result includes actionId and url
       expect(jsonRep, contains('action-123'));
       expect(jsonRep, contains('https://example.com/action'));
     });

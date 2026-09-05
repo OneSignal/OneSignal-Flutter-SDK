@@ -266,7 +266,59 @@ class OSNotification extends JSONStringRepresentable {
     }
   }
 
-  String jsonRepresentation() => convertToJsonString(this.rawPayload);
+  Map<String, dynamic> mapRepresentation() {
+    return {
+      'notificationId': this.notificationId,
+      if (this.templateId != null) 'templateId': this.templateId,
+      if (this.templateName != null) 'templateName': this.templateName,
+      if (this.sound != null) 'sound': this.sound,
+      if (this.title != null) 'title': this.title,
+      if (this.body != null) 'body': this.body,
+      if (this.launchUrl != null) 'launchUrl': this.launchUrl,
+      if (this.additionalData != null) 'additionalData': this.additionalData,
+      if (this.buttons != null)
+        'buttons':
+            this.buttons!.map((button) => button.mapRepresentation()).toList(),
+      if (this.rawPayload != null) 'rawPayload': this.rawPayload,
+      if (this.attachments != null) 'attachments': this.attachments,
+      if (this.contentAvailable != null)
+        'contentAvailable': this.contentAvailable,
+      if (this.mutableContent != null) 'mutableContent': this.mutableContent,
+      if (this.category != null) 'category': this.category,
+      if (this.badge != null) 'badge': this.badge,
+      if (this.badgeIncrement != null) 'badgeIncrement': this.badgeIncrement,
+      if (this.subtitle != null) 'subtitle': this.subtitle,
+      if (this.relevanceScore != null) 'relevanceScore': this.relevanceScore,
+      if (this.interruptionLevel != null)
+        'interruptionLevel': this.interruptionLevel,
+      if (this.groupedNotifications != null)
+        'groupedNotifications': this
+            .groupedNotifications!
+            .map((notification) => notification.mapRepresentation())
+            .toList(),
+      if (this.androidNotificationId != null)
+        'androidNotificationId': this.androidNotificationId,
+      if (this.smallIcon != null) 'smallIcon': this.smallIcon,
+      if (this.largeIcon != null) 'largeIcon': this.largeIcon,
+      if (this.bigPicture != null) 'bigPicture': this.bigPicture,
+      if (this.smallIconAccentColor != null)
+        'smallIconAccentColor': this.smallIconAccentColor,
+      if (this.ledColor != null) 'ledColor': this.ledColor,
+      if (this.lockScreenVisibility != null)
+        'lockScreenVisibility': this.lockScreenVisibility,
+      if (this.groupKey != null) 'groupKey': this.groupKey,
+      if (this.groupMessage != null) 'groupMessage': this.groupMessage,
+      if (this.fromProjectNumber != null)
+        'fromProjectNumber': this.fromProjectNumber,
+      if (this.collapseId != null) 'collapseId': this.collapseId,
+      if (this.priority != null) 'priority': this.priority,
+      if (this.backgroundImageLayout != null)
+        'backgroundImageLayout':
+            this.backgroundImageLayout!.mapRepresentation(),
+    };
+  }
+
+  String jsonRepresentation() => convertToJsonString(mapRepresentation());
 }
 
 /// An instance of this class represents a user interaction with
@@ -282,9 +334,10 @@ class OSNotificationClickResult extends JSONStringRepresentable {
     this.url = json['url'];
   }
 
-  String jsonRepresentation() {
-    return convertToJsonString({'action_id': this.actionId, 'url': this.url});
-  }
+  Map<String, dynamic> mapRepresentation() =>
+      {'action_id': this.actionId, 'url': this.url};
+
+  String jsonRepresentation() => convertToJsonString(mapRepresentation());
 }
 
 /// Represents a button sent as part of a push notification
@@ -342,13 +395,15 @@ class OSAndroidBackgroundImageLayout extends JSONStringRepresentable {
       this.bodyTextColor = json['bodyTextColor'] as String?;
   }
 
-  String jsonRepresentation() {
-    return convertToJsonString({
+  Map<String, dynamic> mapRepresentation() {
+    return {
       'image': this.image,
       'titleTextColor': this.titleTextColor,
       'bodyTextColor': this.bodyTextColor
-    });
+    };
   }
+
+  String jsonRepresentation() => convertToJsonString(mapRepresentation());
 }
 
 extension OSDisplayNotification on OSNotification {
@@ -370,7 +425,7 @@ class OSNotificationWillDisplayEvent extends JSONStringRepresentable {
 
   String jsonRepresentation() {
     return convertToJsonString(
-        {'notification': this.notification.jsonRepresentation()});
+        {'notification': this.notification.mapRepresentation()});
   }
 }
 
@@ -389,8 +444,8 @@ class OSNotificationClickEvent extends JSONStringRepresentable {
 
   String jsonRepresentation() {
     return convertToJsonString({
-      'notification': this.notification.jsonRepresentation(),
-      'result': this.result.jsonRepresentation()
+      'notification': this.notification.mapRepresentation(),
+      'result': this.result.mapRepresentation()
     });
   }
 }
