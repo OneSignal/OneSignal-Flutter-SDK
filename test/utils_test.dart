@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter_test/flutter_test.dart';
 import 'package:onesignal_flutter/src/utils.dart';
 
@@ -63,22 +65,24 @@ void main() {
       expect(result, equals('{}'));
     });
 
-    test('convertToJsonString removes escaped newlines', () {
+    test('convertToJsonString preserves escaped newlines as valid JSON', () {
       final testObj = TestJSONStringRepresentable();
       final map = {'text': 'line1\nline2'};
 
       final result = testObj.convertToJsonString(map);
 
-      expect(result, contains('"text": "line1\nline2"'));
+      expect(result, contains(r'"text": "line1\nline2"'));
+      expect(jsonDecode(result), map);
     });
 
-    test('convertToJsonString removes escaped backslashes', () {
+    test('convertToJsonString preserves escaped backslashes as valid JSON', () {
       final testObj = TestJSONStringRepresentable();
-      final map = {'path': 'folder/file'};
+      final map = {'path': r'folder\file'};
 
       final result = testObj.convertToJsonString(map);
 
-      expect(result, contains('"path": "folder/file"'));
+      expect(result, contains(r'"path": "folder\\file"'));
+      expect(jsonDecode(result), map);
     });
 
     test('convertToJsonString formats with proper indentation', () {

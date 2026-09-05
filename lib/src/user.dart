@@ -18,12 +18,12 @@ class OSUserState extends JSONStringRepresentable {
       this.externalId = json['externalId'] as String?;
   }
 
-  String jsonRepresentation() {
-    return convertToJsonString({
-      'onesignalId': this.onesignalId,
-      'externalId': this.externalId,
-    });
-  }
+  Map<String, dynamic> mapRepresentation() => {
+        'onesignalId': this.onesignalId,
+        'externalId': this.externalId,
+      };
+
+  String jsonRepresentation() => convertToJsonString(mapRepresentation());
 }
 
 /// An instance of this class describes a change in the user state.
@@ -37,7 +37,7 @@ class OSUserChangedState extends JSONStringRepresentable {
 
   String jsonRepresentation() {
     return convertToJsonString(<String, dynamic>{
-      'current': current.jsonRepresentation(),
+      'current': current.mapRepresentation(),
     });
   }
 }

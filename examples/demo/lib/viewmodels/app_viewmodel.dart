@@ -169,7 +169,7 @@ class AppViewModel extends ChangeNotifier {
       }
 
       debugPrint(
-        'Push subscription changed: '
+        '[OneSignal] Push subscription changed: '
         'id=${state.previous.id ?? 'null'} → ${state.current.id ?? 'null'}, '
         'optedIn=${state.previous.optedIn} → ${state.current.optedIn}, '
         'token=${fmtToken(state.previous.token)} → ${fmtToken(state.current.token)}',
@@ -179,14 +179,15 @@ class AppViewModel extends ChangeNotifier {
 
     OneSignal.Notifications.addPermissionObserver((permission) {
       _hasNotificationPermission = permission;
-      debugPrint('Permission changed: $permission');
+      debugPrint('[OneSignal] Permission changed: $permission');
       notifyListeners();
     });
 
     OneSignal.User.addObserver((state) {
       final nextOnesignalId = state.current.onesignalId;
       debugPrint(
-        'User changed: onesignalId=${nextOnesignalId ?? 'null'}, externalId=${state.current.externalId ?? 'null'}',
+        '[OneSignal] User changed: onesignalId=${nextOnesignalId ?? 'null'}, '
+        'externalId=${state.current.externalId ?? 'null'}',
       );
 
       _oneSignalId = nextOnesignalId;

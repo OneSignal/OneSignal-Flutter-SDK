@@ -38,6 +38,9 @@ For iOS with multiple simulators:
 ../run-ios.sh
 ```
 
+To test the bundled iOS notification action icons, follow
+[Testing iOS Action Button Icons](../ios-action-button-icons.md).
+
 Or specify a device directly:
 
 ```bash
