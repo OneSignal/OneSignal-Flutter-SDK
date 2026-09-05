@@ -337,6 +337,49 @@ void main() {
       expect(button.icon, isNull);
     });
 
+    test('creates from JSON with an iOS system icon', () {
+      final button = OSActionButton.fromJson({
+        'id': 'action3',
+        'text': 'Save',
+        'systemIcon': 'bookmark',
+      });
+
+      expect(button.systemIcon, 'bookmark');
+      expect(button.templateIcon, isNull);
+      expect(button.icon, isNull);
+      expect(button.mapRepresentation(), {
+        'id': 'action3',
+        'text': 'Save',
+        'systemIcon': 'bookmark',
+      });
+    });
+
+    test('creates from JSON with an iOS template icon', () {
+      final button = OSActionButton.fromJson({
+        'id': 'action4',
+        'text': 'Share',
+        'templateIcon': 'share-icon',
+      });
+
+      expect(button.templateIcon, 'share-icon');
+      expect(button.systemIcon, isNull);
+      expect(button.icon, isNull);
+      expect(button.mapRepresentation(), {
+        'id': 'action4',
+        'text': 'Share',
+        'templateIcon': 'share-icon',
+      });
+    });
+
+    test('mapRepresentation omits absent icons', () {
+      final button = OSActionButton(id: 'action5', text: 'Dismiss');
+
+      expect(button.mapRepresentation(), {
+        'id': 'action5',
+        'text': 'Dismiss',
+      });
+    });
+
     test('mapRepresentation returns correct map', () {
       final button = OSActionButton(
         id: 'btn',

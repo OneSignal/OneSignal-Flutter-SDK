@@ -353,17 +353,41 @@ class OSActionButton extends JSONStringRepresentable {
   /// button's icon
   String? icon;
 
-  OSActionButton({required this.id, required this.text, this.icon});
+  /// (iOS only)
+  /// The SF Symbol name for the button's icon.
+  String? systemIcon;
+
+  /// (iOS only)
+  /// The name of an image in the app bundle for the button's icon.
+  String? templateIcon;
+
+  OSActionButton({
+    required this.id,
+    required this.text,
+    this.icon,
+    this.systemIcon,
+    this.templateIcon,
+  });
 
   OSActionButton.fromJson(Map<String, dynamic> json) {
     this.id = json['id'] as String;
     this.text = json['text'] as String;
 
     if (json.containsKey('icon')) this.icon = json['icon'] as String?;
+    if (json.containsKey('systemIcon'))
+      this.systemIcon = json['systemIcon'] as String?;
+    if (json.containsKey('templateIcon'))
+      this.templateIcon = json['templateIcon'] as String?;
   }
 
   Map<String, dynamic> mapRepresentation() {
-    return {'id': this.id, 'text': this.text, 'icon': this.icon};
+    return {
+      'id': this.id,
+      'text': this.text,
+      if (this.icon != null) 'icon': this.icon,
+      if (this.systemIcon != null) 'systemIcon': this.systemIcon,
+      if (this.templateIcon != null) 'templateIcon': this.templateIcon,
+    };
   }
 
   String jsonRepresentation() {
