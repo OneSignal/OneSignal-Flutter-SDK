@@ -14,3 +14,8 @@ A few resources to get you started if this is your first Flutter project:
 For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
+
+## iOS Action Button Icons
+
+See [Testing iOS Action Button Icons](../ios-action-button-icons.md) to verify
+the bundled Save Story and Share notification icons.

@@ -34,7 +34,11 @@ class OneSignalSerializer {
         if (notification.getGroupedNotifications() != null) {
             hash.put("groupKey", notification.getGroupKey());
             hash.put("groupMessage", notification.getGroupMessage());
-            hash.put("groupedNotifications", notification.getGroupedNotifications());
+            List<HashMap<String, Object>> groupedNotifications = new ArrayList<>();
+            for (INotification groupedNotification : notification.getGroupedNotifications()) {
+                groupedNotifications.add(convertNotificationToMap(groupedNotification));
+            }
+            hash.put("groupedNotifications", groupedNotifications);
         }
 
         hash.put("notificationId", notification.getNotificationId());

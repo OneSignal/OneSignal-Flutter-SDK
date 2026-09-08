@@ -17,6 +17,7 @@
 		74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 74858FAE1ED2DC5600515810 /* AppDelegate.swift */; };
 		7884E8682EC3CC0700C636F2 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */; };
 		78A318202AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage in Frameworks */ = {isa = PBXBuildFile; productRef = 78A3181F2AECB46A00862997 /* FlutterGeneratedPluginSwiftPackage */; };
+		81721935A1C1A6B22D0FC7B6 /* template-share-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = B8BD931218470F9C63269DE3 /* template-share-icon.png */; };
 		82A717C11D665E1F17CE0805 /* OneSignalExtension in Frameworks */ = {isa = PBXBuildFile; productRef = 91805F36348D16AC33C7D5F1 /* OneSignalExtension */; };
 		8C82A425795B004071C2D17E /* OneSignalWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 80BDB394CE3DE731FCC5878B /* OneSignalWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		97C146FC1CF9000F007C117D /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
@@ -24,7 +25,10 @@
 		97C147011CF9000F007C117D /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */; };
 		A4E37AE03CDC1BF28477FEF5 /* OneSignalWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B93B5702926A8142C6303DB7 /* OneSignalWidgetBundle.swift */; };
 		A9B01134CB411B595607C5A5 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F82AD17ACA999C1A5906D1E6 /* Foundation.framework */; };
+		CD43A29374CB82B100D28169 /* template-share-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = B8BD931218470F9C63269DE3 /* template-share-icon.png */; };
 		D84C4DEF279FD1D3E87E77EE /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DAD6D18F62B44DB9751DFADB /* SwiftUI.framework */; };
+		E9FCC244F985FC546FE5F851 /* template-bookmark-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8E9793F9F4D3397328182FF8 /* template-bookmark-icon.png */; };
+		ED234D389219D9D3E3C6AC11 /* template-bookmark-icon.png in Resources */ = {isa = PBXBuildFile; fileRef = 8E9793F9F4D3397328182FF8 /* template-bookmark-icon.png */; };
 		F6CD8D8AD9B2E6BE0FE837D1 /* OneSignalNotificationServiceExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = 814EE513E76B5D478AC1C14C /* OneSignalNotificationServiceExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -84,6 +88,7 @@
 		7AFA3C8E1D35360C0083082E /* Release.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = Release.xcconfig; path = Flutter/Release.xcconfig; sourceTree = "<group>"; };
 		80BDB394CE3DE731FCC5878B /* OneSignalWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
 		814EE513E76B5D478AC1C14C /* OneSignalNotificationServiceExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = OneSignalNotificationServiceExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		8E9793F9F4D3397328182FF8 /* template-bookmark-icon.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "template-bookmark-icon.png"; sourceTree = "<group>"; };
 		9740EEB21CF90195004384FC /* Debug.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Debug.xcconfig; path = Flutter/Debug.xcconfig; sourceTree = "<group>"; };
 		9740EEB31CF90195004384FC /* Generated.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; name = Generated.xcconfig; path = Flutter/Generated.xcconfig; sourceTree = "<group>"; };
 		97C146EE1CF9000F007C117D /* Runner.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Runner.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -93,6 +98,7 @@
 		97C147021CF9000F007C117D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B40000000000000000000001 /* Runner.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Runner.entitlements; sourceTree = "<group>"; };
 		B663C4730837080E9D812D72 /* NotificationService.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = NotificationService.swift; sourceTree = "<group>"; };
+		B8BD931218470F9C63269DE3 /* template-share-icon.png */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = image.png; path = "template-share-icon.png"; sourceTree = "<group>"; };
 		B93B5702926A8142C6303DB7 /* OneSignalWidgetBundle.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; path = OneSignalWidgetBundle.swift; sourceTree = "<group>"; };
 		C830DE33B467A1DED62321BB /* OneSignalNotificationServiceExtension.entitlements */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.plist.entitlements; path = OneSignalNotificationServiceExtension.entitlements; sourceTree = "<group>"; };
 		DAD6D18F62B44DB9751DFADB /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
@@ -198,6 +204,8 @@
 				7884E8672EC3CC0400C636F2 /* SceneDelegate.swift */,
 				74858FAD1ED2DC5600515810 /* Runner-Bridging-Header.h */,
 				B40000000000000000000001 /* Runner.entitlements */,
+				8E9793F9F4D3397328182FF8 /* template-bookmark-icon.png */,
+				B8BD931218470F9C63269DE3 /* template-share-icon.png */,
 			);
 			path = Runner;
 			sourceTree = "<group>";
@@ -341,6 +349,8 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E9FCC244F985FC546FE5F851 /* template-bookmark-icon.png in Resources */,
+				81721935A1C1A6B22D0FC7B6 /* template-share-icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -352,6 +362,8 @@
 				3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */,
 				97C146FE1CF9000F007C117D /* Assets.xcassets in Resources */,
 				97C146FC1CF9000F007C117D /* Main.storyboard in Resources */,
+				ED234D389219D9D3E3C6AC11 /* template-bookmark-icon.png in Resources */,
+				CD43A29374CB82B100D28169 /* template-share-icon.png in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

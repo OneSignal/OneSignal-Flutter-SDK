@@ -15,10 +15,10 @@ class OSPushSubscriptionState extends JSONStringRepresentable {
     this.optedIn = json['optedIn'] as bool;
   }
 
-  String jsonRepresentation() {
-    return convertToJsonString(
-        {'id': this.id, 'token': this.token, 'optedIn': this.optedIn});
-  }
+  Map<String, dynamic> mapRepresentation() =>
+      {'id': this.id, 'token': this.token, 'optedIn': this.optedIn};
+
+  String jsonRepresentation() => convertToJsonString(mapRepresentation());
 }
 
 /// An instance of this class describes a change in the user's OneSignal
@@ -39,8 +39,8 @@ class OSPushSubscriptionChangedState extends JSONStringRepresentable {
 
   String jsonRepresentation() {
     return convertToJsonString(<String, dynamic>{
-      'current': current.jsonRepresentation(),
-      'previous': previous.jsonRepresentation()
+      'current': current.mapRepresentation(),
+      'previous': previous.mapRepresentation()
     });
   }
 }
