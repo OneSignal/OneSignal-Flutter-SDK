@@ -24,7 +24,7 @@ if !oneSignalDisableLocation {
 let package = Package(
     name: "onesignal_flutter",
     platforms: [
-        .iOS("11.0")
+        .iOS("12.0")
     ],
     products: [
         .library(name: "onesignal-flutter", targets: ["onesignal_flutter"])
