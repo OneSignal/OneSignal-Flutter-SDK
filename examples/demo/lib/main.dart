@@ -70,7 +70,7 @@ Future<void> main() async {
     );
 
     // Uncomment to see the full event object.
-    // debugPrint('[OneSignal] event: ${event.jsonRepresentation()}');
+    // debugPrint('[OneSignal] click event: ${event.jsonRepresentation()}');
   });
   
   OneSignal.Notifications.addForegroundWillDisplayListener((event) {
@@ -78,6 +78,9 @@ Future<void> main() async {
       '[OneSignal] Notification foregroundWillDisplay: '
       '${event.notification.title ?? ''}',
     );
+
+    // Uncomment to see the full event object.
+    // debugPrint('[OneSignal] will display event: ${event.notification.jsonRepresentation()}');
 
     // Uncomment to test preventing the default display behavior.
     // event.preventDefault();
