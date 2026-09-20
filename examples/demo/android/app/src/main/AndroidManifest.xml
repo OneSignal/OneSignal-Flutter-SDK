@@ -1,10 +1,16 @@
-<manifest xmlns:android="http://schemas.android.com/apk/res/android">
+<manifest
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
     <application
         android:label="OneSignal Demo"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
+        <meta-data
+            android:name="firebase_messaging_installation_id_enabled"
+            android:value="true"
+            tools:replace="android:value" />
         <activity
             android:name=".MainActivity"
             android:exported="true"
