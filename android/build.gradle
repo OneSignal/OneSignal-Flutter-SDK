@@ -7,7 +7,7 @@ def safeEnvFlagGet(prop) {
     return normalizedValue != null && (normalizedValue.equalsIgnoreCase('true') || normalizedValue == '1')
 }
 
-def oneSignalVersion = '5.10.2'
+def oneSignalVersion = '5.11.0-rc'
 def oneSignalDisableLocation = safeEnvFlagGet('ONESIGNAL_DISABLE_LOCATION')
 
 buildscript {
@@ -23,6 +23,7 @@ buildscript {
 
 rootProject.allprojects {
     repositories {
+        mavenLocal()
         google()
         mavenCentral()
     }
@@ -47,6 +48,8 @@ android {
 }
 
 dependencies {
+    implementation "com.google.firebase:firebase-messaging:25.1.0"
+
     if (oneSignalDisableLocation) {
         implementation "com.onesignal:core:${oneSignalVersion}"
         implementation "com.onesignal:notifications:${oneSignalVersion}"
