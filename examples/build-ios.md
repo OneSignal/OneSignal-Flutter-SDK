@@ -11,7 +11,7 @@ Open `ios/Podfile` and make the following changes.
 **Uncomment the platform line** (or add it if missing):
 
 ```ruby
-platform :ios, '13.0'
+platform :ios, '15.0'
 ```
 
 **Add two new targets** after the `Runner` target block and before `post_install`:
@@ -388,7 +388,7 @@ The `project.pbxproj` needs native target entries for both extensions. These are
 - `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.NSE` (must be prefixed with parent app's bundle ID)
 - `CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`
 - `INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist`
-- `SKIP_INSTALL = YES`, `SWIFT_VERSION = 5.0`, `IPHONEOS_DEPLOYMENT_TARGET = 13.0`
+- `SKIP_INSTALL = YES`, `SWIFT_VERSION = 5.0`, `IPHONEOS_DEPLOYMENT_TARGET = 15.0`
 
 **OneSignalWidgetExtension target** (`com.apple.product-type.app-extension`):
 - Sources, Frameworks (linking WidgetKit.framework and SwiftUI.framework), Resources build phases
