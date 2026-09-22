@@ -30,10 +30,10 @@ void main() {
         expect(channelController.state.externalId, equals('user-123'));
       });
 
-      test('login handles empty externalId', () async {
+      test('login rejects empty externalId', () async {
         await OneSignal.login('');
 
-        expect(channelController.state.externalId, equals(''));
+        expect(channelController.state.externalId, isNull);
       });
     });
 
@@ -134,6 +134,20 @@ void main() {
         final liveActivities2 = OneSignal.LiveActivities;
         expect(identical(liveActivities1, liveActivities2), isTrue);
       });
+    });
+  });
+
+  group('user strings', () {
+    test('addTag rejects an empty key', () async {
+      await OneSignal.User.addTagWithKey('', 'premium');
+
+      expect(channelController.state.tags, isNull);
+    });
+
+    test('addEmail rejects an empty address', () async {
+      await OneSignal.User.addEmail('');
+
+      expect(channelController.state.addedEmail, isNull);
     });
   });
 }

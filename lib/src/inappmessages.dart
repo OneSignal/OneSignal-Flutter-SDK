@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 import 'package:onesignal_flutter/src/inappmessage.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 
 typedef void OnClickInAppMessageListener(OSInAppMessageClickEvent event);
 
@@ -38,24 +39,26 @@ class OneSignalInAppMessages {
   /// Adds a single key, value trigger, which will trigger an in app message
   /// if one exists matching the specific trigger added
   Future<void> addTrigger(String key, String value) async {
+    if (rejectNullOrEmpty(key, 'addTrigger: key')) return;
     return await _channel.invokeMethod("OneSignal#addTrigger", {key: value});
   }
 
-  /// Adds one or more key, value triggers, which will trigger in app messages
-  /// (one at a time) if any exist matching the specific triggers added
   Future<void> addTriggers(Map<String, String> triggers) async {
+    for (final key in triggers.keys) {
+      if (rejectNullOrEmpty(key, 'addTriggers: key')) return;
+    }
     return await _channel.invokeMethod("OneSignal#addTriggers", triggers);
   }
 
-  /// Remove a single key, value trigger to prevent an in app message from
-  /// showing with that trigger
   Future<void> removeTrigger(String key) async {
+    if (rejectNullOrEmpty(key, 'removeTrigger: key')) return;
     return await _channel.invokeMethod("OneSignal#removeTrigger", key);
   }
 
-  /// Remove one or more key, value triggers to prevent any in app messages
-  /// from showing with those triggers
   Future<void> removeTriggers(List<String> keys) async {
+    for (final key in keys) {
+      if (rejectNullOrEmpty(key, 'removeTriggers: key')) return;
+    }
     return await _channel.invokeMethod("OneSignal#removeTriggers", keys);
   }
 
