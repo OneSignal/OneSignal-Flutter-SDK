@@ -9,6 +9,7 @@ import 'package:onesignal_flutter/src/location.dart';
 import 'package:onesignal_flutter/src/notifications.dart';
 import 'package:onesignal_flutter/src/session.dart';
 import 'package:onesignal_flutter/src/user.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 
 export 'src/defines.dart';
 export 'src/inappmessage.dart';
@@ -48,6 +49,7 @@ class OneSignal {
   /// The initializer accepts an [appId] which the developer can get
   /// from the OneSignal consoleas well as a dictonary of [launchOptions]
   static Future<void> initialize(String appId) async {
+    if (rejectNullOrEmpty(appId, 'initialize: appId')) return;
     await _channel.invokeMethod('OneSignal#initialize', {'appId': appId});
     await Future.wait([
       InAppMessages.lifecycleInit(),
@@ -62,6 +64,7 @@ class OneSignal {
   /// The act of logging a user into the OneSignal SDK will switch the
   /// user context to that specific user.
   static Future<void> login(String externalId) async {
+    if (rejectNullOrEmpty(externalId, 'login: externalId')) return;
     return await _channel
         .invokeMethod('OneSignal#login', {'externalId': externalId});
   }
