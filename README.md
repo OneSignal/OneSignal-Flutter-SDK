@@ -128,5 +128,5 @@ For account issues and support please contact OneSignal support from the [OneSig
 To make things easier, we have published a demo project in the `/example` folder of this repository.
 
 #### Supports: 
-* Tested from iOS 8 to iOS 15
+* iOS 15 and newer
 * Tested from Android 4.0.3 (API level 15) to Android 12.0 (31)

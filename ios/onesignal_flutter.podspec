@@ -23,6 +23,6 @@ Pod::Spec.new do |s|
   else
     s.dependency 'OneSignalXCFramework', onesignal_xcframework_version
   end
-  s.ios.deployment_target = '12.0'
+  s.ios.deployment_target = '15.0'
   s.static_framework = true
 end
