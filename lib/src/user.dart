@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/pushsubscription.dart';
 import 'package:onesignal_flutter/src/utils.dart';
@@ -62,6 +63,7 @@ class OneSignalUser {
   /// Sets the user's language to [language] this also applies to
   /// the email and/or SMS player if those are logged in on the device.
   Future<void> setLanguage(String language) async {
+    // Empty string is the reset to the device language.
     return await _channel.invokeMethod("OneSignal#setLanguage", {
       'language': language,
     });
@@ -72,6 +74,10 @@ class OneSignalUser {
   /// If this [alias] label already exists on this user,
   /// it will be overwritten with the new alias [id].
   Future<void> addAlias(String alias, dynamic id) async {
+    if (rejectNullOrEmpty(alias, 'addAlias: label') ||
+        rejectNullOrEmpty(id, 'addAlias: id')) {
+      return;
+    }
     return await this.addAliases({alias: id});
   }
 
@@ -79,16 +85,26 @@ class OneSignalUser {
   ///
   /// If any alias already exists, it will be overwritten to the new values.
   Future<void> addAliases(Map<String, dynamic> aliases) async {
+    for (final label in aliases.keys) {
+      if (rejectNullOrEmpty(label, 'addAliases: label') ||
+          rejectNullOrEmpty(aliases[label], 'addAliases: id')) {
+        return;
+      }
+    }
     return await _channel.invokeMethod("OneSignal#addAliases", aliases);
   }
 
   /// Remove an [alias] from the current user.
   Future<void> removeAlias(String label) async {
+    if (rejectNullOrEmpty(label, 'removeAlias: label')) return;
     return await this.removeAliases([label]);
   }
 
   /// Remove [aliases] from the current user.
   Future<void> removeAliases(List<String> aliases) async {
+    for (final label in aliases) {
+      if (rejectNullOrEmpty(label, 'removeAliases: label')) return;
+    }
     return await _channel.invokeMethod("OneSignal#removeAliases", aliases);
   }
 
@@ -98,6 +114,11 @@ class OneSignalUser {
   /// specific users and/or personalizing messages. If the tag [key] already
   /// exists, it will be replaced with the [value] provided here.
   Future<void> addTagWithKey(String key, dynamic value) async {
+    if (rejectNullOrEmpty(key, 'addTag: key')) return;
+    if (value == null) {
+      debugPrint('OneSignal: addTag: value is required');
+      return;
+    }
     return await this.addTags({key: value.toString()});
   }
 
@@ -107,6 +128,13 @@ class OneSignalUser {
   /// specific users and/or personalizing messages. If the tag key already
   /// exists, it will be replaced with the value provided here.
   Future<void> addTags(Map<String, dynamic> tags) async {
+    for (final key in tags.keys) {
+      if (rejectNullOrEmpty(key, 'addTags: key')) return;
+      if (tags[key] == null) {
+        debugPrint('OneSignal: addTags: value is required');
+        return;
+      }
+    }
     tags.forEach((key, value) {
       tags[key] = value.toString();
     });
@@ -115,11 +143,15 @@ class OneSignalUser {
 
   /// Remove the data tag with the provided [key] from the current user.
   Future<void> removeTag(String key) async {
+    if (rejectNullOrEmpty(key, 'removeTag: key')) return;
     return await this.removeTags([key]);
   }
 
   /// Remove multiple [tags] with the provided keys from the current user.
   Future<void> removeTags(List<String> tags) async {
+    for (final key in tags) {
+      if (rejectNullOrEmpty(key, 'removeTags: key')) return;
+    }
     return await _channel.invokeMethod("OneSignal#removeTags", tags);
   }
 
@@ -133,6 +165,7 @@ class OneSignalUser {
 
   /// Add a new [email] subscription to the current user.
   Future<void> addEmail(String email) async {
+    if (rejectNullOrEmpty(email, 'addEmail: email')) return;
     return await _channel.invokeMethod("OneSignal#addEmail", email);
   }
 
@@ -141,6 +174,7 @@ class OneSignalUser {
   /// Returns false if the specified [email] does not exist
   /// on the user within the SDK, and no request will be made.
   Future<void> removeEmail(String email) async {
+    if (rejectNullOrEmpty(email, 'removeEmail: email')) return;
     return await _channel.invokeMethod("OneSignal#removeEmail", email);
   }
 
@@ -148,6 +182,7 @@ class OneSignalUser {
   ///
   /// Add an SMS subscription by adding an [smsNumber]
   Future<void> addSms(String smsNumber) async {
+    if (rejectNullOrEmpty(smsNumber, 'addSms: smsNumber')) return;
     return await _channel.invokeMethod("OneSignal#addSms", smsNumber);
   }
 
@@ -156,6 +191,7 @@ class OneSignalUser {
   /// Returns false if the specified [smsNumber] does not
   /// exist on the user within the SDK, and no request will be made.
   Future<void> removeSms(String smsNumber) async {
+    if (rejectNullOrEmpty(smsNumber, 'removeSms: smsNumber')) return;
     return await _channel.invokeMethod("OneSignal#removeSms", smsNumber);
   }
 
@@ -175,6 +211,7 @@ class OneSignalUser {
   /// [properties] is an optional map of custom properties associated with the event.
   Future<void> trackEvent(String name,
       [Map<String, dynamic>? properties]) async {
+    if (rejectNullOrEmpty(name, 'trackEvent: name')) return;
     return await _channel.invokeMethod("OneSignal#trackEvent", {
       'name': name,
       'properties': properties,
