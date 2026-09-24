@@ -9,7 +9,7 @@
         android:icon="@mipmap/ic_launcher">
         <meta-data
             android:name="firebase_messaging_installation_id_enabled"
-            android:value="true"
+            android:value="false"
             tools:replace="android:value" />
         <activity
             android:name=".MainActivity"
