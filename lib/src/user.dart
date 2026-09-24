@@ -63,7 +63,7 @@ class OneSignalUser {
   /// Sets the user's language to [language] this also applies to
   /// the email and/or SMS player if those are logged in on the device.
   Future<void> setLanguage(String language) async {
-    if (rejectNullOrEmpty(language, 'setLanguage: language')) return;
+    // Empty string is the reset to the device language.
     return await _channel.invokeMethod("OneSignal#setLanguage", {
       'language': language,
     });
