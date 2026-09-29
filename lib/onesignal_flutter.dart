@@ -49,7 +49,7 @@ class OneSignal {
   /// The initializer accepts an [appId] which the developer can get
   /// from the OneSignal consoleas well as a dictonary of [launchOptions]
   static Future<void> initialize(String appId) async {
-    if (rejectNullOrEmpty(appId, 'initialize: appId')) return;
+    if (isMissing(appId, 'initialize: appId')) return;
     await _channel.invokeMethod('OneSignal#initialize', {'appId': appId});
     await Future.wait([
       InAppMessages.lifecycleInit(),
@@ -64,7 +64,7 @@ class OneSignal {
   /// The act of logging a user into the OneSignal SDK will switch the
   /// user context to that specific user.
   static Future<void> login(String externalId) async {
-    if (rejectNullOrEmpty(externalId, 'login: externalId')) return;
+    if (isMissing(externalId, 'login: externalId')) return;
     return await _channel
         .invokeMethod('OneSignal#login', {'externalId': externalId});
   }

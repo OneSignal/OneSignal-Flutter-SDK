@@ -74,8 +74,8 @@ class OneSignalUser {
   /// If this [alias] label already exists on this user,
   /// it will be overwritten with the new alias [id].
   Future<void> addAlias(String alias, dynamic id) async {
-    if (rejectNullOrEmpty(alias, 'addAlias: label') ||
-        rejectNullOrEmpty(id, 'addAlias: id')) {
+    if (isMissing(alias, 'addAlias: label') ||
+        isMissing(id, 'addAlias: id')) {
       return;
     }
     return await this.addAliases({alias: id});
@@ -86,8 +86,8 @@ class OneSignalUser {
   /// If any alias already exists, it will be overwritten to the new values.
   Future<void> addAliases(Map<String, dynamic> aliases) async {
     for (final label in aliases.keys) {
-      if (rejectNullOrEmpty(label, 'addAliases: label') ||
-          rejectNullOrEmpty(aliases[label], 'addAliases: id')) {
+      if (isMissing(label, 'addAliases: label') ||
+          isMissing(aliases[label], 'addAliases: id')) {
         return;
       }
     }
@@ -96,14 +96,14 @@ class OneSignalUser {
 
   /// Remove an [alias] from the current user.
   Future<void> removeAlias(String label) async {
-    if (rejectNullOrEmpty(label, 'removeAlias: label')) return;
+    if (isMissing(label, 'removeAlias: label')) return;
     return await this.removeAliases([label]);
   }
 
   /// Remove [aliases] from the current user.
   Future<void> removeAliases(List<String> aliases) async {
     for (final label in aliases) {
-      if (rejectNullOrEmpty(label, 'removeAliases: label')) return;
+      if (isMissing(label, 'removeAliases: label')) return;
     }
     return await _channel.invokeMethod("OneSignal#removeAliases", aliases);
   }
@@ -114,7 +114,7 @@ class OneSignalUser {
   /// specific users and/or personalizing messages. If the tag [key] already
   /// exists, it will be replaced with the [value] provided here.
   Future<void> addTagWithKey(String key, dynamic value) async {
-    if (rejectNullOrEmpty(key, 'addTag: key')) return;
+    if (isMissing(key, 'addTag: key')) return;
     if (value == null) {
       debugPrint('OneSignal: addTag: value is required');
       return;
@@ -129,7 +129,7 @@ class OneSignalUser {
   /// exists, it will be replaced with the value provided here.
   Future<void> addTags(Map<String, dynamic> tags) async {
     for (final key in tags.keys) {
-      if (rejectNullOrEmpty(key, 'addTags: key')) return;
+      if (isMissing(key, 'addTags: key')) return;
       if (tags[key] == null) {
         debugPrint('OneSignal: addTags: value is required');
         return;
@@ -143,14 +143,14 @@ class OneSignalUser {
 
   /// Remove the data tag with the provided [key] from the current user.
   Future<void> removeTag(String key) async {
-    if (rejectNullOrEmpty(key, 'removeTag: key')) return;
+    if (isMissing(key, 'removeTag: key')) return;
     return await this.removeTags([key]);
   }
 
   /// Remove multiple [tags] with the provided keys from the current user.
   Future<void> removeTags(List<String> tags) async {
     for (final key in tags) {
-      if (rejectNullOrEmpty(key, 'removeTags: key')) return;
+      if (isMissing(key, 'removeTags: key')) return;
     }
     return await _channel.invokeMethod("OneSignal#removeTags", tags);
   }
@@ -165,7 +165,7 @@ class OneSignalUser {
 
   /// Add a new [email] subscription to the current user.
   Future<void> addEmail(String email) async {
-    if (rejectNullOrEmpty(email, 'addEmail: email')) return;
+    if (isMissing(email, 'addEmail: email')) return;
     return await _channel.invokeMethod("OneSignal#addEmail", email);
   }
 
@@ -174,7 +174,7 @@ class OneSignalUser {
   /// Returns false if the specified [email] does not exist
   /// on the user within the SDK, and no request will be made.
   Future<void> removeEmail(String email) async {
-    if (rejectNullOrEmpty(email, 'removeEmail: email')) return;
+    if (isMissing(email, 'removeEmail: email')) return;
     return await _channel.invokeMethod("OneSignal#removeEmail", email);
   }
 
@@ -182,7 +182,7 @@ class OneSignalUser {
   ///
   /// Add an SMS subscription by adding an [smsNumber]
   Future<void> addSms(String smsNumber) async {
-    if (rejectNullOrEmpty(smsNumber, 'addSms: smsNumber')) return;
+    if (isMissing(smsNumber, 'addSms: smsNumber')) return;
     return await _channel.invokeMethod("OneSignal#addSms", smsNumber);
   }
 
@@ -191,7 +191,7 @@ class OneSignalUser {
   /// Returns false if the specified [smsNumber] does not
   /// exist on the user within the SDK, and no request will be made.
   Future<void> removeSms(String smsNumber) async {
-    if (rejectNullOrEmpty(smsNumber, 'removeSms: smsNumber')) return;
+    if (isMissing(smsNumber, 'removeSms: smsNumber')) return;
     return await _channel.invokeMethod("OneSignal#removeSms", smsNumber);
   }
 
@@ -211,7 +211,7 @@ class OneSignalUser {
   /// [properties] is an optional map of custom properties associated with the event.
   Future<void> trackEvent(String name,
       [Map<String, dynamic>? properties]) async {
-    if (rejectNullOrEmpty(name, 'trackEvent: name')) return;
+    if (isMissing(name, 'trackEvent: name')) return;
     return await _channel.invokeMethod("OneSignal#trackEvent", {
       'name': name,
       'properties': properties,

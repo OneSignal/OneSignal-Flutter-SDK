@@ -39,25 +39,25 @@ class OneSignalInAppMessages {
   /// Adds a single key, value trigger, which will trigger an in app message
   /// if one exists matching the specific trigger added
   Future<void> addTrigger(String key, String value) async {
-    if (rejectNullOrEmpty(key, 'addTrigger: key')) return;
+    if (isMissing(key, 'addTrigger: key')) return;
     return await _channel.invokeMethod("OneSignal#addTrigger", {key: value});
   }
 
   Future<void> addTriggers(Map<String, String> triggers) async {
     for (final key in triggers.keys) {
-      if (rejectNullOrEmpty(key, 'addTriggers: key')) return;
+      if (isMissing(key, 'addTriggers: key')) return;
     }
     return await _channel.invokeMethod("OneSignal#addTriggers", triggers);
   }
 
   Future<void> removeTrigger(String key) async {
-    if (rejectNullOrEmpty(key, 'removeTrigger: key')) return;
+    if (isMissing(key, 'removeTrigger: key')) return;
     return await _channel.invokeMethod("OneSignal#removeTrigger", key);
   }
 
   Future<void> removeTriggers(List<String> keys) async {
     for (final key in keys) {
-      if (rejectNullOrEmpty(key, 'removeTriggers: key')) return;
+      if (isMissing(key, 'removeTriggers: key')) return;
     }
     return await _channel.invokeMethod("OneSignal#removeTriggers", keys);
   }
