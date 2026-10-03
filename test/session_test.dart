@@ -104,6 +104,14 @@ void main() {
 
         expect(channelController.state.addOutcomeWithValueCallCount, 0);
       });
+
+      test('rejects non-finite value', () async {
+        await session.addOutcomeWithValue('outcome', double.nan);
+        await session.addOutcomeWithValue('outcome', double.infinity);
+        await session.addOutcomeWithValue('outcome', double.negativeInfinity);
+
+        expect(channelController.state.addOutcomeWithValueCallCount, 0);
+      });
     });
   });
 }

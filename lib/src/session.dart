@@ -24,6 +24,10 @@ class OneSignalSession {
   /// Counted each time sent successfully, failed ones will be cached and reattempted in future
   Future<void> addOutcomeWithValue(String name, double value) async {
     if (isMissing(name, 'addOutcomeWithValue: name')) return;
+    if (!value.isFinite) {
+      logError('addOutcomeWithValue: value must be a finite number');
+      return;
+    }
     return await _channel.invokeMethod("OneSignal#addOutcomeWithValue",
         {"outcome_name": name, "outcome_value": value});
   }
