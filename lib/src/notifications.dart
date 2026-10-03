@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/defines.dart';
 import 'package:onesignal_flutter/src/notification.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 
 typedef void OnNotificationPermissionChangeObserver(bool permission);
 
@@ -84,6 +85,10 @@ class OneSignalNotifications {
 
   /// Removes a grouped notification.
   Future<void> removeGroupedNotifications(String notificationGroup) async {
+    if (isMissing(
+        notificationGroup, 'removeGroupedNotifications: notificationGroup')) {
+      return;
+    }
     if (defaultTargetPlatform == TargetPlatform.android) {
       return await _channel.invokeMethod("OneSignal#removeGroupedNotifications",
           {'notificationGroup': notificationGroup});

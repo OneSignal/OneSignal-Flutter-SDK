@@ -34,10 +34,10 @@ void main() {
         expect(channelController.state.addOutcomeCallCount, 3);
       });
 
-      test('handles empty string outcome name', () async {
+      test('rejects empty outcome name', () async {
         await session.addOutcome('');
 
-        expect(channelController.state.addedOutcome, '');
+        expect(channelController.state.addOutcomeCallCount, 0);
       });
     });
 
@@ -58,10 +58,10 @@ void main() {
         expect(channelController.state.addUniqueOutcomeCallCount, 2);
       });
 
-      test('handles empty string outcome name', () async {
+      test('rejects empty outcome name', () async {
         await session.addUniqueOutcome('');
 
-        expect(channelController.state.addedUniqueOutcome, '');
+        expect(channelController.state.addUniqueOutcomeCallCount, 0);
       });
     });
 
@@ -99,14 +99,18 @@ void main() {
         expect(channelController.state.addOutcomeWithValueCallCount, 3);
       });
 
-      test('handles empty string outcome name with value', () async {
-        const outcomeValue = 15.5;
+      test('rejects empty outcome name', () async {
+        await session.addOutcomeWithValue('', 15.5);
 
-        await session.addOutcomeWithValue('', outcomeValue);
+        expect(channelController.state.addOutcomeWithValueCallCount, 0);
+      });
 
-        expect(channelController.state.addedOutcomeWithValueName, '');
-        expect(
-            channelController.state.addedOutcomeWithValueValue, outcomeValue);
+      test('rejects non-finite value', () async {
+        await session.addOutcomeWithValue('outcome', double.nan);
+        await session.addOutcomeWithValue('outcome', double.infinity);
+        await session.addOutcomeWithValue('outcome', double.negativeInfinity);
+
+        expect(channelController.state.addOutcomeWithValueCallCount, 0);
       });
     });
   });
