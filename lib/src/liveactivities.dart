@@ -116,7 +116,7 @@ class OneSignalLiveActivities {
 
   bool _isMap(Object? value, String api) {
     if (value is Map) return true;
-    debugPrint('[OneSignal] $api must be a map');
+    logError('$api must be a map');
     return false;
   }
 }

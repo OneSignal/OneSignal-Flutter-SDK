@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/pushsubscription.dart';
 import 'package:onesignal_flutter/src/utils.dart';
@@ -115,7 +114,7 @@ class OneSignalUser {
   Future<void> addTagWithKey(String key, dynamic value) async {
     if (isMissing(key, 'addTag: key')) return;
     if (value == null) {
-      debugPrint('[OneSignal] addTag: value is required');
+      logError('addTag: value is required');
       return;
     }
     return await this.addTags({key: value.toString()});
@@ -130,7 +129,7 @@ class OneSignalUser {
     for (final key in tags.keys) {
       if (isMissing(key, 'addTags: key')) return;
       if (tags[key] == null) {
-        debugPrint('[OneSignal] addTags: value is required');
+        logError('addTags: value is required');
         return;
       }
     }

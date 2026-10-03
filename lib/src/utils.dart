@@ -2,9 +2,11 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 
+void logError(String message) => debugPrint('[OneSignal] $message');
+
 bool isMissing(Object? value, String api) {
   if (value is String && value.isNotEmpty) return false;
-  debugPrint('[OneSignal] $api is required');
+  logError('$api is required');
   return true;
 }
 
