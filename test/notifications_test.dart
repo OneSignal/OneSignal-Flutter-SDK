@@ -111,6 +111,12 @@ void main() {
         expect(channelController.state.removedNotificationGroup,
             notificationGroup);
       });
+
+      test('rejects empty notificationGroup', () async {
+        debugDefaultTargetPlatformOverride = TargetPlatform.android;
+        await notifications.removeGroupedNotifications('');
+        expect(channelController.state.removedNotificationGroup, isNull);
+      });
     });
 
     group('clearAll', () {

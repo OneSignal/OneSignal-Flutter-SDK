@@ -74,8 +74,7 @@ class OneSignalUser {
   /// If this [alias] label already exists on this user,
   /// it will be overwritten with the new alias [id].
   Future<void> addAlias(String alias, dynamic id) async {
-    if (isMissing(alias, 'addAlias: label') ||
-        isMissing(id, 'addAlias: id')) {
+    if (isMissing(alias, 'addAlias: label') || isMissing(id, 'addAlias: id')) {
       return;
     }
     return await this.addAliases({alias: id});
@@ -116,7 +115,7 @@ class OneSignalUser {
   Future<void> addTagWithKey(String key, dynamic value) async {
     if (isMissing(key, 'addTag: key')) return;
     if (value == null) {
-      debugPrint('OneSignal: addTag: value is required');
+      debugPrint('[OneSignal] addTag: value is required');
       return;
     }
     return await this.addTags({key: value.toString()});
@@ -131,7 +130,7 @@ class OneSignalUser {
     for (final key in tags.keys) {
       if (isMissing(key, 'addTags: key')) return;
       if (tags[key] == null) {
-        debugPrint('OneSignal: addTags: value is required');
+        debugPrint('[OneSignal] addTags: value is required');
         return;
       }
     }

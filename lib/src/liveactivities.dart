@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'package:onesignal_flutter/src/utils.dart';
 
 class OneSignalLiveActivities {
   // private channels used to bridge to ObjC/Java
@@ -10,6 +11,10 @@ class OneSignalLiveActivities {
   ///
   /// Only applies to iOS.
   Future<void> enterLiveActivity(String activityId, String token) async {
+    if (isMissing(activityId, 'enterLiveActivity: activityId') ||
+        isMissing(token, 'enterLiveActivity: token')) {
+      return;
+    }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return await _channel.invokeMethod("OneSignal#enterLiveActivity",
           {'activityId': activityId, 'token': token});
@@ -21,6 +26,7 @@ class OneSignalLiveActivities {
   /// Only applies to iOS.
   @Deprecated('Currently unsupported, avoid using this method.')
   Future<void> exitLiveActivity(String activityId) async {
+    if (isMissing(activityId, 'exitLiveActivity: activityId')) return;
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return await _channel.invokeMethod(
           "OneSignal#exitLiveActivity", {'activityId': activityId});
@@ -62,6 +68,11 @@ class OneSignalLiveActivities {
   /// Only applies to iOS.
   Future<void> startDefault(
       String activityId, dynamic attributes, dynamic content) async {
+    if (isMissing(activityId, 'startDefault: activityId') ||
+        !_isMap(attributes, 'startDefault: attributes') ||
+        !_isMap(content, 'startDefault: content')) {
+      return;
+    }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return await _channel.invokeMethod("OneSignal#startDefault", {
         'activityId': activityId,
@@ -78,6 +89,10 @@ class OneSignalLiveActivities {
   ///
   /// Only applies to iOS.
   Future<void> setPushToStartToken(String activityType, String token) async {
+    if (isMissing(activityType, 'setPushToStartToken: activityType') ||
+        isMissing(token, 'setPushToStartToken: token')) {
+      return;
+    }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return await _channel.invokeMethod("OneSignal#setPushToStartToken",
           {'activityType': activityType, 'token': token});
@@ -90,10 +105,19 @@ class OneSignalLiveActivities {
   ///
   /// Only applies to iOS.
   Future<void> removePushToStartToken(String activityType) async {
+    if (isMissing(activityType, 'removePushToStartToken: activityType')) {
+      return;
+    }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
       return await _channel.invokeMethod(
           "OneSignal#removePushToStartToken", {'activityType': activityType});
     }
+  }
+
+  bool _isMap(Object? value, String api) {
+    if (value is Map) return true;
+    debugPrint('[OneSignal] $api must be a map');
+    return false;
   }
 }
 

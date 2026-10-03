@@ -35,6 +35,13 @@ void main() {
         expect(channelController.state.liveActivityId, activityId);
         expect(channelController.state.liveActivityToken, token);
       });
+
+      test('rejects empty activityId or token', () async {
+        await liveActivities.enterLiveActivity('', token);
+        await liveActivities.enterLiveActivity(activityId, '');
+
+        expect(channelController.state.liveActivityEntered, isNull);
+      });
     });
 
     group('exitLiveActivity', () {
@@ -44,6 +51,13 @@ void main() {
 
         expect(channelController.state.liveActivityExited, true);
         expect(channelController.state.liveActivityId, activityId);
+      });
+
+      test('rejects empty activityId', () async {
+        // ignore: deprecated_member_use_from_same_package
+        await liveActivities.exitLiveActivity('');
+
+        expect(channelController.state.liveActivityExited, isNull);
       });
     });
 
@@ -113,6 +127,19 @@ void main() {
         expect(channelController.state.liveActivityContent['data']['status'],
             'running');
       });
+
+      test('rejects empty activityId', () async {
+        await liveActivities.startDefault('', {}, {});
+
+        expect(channelController.state.liveActivityStarted, isNull);
+      });
+
+      test('rejects non-map attributes or content', () async {
+        await liveActivities.startDefault(activityId, null, {});
+        await liveActivities.startDefault(activityId, {}, 'content');
+
+        expect(channelController.state.liveActivityStarted, isNull);
+      });
     });
 
     group('setPushToStartToken', () {
@@ -124,6 +151,13 @@ void main() {
         expect(channelController.state.liveActivityType, activityType);
         expect(channelController.state.liveActivityPushToken, token);
       });
+
+      test('rejects empty activityType or token', () async {
+        await liveActivities.setPushToStartToken('', token);
+        await liveActivities.setPushToStartToken(activityType, '');
+
+        expect(channelController.state.liveActivityPushToStartSet, isNull);
+      });
     });
 
     group('removePushToStartToken', () {
@@ -133,6 +167,12 @@ void main() {
 
         expect(channelController.state.liveActivityPushToStartRemoved, true);
         expect(channelController.state.liveActivityType, activityType);
+      });
+
+      test('rejects empty activityType', () async {
+        await liveActivities.removePushToStartToken('');
+
+        expect(channelController.state.liveActivityPushToStartRemoved, isNull);
       });
     });
   });
