@@ -152,6 +152,11 @@ class OneSignalMockChannelController {
         state.externalId =
             (call.arguments as Map<dynamic, dynamic>)['externalId'] as String?;
         break;
+      case "OneSignal#loginWithProfile":
+        state.loginWithProfileArgs = call.arguments as Map<dynamic, dynamic>?;
+        final response = state.loginWithProfileResponse;
+        if (response is Exception) throw response;
+        return response;
       case "OneSignal#logout":
         state.externalId = null;
         break;
@@ -417,6 +422,8 @@ class OneSignalState {
   bool? disablePush;
   String? externalId;
   String? language;
+  Map<dynamic, dynamic>? loginWithProfileArgs;
+  dynamic loginWithProfileResponse;
 
   // live activities
   bool? liveActivityEntered;

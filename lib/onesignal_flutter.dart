@@ -6,6 +6,7 @@ import 'package:onesignal_flutter/src/debug.dart';
 import 'package:onesignal_flutter/src/inappmessages.dart';
 import 'package:onesignal_flutter/src/liveactivities.dart';
 import 'package:onesignal_flutter/src/location.dart';
+import 'package:onesignal_flutter/src/loginresult.dart';
 import 'package:onesignal_flutter/src/notifications.dart';
 import 'package:onesignal_flutter/src/session.dart';
 import 'package:onesignal_flutter/src/user.dart';
@@ -15,6 +16,7 @@ export 'src/defines.dart';
 export 'src/inappmessage.dart';
 export 'src/inappmessages.dart';
 export 'src/liveactivities.dart';
+export 'src/loginresult.dart';
 export 'src/notification.dart';
 export 'src/notifications.dart';
 export 'src/pushsubscription.dart';
@@ -67,6 +69,47 @@ class OneSignal {
     if (isMissing(externalId, 'login: externalId')) return;
     return await _channel
         .invokeMethod('OneSignal#login', {'externalId': externalId});
+  }
+
+  /// Logs in as [externalId] and applies [profile] in the same request, resolving with the outcome.
+  ///
+  /// Android only for now: on iOS this returns a failure without calling the native SDK.
+  static Future<OSLoginResult> loginWithProfile(
+      String externalId, OSUserProfile profile,
+      [String? jwtBearerToken]) async {
+    if (defaultTargetPlatform != TargetPlatform.android) {
+      return OSLoginResult.failure(
+          'UNKNOWN', 'loginWithProfile is only supported on Android');
+    }
+    final invalid = _validateProfileLogin(externalId, profile);
+    if (invalid != null) {
+      logError(invalid);
+      return OSLoginResult.failure('INVALID_ARGUMENT', invalid);
+    }
+    try {
+      final raw = await _channel.invokeMethod('OneSignal#loginWithProfile', {
+        'externalId': externalId,
+        'profile': profile.mapRepresentation(),
+        'jwtBearerToken': jwtBearerToken,
+      });
+      return OSLoginResult.fromWire(raw);
+    } catch (e) {
+      return OSLoginResult.failure('UNKNOWN', e.toString());
+    }
+  }
+
+  static String? _validateProfileLogin(
+      String externalId, OSUserProfile profile) {
+    if (externalId.isEmpty) return 'loginWithProfile: externalId is required';
+    for (final entry in (profile.tags ?? const {}).entries) {
+      if (entry.key.isEmpty) return 'loginWithProfile: tag key is required';
+    }
+    for (final entry in (profile.aliases ?? const {}).entries) {
+      if (entry.key.isEmpty || entry.value.isEmpty) {
+        return 'loginWithProfile: alias label and id are required';
+      }
+    }
+    return null;
   }
 
   /// Login to OneSignal under the user identified by the [externalId] provided.
