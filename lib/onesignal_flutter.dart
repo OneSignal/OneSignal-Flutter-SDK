@@ -94,7 +94,10 @@ class OneSignal {
       });
       return OSLoginResult.fromWire(raw);
     } catch (e) {
-      return OSLoginResult.failure('UNKNOWN', e.toString());
+      final message =
+          e is PlatformException ? (e.message ?? e.code) : e.toString();
+      logError('loginWithProfile failed: $message');
+      return OSLoginResult.failure('UNKNOWN', message);
     }
   }
 

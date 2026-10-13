@@ -137,6 +137,13 @@ void main() {
         },
         {'success': false, 'error': []},
         {'success': false, 'error': 'boom'},
+        {
+          'success': true,
+          'data': {'onesignalId': 'os-1', 'externalId': 'user-123'},
+          'error': [
+            {'code': 'BACKEND_ERROR', 'source': 'BACKEND', 'message': 'x'},
+          ],
+        },
       ]) {
         test(
           'treats malformed envelope $malformed as UNKNOWN failure',
@@ -177,7 +184,7 @@ void main() {
 
         expect(result.success, isFalse);
         expect(result.error!.single.code, equals('UNKNOWN'));
-        expect(result.error!.single.message, contains('native threw'));
+        expect(result.error!.single.message, equals('native threw'));
       });
 
       test('rejects empty externalId without calling native', () async {

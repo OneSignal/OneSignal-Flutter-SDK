@@ -71,6 +71,8 @@ class OSLoginResult {
     if (raw is! Map) return _malformed();
     final success = raw['success'];
     if (success == true) {
+      final error = raw['error'];
+      if (error is List && error.isNotEmpty) return _malformed();
       final data = _parseData(raw['data']);
       return data == null ? _malformed() : OSLoginResult._(true, data, null);
     }

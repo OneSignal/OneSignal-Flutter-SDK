@@ -187,7 +187,8 @@ public class OneSignalPlugin extends FlutterMessengerResponder
                 message = String.valueOf(t);
             }
         } else if (outcome instanceof kotlin.Result.Failure) {
-            message = String.valueOf(((kotlin.Result.Failure) outcome).exception);
+            Throwable exception = ((kotlin.Result.Failure) outcome).exception;
+            message = exception.getMessage() != null ? exception.getMessage() : exception.toString();
         }
         replyError(result, "OneSignal", message, null);
     }
