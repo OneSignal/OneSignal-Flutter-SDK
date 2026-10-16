@@ -20,12 +20,8 @@ class AppColors {
   static const osDivider = Color(0xFFE8EAED);
   static const osWarningBackground = Color(0xFFFFF8E1);
   static const osBackdrop = Color(0x8A000000);
-  static const osLogBackground = Color(0xFF1A1B1E);
-  static const osLogDebug = Color(0xFF82AAFF);
-  static const osLogInfo = Color(0xFFC3E88D);
-  static const osLogWarn = Color(0xFFFFCB6B);
-  static const osLogError = Color(0xFFFF5370);
-  static const osLogTimestamp = Color(0xFF676E7B);
+  static const osLogBackground = Color(0xFF1E1E1E);
+  static const osLogText = Color(0xFFD4D4D4);
   AppColors._();
 }
 
