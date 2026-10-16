@@ -260,6 +260,40 @@ class AppViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> loginWithProfile(
+    String externalUserId, {
+    String? email,
+    String? sms,
+    String? jwt,
+  }) async {
+    _aliasesList = [];
+    _emailsList = [];
+    _smsNumbersList = [];
+    _tagsList = [];
+    _triggersList = [];
+    _isLoading = true;
+    notifyListeners();
+
+    final result = await OneSignal.loginWithProfile(
+      externalUserId,
+      OSUserProfile(email: email, sms: sms),
+      jwt,
+    );
+    if (!result.success) {
+      final error = result.error?.first;
+      debugPrint('Login with profile error: ${error?.code} ${error?.message}');
+      _isLoading = false;
+      notifyListeners();
+      return;
+    }
+
+    _externalUserId = externalUserId;
+    await _prefs.setExternalUserId(externalUserId);
+    debugPrint('Logged in with profile as: $externalUserId');
+    // The user observer does not fire when the external id is unchanged.
+    await fetchUserDataFromApi();
+  }
+
   Future<void> logoutUser() async {
     _externalUserId = null;
     _aliasesList = [];
