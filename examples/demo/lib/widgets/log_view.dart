@@ -20,19 +20,27 @@ class _LogViewState extends State<LogView> {
   @override
   void initState() {
     super.initState();
-    LogService.entries.addListener(_scrollToEnd);
+    LogService.entries.addListener(_onEntriesChanged);
   }
 
   @override
   void dispose() {
-    LogService.entries.removeListener(_scrollToEnd);
+    LogService.entries.removeListener(_onEntriesChanged);
     _scrollController.dispose();
     super.dispose();
   }
 
+  // Keep following new entries only while the reader is already at the end.
+  void _onEntriesChanged() {
+    final atEnd =
+        !_scrollController.hasClients ||
+        _scrollController.position.extentAfter < _entryFontSize * 2;
+    if (atEnd) _scrollToEnd();
+  }
+
   void _scrollToEnd() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (!_scrollController.hasClients) return;
+      if (!mounted || !_scrollController.hasClients) return;
       _scrollController.jumpTo(_scrollController.position.maxScrollExtent);
     });
   }
@@ -69,7 +77,7 @@ class _LogViewState extends State<LogView> {
     return SizedBox(
       height: 24,
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
+        padding: const EdgeInsets.only(left: 16, right: 9),
         child: Row(
           children: [
             Expanded(
@@ -91,7 +99,6 @@ class _LogViewState extends State<LogView> {
               size: 14,
               onTap: LogService.clear,
             ),
-            const SizedBox(width: 12),
             _HeaderButton(
               identifier: 'log_toggle_button',
               label: _collapsed ? 'Expand logs' : 'Collapse logs',
@@ -168,11 +175,14 @@ class _HeaderButton extends StatelessWidget {
       button: true,
       label: label,
       excludeSemantics: true,
+      onTap: onTap,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: onTap,
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 2),
+        // The header is only 24 tall, so widen the target instead.
+        child: SizedBox(
+          width: 32,
+          height: double.infinity,
           child: Icon(icon, size: size, color: AppColors.osGrey500),
         ),
       ),

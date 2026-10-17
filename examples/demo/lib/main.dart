@@ -108,7 +108,7 @@ Future<void> main() async {
   try {
     apiKey = dotenv.env['ONESIGNAL_API_KEY'] ?? '';
   } catch (_) {
-    debugPrint('[OneSignal] API key not found, continuing without it');
+    LogService.log('API key not found, continuing without it');
   }
   final apiService =
       OneSignalApiService()
@@ -118,7 +118,7 @@ Future<void> main() async {
   // Fetch tooltips in background
   TooltipHelper().init();
 
-  debugPrint('[OneSignal] Initialized with app ID: $appId');
+  LogService.log('Initialized with app ID: $appId');
 
   runApp(
     ChangeNotifierProvider(
