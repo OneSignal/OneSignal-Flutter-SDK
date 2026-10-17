@@ -3,6 +3,7 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import '../models/in_app_message_type.dart';
 import '../models/notification_type.dart';
+import '../services/log_service.dart';
 import '../services/onesignal_api_service.dart';
 import '../services/preferences_service.dart';
 
@@ -168,8 +169,8 @@ class AppViewModel extends ChangeNotifier {
         return t.length > 8 ? '${t.substring(0, 8)}…' : t;
       }
 
-      debugPrint(
-        '[OneSignal] Push subscription changed: '
+      LogService.log(
+        'Push subscription changed: '
         'id=${state.previous.id ?? 'null'} → ${state.current.id ?? 'null'}, '
         'optedIn=${state.previous.optedIn} → ${state.current.optedIn}, '
         'token=${fmtToken(state.previous.token)} → ${fmtToken(state.current.token)}',
@@ -179,14 +180,14 @@ class AppViewModel extends ChangeNotifier {
 
     OneSignal.Notifications.addPermissionObserver((permission) {
       _hasNotificationPermission = permission;
-      debugPrint('[OneSignal] Permission changed: $permission');
+      LogService.log('Permission changed: $permission');
       notifyListeners();
     });
 
     OneSignal.User.addObserver((state) {
       final nextOnesignalId = state.current.onesignalId;
-      debugPrint(
-        '[OneSignal] User changed: onesignalId=${nextOnesignalId ?? 'null'}, '
+      LogService.log(
+        'User changed: onesignalId=${nextOnesignalId ?? 'null'}, '
         'externalId=${state.current.externalId ?? 'null'}',
       );
 
