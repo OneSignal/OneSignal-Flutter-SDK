@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'screens/home_screen.dart';
 import 'services/onesignal_api_service.dart';
+import 'services/log_service.dart';
 import 'services/preferences_service.dart';
 import 'services/tooltip_helper.dart';
 import 'theme.dart';
@@ -48,35 +49,36 @@ Future<void> main() async {
 
   // Register IAM listeners
   OneSignal.InAppMessages.addWillDisplayListener((event) {
-    debugPrint('[OneSignal] IAM willDisplay: ${event.message.messageId}');
+    LogService.show('IAM willDisplay: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addDidDisplayListener((event) {
-    debugPrint('[OneSignal] IAM didDisplay: ${event.message.messageId}');
+    LogService.show('IAM didDisplay: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addWillDismissListener((event) {
-    debugPrint('[OneSignal] IAM willDismiss: ${event.message.messageId}');
+    LogService.show('IAM willDismiss: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addDidDismissListener((event) {
-    debugPrint('[OneSignal] IAM didDismiss: ${event.message.messageId}');
+    LogService.show('IAM didDismiss: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addClickListener((event) {
-    debugPrint('[OneSignal] IAM click: ${event.message.messageId}');
+    LogService.show('IAM click: ${event.message.messageId}');
   });
 
   // Register notification listeners
   OneSignal.Notifications.addClickListener((event) {
-    debugPrint(
-      '[OneSignal] Notification click: ${event.notification.title ?? ''}',
+    LogService.show(
+      'Notification click: ${event.notification.notificationId} '
+      '${event.notification.title ?? ''}',
     );
 
     // Uncomment to see the full event object.
     // debugPrint('[OneSignal] click event: ${event.jsonRepresentation()}');
   });
-  
+
   OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-    debugPrint(
-      '[OneSignal] Notification foregroundWillDisplay: '
-      '${event.notification.title ?? ''}',
+    LogService.show(
+      'Notification foregroundWillDisplay: '
+      '${event.notification.notificationId} ${event.notification.title ?? ''}',
     );
 
     // Uncomment to see the full event object.

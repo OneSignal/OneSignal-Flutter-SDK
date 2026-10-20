@@ -5,3 +5,6 @@ analyzer:
     - example_pod/**
     - example_spm/**
     - examples/**
+    - build/**
+    - android/**
+    - ios/**
