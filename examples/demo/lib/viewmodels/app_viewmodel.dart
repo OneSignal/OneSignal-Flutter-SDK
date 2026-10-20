@@ -50,6 +50,12 @@ class AppViewModel extends ChangeNotifier {
   // user-change observer's fetch right after login).
   int _fetchSequence = 0;
 
+  // Last identity pair seen by the User observer. Some native SDK versions
+  // re-fire the observer on every user model hydration (e.g. after addEmail
+  // or addTag), so only refetch when the identity actually changes.
+  String? _observedOnesignalId;
+  String? _observedExternalId;
+
   // App state
   String _appId = '';
   String get appId => _appId;
@@ -149,6 +155,8 @@ class AppViewModel extends ChangeNotifier {
 
     final onesignalId = await OneSignal.User.getOnesignalId();
     _oneSignalId = onesignalId;
+    _observedOnesignalId ??= onesignalId;
+    _observedExternalId ??= await OneSignal.User.getExternalId();
 
     notifyListeners();
 
@@ -191,8 +199,17 @@ class AppViewModel extends ChangeNotifier {
         'externalId=${state.current.externalId ?? 'null'}',
       );
 
+      final nextExternalId = state.current.externalId;
+      final identityChanged =
+          nextOnesignalId != _observedOnesignalId ||
+          nextExternalId != _observedExternalId;
+      _observedOnesignalId = nextOnesignalId;
+      _observedExternalId = nextExternalId;
+
       _oneSignalId = nextOnesignalId;
       notifyListeners();
+
+      if (!identityChanged) return;
 
       // Drive the post-login fetch from the observer so it runs only once the
       // SDK has actually assigned a new onesignalId. Logout clears it to null;
