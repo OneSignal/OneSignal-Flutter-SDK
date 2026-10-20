@@ -10,12 +10,24 @@ class LogEntry {
 class LogService {
   static const _maxEntries = 100;
 
-  /// Kept in memory only, so each launch starts empty.
+  /// Log view entries are kept in memory only, so each launch starts empty.
   static final ValueNotifier<List<LogEntry>> entries = ValueNotifier(const []);
 
-  /// Write to the on-screen log view and the console.
-  static void log(String message) {
-    debugPrint('[OneSignal] $message');
+  static void info(String message) => _write(message);
+
+  static void show(String message) {
+    _write(message);
+    _addToView(message);
+  }
+
+  static void error(String message) {
+    _write('ERROR: $message');
+    _addToView(message);
+  }
+
+  static void _write(String message) => debugPrint('[OneSignal] $message');
+
+  static void _addToView(String message) {
     final next = [
       ...entries.value,
       LogEntry(_formatTime(DateTime.now()), message),

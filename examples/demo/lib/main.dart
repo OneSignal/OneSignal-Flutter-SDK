@@ -49,24 +49,24 @@ Future<void> main() async {
 
   // Register IAM listeners
   OneSignal.InAppMessages.addWillDisplayListener((event) {
-    LogService.log('IAM willDisplay: ${event.message.messageId}');
+    LogService.show('IAM willDisplay: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addDidDisplayListener((event) {
-    LogService.log('IAM didDisplay: ${event.message.messageId}');
+    LogService.show('IAM didDisplay: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addWillDismissListener((event) {
-    LogService.log('IAM willDismiss: ${event.message.messageId}');
+    LogService.show('IAM willDismiss: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addDidDismissListener((event) {
-    LogService.log('IAM didDismiss: ${event.message.messageId}');
+    LogService.show('IAM didDismiss: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addClickListener((event) {
-    LogService.log('IAM click: ${event.message.messageId}');
+    LogService.show('IAM click: ${event.message.messageId}');
   });
 
   // Register notification listeners
   OneSignal.Notifications.addClickListener((event) {
-    LogService.log(
+    LogService.show(
       'Notification click: ${event.notification.notificationId} '
       '${event.notification.title ?? ''}',
     );
@@ -76,7 +76,7 @@ Future<void> main() async {
   });
 
   OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-    LogService.log(
+    LogService.show(
       'Notification foregroundWillDisplay: '
       '${event.notification.notificationId} ${event.notification.title ?? ''}',
     );

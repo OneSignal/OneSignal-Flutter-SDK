@@ -169,7 +169,7 @@ class AppViewModel extends ChangeNotifier {
         return t.length > 8 ? '${t.substring(0, 8)}…' : t;
       }
 
-      LogService.log(
+      LogService.show(
         'Push subscription changed: '
         'id=${state.previous.id ?? 'null'} → ${state.current.id ?? 'null'}, '
         'optedIn=${state.previous.optedIn} → ${state.current.optedIn}, '
@@ -180,13 +180,13 @@ class AppViewModel extends ChangeNotifier {
 
     OneSignal.Notifications.addPermissionObserver((permission) {
       _hasNotificationPermission = permission;
-      LogService.log('Permission changed: $permission');
+      LogService.show('Permission changed: $permission');
       notifyListeners();
     });
 
     OneSignal.User.addObserver((state) {
       final nextOnesignalId = state.current.onesignalId;
-      LogService.log(
+      LogService.show(
         'User changed: onesignalId=${nextOnesignalId ?? 'null'}, '
         'externalId=${state.current.externalId ?? 'null'}',
       );
@@ -252,11 +252,11 @@ class AppViewModel extends ChangeNotifier {
     try {
       await OneSignal.login(externalUserId);
       await _prefs.setExternalUserId(externalUserId);
-      debugPrint('Logged in as: $externalUserId');
+      LogService.info('Logged in as: $externalUserId');
       // The User observer runs fetchUserDataFromApi once the new onesignalId
       // is assigned; that call clears _isLoading in its finally.
     } catch (e) {
-      debugPrint('Login error: $e');
+      LogService.error('Login error: $e');
       _isLoading = false;
       notifyListeners();
     }
@@ -274,9 +274,9 @@ class AppViewModel extends ChangeNotifier {
     try {
       await OneSignal.logout();
       await _prefs.setExternalUserId(null);
-      debugPrint('Logged out');
+      LogService.info('Logged out');
     } catch (e) {
-      debugPrint('Logout error: $e');
+      LogService.error('Logout error: $e');
     }
   }
 
@@ -308,7 +308,7 @@ class AppViewModel extends ChangeNotifier {
     }
     _pushEnabled = enabled;
     notifyListeners();
-    debugPrint('Push ${enabled ? "enabled" : "disabled"}');
+    LogService.info('Push ${enabled ? "enabled" : "disabled"}');
   }
 
   Future<void> promptPush() => OneSignal.Notifications.requestPermission(true);
@@ -317,21 +317,21 @@ class AppViewModel extends ChangeNotifier {
   Future<void> sendNotification(NotificationType type) async {
     final subscriptionId = OneSignal.User.pushSubscription.id;
     if (subscriptionId == null) {
-      debugPrint('No subscription ID for notification');
+      LogService.info('No subscription ID for notification');
       return;
     }
     final success = await _apiService.sendNotification(type, subscriptionId);
     if (success) {
-      debugPrint('Notification sent: ${type.name}');
+      LogService.info('Notification sent: ${type.name}');
     } else {
-      debugPrint('Failed to send notification');
+      LogService.info('Failed to send notification');
     }
   }
 
   Future<void> sendCustomNotification(String title, String body) async {
     final subscriptionId = OneSignal.User.pushSubscription.id;
     if (subscriptionId == null) {
-      debugPrint('No subscription ID for custom notification');
+      LogService.info('No subscription ID for custom notification');
       return;
     }
     final success = await _apiService.sendCustomNotification(
@@ -340,15 +340,15 @@ class AppViewModel extends ChangeNotifier {
       subscriptionId,
     );
     if (success) {
-      debugPrint('Custom notification sent');
+      LogService.info('Custom notification sent');
     } else {
-      debugPrint('Failed to send notification');
+      LogService.info('Failed to send notification');
     }
   }
 
   void clearAllNotifications() {
     OneSignal.Notifications.clearAll();
-    debugPrint('All notifications cleared');
+    LogService.info('All notifications cleared');
   }
 
   // IAM
@@ -363,7 +363,7 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.InAppMessages.addTrigger('iam_type', type.triggerValue);
     _triggersList = _mergePairs(_triggersList, {'iam_type': type.triggerValue});
     notifyListeners();
-    debugPrint('Sent In-App Message: ${type.label}');
+    LogService.info('Sent In-App Message: ${type.label}');
   }
 
   // Aliases
@@ -371,14 +371,14 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.addAlias(label, id);
     _aliasesList = _mergePairs(_aliasesList, {label: id});
     notifyListeners();
-    debugPrint('Alias added: $label');
+    LogService.info('Alias added: $label');
   }
 
   void addAliases(Map<String, String> aliases) {
     OneSignal.User.addAliases(aliases);
     _aliasesList = _mergePairs(_aliasesList, aliases);
     notifyListeners();
-    debugPrint('${aliases.length} alias(es) added');
+    LogService.info('${aliases.length} alias(es) added');
   }
 
   // Emails
@@ -386,14 +386,14 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.addEmail(email);
     _emailsList = _mergeUnique(_emailsList, [email]);
     notifyListeners();
-    debugPrint('Email added: $email');
+    LogService.info('Email added: $email');
   }
 
   void removeEmail(String email) {
     OneSignal.User.removeEmail(email);
     _emailsList = List.from(_emailsList)..remove(email);
     notifyListeners();
-    debugPrint('Email removed: $email');
+    LogService.info('Email removed: $email');
   }
 
   // SMS
@@ -401,14 +401,14 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.addSms(smsNumber);
     _smsNumbersList = _mergeUnique(_smsNumbersList, [smsNumber]);
     notifyListeners();
-    debugPrint('SMS added: $smsNumber');
+    LogService.info('SMS added: $smsNumber');
   }
 
   void removeSms(String smsNumber) {
     OneSignal.User.removeSms(smsNumber);
     _smsNumbersList = List.from(_smsNumbersList)..remove(smsNumber);
     notifyListeners();
-    debugPrint('SMS removed: $smsNumber');
+    LogService.info('SMS removed: $smsNumber');
   }
 
   // Tags
@@ -416,28 +416,28 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.addTagWithKey(key, value);
     _tagsList = _mergePairs(_tagsList, {key: value});
     notifyListeners();
-    debugPrint('Tag added: $key');
+    LogService.info('Tag added: $key');
   }
 
   void addTags(Map<String, String> tags) {
     OneSignal.User.addTags(tags);
     _tagsList = _mergePairs(_tagsList, tags);
     notifyListeners();
-    debugPrint('${tags.length} tag(s) added');
+    LogService.info('${tags.length} tag(s) added');
   }
 
   void removeTag(String key) {
     OneSignal.User.removeTag(key);
     _tagsList = List.from(_tagsList)..removeWhere((e) => e.key == key);
     notifyListeners();
-    debugPrint('Tag removed: $key');
+    LogService.info('Tag removed: $key');
   }
 
   void removeSelectedTags(List<String> keys) {
     OneSignal.User.removeTags(keys);
     _tagsList = List.from(_tagsList)..removeWhere((e) => keys.contains(e.key));
     notifyListeners();
-    debugPrint('${keys.length} tag(s) removed');
+    LogService.info('${keys.length} tag(s) removed');
   }
 
   // Triggers (in-memory only)
@@ -445,21 +445,21 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.InAppMessages.addTrigger(key, value);
     _triggersList = _mergePairs(_triggersList, {key: value});
     notifyListeners();
-    debugPrint('Trigger added: $key');
+    LogService.info('Trigger added: $key');
   }
 
   void addTriggers(Map<String, String> triggers) {
     OneSignal.InAppMessages.addTriggers(triggers);
     _triggersList = _mergePairs(_triggersList, triggers);
     notifyListeners();
-    debugPrint('${triggers.length} trigger(s) added');
+    LogService.info('${triggers.length} trigger(s) added');
   }
 
   void removeTrigger(String key) {
     OneSignal.InAppMessages.removeTrigger(key);
     _triggersList = List.from(_triggersList)..removeWhere((e) => e.key == key);
     notifyListeners();
-    debugPrint('Trigger removed: $key');
+    LogService.info('Trigger removed: $key');
   }
 
   void removeSelectedTriggers(List<String> keys) {
@@ -467,36 +467,36 @@ class AppViewModel extends ChangeNotifier {
     _triggersList = List.from(_triggersList)
       ..removeWhere((e) => keys.contains(e.key));
     notifyListeners();
-    debugPrint('${keys.length} trigger(s) removed');
+    LogService.info('${keys.length} trigger(s) removed');
   }
 
   void clearAllTriggers() {
     OneSignal.InAppMessages.clearTriggers();
     _triggersList = [];
     notifyListeners();
-    debugPrint('All triggers cleared');
+    LogService.info('All triggers cleared');
   }
 
   // Outcomes
   void sendOutcome(String name) {
     OneSignal.Session.addOutcome(name);
-    debugPrint('Outcome sent: $name');
+    LogService.info('Outcome sent: $name');
   }
 
   void sendUniqueOutcome(String name) {
     OneSignal.Session.addUniqueOutcome(name);
-    debugPrint('Unique outcome sent: $name');
+    LogService.info('Unique outcome sent: $name');
   }
 
   void sendOutcomeWithValue(String name, double value) {
     OneSignal.Session.addOutcomeWithValue(name, value);
-    debugPrint('Outcome sent: $name = $value');
+    LogService.info('Outcome sent: $name = $value');
   }
 
   // Custom Events
   void trackEvent(String name, Map<String, dynamic>? properties) {
     OneSignal.User.trackEvent(name, properties);
-    debugPrint('Event tracked: $name');
+    LogService.info('Event tracked: $name');
   }
 
   // Live Activities
@@ -520,7 +520,7 @@ class AppViewModel extends ChangeNotifier {
       content,
     );
     notifyListeners();
-    debugPrint('Started Live Activity: $_activityId');
+    LogService.info('Started Live Activity: $_activityId');
   }
 
   Future<void> updateLiveActivity() async {
@@ -538,9 +538,9 @@ class AppViewModel extends ChangeNotifier {
     _isLaUpdating = false;
     if (success) {
       _statusIndex = nextIndex;
-      debugPrint('Updated Live Activity: $_activityId');
+      LogService.info('Updated Live Activity: $_activityId');
     } else {
-      debugPrint('Failed to update Live Activity');
+      LogService.info('Failed to update Live Activity');
     }
     notifyListeners();
   }
@@ -549,9 +549,9 @@ class AppViewModel extends ChangeNotifier {
     final success = await _apiService.endLiveActivity(_activityId);
     if (success) {
       _statusIndex = 0;
-      debugPrint('Ended Live Activity: $_activityId');
+      LogService.info('Ended Live Activity: $_activityId');
     } else {
-      debugPrint('Failed to end Live Activity');
+      LogService.info('Failed to end Live Activity');
     }
     notifyListeners();
   }
@@ -562,7 +562,7 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.Location.setShared(shared);
     await _prefs.setLocationShared(shared);
     notifyListeners();
-    debugPrint('Location sharing ${shared ? "enabled" : "disabled"}');
+    LogService.info('Location sharing ${shared ? "enabled" : "disabled"}');
   }
 
   void promptLocation() {
