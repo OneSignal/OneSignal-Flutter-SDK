@@ -22,6 +22,12 @@ jobs:
       - name: Static Analysis
         run: flutter analyze
 
+      - name: Set up Java
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: '17'
+
       - name: Setup Clang
         uses: OneSignal/sdk-shared/.github/actions/setup-clang@main
 
