@@ -140,7 +140,7 @@ if (_externalUserId != null) {
 }
 ```
 
-The cached `externalUserId` is the only value that drives an SDK call inside `loadInitialState()` -- it triggers `OneSignal.login(...)` so the SDK identity matches the persisted UI state. Push subscription id, opted-in flag, and permission are then read from the live SDK state, and the OneSignal ID is fetched via `OneSignal.User.getOnesignalId()`.
+The cached `externalUserId` is the only value that drives an SDK call inside `loadInitialState()` -- it triggers `OneSignal.login(...)` so the SDK identity matches the persisted UI state. Push subscription id, opted-in flag, token, and permission are then read from the live SDK state, and the OneSignal ID is fetched via `OneSignal.User.getOnesignalId()`.
 
 ### Observers
 
@@ -161,6 +161,13 @@ OneSignal.User.addObserver(...)
 ### Loading State
 - No global loading overlay. `vm.isLoading` is passed to `PairList(loading: ...)` in **aliases**, **emails**, **sms**, and **tags** sections only. `user_section.dart` has no loading UI.
 - The viewmodel uses a request-sequence counter (`_fetchSequence`) so stale REST results are dropped when a newer fetch is already in flight.
+
+### Push Status
+- The Push section shows a read-only **Status** row above the **Opted In** toggle: `Subscribed` when `pushSubscription.optedIn` is true, notification permission is granted, and a push token is present; otherwise `Unsubscribed`. `AppViewModel.isPushSubscribed` derives this from the push subscription and permission observers.
+
+### Language
+- The User section has a **Language** dropdown (`Device Default` plus the shared language list) after External ID. The selection is cached in `PreferencesService` and reset to `Device Default` on logout.
+- `Device Default` calls `OneSignal.User.setLanguage('')`, which the native SDK resolves to the device language.
 
 ### SnackBar Messages
 - `AppSnackBar` extension on `BuildContext` defined in `lib/theme.dart` exposes `context.showSnackBar(message)`.

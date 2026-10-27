@@ -63,9 +63,6 @@ public class OneSignalUser extends FlutterMessengerResponder implements MethodCa
 
     private void setLanguage(MethodCall call, Result result) {
         String language = call.argument("language");
-        if (language != null && language.length() == 0) {
-            language = null;
-        }
         OneSignal.getUser().setLanguage(language);
         replySuccess(result, null);
     }
