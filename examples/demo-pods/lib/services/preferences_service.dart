@@ -6,6 +6,7 @@ class PreferencesService {
   static const _keyExternalUserId = 'external_user_id';
   static const _keyLocationShared = 'location_shared';
   static const _keyIamPaused = 'iam_paused';
+  static const _keyLanguage = 'language';
 
   late final SharedPreferences _prefs;
 
@@ -39,4 +40,9 @@ class PreferencesService {
   bool get iamPaused => _prefs.getBool(_keyIamPaused) ?? false;
   Future<void> setIamPaused(bool value) =>
       _prefs.setBool(_keyIamPaused, value);
+
+  // Language
+  String get language => _prefs.getString(_keyLanguage) ?? '';
+  Future<void> setLanguage(String value) =>
+      _prefs.setString(_keyLanguage, value);
 }

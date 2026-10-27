@@ -51,8 +51,26 @@ class PushSection extends StatelessWidget {
                     ],
                   ),
                   const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Status',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      Semantics(
+                        identifier: 'push_subscription_status',
+                        container: true,
+                        child: Text(
+                          vm.isPushSubscribed ? 'Subscribed' : 'Unsubscribed',
+                          style: Theme.of(context).textTheme.bodySmall,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
                   ToggleRow(
-                    label: 'Enabled',
+                    label: 'Opted In',
                     value: vm.pushEnabled,
                     semanticsLabel: 'push_enabled_toggle',
                     onChanged: vm.hasNotificationPermission

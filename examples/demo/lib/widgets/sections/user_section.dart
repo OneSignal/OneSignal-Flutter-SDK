@@ -7,6 +7,53 @@ import '../dialogs.dart';
 import '../action_button.dart';
 import '../section_card.dart';
 
+const _languageOptions = [
+  ('Device Default', ''),
+  ('English', 'en'),
+  ('Arabic', 'ar'),
+  ('Azerbaijani', 'az'),
+  ('Bosnian', 'bs'),
+  ('Catalan', 'ca'),
+  ('Chinese (Simplified)', 'zh-Hans'),
+  ('Chinese (Traditional)', 'zh-Hant'),
+  ('Croatian', 'hr'),
+  ('Czech', 'cs'),
+  ('Danish', 'da'),
+  ('Dutch', 'nl'),
+  ('Estonian', 'et'),
+  ('Finnish', 'fi'),
+  ('French', 'fr'),
+  ('Georgian', 'ka'),
+  ('Bulgarian', 'bg'),
+  ('German', 'de'),
+  ('Greek', 'el'),
+  ('Hindi', 'hi'),
+  ('Hebrew', 'he'),
+  ('Hungarian', 'hu'),
+  ('Indonesian', 'id'),
+  ('Italian', 'it'),
+  ('Japanese', 'ja'),
+  ('Korean', 'ko'),
+  ('Latvian', 'lv'),
+  ('Lithuanian', 'lt'),
+  ('Malay', 'ms'),
+  ('Norwegian', 'nb'),
+  ('Persian', 'fa'),
+  ('Polish', 'pl'),
+  ('Portuguese', 'pt'),
+  ('Punjabi', 'pa'),
+  ('Romanian', 'ro'),
+  ('Russian', 'ru'),
+  ('Serbian', 'sr'),
+  ('Slovak', 'sk'),
+  ('Spanish', 'es'),
+  ('Swedish', 'sv'),
+  ('Thai', 'th'),
+  ('Turkish', 'tr'),
+  ('Ukrainian', 'uk'),
+  ('Vietnamese', 'vi'),
+];
+
 class UserSection extends StatelessWidget {
   final VoidCallback? onInfoTap;
 
@@ -64,6 +111,36 @@ class UserSection extends StatelessWidget {
                           style: Theme.of(context).textTheme.bodySmall?.copyWith(
                                 fontFamily: 'monospace',
                               ),
+                        ),
+                      ),
+                    ],
+                  ),
+                  const Divider(),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Language',
+                        style: Theme.of(context).textTheme.bodyMedium,
+                      ),
+                      Semantics(
+                        identifier: 'user_language_dropdown',
+                        container: true,
+                        child: DropdownButton<String>(
+                          value:
+                              _languageOptions.any((o) => o.$2 == vm.language)
+                                  ? vm.language
+                                  : '',
+                          isDense: true,
+                          underline: const SizedBox.shrink(),
+                          style: Theme.of(context).textTheme.bodySmall,
+                          items: [
+                            for (final (name, code) in _languageOptions)
+                              DropdownMenuItem(value: code, child: Text(name)),
+                          ],
+                          onChanged: (code) {
+                            if (code != null) vm.setLanguage(code);
+                          },
                         ),
                       ),
                     ],

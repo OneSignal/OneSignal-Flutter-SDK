@@ -20,6 +20,15 @@ List<MapEntry<String, String>> _mergePairs(
 List<T> _mergeUnique<T>(List<T> prev, List<T> next) =>
     {...prev, ...next}.toList();
 
+String _deviceLanguageCode() {
+  final locale = PlatformDispatcher.instance.locale;
+  if (locale.languageCode != 'zh') return locale.languageCode;
+  final traditional =
+      locale.scriptCode == 'Hant' ||
+      const {'TW', 'HK', 'MO'}.contains(locale.countryCode);
+  return traditional ? 'zh-Hant' : 'zh-Hans';
+}
+
 class AppViewModel extends ChangeNotifier {
   final OneSignalApiService _apiService;
   final PreferencesService _prefs;
@@ -75,6 +84,17 @@ class AppViewModel extends ChangeNotifier {
 
   bool _hasNotificationPermission = false;
   bool get hasNotificationPermission => _hasNotificationPermission;
+
+  String? _pushToken;
+
+  bool get isPushSubscribed =>
+      _pushEnabled &&
+      _hasNotificationPermission &&
+      (_pushToken?.isNotEmpty ?? false);
+
+  // Empty means device default.
+  String _language = '';
+  String get language => _language;
 
   // IAM state
   bool _iamPaused = false;
@@ -132,6 +152,7 @@ class AppViewModel extends ChangeNotifier {
 
     _iamPaused = _prefs.iamPaused;
     _locationShared = _prefs.locationShared;
+    _language = _prefs.language;
 
     if (_externalUserId != null) {
       OneSignal.login(_externalUserId!);
@@ -139,6 +160,7 @@ class AppViewModel extends ChangeNotifier {
 
     _pushSubscriptionId = OneSignal.User.pushSubscription.id;
     _pushEnabled = OneSignal.User.pushSubscription.optedIn ?? false;
+    _pushToken = OneSignal.User.pushSubscription.token;
     _hasNotificationPermission = OneSignal.Notifications.permission;
 
     final onesignalId = await OneSignal.User.getOnesignalId();
@@ -165,6 +187,7 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.pushSubscription.addObserver((state) {
       _pushSubscriptionId = state.current.id;
       _pushEnabled = state.current.optedIn;
+      _pushToken = state.current.token;
 
       String fmtToken(String? t) {
         if (t == null || t.isEmpty) return 'null';
@@ -255,9 +278,30 @@ class AppViewModel extends ChangeNotifier {
     try {
       await OneSignal.logout();
       await _prefs.setExternalUserId(null);
+      await setLanguage('');
       debugPrint('Logged out');
     } catch (e) {
       debugPrint('Logout error: $e');
+    }
+  }
+
+  // Language
+  Future<void> setLanguage(String language) async {
+    _language = language;
+    notifyListeners();
+
+    try {
+      // The Android bridge forwards '' as null, which the native setLanguage
+      // rejects, so resolve the device language here instead.
+      await OneSignal.User.setLanguage(
+        language.isEmpty ? _deviceLanguageCode() : language,
+      );
+      await _prefs.setLanguage(language);
+      debugPrint(
+        'Language set to: ${language.isEmpty ? 'device default' : language}',
+      );
+    } catch (e) {
+      debugPrint('Set language error: $e');
     }
   }
 
