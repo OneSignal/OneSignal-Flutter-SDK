@@ -20,15 +20,6 @@ List<MapEntry<String, String>> _mergePairs(
 List<T> _mergeUnique<T>(List<T> prev, List<T> next) =>
     {...prev, ...next}.toList();
 
-String _deviceLanguageCode() {
-  final locale = PlatformDispatcher.instance.locale;
-  if (locale.languageCode != 'zh') return locale.languageCode;
-  final traditional =
-      locale.scriptCode == 'Hant' ||
-      const {'TW', 'HK', 'MO'}.contains(locale.countryCode);
-  return traditional ? 'zh-Hant' : 'zh-Hans';
-}
-
 class AppViewModel extends ChangeNotifier {
   final OneSignalApiService _apiService;
   final PreferencesService _prefs;
@@ -291,11 +282,7 @@ class AppViewModel extends ChangeNotifier {
     notifyListeners();
 
     try {
-      // The Android bridge forwards '' as null, which the native setLanguage
-      // rejects, so resolve the device language here instead.
-      await OneSignal.User.setLanguage(
-        language.isEmpty ? _deviceLanguageCode() : language,
-      );
+      await OneSignal.User.setLanguage(language);
       await _prefs.setLanguage(language);
       debugPrint(
         'Language set to: ${language.isEmpty ? 'device default' : language}',

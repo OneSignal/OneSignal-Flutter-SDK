@@ -167,7 +167,7 @@ OneSignal.User.addObserver(...)
 
 ### Language
 - The User section has a **Language** dropdown (`Device Default` plus the shared language list) after External ID. The selection is cached in `PreferencesService` and reset to `Device Default` on logout.
-- `Device Default` calls `OneSignal.User.setLanguage(...)` with the device locale language (`PlatformDispatcher.instance.locale`) instead of an empty string, because the Android bridge forwards `''` as `null`, which the native SDK rejects.
+- `Device Default` calls `OneSignal.User.setLanguage('')`, which the native SDK resolves to the device language.
 
 ### SnackBar Messages
 - `AppSnackBar` extension on `BuildContext` defined in `lib/theme.dart` exposes `context.showSnackBar(message)`.
