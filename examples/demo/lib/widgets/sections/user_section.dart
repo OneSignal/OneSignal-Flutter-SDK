@@ -132,6 +132,7 @@ class UserSection extends StatelessWidget {
                                   ? vm.language
                                   : '',
                           isDense: true,
+                          menuMaxHeight: 320,
                           underline: const SizedBox.shrink(),
                           style: Theme.of(context).textTheme.bodySmall,
                           items: [
