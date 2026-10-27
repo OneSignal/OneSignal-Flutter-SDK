@@ -283,6 +283,7 @@ class AppViewModel extends ChangeNotifier {
     try {
       await OneSignal.login(externalUserId);
       await _prefs.setExternalUserId(externalUserId);
+      await _resetLanguagePicker();
       LogService.info('Logged in as: $externalUserId');
       // The User observer runs fetchUserDataFromApi once the new onesignalId
       // is assigned; that call clears _isLoading in its finally.
@@ -305,7 +306,7 @@ class AppViewModel extends ChangeNotifier {
     try {
       await OneSignal.logout();
       await _prefs.setExternalUserId(null);
-      await setLanguage('');
+      await _resetLanguagePicker();
       LogService.info('Logged out');
     } catch (e) {
       LogService.error('Logout error: $e');
@@ -313,6 +314,14 @@ class AppViewModel extends ChangeNotifier {
   }
 
   // Language
+  // Clears only the cached choice. setLanguage('') would send the device
+  // language and overwrite the user's backend value.
+  Future<void> _resetLanguagePicker() async {
+    _language = '';
+    notifyListeners();
+    await _prefs.setLanguage('');
+  }
+
   Future<void> setLanguage(String language) async {
     _language = language;
     notifyListeners();

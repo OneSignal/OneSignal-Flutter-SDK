@@ -166,8 +166,8 @@ OneSignal.User.addObserver(...)
 - The Push section shows a read-only **Status** row above the **Opted In** toggle: `Subscribed` when `pushSubscription.optedIn` is true, notification permission is granted, and a push token is present; otherwise `Unsubscribed`. `AppViewModel.isPushSubscribed` derives this from the push subscription and permission observers.
 
 ### Language
-- The User section has a **Language** dropdown (`Device Default` plus the shared language list) after External ID. The selection is cached in `PreferencesService` and reset to `Device Default` on logout.
-- `Device Default` calls `OneSignal.User.setLanguage('')`, which the native SDK resolves to the device language.
+- The User section has a **Language** dropdown (`Device Default` plus the shared language list) after External ID. The selection is cached in `PreferencesService`. Login and logout reset the picker to `Device Default` locally (clear the cached value and UI state) without calling `OneSignal.User.setLanguage`, since `''` would send the device language and overwrite the user's backend value.
+- Selecting `Device Default` in the picker calls `OneSignal.User.setLanguage('')`, which the native SDK resolves to the device language.
 - `DropdownButton` sizes itself to its widest option, so set `alignment: AlignmentDirectional.centerEnd` to keep the selected value next to the arrow, and `menuMaxHeight` so the open menu doesn't cover the screen.
 
 ### SnackBar Messages
