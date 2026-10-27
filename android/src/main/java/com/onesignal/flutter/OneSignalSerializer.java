@@ -17,9 +17,11 @@ import com.onesignal.user.state.UserState;
 import com.onesignal.user.subscriptions.PushSubscriptionChangedState;
 import com.onesignal.user.subscriptions.PushSubscriptionState;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -253,6 +255,33 @@ class OneSignalSerializer {
         }
 
         return list;
+    }
+
+    /** Reduces a value to types StandardMessageCodec can encode, since an unsupported type throws on the main thread. */
+    static Object convertToCodecValue(Object value) {
+        if (value == null || value == JSONObject.NULL) return null;
+        if (value instanceof String || value instanceof Boolean) return value;
+        if (value instanceof Integer || value instanceof Long || value instanceof Double) return value;
+        if (value instanceof Number) return ((Number) value).doubleValue();
+        if (value instanceof Map) {
+            HashMap<String, Object> map = new HashMap<>();
+            for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
+                map.put(String.valueOf(entry.getKey()), convertToCodecValue(entry.getValue()));
+            }
+            return map;
+        }
+        if (value instanceof Collection) {
+            List<Object> list = new ArrayList<>();
+            for (Object item : (Collection<?>) value) list.add(convertToCodecValue(item));
+            return list;
+        }
+        try {
+            if (value instanceof JSONObject) return convertJSONObjectToHashMap((JSONObject) value);
+            if (value instanceof JSONArray) return convertJSONArrayToList((JSONArray) value);
+        } catch (JSONException e) {
+            return value.toString();
+        }
+        return value.toString();
     }
 
     /** Helper method to return null value if string is empty **/
