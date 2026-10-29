@@ -1,5 +1,5 @@
 group 'com.onesignal.flutter'
-version '5.7.1'
+version '5.7.2'
 
 def safeEnvFlagGet(prop) {
     def value = System.getenv(prop)
@@ -7,7 +7,7 @@ def safeEnvFlagGet(prop) {
     return normalizedValue != null && (normalizedValue.equalsIgnoreCase('true') || normalizedValue == '1')
 }
 
-def oneSignalVersion = '5.10.2'
+def oneSignalVersion = '5.11.0'
 def oneSignalDisableLocation = safeEnvFlagGet('ONESIGNAL_DISABLE_LOCATION')
 
 buildscript {
