@@ -15,6 +15,7 @@ class SendIamSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final vm = context.read<AppViewModel>();
+    const types = InAppMessageType.values;
 
     return SectionCard(
       title: 'Send In-App Message',
@@ -22,13 +23,22 @@ class SendIamSection extends StatelessWidget {
       onInfoTap: onInfoTap,
       child: Column(
         spacing: AppSpacing.gap,
-        children: InAppMessageType.values.map((type) {
-          return PrimaryButton(
-            label: type.label.toUpperCase(),
-            onPressed: () => vm.sendInAppMessage(type),
-            semanticsLabel: 'send_iam_${type.triggerValue}_button',
-          );
-        }).toList(),
+        children: [
+          for (var i = 0; i < types.length; i += 2)
+            Row(
+              spacing: AppSpacing.gap,
+              children: types.sublist(i, i + 2).map((type) {
+                return Expanded(
+                  child: PrimaryButton(
+                    label: type.label.toUpperCase(),
+                    onPressed: () => vm.sendInAppMessage(type),
+                    semanticsLabel: 'send_iam_${type.triggerValue}_button',
+                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                  ),
+                );
+              }).toList(),
+            ),
+        ],
       ),
     );
   }
