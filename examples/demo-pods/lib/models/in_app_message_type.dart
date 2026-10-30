@@ -1,14 +1,15 @@
-import 'package:flutter/material.dart';
-
 enum InAppMessageType {
-  topBanner('Top Banner', 'top_banner', Icons.vertical_align_top),
-  bottomBanner('Bottom Banner', 'bottom_banner', Icons.vertical_align_bottom),
-  centerModal('Center Modal', 'center_modal', Icons.crop_square),
-  fullScreen('Full Screen', 'full_screen', Icons.fullscreen);
+  topBanner('Top', 'top_banner'),
+  bottomBanner('Bottom', 'bottom_banner'),
+  centerModal('Center', 'center_modal'),
+  html('HTML', 'html'),
+  fullScreen('Full', 'full_screen'),
+  fullBleed('Full Bleed', 'full_bleed'),
+  carousel('Carousel', 'carousel'),
+  carouselBleed('Carousel Bleed', 'carousel_bleed');
 
   final String label;
   final String triggerValue;
-  final IconData icon;
 
-  const InAppMessageType(this.label, this.triggerValue, this.icon);
+  const InAppMessageType(this.label, this.triggerValue);
 }

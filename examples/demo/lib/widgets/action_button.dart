@@ -7,6 +7,7 @@ class PrimaryButton extends StatelessWidget {
   final VoidCallback? onPressed;
   final IconData? icon;
   final String? semanticsLabel;
+  final EdgeInsetsGeometry? padding;
 
   const PrimaryButton({
     super.key,
@@ -14,6 +15,7 @@ class PrimaryButton extends StatelessWidget {
     this.onPressed,
     this.icon,
     this.semanticsLabel,
+    this.padding,
   });
 
   @override
@@ -25,16 +27,20 @@ class PrimaryButton extends StatelessWidget {
         style: ElevatedButton.styleFrom(
           backgroundColor: AppColors.osPrimary,
           foregroundColor: Colors.white,
+          padding: padding,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            if (icon != null) ...[
-              Icon(icon, size: 18),
-              const SizedBox(width: 8),
+        child: FittedBox(
+          fit: BoxFit.scaleDown,
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              if (icon != null) ...[
+                Icon(icon, size: 18),
+                const SizedBox(width: 8),
+              ],
+              Text(label),
             ],
-            Text(label),
-          ],
+          ),
         ),
       ),
     );
