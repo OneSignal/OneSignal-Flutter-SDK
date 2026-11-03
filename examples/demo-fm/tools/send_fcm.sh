@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 #
 # Send a non-OneSignal push directly through the FCM HTTP v1 API, to exercise
-# the FlutterFire path in examples/demo_fm (onMessage / onBackgroundMessage /
-# onMessageOpenedApp / getInitialMessage). See examples/demo_fm/README.md.
+# the FlutterFire path in examples/demo-fm (onMessage / onBackgroundMessage /
+# onMessageOpenedApp / getInitialMessage). See examples/demo-fm/README.md.
 #
 # Usage:
 #   FCM_TOKEN=<device-token> ./send_fcm.sh notif      # notification message

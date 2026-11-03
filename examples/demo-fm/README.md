@@ -1,21 +1,42 @@
-# demo
+# OneSignal + Firebase Messaging Demo
 
-A new Flutter project.
+The main demo app with `firebase_messaging` added, for reproducing issues where OneSignal runs alongside FlutterFire, such as notification click listeners not firing on Android background or killed taps ([#1138](https://github.com/OneSignal/OneSignal-Flutter-SDK/issues/1138)).
 
-## Getting Started
+## Setup
 
-This project is a starting point for a Flutter application.
+1. Copy the environment template and set your OneSignal credentials. The `.env` file must exist before the first build because Flutter bundles it as an app asset:
 
-A few resources to get you started if this is your first Flutter project:
+   ```bash
+   cp .env.example .env
+   ```
 
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
+2. Add your Firebase project's `google-services.json` to `android/app/`. The Android build needs it because this app applies the `com.google.gms.google-services` Gradle plugin. OneSignal push itself doesn't depend on it. The file is for FlutterFire and `tools/send_fcm.sh`.
 
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+3. Fetch dependencies:
 
-## iOS Action Button Icons
+   ```bash
+   flutter pub get
+   ```
 
-See [Testing iOS Action Button Icons](../ios-action-button-icons.md) to verify
-the bundled Save Story and Share notification icons.
+## Run
+
+```bash
+flutter run -d <device_id>
+```
+
+The app logs the FCM token as `[FCM token]` and FlutterFire events as `[FCM fg]`, `[FCM bg]` and `[FCM open]`.
+
+## Sending FCM pushes
+
+[`tools/send_fcm.sh`](tools/send_fcm.sh) sends a non-OneSignal push through the FCM HTTP v1 API:
+
+```bash
+FCM_TOKEN=<device-token> ./tools/send_fcm.sh notif   # notification message
+FCM_TOKEN=<device-token> ./tools/send_fcm.sh data    # data-only message
+FCM_TOKEN=<device-token> ./tools/send_fcm.sh both    # notification + data
+```
+
+It authenticates with `$ACCESS_TOKEN`, `tools/service-account.json` (gitignored), or your active `gcloud` credentials.
+
+To test the bundled iOS notification action icons, follow
+[Testing iOS Action Button Icons](../ios-action-button-icons.md).

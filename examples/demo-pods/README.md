@@ -4,7 +4,7 @@ A demo app showcasing all OneSignal Flutter SDK features including push notifica
 
 ## Prerequisites
 
-- Flutter 3.7+
+- Flutter with Dart 3.7+
 - Android emulator or iOS simulator (or a physical device)
 - For iOS: Xcode with a valid signing configuration
 
@@ -23,29 +23,13 @@ cd ios && pod install && cd ..
 ## Run
 
 ```bash
-flutter run
+flutter run -d <device_id>
 ```
 
-For Android with multiple emulators, use the helper script to pick by AVD name:
-
-```bash
-../run-android.sh
-```
-
-For iOS with multiple simulators:
-
-```bash
-../run-ios.sh
-```
+The `../run-android.sh` and `../run-ios.sh` helper scripts launch `examples/demo`, not this app.
 
 To test the bundled iOS notification action icons, follow
 [Testing iOS Action Button Icons](../ios-action-button-icons.md).
-
-Or specify a device directly:
-
-```bash
-flutter run -d <device_id>
-```
 
 ## Configuration
 
@@ -62,7 +46,7 @@ ONESIGNAL_APP_ID=your-onesignal-app-id
 ONESIGNAL_API_KEY=your-onesignal-api-key
 ```
 
-If no `.env` is provided, the app falls back to a built-in default App ID.
+The `.env` file must exist before the first build because Flutter bundles it as an app asset. If `ONESIGNAL_APP_ID` is empty, the app falls back to a built-in default App ID.
 
 ## Build Guide
 

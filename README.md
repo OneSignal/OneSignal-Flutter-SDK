@@ -125,7 +125,7 @@ Please visit this repository's [Github issue tracker](https://github.com/onesign
 For account issues and support please contact OneSignal support from the [OneSignal.com](https://onesignal.com) dashboard.
 
 #### Demo Project
-To make things easier, we have published a demo project in the `/example` folder of this repository.
+To make things easier, we have published a demo project in the [`examples/demo`](examples/demo) folder of this repository.
 
 #### Supports: 
 * iOS 15 and newer
