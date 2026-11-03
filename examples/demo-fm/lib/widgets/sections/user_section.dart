@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -91,6 +92,27 @@ class UserSection extends StatelessWidget {
               }
             },
           ),
+          if (defaultTargetPlatform == TargetPlatform.android) ...[
+            AppSpacing.gapBox,
+            DestructiveButton(
+              label: 'LOGIN WITH PROFILE',
+              semanticsLabel: 'composite_login_button',
+              onPressed: () async {
+                final input = await showDialog<LoginWithProfileInput>(
+                  context: context,
+                  builder: (_) => const LoginWithProfileDialog(),
+                );
+                if (input != null && context.mounted) {
+                  await vm.loginWithProfile(
+                    input.externalId,
+                    email: input.email,
+                    sms: input.sms,
+                    jwt: input.jwt,
+                  );
+                }
+              },
+            ),
+          ],
           if (vm.isLoggedIn) ...[
             AppSpacing.gapBox,
             DestructiveButton(

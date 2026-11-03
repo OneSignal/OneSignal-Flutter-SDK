@@ -75,6 +75,125 @@ class _SingleInputDialogState extends State<SingleInputDialog> {
   }
 }
 
+typedef LoginWithProfileInput = ({
+  String externalId,
+  String? email,
+  String? sms,
+  String? jwt,
+});
+
+// Login with profile dialog (external id plus optional email, sms, jwt)
+class LoginWithProfileDialog extends StatefulWidget {
+  const LoginWithProfileDialog({super.key});
+
+  @override
+  State<LoginWithProfileDialog> createState() => _LoginWithProfileDialogState();
+}
+
+class _LoginWithProfileDialogState extends State<LoginWithProfileDialog> {
+  final _externalIdController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _smsController = TextEditingController();
+  final _jwtController = TextEditingController();
+
+  @override
+  void dispose() {
+    _externalIdController.dispose();
+    _emailController.dispose();
+    _smsController.dispose();
+    _jwtController.dispose();
+    super.dispose();
+  }
+
+  String? _optional(TextEditingController controller) {
+    final text = controller.text.trim();
+    return text.isEmpty ? null : text;
+  }
+
+  Widget _field(
+    String identifier,
+    String label,
+    TextEditingController controller, {
+    TextInputType keyboardType = TextInputType.text,
+  }) {
+    return Semantics(
+      identifier: identifier,
+      container: true,
+      child: AppTextField(
+        controller: controller,
+        decoration: InputDecoration(labelText: label),
+        keyboardType: keyboardType,
+        onChanged: (_) => setState(() {}),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      title: const Text('Login With Profile'),
+      content: SizedBox(
+        width: double.maxFinite,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              _field(
+                'composite_login_user_id_input',
+                'External User Id',
+                _externalIdController,
+              ),
+              AppSpacing.gapBox,
+              _field(
+                'composite_login_email_input',
+                'Email (optional)',
+                _emailController,
+                keyboardType: TextInputType.emailAddress,
+              ),
+              AppSpacing.gapBox,
+              _field(
+                'composite_login_sms_input',
+                'SMS (optional)',
+                _smsController,
+                keyboardType: TextInputType.phone,
+              ),
+              AppSpacing.gapBox,
+              _field(
+                'composite_login_jwt_input',
+                'JWT Token (optional)',
+                _jwtController,
+              ),
+            ],
+          ),
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        Semantics(
+          identifier: 'composite_login_confirm_button',
+          container: true,
+          button: true,
+          child: TextButton(
+            onPressed: _externalIdController.text.trim().isEmpty
+                ? null
+                : () => Navigator.pop<LoginWithProfileInput>(context, (
+                    externalId: _externalIdController.text.trim(),
+                    email: _optional(_emailController),
+                    sms: _optional(_smsController),
+                    jwt: _optional(_jwtController),
+                  )),
+            child: const Text('Login'),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 // Key-value pair input dialog (single pair)
 class PairInputDialog extends StatefulWidget {
   final String title;

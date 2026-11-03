@@ -3,6 +3,8 @@ package com.onesignal.flutter;
 import android.content.Context;
 import androidx.annotation.NonNull;
 import com.onesignal.OneSignal;
+import com.onesignal.OneSignalResult;
+import com.onesignal.OneSignalUserProfile;
 import com.onesignal.common.OneSignalWrapper;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -12,6 +14,13 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.atomic.AtomicBoolean;
+import kotlin.coroutines.Continuation;
+import kotlin.coroutines.CoroutineContext;
+import kotlin.coroutines.EmptyCoroutineContext;
+import kotlin.coroutines.intrinsics.IntrinsicsKt;
 
 /** OnesignalPlugin */
 public class OneSignalPlugin extends FlutterMessengerResponder
@@ -101,6 +110,7 @@ public class OneSignalPlugin extends FlutterMessengerResponder
         else if (call.method.contentEquals("OneSignal#consentGiven")) this.setConsentGiven(call, result);
         else if (call.method.contentEquals("OneSignal#login")) this.login(call, result);
         else if (call.method.contentEquals("OneSignal#loginWithJWT")) this.loginWithJWT(call, result);
+        else if (call.method.contentEquals("OneSignal#loginWithProfile")) this.loginWithProfile(call, result);
         else if (call.method.contentEquals("OneSignal#logout")) this.logout(call, result);
         else replyNotImplemented(result);
     }
@@ -131,6 +141,73 @@ public class OneSignalPlugin extends FlutterMessengerResponder
     private void loginWithJWT(MethodCall call, Result result) {
         OneSignal.login((String) call.argument("externalId"), (String) call.argument("jwt"));
         replySuccess(result, null);
+    }
+
+    private void loginWithProfile(MethodCall call, final Result result) {
+        Map<String, Object> rawProfile = call.argument("profile");
+        OneSignalUserProfile profile = new OneSignalUserProfile.Builder()
+                .setEmail(stringOrNull(rawProfile, "email"))
+                .setSms(stringOrNull(rawProfile, "sms"))
+                .setTags(stringMap(rawProfile, "tags"))
+                .setAliases(stringMap(rawProfile, "aliases"))
+                .build();
+
+        final AtomicBoolean replied = new AtomicBoolean(false);
+        Continuation<Object> continuation = new Continuation<Object>() {
+            @NonNull
+            @Override
+            public CoroutineContext getContext() {
+                return EmptyCoroutineContext.INSTANCE;
+            }
+
+            @Override
+            public void resumeWith(@NonNull Object outcome) {
+                replyLoginResult(result, replied, outcome);
+            }
+        };
+
+        Object returned = OneSignal.login(
+                (String) call.argument("externalId"), profile, (String) call.argument("jwtBearerToken"), continuation);
+        // A suspend function that completes without suspending returns its result here
+        // and never calls resumeWith.
+        if (returned != IntrinsicsKt.getCOROUTINE_SUSPENDED()) {
+            replyLoginResult(result, replied, returned);
+        }
+    }
+
+    private void replyLoginResult(Result result, AtomicBoolean replied, Object outcome) {
+        if (!replied.compareAndSet(false, true)) return;
+        String message = "Unexpected loginWithProfile result";
+        if (outcome instanceof OneSignalResult) {
+            // May run on the SDK's coroutine thread, so a conversion failure must not escape.
+            try {
+                replySuccess(result, OneSignalSerializer.convertToCodecValue(((OneSignalResult<?>) outcome).toMap()));
+                return;
+            } catch (Throwable t) {
+                message = String.valueOf(t);
+            }
+        } else if (outcome instanceof kotlin.Result.Failure) {
+            Throwable exception = ((kotlin.Result.Failure) outcome).exception;
+            message = exception.getMessage() != null ? exception.getMessage() : exception.toString();
+        }
+        replyError(result, "OneSignal", message, null);
+    }
+
+    private static String stringOrNull(Map<String, Object> map, String key) {
+        Object value = map == null ? null : map.get(key);
+        return value instanceof String ? (String) value : null;
+    }
+
+    private static Map<String, String> stringMap(Map<String, Object> map, String key) {
+        Map<String, String> converted = new HashMap<>();
+        Object value = map == null ? null : map.get(key);
+        if (!(value instanceof Map)) return converted;
+        for (Map.Entry<?, ?> entry : ((Map<?, ?>) value).entrySet()) {
+            if (entry.getKey() != null && entry.getValue() != null) {
+                converted.put(entry.getKey().toString(), entry.getValue().toString());
+            }
+        }
+        return converted;
     }
 
     private void logout(MethodCall call, Result result) {
