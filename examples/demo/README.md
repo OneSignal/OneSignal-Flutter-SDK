@@ -26,7 +26,7 @@ ONESIGNAL_ANDROID_CHANNEL_ID=
 
 - `ONESIGNAL_APP_ID`: falls back to a built-in default App ID when empty.
 - `ONESIGNAL_API_KEY`: REST API key, used to update and end live activities. Sending notifications from the demo doesn't need it.
-- `ONESIGNAL_ANDROID_CHANNEL_ID`: optional Android notification channel for the sound test notification.
+- `ONESIGNAL_ANDROID_CHANNEL_ID`: optional Android notification channel for the sound test notification. Falls back to a built-in default channel.
 
 The OneSignal app needs FCM credentials for Android and APNs credentials for the `com.onesignal.example` bundle ID on iOS.
 
