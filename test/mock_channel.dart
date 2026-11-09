@@ -12,18 +12,24 @@ class OneSignalMockChannelController {
   final MethodChannel _channel = const MethodChannel('OneSignal');
   final MethodChannel _debugChannel = const MethodChannel('OneSignal#debug');
   final MethodChannel _tagsChannel = const MethodChannel('OneSignal#tags');
-  final MethodChannel _locationChannel =
-      const MethodChannel('OneSignal#location');
-  final MethodChannel _inAppMessagesChannel =
-      const MethodChannel('OneSignal#inappmessages');
-  final MethodChannel _liveActivitiesChannel =
-      const MethodChannel('OneSignal#liveactivities');
-  final MethodChannel _notificationsChannel =
-      const MethodChannel('OneSignal#notifications');
-  final MethodChannel _pushSubscriptionChannel =
-      const MethodChannel('OneSignal#pushsubscription');
-  final MethodChannel _sessionChannel =
-      const MethodChannel('OneSignal#session');
+  final MethodChannel _locationChannel = const MethodChannel(
+    'OneSignal#location',
+  );
+  final MethodChannel _inAppMessagesChannel = const MethodChannel(
+    'OneSignal#inappmessages',
+  );
+  final MethodChannel _liveActivitiesChannel = const MethodChannel(
+    'OneSignal#liveactivities',
+  );
+  final MethodChannel _notificationsChannel = const MethodChannel(
+    'OneSignal#notifications',
+  );
+  final MethodChannel _pushSubscriptionChannel = const MethodChannel(
+    'OneSignal#pushsubscription',
+  );
+  final MethodChannel _sessionChannel = const MethodChannel(
+    'OneSignal#session',
+  );
   final MethodChannel _userChannel = const MethodChannel('OneSignal#user');
 
   late OneSignalState state;
@@ -59,29 +65,32 @@ class OneSignalMockChannelController {
   void simulatePushSubscriptionChange(Map<String, dynamic> changeData) {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .handlePlatformMessage(
-      _pushSubscriptionChannel.name,
-      _pushSubscriptionChannel.codec.encodeMethodCall(
-        MethodCall('OneSignal#onPushSubscriptionChange', changeData),
-      ),
-      (ByteData? data) {},
-    );
+          _pushSubscriptionChannel.name,
+          _pushSubscriptionChannel.codec.encodeMethodCall(
+            MethodCall('OneSignal#onPushSubscriptionChange', changeData),
+          ),
+          (ByteData? data) {},
+        );
   }
 
   // Helper method to simulate user state changes from native
   void simulateUserStateChange(Map<String, dynamic> changeData) {
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .handlePlatformMessage(
-      _userChannel.name,
-      _userChannel.codec.encodeMethodCall(
-        MethodCall('OneSignal#onUserStateChange', changeData),
-      ),
-      (ByteData? data) {},
-    );
+          _userChannel.name,
+          _userChannel.codec.encodeMethodCall(
+            MethodCall('OneSignal#onUserStateChange', changeData),
+          ),
+          (ByteData? data) {},
+        );
   }
 
   // Generic helper method to simulate method calls from native on any channel
   void simulateMethodCall(
-      String channelName, String methodName, dynamic arguments) {
+    String channelName,
+    String methodName,
+    dynamic arguments,
+  ) {
     final MethodChannel channel;
 
     switch (channelName) {
@@ -121,12 +130,10 @@ class OneSignalMockChannelController {
 
     TestDefaultBinaryMessengerBinding.instance.defaultBinaryMessenger
         .handlePlatformMessage(
-      channel.name,
-      channel.codec.encodeMethodCall(
-        MethodCall(methodName, arguments),
-      ),
-      (ByteData? data) {},
-    );
+          channel.name,
+          channel.codec.encodeMethodCall(MethodCall(methodName, arguments)),
+          (ByteData? data) {},
+        );
   }
 
   // Convenience wrapper for in-app message events
@@ -197,8 +204,9 @@ class OneSignalMockChannelController {
         state.deleteTags = call.arguments;
         return {"success": true};
       case "OneSignal#setExternalUserId":
-        state.externalId = (call.arguments
-            as Map<dynamic, dynamic>)['externalUserId'] as String?;
+        state.externalId =
+            (call.arguments as Map<dynamic, dynamic>)['externalUserId']
+                as String?;
         return {"success": true};
       case "OneSignal#removeExternalUserId":
         state.externalId = null;
@@ -212,8 +220,9 @@ class OneSignalMockChannelController {
         // Notifications requestPermission (with fallbackToSettings argument)
         // Falls through to the notifications handler below
         state.requestPermissionCalled = true;
-        state.requestPermissionFallbackToSettings = (call.arguments
-            as Map<dynamic, dynamic>)['fallbackToSettings'] as bool?;
+        state.requestPermissionFallbackToSettings =
+            (call.arguments as Map<dynamic, dynamic>)['fallbackToSettings']
+                as bool?;
         return true;
       case "OneSignal#setShared":
         state.locationShared = call.arguments as bool?;
@@ -234,8 +243,9 @@ class OneSignalMockChannelController {
         break;
       case "OneSignal#setupDefault":
         state.liveActivitySetupCalled = true;
-        state.liveActivitySetupOptions = (call.arguments
-            as Map<dynamic, dynamic>)['options'] as Map<dynamic, dynamic>?;
+        state.liveActivitySetupOptions =
+            (call.arguments as Map<dynamic, dynamic>)['options']
+                as Map<dynamic, dynamic>?;
         break;
       case "OneSignal#startDefault":
         state.liveActivityStarted = true;
@@ -248,15 +258,17 @@ class OneSignalMockChannelController {
         break;
       case "OneSignal#setPushToStartToken":
         state.liveActivityPushToStartSet = true;
-        state.liveActivityType = (call.arguments
-            as Map<dynamic, dynamic>)['activityType'] as String?;
+        state.liveActivityType =
+            (call.arguments as Map<dynamic, dynamic>)['activityType']
+                as String?;
         state.liveActivityPushToken =
             (call.arguments as Map<dynamic, dynamic>)['token'] as String?;
         break;
       case "OneSignal#removePushToStartToken":
         state.liveActivityPushToStartRemoved = true;
-        state.liveActivityType = (call.arguments
-            as Map<dynamic, dynamic>)['activityType'] as String?;
+        state.liveActivityType =
+            (call.arguments as Map<dynamic, dynamic>)['activityType']
+                as String?;
         break;
       case "OneSignal#addTrigger":
         state.addTrigger(call.arguments as Map<dynamic, dynamic>);
@@ -280,21 +292,24 @@ class OneSignalMockChannelController {
         return state.inAppMessagesPaused ?? false;
       case "OneSignal#displayNotification":
         // This is called on OneSignal#notifications channel
-        state.displayedNotificationId = (call.arguments
-            as Map<dynamic, dynamic>)['notificationId'] as String?;
+        state.displayedNotificationId =
+            (call.arguments as Map<dynamic, dynamic>)['notificationId']
+                as String?;
         break;
       case "OneSignal#preventDefault":
         // This is called on OneSignal#notifications channel
-        state.preventedNotificationId = (call.arguments
-            as Map<dynamic, dynamic>)['notificationId'] as String?;
+        state.preventedNotificationId =
+            (call.arguments as Map<dynamic, dynamic>)['notificationId']
+                as String?;
         break;
       case "OneSignal#removeNotification":
         state.removedNotificationId =
             (call.arguments as Map<dynamic, dynamic>)['notificationId'] as int?;
         break;
       case "OneSignal#removeGroupedNotifications":
-        state.removedNotificationGroup = (call.arguments
-            as Map<dynamic, dynamic>)['notificationGroup'] as String?;
+        state.removedNotificationGroup =
+            (call.arguments as Map<dynamic, dynamic>)['notificationGroup']
+                as String?;
         break;
       case "OneSignal#clearAll":
         state.clearedAllNotifications = true;
@@ -454,7 +469,7 @@ class OneSignalState {
   bool? clearedAllNotifications;
   bool? notificationPermission;
   int?
-      notificationPermissionNative; // 0 = notDetermined, 1 = denied, 2 = authorized, etc.
+  notificationPermissionNative; // 0 = notDetermined, 1 = denied, 2 = authorized, etc.
   bool? canRequestPermission;
   bool? requestPermissionCalled;
   bool? requestPermissionFallbackToSettings;

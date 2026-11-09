@@ -16,8 +16,10 @@ class OneSignalLiveActivities {
       return;
     }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return await _channel.invokeMethod("OneSignal#enterLiveActivity",
-          {'activityId': activityId, 'token': token});
+      return await _channel.invokeMethod("OneSignal#enterLiveActivity", {
+        'activityId': activityId,
+        'token': token,
+      });
     }
   }
 
@@ -28,8 +30,9 @@ class OneSignalLiveActivities {
   Future<void> exitLiveActivity(String activityId) async {
     if (isMissing(activityId, 'exitLiveActivity: activityId')) return;
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return await _channel.invokeMethod(
-          "OneSignal#exitLiveActivity", {'activityId': activityId});
+      return await _channel.invokeMethod("OneSignal#exitLiveActivity", {
+        'activityId': activityId,
+      });
     }
   }
 
@@ -55,8 +58,9 @@ class OneSignalLiveActivities {
         };
       }
 
-      return await _channel
-          .invokeMethod("OneSignal#setupDefault", {'options': optionsMap});
+      return await _channel.invokeMethod("OneSignal#setupDefault", {
+        'options': optionsMap,
+      });
     }
   }
 
@@ -67,7 +71,10 @@ class OneSignalLiveActivities {
   ///
   /// Only applies to iOS.
   Future<void> startDefault(
-      String activityId, dynamic attributes, dynamic content) async {
+    String activityId,
+    dynamic attributes,
+    dynamic content,
+  ) async {
     if (isMissing(activityId, 'startDefault: activityId') ||
         !_isMap(attributes, 'startDefault: attributes') ||
         !_isMap(content, 'startDefault: content')) {
@@ -77,7 +84,7 @@ class OneSignalLiveActivities {
       return await _channel.invokeMethod("OneSignal#startDefault", {
         'activityId': activityId,
         'attributes': attributes,
-        'content': content
+        'content': content,
       });
     }
   }
@@ -94,8 +101,10 @@ class OneSignalLiveActivities {
       return;
     }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return await _channel.invokeMethod("OneSignal#setPushToStartToken",
-          {'activityType': activityType, 'token': token});
+      return await _channel.invokeMethod("OneSignal#setPushToStartToken", {
+        'activityType': activityType,
+        'token': token,
+      });
     }
   }
 
@@ -109,8 +118,9 @@ class OneSignalLiveActivities {
       return;
     }
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return await _channel.invokeMethod(
-          "OneSignal#removePushToStartToken", {'activityType': activityType});
+      return await _channel.invokeMethod("OneSignal#removePushToStartToken", {
+        'activityType': activityType,
+      });
     }
   }
 
@@ -129,6 +139,8 @@ class LiveActivitySetupOptions {
   /// When true, OneSignal will listen for pushToUpdate tokens for each started live activity.
   final bool enablePushToUpdate;
 
-  LiveActivitySetupOptions(
-      {this.enablePushToStart = true, this.enablePushToUpdate = true});
+  LiveActivitySetupOptions({
+    this.enablePushToStart = true,
+    this.enablePushToUpdate = true,
+  });
 }

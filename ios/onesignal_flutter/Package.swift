@@ -12,6 +12,7 @@ func oneSignalEnvFlag(_ name: String) -> Bool {
 let oneSignalDisableLocation = oneSignalEnvFlag("ONESIGNAL_DISABLE_LOCATION")
 
 var oneSignalDependencies: [Target.Dependency] = [
+    .product(name: "FlutterFramework", package: "FlutterFramework"),
     .product(name: "OneSignalFramework", package: "OneSignal-XCFramework"),
     .product(name: "OneSignalInAppMessages", package: "OneSignal-XCFramework"),
     .product(name: "OneSignalExtension", package: "OneSignal-XCFramework"),
@@ -30,6 +31,7 @@ let package = Package(
         .library(name: "onesignal-flutter", targets: ["onesignal_flutter"])
     ],
     dependencies: [
+        .package(name: "FlutterFramework", path: "../FlutterFramework"),
         .package(url: "https://github.com/OneSignal/OneSignal-XCFramework", exact: "5.8.1"),
     ],
     targets: [

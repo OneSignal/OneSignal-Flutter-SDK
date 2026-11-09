@@ -27,14 +27,16 @@ void main() {
     });
 
     group('enterLiveActivity', () {
-      test('invokes OneSignal#enterLiveActivity with activityId and token',
-          () async {
-        await liveActivities.enterLiveActivity(activityId, token);
+      test(
+        'invokes OneSignal#enterLiveActivity with activityId and token',
+        () async {
+          await liveActivities.enterLiveActivity(activityId, token);
 
-        expect(channelController.state.liveActivityEntered, true);
-        expect(channelController.state.liveActivityId, activityId);
-        expect(channelController.state.liveActivityToken, token);
-      });
+          expect(channelController.state.liveActivityEntered, true);
+          expect(channelController.state.liveActivityId, activityId);
+          expect(channelController.state.liveActivityToken, token);
+        },
+      );
 
       test('rejects empty activityId or token', () async {
         await liveActivities.enterLiveActivity('', token);
@@ -120,12 +122,19 @@ void main() {
         };
 
         await liveActivities.startDefault(
-            activityId, complexAttributes, complexContent);
+          activityId,
+          complexAttributes,
+          complexContent,
+        );
 
-        expect(channelController.state.liveActivityAttributes['nested']['key'],
-            'value');
-        expect(channelController.state.liveActivityContent['data']['status'],
-            'running');
+        expect(
+          channelController.state.liveActivityAttributes['nested']['key'],
+          'value',
+        );
+        expect(
+          channelController.state.liveActivityContent['data']['status'],
+          'running',
+        );
       });
 
       test('rejects empty activityId', () async {
@@ -143,14 +152,16 @@ void main() {
     });
 
     group('setPushToStartToken', () {
-      test('invokes OneSignal#setPushToStartToken with activityType and token',
-          () async {
-        await liveActivities.setPushToStartToken(activityType, token);
+      test(
+        'invokes OneSignal#setPushToStartToken with activityType and token',
+        () async {
+          await liveActivities.setPushToStartToken(activityType, token);
 
-        expect(channelController.state.liveActivityPushToStartSet, true);
-        expect(channelController.state.liveActivityType, activityType);
-        expect(channelController.state.liveActivityPushToken, token);
-      });
+          expect(channelController.state.liveActivityPushToStartSet, true);
+          expect(channelController.state.liveActivityType, activityType);
+          expect(channelController.state.liveActivityPushToken, token);
+        },
+      );
 
       test('rejects empty activityType or token', () async {
         await liveActivities.setPushToStartToken('', token);
@@ -161,13 +172,15 @@ void main() {
     });
 
     group('removePushToStartToken', () {
-      test('invokes OneSignal#removePushToStartToken with activityType',
-          () async {
-        await liveActivities.removePushToStartToken(activityType);
+      test(
+        'invokes OneSignal#removePushToStartToken with activityType',
+        () async {
+          await liveActivities.removePushToStartToken(activityType);
 
-        expect(channelController.state.liveActivityPushToStartRemoved, true);
-        expect(channelController.state.liveActivityType, activityType);
-      });
+          expect(channelController.state.liveActivityPushToStartRemoved, true);
+          expect(channelController.state.liveActivityType, activityType);
+        },
+      );
 
       test('rejects empty activityType', () async {
         await liveActivities.removePushToStartToken('');

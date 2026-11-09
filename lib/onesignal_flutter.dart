@@ -65,8 +65,9 @@ class OneSignal {
   /// user context to that specific user.
   static Future<void> login(String externalId) async {
     if (isMissing(externalId, 'login: externalId')) return;
-    return await _channel
-        .invokeMethod('OneSignal#login', {'externalId': externalId});
+    return await _channel.invokeMethod('OneSignal#login', {
+      'externalId': externalId,
+    });
   }
 
   /// Login to OneSignal under the user identified by the [externalId] provided.
@@ -74,11 +75,14 @@ class OneSignal {
   /// The act of logging a user into the OneSignal SDK will switch the
   /// user context to that specific user.
   @Deprecated(
-      'Do not use, this method is not implemented. See https://documentation.onesignal.com/docs/identity-verification for updates.')
+    'Do not use, this method is not implemented. See https://documentation.onesignal.com/docs/identity-verification for updates.',
+  )
   static Future<void> loginWithJWT(String externalId, String jwt) async {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return await _channel.invokeMethod(
-          'OneSignal#loginWithJWT', {'externalId': externalId, 'jwt': jwt});
+      return await _channel.invokeMethod('OneSignal#loginWithJWT', {
+        'externalId': externalId,
+        'jwt': jwt,
+      });
     }
   }
 
@@ -96,15 +100,17 @@ class OneSignal {
   /// This field is only relevant when the application has
   /// opted into data privacy protections. See [consentRequired].
   static Future<void> consentGiven(bool granted) async {
-    return await _channel
-        .invokeMethod("OneSignal#consentGiven", {'granted': granted});
+    return await _channel.invokeMethod("OneSignal#consentGiven", {
+      'granted': granted,
+    });
   }
 
   /// Allows you to completely disable the SDK until your app calls the
   /// OneSignal.consentGiven(true) function. This is useful if you want
   /// to show a Terms and Conditions or privacy popup for GDPR.
   static Future<void> consentRequired(bool require) async {
-    return await _channel
-        .invokeMethod("OneSignal#consentRequired", {'required': require});
+    return await _channel.invokeMethod("OneSignal#consentRequired", {
+      'required': require,
+    });
   }
 }

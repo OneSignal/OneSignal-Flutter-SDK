@@ -28,7 +28,9 @@ class OneSignalSession {
       logError('addOutcomeWithValue: value must be a finite number');
       return;
     }
-    return await _channel.invokeMethod("OneSignal#addOutcomeWithValue",
-        {"outcome_name": name, "outcome_value": value});
+    return await _channel.invokeMethod("OneSignal#addOutcomeWithValue", {
+      "outcome_name": name,
+      "outcome_value": value,
+    });
   }
 }

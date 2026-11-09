@@ -30,19 +30,21 @@ void main() {
         expect(notifications.permission, false);
       });
 
-      test('permission gets updated via observer during lifecycleInit',
-          () async {
-        channelController.state.notificationPermission = false;
-        await notifications.lifecycleInit();
-        expect(notifications.permission, false);
+      test(
+        'permission gets updated via observer during lifecycleInit',
+        () async {
+          channelController.state.notificationPermission = false;
+          await notifications.lifecycleInit();
+          expect(notifications.permission, false);
 
-        // Test that the observer added in lifecycleInit updates _permission
-        notifications.onNotificationPermissionDidChange(true);
-        expect(notifications.permission, true);
+          // Test that the observer added in lifecycleInit updates _permission
+          notifications.onNotificationPermissionDidChange(true);
+          expect(notifications.permission, true);
 
-        notifications.onNotificationPermissionDidChange(false);
-        expect(notifications.permission, false);
-      });
+          notifications.onNotificationPermissionDidChange(false);
+          expect(notifications.permission, false);
+        },
+      );
     });
 
     group('permissionNative', () {
@@ -60,15 +62,17 @@ void main() {
         expect(permission, OSNotificationPermission.denied);
       });
 
-      test('returns authorized on iOS when native method returns authorized',
-          () async {
-        debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        channelController.state.notificationPermissionNative =
-            OSNotificationPermission.authorized.index;
+      test(
+        'returns authorized on iOS when native method returns authorized',
+        () async {
+          debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
+          channelController.state.notificationPermissionNative =
+              OSNotificationPermission.authorized.index;
 
-        final permission = await notifications.permissionNative();
-        expect(permission, OSNotificationPermission.authorized);
-      });
+          final permission = await notifications.permissionNative();
+          expect(permission, OSNotificationPermission.authorized);
+        },
+      );
 
       test('returns denied on iOS when native method returns denied', () async {
         debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
@@ -108,8 +112,10 @@ void main() {
         debugDefaultTargetPlatformOverride = TargetPlatform.android;
         const notificationGroup = 'test_group';
         await notifications.removeGroupedNotifications(notificationGroup);
-        expect(channelController.state.removedNotificationGroup,
-            notificationGroup);
+        expect(
+          channelController.state.removedNotificationGroup,
+          notificationGroup,
+        );
       });
 
       test('rejects empty notificationGroup', () async {
@@ -127,38 +133,49 @@ void main() {
     });
 
     group('requestPermission', () {
-      test('invokes OneSignal#requestPermission with fallbackToSettings true',
-          () async {
-        await notifications.requestPermission(true);
-        expect(channelController.state.requestPermissionCalled, true);
-        expect(
-            channelController.state.requestPermissionFallbackToSettings, true);
-      });
+      test(
+        'invokes OneSignal#requestPermission with fallbackToSettings true',
+        () async {
+          await notifications.requestPermission(true);
+          expect(channelController.state.requestPermissionCalled, true);
+          expect(
+            channelController.state.requestPermissionFallbackToSettings,
+            true,
+          );
+        },
+      );
 
-      test('invokes OneSignal#requestPermission with fallbackToSettings false',
-          () async {
-        await notifications.requestPermission(false);
-        expect(channelController.state.requestPermissionCalled, true);
-        expect(
-            channelController.state.requestPermissionFallbackToSettings, false);
-      });
+      test(
+        'invokes OneSignal#requestPermission with fallbackToSettings false',
+        () async {
+          await notifications.requestPermission(false);
+          expect(channelController.state.requestPermissionCalled, true);
+          expect(
+            channelController.state.requestPermissionFallbackToSettings,
+            false,
+          );
+        },
+      );
     });
 
     group('registerForProvisionalAuthorization', () {
       test('invokes method on iOS only', () async {
         debugDefaultTargetPlatformOverride = TargetPlatform.iOS;
-        final result =
-            await notifications.registerForProvisionalAuthorization(true);
+        final result = await notifications.registerForProvisionalAuthorization(
+          true,
+        );
         expect(result, true);
         expect(
-            channelController.state.registerForProvisionalAuthorizationCalled,
-            true);
+          channelController.state.registerForProvisionalAuthorizationCalled,
+          true,
+        );
       });
 
       test('returns false on Android', () async {
         debugDefaultTargetPlatformOverride = TargetPlatform.android;
-        final result =
-            await notifications.registerForProvisionalAuthorization(true);
+        final result = await notifications.registerForProvisionalAuthorization(
+          true,
+        );
         expect(result, false);
       });
     });
@@ -285,102 +302,123 @@ void main() {
         'notification': {
           'notificationId': 'buffered-click-id',
           'title': 'Test',
-          'body': 'Test body'
+          'body': 'Test body',
         },
-        'result': {'action_id': null, 'url': null}
+        'result': {'action_id': null, 'url': null},
       };
 
-      test('click arriving before any listener is buffered and delivered',
-          () async {
-        channelController.simulateNotificationEvent(
-            'OneSignal#onClickNotification', clickData);
+      test(
+        'click arriving before any listener is buffered and delivered',
+        () async {
+          channelController.simulateNotificationEvent(
+            'OneSignal#onClickNotification',
+            clickData,
+          );
 
-        final received = <OSNotificationClickEvent>[];
-        notifications.addClickListener(received.add);
+          final received = <OSNotificationClickEvent>[];
+          notifications.addClickListener(received.add);
 
-        // The drain is deferred to a microtask.
-        await Future<void>.delayed(Duration.zero);
+          // The drain is deferred to a microtask.
+          await Future<void>.delayed(Duration.zero);
 
-        expect(received.length, 1);
-        expect(received.first.notification.notificationId, 'buffered-click-id');
-      });
+          expect(received.length, 1);
+          expect(
+            received.first.notification.notificationId,
+            'buffered-click-id',
+          );
+        },
+      );
 
       test(
-          'buffered click fans out to all listeners registered before the drain',
-          () async {
-        channelController.simulateNotificationEvent(
-            'OneSignal#onClickNotification', clickData);
+        'buffered click fans out to all listeners registered before the drain',
+        () async {
+          channelController.simulateNotificationEvent(
+            'OneSignal#onClickNotification',
+            clickData,
+          );
 
-        // Both listeners register synchronously (e.g. analytics then nav) before
-        // the deferred drain runs, so both receive the cold-start click.
-        var firstReceived = 0;
-        var secondReceived = 0;
-        notifications.addClickListener((event) => firstReceived++);
-        notifications.addClickListener((event) => secondReceived++);
+          // Both listeners register synchronously (e.g. analytics then nav) before
+          // the deferred drain runs, so both receive the cold-start click.
+          var firstReceived = 0;
+          var secondReceived = 0;
+          notifications.addClickListener((event) => firstReceived++);
+          notifications.addClickListener((event) => secondReceived++);
 
-        await Future<void>.delayed(Duration.zero);
+          await Future<void>.delayed(Duration.zero);
 
-        expect(firstReceived, 1);
-        expect(secondReceived, 1);
-      });
+          expect(firstReceived, 1);
+          expect(secondReceived, 1);
+        },
+      );
 
-      test('drain survives a listener that removes itself during its callback',
-          () async {
-        channelController.simulateNotificationEvent(
-            'OneSignal#onClickNotification', clickData);
+      test(
+        'drain survives a listener that removes itself during its callback',
+        () async {
+          channelController.simulateNotificationEvent(
+            'OneSignal#onClickNotification',
+            clickData,
+          );
 
-        var received = 0;
-        late OnNotificationClickListener oneShot;
-        oneShot = (event) {
-          received++;
-          notifications.removeClickListener(oneShot);
-        };
-        notifications.addClickListener(oneShot);
+          var received = 0;
+          late OnNotificationClickListener oneShot;
+          oneShot = (event) {
+            received++;
+            notifications.removeClickListener(oneShot);
+          };
+          notifications.addClickListener(oneShot);
 
-        // Mutating _clickListeners mid-drain must not throw
-        // ConcurrentModificationError or drop the event.
-        await Future<void>.delayed(Duration.zero);
+          // Mutating _clickListeners mid-drain must not throw
+          // ConcurrentModificationError or drop the event.
+          await Future<void>.delayed(Duration.zero);
 
-        expect(received, 1);
-      });
+          expect(received, 1);
+        },
+      );
 
       test('drain continues after a listener throws for one event', () async {
         final firstClickData = {
           'notification': {
             'notificationId': 'first-click-id',
             'title': 'First',
-            'body': 'Test body'
+            'body': 'Test body',
           },
-          'result': {'action_id': null, 'url': null}
+          'result': {'action_id': null, 'url': null},
         };
         final secondClickData = {
           'notification': {
             'notificationId': 'second-click-id',
             'title': 'Second',
-            'body': 'Test body'
+            'body': 'Test body',
           },
-          'result': {'action_id': null, 'url': null}
+          'result': {'action_id': null, 'url': null},
         };
         channelController.simulateNotificationEvent(
-            'OneSignal#onClickNotification', firstClickData);
+          'OneSignal#onClickNotification',
+          firstClickData,
+        );
         channelController.simulateNotificationEvent(
-            'OneSignal#onClickNotification', secondClickData);
+          'OneSignal#onClickNotification',
+          secondClickData,
+        );
 
         final received = <String>[];
         final errors = <Object>[];
-        final guarded = runZonedGuarded<Future<void>>(() async {
-          notifications.addClickListener((event) {
-            final notificationId = event.notification.notificationId;
-            received.add(notificationId);
-            if (notificationId == 'first-click-id') {
-              throw StateError('boom');
-            }
-          });
+        final guarded = runZonedGuarded<Future<void>>(
+          () async {
+            notifications.addClickListener((event) {
+              final notificationId = event.notification.notificationId;
+              received.add(notificationId);
+              if (notificationId == 'first-click-id') {
+                throw StateError('boom');
+              }
+            });
 
-          await Future<void>.delayed(Duration.zero);
-        }, (error, stackTrace) {
-          errors.add(error);
-        });
+            await Future<void>.delayed(Duration.zero);
+          },
+          (error, stackTrace) {
+            errors.add(error);
+          },
+        );
 
         await guarded;
 
@@ -389,23 +427,27 @@ void main() {
         expect(errors.single, isA<StateError>());
       });
 
-      test('clicks are not buffered after the first listener has registered',
-          () async {
-        var firstReceived = 0;
-        notifications.addClickListener((event) => firstReceived++);
+      test(
+        'clicks are not buffered after the first listener has registered',
+        () async {
+          var firstReceived = 0;
+          notifications.addClickListener((event) => firstReceived++);
 
-        // A click after registration is delivered live, not buffered.
-        channelController.simulateNotificationEvent(
-            'OneSignal#onClickNotification', clickData);
-        expect(firstReceived, 1);
+          // A click after registration is delivered live, not buffered.
+          channelController.simulateNotificationEvent(
+            'OneSignal#onClickNotification',
+            clickData,
+          );
+          expect(firstReceived, 1);
 
-        // A later listener does not receive the earlier (already delivered)
-        // click; nothing is buffered once a listener has registered.
-        var secondReceived = 0;
-        notifications.addClickListener((event) => secondReceived++);
-        await Future<void>.delayed(Duration.zero);
-        expect(secondReceived, 0);
-      });
+          // A later listener does not receive the earlier (already delivered)
+          // click; nothing is buffered once a listener has registered.
+          var secondReceived = 0;
+          notifications.addClickListener((event) => secondReceived++);
+          await Future<void>.delayed(Duration.zero);
+          expect(secondReceived, 0);
+        },
+      );
     });
 
     group('Will Display Listeners', () {
@@ -413,8 +455,8 @@ void main() {
         'notification': {
           'notificationId': 'test-id',
           'title': 'Test',
-          'body': 'Test body'
-        }
+          'body': 'Test body',
+        },
       };
 
       test('addForegroundWillDisplayListener adds listener', () async {
@@ -425,7 +467,9 @@ void main() {
 
         notifications.addForegroundWillDisplayListener(listener);
         channelController.simulateNotificationEvent(
-            'OneSignal#onWillDisplayNotification', notificationData);
+          'OneSignal#onWillDisplayNotification',
+          notificationData,
+        );
 
         expect(listenerCalled, true);
       });
@@ -439,7 +483,9 @@ void main() {
         notifications.addForegroundWillDisplayListener(listener);
         notifications.removeForegroundWillDisplayListener(listener);
         channelController.simulateNotificationEvent(
-            'OneSignal#onWillDisplayNotification', notificationData);
+          'OneSignal#onWillDisplayNotification',
+          notificationData,
+        );
 
         expect(listenerCalled, false);
       });
@@ -459,7 +505,9 @@ void main() {
         notifications.addForegroundWillDisplayListener(listener2);
 
         channelController.simulateNotificationEvent(
-            'OneSignal#onWillDisplayNotification', notificationData);
+          'OneSignal#onWillDisplayNotification',
+          notificationData,
+        );
 
         expect(listener1Called, true);
         expect(listener2Called, true);
@@ -481,7 +529,9 @@ void main() {
         notifications.removeForegroundWillDisplayListener(listener1);
 
         channelController.simulateNotificationEvent(
-            'OneSignal#onWillDisplayNotification', notificationData);
+          'OneSignal#onWillDisplayNotification',
+          notificationData,
+        );
 
         expect(listener1Called, false);
         expect(listener2Called, true);
@@ -507,23 +557,25 @@ void main() {
     });
 
     group('onNotificationPermissionDidChange', () {
-      test('calls all registered permission observers with permission value',
-          () {
-        var observer1PermissionValue;
-        var observer2PermissionValue;
+      test(
+        'calls all registered permission observers with permission value',
+        () {
+          var observer1PermissionValue;
+          var observer2PermissionValue;
 
-        notifications.addPermissionObserver((permission) {
-          observer1PermissionValue = permission;
-        });
-        notifications.addPermissionObserver((permission) {
-          observer2PermissionValue = permission;
-        });
+          notifications.addPermissionObserver((permission) {
+            observer1PermissionValue = permission;
+          });
+          notifications.addPermissionObserver((permission) {
+            observer2PermissionValue = permission;
+          });
 
-        notifications.onNotificationPermissionDidChange(true);
+          notifications.onNotificationPermissionDidChange(true);
 
-        expect(observer1PermissionValue, true);
-        expect(observer2PermissionValue, true);
-      });
+          expect(observer1PermissionValue, true);
+          expect(observer2PermissionValue, true);
+        },
+      );
 
       test('observers can be called multiple times with different values', () {
         final receivedValues = <bool>[];

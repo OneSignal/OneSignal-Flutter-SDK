@@ -21,8 +21,8 @@ void main() {
       final map = {
         'outer': {
           'inner': 'value',
-          'nested': {'deep': 'data'}
-        }
+          'nested': {'deep': 'data'},
+        },
       };
 
       final result = testObj.convertToJsonString(map);
@@ -37,7 +37,7 @@ void main() {
       final testObj = TestJSONStringRepresentable();
       final map = {
         'items': [1, 2, 3],
-        'strings': ['a', 'b', 'c']
+        'strings': ['a', 'b', 'c'],
       };
 
       final result = testObj.convertToJsonString(map);
@@ -88,7 +88,7 @@ void main() {
     test('convertToJsonString formats with proper indentation', () {
       final testObj = TestJSONStringRepresentable();
       final map = {
-        'level1': {'level2': 'value'}
+        'level1': {'level2': 'value'},
       };
 
       final result = testObj.convertToJsonString(map);
@@ -127,7 +127,7 @@ void main() {
         'bool': true,
         'null': null,
         'list': [1, 2],
-        'map': {'nested': 'value'}
+        'map': {'nested': 'value'},
       };
 
       final result = testObj.convertToJsonString(map);

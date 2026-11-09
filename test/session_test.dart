@@ -66,17 +66,24 @@ void main() {
     });
 
     group('addOutcomeWithValue', () {
-      test('invokes OneSignal#addOutcomeWithValue with name and value',
-          () async {
-        const outcomeName = 'valued_outcome';
-        const outcomeValue = 42.5;
+      test(
+        'invokes OneSignal#addOutcomeWithValue with name and value',
+        () async {
+          const outcomeName = 'valued_outcome';
+          const outcomeValue = 42.5;
 
-        await session.addOutcomeWithValue(outcomeName, outcomeValue);
+          await session.addOutcomeWithValue(outcomeName, outcomeValue);
 
-        expect(channelController.state.addedOutcomeWithValueName, outcomeName);
-        expect(
-            channelController.state.addedOutcomeWithValueValue, outcomeValue);
-      });
+          expect(
+            channelController.state.addedOutcomeWithValueName,
+            outcomeName,
+          );
+          expect(
+            channelController.state.addedOutcomeWithValueValue,
+            outcomeValue,
+          );
+        },
+      );
 
       test('handles negative value', () async {
         const outcomeName = 'negative_outcome';
@@ -86,7 +93,9 @@ void main() {
 
         expect(channelController.state.addedOutcomeWithValueName, outcomeName);
         expect(
-            channelController.state.addedOutcomeWithValueValue, outcomeValue);
+          channelController.state.addedOutcomeWithValueValue,
+          outcomeValue,
+        );
       });
 
       test('can be called multiple times with different values', () async {

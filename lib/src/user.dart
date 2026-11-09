@@ -19,9 +19,9 @@ class OSUserState extends JSONStringRepresentable {
   }
 
   Map<String, dynamic> mapRepresentation() => {
-        'onesignalId': this.onesignalId,
-        'externalId': this.externalId,
-      };
+    'onesignalId': this.onesignalId,
+    'externalId': this.externalId,
+  };
 
   String jsonRepresentation() => convertToJsonString(mapRepresentation());
 }
@@ -207,8 +207,10 @@ class OneSignalUser {
   ///
   /// [name] is the event name to track.
   /// [properties] is an optional map of custom properties associated with the event.
-  Future<void> trackEvent(String name,
-      [Map<String, dynamic>? properties]) async {
+  Future<void> trackEvent(
+    String name, [
+    Map<String, dynamic>? properties,
+  ]) async {
     if (isMissing(name, 'trackEvent: name')) return;
     return await _channel.invokeMethod("OneSignal#trackEvent", {
       'name': name,

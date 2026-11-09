@@ -209,12 +209,12 @@ void main() {
           'current': {
             'id': 'updated-id',
             'token': 'updated-token',
-            'optedIn': true
+            'optedIn': true,
           },
           'previous': {
             'id': 'initial-id',
             'token': 'initial-token',
-            'optedIn': false
+            'optedIn': false,
           },
         };
 

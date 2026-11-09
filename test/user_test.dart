@@ -34,10 +34,7 @@ void main() {
 
       test('handles null/missing onesignalId', () {
         // with null onesignalId
-        final stateWithNull = OSUserState({
-          ...userState,
-          'onesignalId': null,
-        });
+        final stateWithNull = OSUserState({...userState, 'onesignalId': null});
         expect(stateWithNull.onesignalId, isNull);
         expect(stateWithNull.externalId, 'test-external-id');
 
@@ -51,10 +48,7 @@ void main() {
 
       test('handles null/missing externalId', () {
         // with null externalId
-        final stateWithNull = OSUserState({
-          ...userState,
-          'externalId': null,
-        });
+        final stateWithNull = OSUserState({...userState, 'externalId': null});
         expect(stateWithNull.onesignalId, 'test-onesignal-id');
         expect(stateWithNull.externalId, isNull);
 
@@ -67,10 +61,7 @@ void main() {
       });
 
       test('handles all null values', () {
-        final state = OSUserState({
-          'onesignalId': null,
-          'externalId': null,
-        });
+        final state = OSUserState({'onesignalId': null, 'externalId': null});
 
         expect(state.onesignalId, isNull);
         expect(state.externalId, isNull);
@@ -87,10 +78,7 @@ void main() {
       });
 
       test('returns json string with null fields', () {
-        final state = OSUserState({
-          'onesignalId': null,
-          'externalId': null,
-        });
+        final state = OSUserState({'onesignalId': null, 'externalId': null});
         final jsonString = state.jsonRepresentation();
 
         expect(jsonString, contains('"onesignalId": null'));
@@ -130,9 +118,7 @@ void main() {
 
   group('OSUserChangedState', () {
     test('initializes with current state', () {
-      final changedState = OSUserChangedState({
-        'current': userState,
-      });
+      final changedState = OSUserChangedState({'current': userState});
 
       expect(changedState.current.onesignalId, 'test-onesignal-id');
       expect(changedState.current.externalId, 'test-external-id');
@@ -140,10 +126,7 @@ void main() {
 
     test('handles null values in current state', () {
       final changedState = OSUserChangedState({
-        'current': {
-          'onesignalId': null,
-          'externalId': null,
-        },
+        'current': {'onesignalId': null, 'externalId': null},
       });
 
       expect(changedState.current.onesignalId, isNull);
@@ -151,9 +134,7 @@ void main() {
     });
 
     test('jsonRepresentation returns correct format', () {
-      final changedState = OSUserChangedState({
-        'current': userState,
-      });
+      final changedState = OSUserChangedState({'current': userState});
       final jsonString = changedState.jsonRepresentation();
 
       expect(jsonString, contains('"current":'));
@@ -176,15 +157,9 @@ void main() {
     });
 
     test('addAliases invokes native method with multiple aliases', () async {
-      await user.addAliases({
-        'customId': '12345',
-        'userId': 'abc',
-      });
+      await user.addAliases({'customId': '12345', 'userId': 'abc'});
 
-      expect(controller.state.aliases, {
-        'customId': '12345',
-        'userId': 'abc',
-      });
+      expect(controller.state.aliases, {'customId': '12345', 'userId': 'abc'});
     });
 
     test('removeAlias invokes native method with alias label', () async {
@@ -206,11 +181,7 @@ void main() {
     });
 
     test('addTags invokes native method with multiple tags', () async {
-      await user.addTags({
-        'level': 10,
-        'score': 500,
-        'name': 'Player1',
-      });
+      await user.addTags({'level': 10, 'score': 500, 'name': 'Player1'});
 
       expect(controller.state.tags, {
         'level': '10',
@@ -232,17 +203,11 @@ void main() {
     });
 
     test('getTags returns tags from native', () async {
-      controller.state.tags = {
-        'level': '10',
-        'score': '500',
-      };
+      controller.state.tags = {'level': '10', 'score': '500'};
 
       final tags = await user.getTags();
 
-      expect(tags, {
-        'level': '10',
-        'score': '500',
-      });
+      expect(tags, {'level': '10', 'score': '500'});
     });
 
     test('addEmail invokes native method with email', () async {
@@ -398,9 +363,7 @@ void main() {
 
         await user.lifecycleInit();
 
-        controller.simulateUserStateChange({
-          'current': userState,
-        });
+        controller.simulateUserStateChange({'current': userState});
 
         expect(callCount, 3);
       });

@@ -221,7 +221,8 @@ class OSNotification extends JSONStringRepresentable {
       this.androidNotificationId = json['androidNotificationId'] as int?;
     if (json.containsKey('backgroundImageLayout')) {
       this.backgroundImageLayout = OSAndroidBackgroundImageLayout(
-          json['backgroundImageLayout'].cast<String, dynamic>());
+        json['backgroundImageLayout'].cast<String, dynamic>(),
+      );
     }
     if (json.containsKey('groupedNotifications')) {
       final dynamic jsonGroupedNotifications = json['groupedNotifications'];
@@ -229,8 +230,10 @@ class OSNotification extends JSONStringRepresentable {
           ? jsonDecode(jsonGroupedNotifications) as List<dynamic>
           : jsonGroupedNotifications as List<dynamic>;
       this.groupedNotifications = jsonList
-          .map((dynamic item) =>
-              OSNotification((item as Map).cast<String, dynamic>()))
+          .map(
+            (dynamic item) =>
+                OSNotification((item as Map).cast<String, dynamic>()),
+          )
           .toList();
     }
 
@@ -277,8 +280,9 @@ class OSNotification extends JSONStringRepresentable {
       if (this.launchUrl != null) 'launchUrl': this.launchUrl,
       if (this.additionalData != null) 'additionalData': this.additionalData,
       if (this.buttons != null)
-        'buttons':
-            this.buttons!.map((button) => button.mapRepresentation()).toList(),
+        'buttons': this.buttons!
+            .map((button) => button.mapRepresentation())
+            .toList(),
       if (this.rawPayload != null) 'rawPayload': this.rawPayload,
       if (this.attachments != null) 'attachments': this.attachments,
       if (this.contentAvailable != null)
@@ -292,8 +296,7 @@ class OSNotification extends JSONStringRepresentable {
       if (this.interruptionLevel != null)
         'interruptionLevel': this.interruptionLevel,
       if (this.groupedNotifications != null)
-        'groupedNotifications': this
-            .groupedNotifications!
+        'groupedNotifications': this.groupedNotifications!
             .map((notification) => notification.mapRepresentation())
             .toList(),
       if (this.androidNotificationId != null)
@@ -313,8 +316,8 @@ class OSNotification extends JSONStringRepresentable {
       if (this.collapseId != null) 'collapseId': this.collapseId,
       if (this.priority != null) 'priority': this.priority,
       if (this.backgroundImageLayout != null)
-        'backgroundImageLayout':
-            this.backgroundImageLayout!.mapRepresentation(),
+        'backgroundImageLayout': this.backgroundImageLayout!
+            .mapRepresentation(),
     };
   }
 
@@ -334,8 +337,10 @@ class OSNotificationClickResult extends JSONStringRepresentable {
     this.url = json['url'];
   }
 
-  Map<String, dynamic> mapRepresentation() =>
-      {'action_id': this.actionId, 'url': this.url};
+  Map<String, dynamic> mapRepresentation() => {
+    'action_id': this.actionId,
+    'url': this.url,
+  };
 
   String jsonRepresentation() => convertToJsonString(mapRepresentation());
 }
@@ -423,7 +428,7 @@ class OSAndroidBackgroundImageLayout extends JSONStringRepresentable {
     return {
       'image': this.image,
       'titleTextColor': this.titleTextColor,
-      'bodyTextColor': this.bodyTextColor
+      'bodyTextColor': this.bodyTextColor,
     };
   }
 
@@ -448,8 +453,9 @@ class OSNotificationWillDisplayEvent extends JSONStringRepresentable {
   }
 
   String jsonRepresentation() {
-    return convertToJsonString(
-        {'notification': this.notification.mapRepresentation()});
+    return convertToJsonString({
+      'notification': this.notification.mapRepresentation(),
+    });
   }
 }
 
@@ -469,7 +475,7 @@ class OSNotificationClickEvent extends JSONStringRepresentable {
   String jsonRepresentation() {
     return convertToJsonString({
       'notification': this.notification.mapRepresentation(),
-      'result': this.result.mapRepresentation()
+      'result': this.result.mapRepresentation(),
     });
   }
 }

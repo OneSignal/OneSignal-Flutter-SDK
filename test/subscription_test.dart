@@ -8,11 +8,7 @@ final pushSubState = {
 };
 
 final pushChangeState = {
-  'current': {
-    'id': 'current-id',
-    'token': 'current-token',
-    'optedIn': true,
-  },
+  'current': {'id': 'current-id', 'token': 'current-token', 'optedIn': true},
   'previous': {
     'id': 'previous-id',
     'token': 'previous-token',
@@ -22,11 +18,7 @@ final pushChangeState = {
 
 final pushNullChangeState = {
   'current': {'id': null, 'token': null, 'optedIn': false},
-  'previous': {
-    'id': 'previous-id',
-    'token': 'previous-token',
-    'optedIn': true,
-  },
+  'previous': {'id': 'previous-id', 'token': 'previous-token', 'optedIn': true},
 };
 
 void main() {
@@ -183,8 +175,9 @@ void main() {
       });
 
       test('handles null values in current state', () {
-        final changedState =
-            OSPushSubscriptionChangedState(pushNullChangeState);
+        final changedState = OSPushSubscriptionChangedState(
+          pushNullChangeState,
+        );
 
         expect(changedState.current.id, isNull);
         expect(changedState.current.token, isNull);
@@ -231,8 +224,9 @@ void main() {
       });
 
       test('handles null values in json representation', () {
-        final changedState =
-            OSPushSubscriptionChangedState(pushNullChangeState);
+        final changedState = OSPushSubscriptionChangedState(
+          pushNullChangeState,
+        );
         final jsonString = changedState.jsonRepresentation();
 
         expect(jsonString, contains('"current"'));
