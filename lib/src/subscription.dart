@@ -15,8 +15,11 @@ class OSPushSubscriptionState extends JSONStringRepresentable {
     this.optedIn = json['optedIn'] as bool;
   }
 
-  Map<String, dynamic> mapRepresentation() =>
-      {'id': this.id, 'token': this.token, 'optedIn': this.optedIn};
+  Map<String, dynamic> mapRepresentation() => {
+    'id': this.id,
+    'token': this.token,
+    'optedIn': this.optedIn,
+  };
 
   String jsonRepresentation() => convertToJsonString(mapRepresentation());
 }
@@ -30,17 +33,19 @@ class OSPushSubscriptionChangedState extends JSONStringRepresentable {
 
   OSPushSubscriptionChangedState(Map<String, dynamic> json) {
     if (json.containsKey('current'))
-      this.current =
-          OSPushSubscriptionState(json['current'].cast<String, dynamic>());
+      this.current = OSPushSubscriptionState(
+        json['current'].cast<String, dynamic>(),
+      );
     if (json.containsKey('previous'))
-      this.previous =
-          OSPushSubscriptionState(json['previous'].cast<String, dynamic>());
+      this.previous = OSPushSubscriptionState(
+        json['previous'].cast<String, dynamic>(),
+      );
   }
 
   String jsonRepresentation() {
     return convertToJsonString(<String, dynamic>{
       'current': current.mapRepresentation(),
-      'previous': previous.mapRepresentation()
+      'previous': previous.mapRepresentation(),
     });
   }
 }

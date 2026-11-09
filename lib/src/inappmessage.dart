@@ -10,8 +10,9 @@ class OSInAppMessageClickEvent extends JSONStringRepresentable {
 
   OSInAppMessageClickEvent(Map<String, dynamic> json) {
     this.message = OSInAppMessage(json["message"].cast<String, dynamic>());
-    this.result =
-        OSInAppMessageClickResult(json["result"].cast<String, dynamic>());
+    this.result = OSInAppMessageClickResult(
+      json["result"].cast<String, dynamic>(),
+    );
   }
 
   String jsonRepresentation() {
@@ -42,10 +43,10 @@ class OSInAppMessageClickResult extends JSONStringRepresentable {
   }
 
   Map<String, dynamic> mapRepresentation() => {
-        'action_id': this.actionId,
-        'url': this.url,
-        'closing_message': this.closingMessage,
-      };
+    'action_id': this.actionId,
+    'url': this.url,
+    'closing_message': this.closingMessage,
+  };
 
   String jsonRepresentation() => convertToJsonString(mapRepresentation());
 }

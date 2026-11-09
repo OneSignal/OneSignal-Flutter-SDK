@@ -8,13 +8,17 @@ import 'package:onesignal_flutter/src/utils.dart';
 typedef void OnClickInAppMessageListener(OSInAppMessageClickEvent event);
 
 typedef void OnWillDisplayInAppMessageListener(
-    OSInAppMessageWillDisplayEvent event);
+  OSInAppMessageWillDisplayEvent event,
+);
 typedef void OnDidDisplayInAppMessageListener(
-    OSInAppMessageDidDisplayEvent event);
+  OSInAppMessageDidDisplayEvent event,
+);
 typedef void OnWillDismissInAppMessageListener(
-    OSInAppMessageWillDismissEvent event);
+  OSInAppMessageWillDismissEvent event,
+);
 typedef void OnDidDismissInAppMessageListener(
-    OSInAppMessageDidDismissEvent event);
+  OSInAppMessageDidDismissEvent event,
+);
 
 class OneSignalInAppMessages {
   // private channels used to bridge to ObjC/Java
@@ -86,27 +90,36 @@ class OneSignalInAppMessages {
     if (call.method == 'OneSignal#onClickInAppMessage') {
       for (var listener in _clickListeners) {
         listener(
-            OSInAppMessageClickEvent(call.arguments.cast<String, dynamic>()));
+          OSInAppMessageClickEvent(call.arguments.cast<String, dynamic>()),
+        );
       }
     } else if (call.method == 'OneSignal#onWillDisplayInAppMessage') {
       for (var listener in _willDisplayListeners) {
-        listener(OSInAppMessageWillDisplayEvent(
-            call.arguments.cast<String, dynamic>()));
+        listener(
+          OSInAppMessageWillDisplayEvent(
+            call.arguments.cast<String, dynamic>(),
+          ),
+        );
       }
     } else if (call.method == 'OneSignal#onDidDisplayInAppMessage') {
       for (var listener in _didDisplayListeners) {
-        listener(OSInAppMessageDidDisplayEvent(
-            call.arguments.cast<String, dynamic>()));
+        listener(
+          OSInAppMessageDidDisplayEvent(call.arguments.cast<String, dynamic>()),
+        );
       }
     } else if (call.method == 'OneSignal#onWillDismissInAppMessage') {
       for (var listener in _willDismissListeners) {
-        listener(OSInAppMessageWillDismissEvent(
-            call.arguments.cast<String, dynamic>()));
+        listener(
+          OSInAppMessageWillDismissEvent(
+            call.arguments.cast<String, dynamic>(),
+          ),
+        );
       }
     } else if (call.method == 'OneSignal#onDidDismissInAppMessage') {
       for (var listener in _didDismissListeners) {
-        listener(OSInAppMessageDidDismissEvent(
-            call.arguments.cast<String, dynamic>()));
+        listener(
+          OSInAppMessageDidDismissEvent(call.arguments.cast<String, dynamic>()),
+        );
       }
     }
     return null;

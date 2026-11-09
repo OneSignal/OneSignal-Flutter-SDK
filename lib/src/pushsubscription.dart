@@ -3,7 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:onesignal_flutter/src/subscription.dart';
 
 typedef void OnPushSubscriptionChangeObserver(
-    OSPushSubscriptionChangedState stateChanges);
+  OSPushSubscriptionChangedState stateChanges,
+);
 
 class OneSignalPushSubscription {
   MethodChannel _channel = const MethodChannel('OneSignal#pushsubscription');
@@ -72,14 +73,16 @@ class OneSignalPushSubscription {
   // Private function that gets called by ObjC/Java
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#onPushSubscriptionChange') {
-      this._onPushSubscriptionChange(OSPushSubscriptionChangedState(
-          call.arguments.cast<String, dynamic>()));
+      this._onPushSubscriptionChange(
+        OSPushSubscriptionChangedState(call.arguments.cast<String, dynamic>()),
+      );
     }
     return null;
   }
 
   void _onPushSubscriptionChange(
-      OSPushSubscriptionChangedState stateChanges) async {
+    OSPushSubscriptionChangedState stateChanges,
+  ) async {
     this._id = stateChanges.current.id;
     this._token = stateChanges.current.token;
     this._optedIn = stateChanges.current.optedIn;

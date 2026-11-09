@@ -24,7 +24,7 @@ enum OSiOSSettings {
   inAppAlerts,
   inAppLaunchUrl,
   promptBeforeOpeningPushUrl,
-  inFocusDisplayOption
+  inFocusDisplayOption,
 }
 
 enum OSSession { DIRECT, INDIRECT, UNATTRIBUTED, DISABLED }

@@ -2,9 +2,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:onesignal_flutter/src/inappmessage.dart';
 import 'package:onesignal_flutter/src/utils.dart';
 
-const validMessageJson = {
-  'message_id': 'test-message-id-123',
-};
+const validMessageJson = {'message_id': 'test-message-id-123'};
 
 const validClickResultJson = {
   'action_id': 'action-123',
@@ -78,9 +76,7 @@ void main() {
     });
 
     test('creates from minimal JSON', () {
-      final json = <String, dynamic>{
-        'closing_message': false,
-      };
+      final json = <String, dynamic>{'closing_message': false};
       final result = OSInAppMessageClickResult(json);
 
       expect(result.actionId, isNull);
@@ -98,9 +94,7 @@ void main() {
     });
 
     test('jsonRepresentation handles null optional fields', () {
-      final json = <String, dynamic>{
-        'closing_message': false,
-      };
+      final json = <String, dynamic>{'closing_message': false};
       final result = OSInAppMessageClickResult(json);
       final jsonString = result.jsonRepresentation();
 
@@ -128,9 +122,7 @@ void main() {
     test('creates from JSON with minimal fields', () {
       final json = {
         'message': validMessageJson,
-        'result': {
-          'closing_message': false,
-        },
+        'result': {'closing_message': false},
       };
       final event = OSInAppMessageClickEvent(json);
 
@@ -142,9 +134,7 @@ void main() {
 
     test('jsonRepresentation returns correct JSON string', () {
       final json = {
-        'message': {
-          'message_id': 'test-message-id-123',
-        },
+        'message': {'message_id': 'test-message-id-123'},
         'result': {
           'action_id': 'action-123',
           'url': 'https://example.com',

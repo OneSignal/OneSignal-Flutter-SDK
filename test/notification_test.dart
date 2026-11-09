@@ -143,8 +143,10 @@ void main() {
       final notification = OSNotification(androidOnlyJson);
 
       expect(notification.backgroundImageLayout, isNotNull);
-      expect(notification.backgroundImageLayout!.image,
-          'https://example.com/bg.png');
+      expect(
+        notification.backgroundImageLayout!.image,
+        'https://example.com/bg.png',
+      );
       expect(notification.backgroundImageLayout!.titleTextColor, '#FF000000');
       expect(notification.backgroundImageLayout!.bodyTextColor, '#FF666666');
     });
@@ -178,14 +180,8 @@ void main() {
       final json = {
         'notificationId': 'parent-notification',
         'groupedNotifications': [
-          {
-            'notificationId': 'grouped-1',
-            'title': 'Title 1',
-          },
-          {
-            'notificationId': 'grouped-2',
-            'title': 'Title 2',
-          },
+          {'notificationId': 'grouped-1', 'title': 'Title 1'},
+          {'notificationId': 'grouped-2', 'title': 'Title 2'},
         ],
       };
 
@@ -313,11 +309,7 @@ void main() {
     });
 
     test('creates from JSON', () {
-      final json = {
-        'id': 'action1',
-        'text': 'Open',
-        'icon': 'open.png',
-      };
+      final json = {'id': 'action1', 'text': 'Open', 'icon': 'open.png'};
       final button = OSActionButton.fromJson(json);
 
       expect(button.id, 'action1');
@@ -326,10 +318,7 @@ void main() {
     });
 
     test('creates from JSON without icon', () {
-      final json = {
-        'id': 'action2',
-        'text': 'Dismiss',
-      };
+      final json = {'id': 'action2', 'text': 'Dismiss'};
       final button = OSActionButton.fromJson(json);
 
       expect(button.id, 'action2');
@@ -374,18 +363,11 @@ void main() {
     test('mapRepresentation omits absent icons', () {
       final button = OSActionButton(id: 'action5', text: 'Dismiss');
 
-      expect(button.mapRepresentation(), {
-        'id': 'action5',
-        'text': 'Dismiss',
-      });
+      expect(button.mapRepresentation(), {'id': 'action5', 'text': 'Dismiss'});
     });
 
     test('mapRepresentation returns correct map', () {
-      final button = OSActionButton(
-        id: 'btn',
-        text: 'Text',
-        icon: 'icon.png',
-      );
+      final button = OSActionButton(id: 'btn', text: 'Text', icon: 'icon.png');
       final map = button.mapRepresentation();
 
       expect(map['id'], 'btn');
@@ -445,9 +427,7 @@ void main() {
 
   group('OSNotificationWillDisplayEvent', () {
     test('creates from valid JSON', () {
-      final json = {
-        'notification': validNotificationJson,
-      };
+      final json = {'notification': validNotificationJson};
       final event = OSNotificationWillDisplayEvent(json);
 
       expect(event.notification, isNotNull);
@@ -456,9 +436,7 @@ void main() {
     });
 
     test('creates with iOS notification data', () {
-      final json = {
-        'notification': iosOnlyJson,
-      };
+      final json = {'notification': iosOnlyJson};
       final event = OSNotificationWillDisplayEvent(json);
 
       expect(event.notification.contentAvailable, true);
@@ -466,9 +444,7 @@ void main() {
     });
 
     test('jsonRepresentation returns correct JSON string', () {
-      final json = {
-        'notification': validNotificationJson,
-      };
+      final json = {'notification': validNotificationJson};
       final event = OSNotificationWillDisplayEvent(json);
       final jsonRep = event.jsonRepresentation();
       final decoded = jsonDecode(jsonRep) as Map<String, dynamic>;
@@ -542,15 +518,19 @@ void main() {
       channelController.resetState();
     });
 
-    test('display() calls displayNotification with correct notification ID',
-        () {
-      final notification = OSNotification(validNotificationJson);
+    test(
+      'display() calls displayNotification with correct notification ID',
+      () {
+        final notification = OSNotification(validNotificationJson);
 
-      notification.display();
+        notification.display();
 
-      expect(
-          channelController.state.displayedNotificationId, 'notification-123');
-    });
+        expect(
+          channelController.state.displayedNotificationId,
+          'notification-123',
+        );
+      },
+    );
 
     test('display() works with different notification IDs', () {
       final json = {'notificationId': 'custom-notification-id'};
@@ -558,8 +538,10 @@ void main() {
 
       notification.display();
 
-      expect(channelController.state.displayedNotificationId,
-          'custom-notification-id');
+      expect(
+        channelController.state.displayedNotificationId,
+        'custom-notification-id',
+      );
     });
 
     test('multiple display() calls update the displayed notification ID', () {
@@ -583,18 +565,20 @@ void main() {
       channelController.resetState();
     });
 
-    test('preventDefault() calls preventDefault with correct notification ID',
-        () {
-      final json = {
-        'notification': validNotificationJson,
-      };
-      final event = OSNotificationWillDisplayEvent(json);
+    test(
+      'preventDefault() calls preventDefault with correct notification ID',
+      () {
+        final json = {'notification': validNotificationJson};
+        final event = OSNotificationWillDisplayEvent(json);
 
-      event.preventDefault();
+        event.preventDefault();
 
-      expect(
-          channelController.state.preventedNotificationId, 'notification-123');
-    });
+        expect(
+          channelController.state.preventedNotificationId,
+          'notification-123',
+        );
+      },
+    );
 
     test('preventDefault() works with different notification IDs', () {
       final json = {
@@ -604,27 +588,31 @@ void main() {
 
       event.preventDefault();
 
-      expect(channelController.state.preventedNotificationId,
-          'custom-will-display-id');
+      expect(
+        channelController.state.preventedNotificationId,
+        'custom-will-display-id',
+      );
     });
 
-    test('multiple preventDefault() calls update the prevented notification ID',
-        () {
-      final json1 = {
-        'notification': {'notificationId': 'prevent-1'},
-      };
-      final json2 = {
-        'notification': {'notificationId': 'prevent-2'},
-      };
-      final event1 = OSNotificationWillDisplayEvent(json1);
-      final event2 = OSNotificationWillDisplayEvent(json2);
+    test(
+      'multiple preventDefault() calls update the prevented notification ID',
+      () {
+        final json1 = {
+          'notification': {'notificationId': 'prevent-1'},
+        };
+        final json2 = {
+          'notification': {'notificationId': 'prevent-2'},
+        };
+        final event1 = OSNotificationWillDisplayEvent(json1);
+        final event2 = OSNotificationWillDisplayEvent(json2);
 
-      event1.preventDefault();
-      expect(channelController.state.preventedNotificationId, 'prevent-1');
+        event1.preventDefault();
+        expect(channelController.state.preventedNotificationId, 'prevent-1');
 
-      event2.preventDefault();
-      expect(channelController.state.preventedNotificationId, 'prevent-2');
-    });
+        event2.preventDefault();
+        expect(channelController.state.preventedNotificationId, 'prevent-2');
+      },
+    );
   });
 
   group('OSNotificationClickEvent preventDefault', () {
@@ -636,19 +624,23 @@ void main() {
       channelController.resetState();
     });
 
-    test('preventDefault() calls preventDefault with correct notification ID',
-        () {
-      final json = {
-        'notification': validNotificationJson,
-        'result': clickResultJson,
-      };
-      final event = OSNotificationClickEvent(json);
+    test(
+      'preventDefault() calls preventDefault with correct notification ID',
+      () {
+        final json = {
+          'notification': validNotificationJson,
+          'result': clickResultJson,
+        };
+        final event = OSNotificationClickEvent(json);
 
-      event.preventDefault();
+        event.preventDefault();
 
-      expect(
-          channelController.state.preventedNotificationId, 'notification-123');
-    });
+        expect(
+          channelController.state.preventedNotificationId,
+          'notification-123',
+        );
+      },
+    );
 
     test('preventDefault() works with different notification IDs', () {
       final json = {
@@ -660,29 +652,37 @@ void main() {
       event.preventDefault();
 
       expect(
-          channelController.state.preventedNotificationId, 'custom-click-id');
+        channelController.state.preventedNotificationId,
+        'custom-click-id',
+      );
     });
 
-    test('multiple preventDefault() calls update the prevented notification ID',
-        () {
-      final json1 = {
-        'notification': {'notificationId': 'click-prevent-1'},
-        'result': <String, dynamic>{},
-      };
-      final json2 = {
-        'notification': {'notificationId': 'click-prevent-2'},
-        'result': <String, dynamic>{},
-      };
-      final event1 = OSNotificationClickEvent(json1);
-      final event2 = OSNotificationClickEvent(json2);
+    test(
+      'multiple preventDefault() calls update the prevented notification ID',
+      () {
+        final json1 = {
+          'notification': {'notificationId': 'click-prevent-1'},
+          'result': <String, dynamic>{},
+        };
+        final json2 = {
+          'notification': {'notificationId': 'click-prevent-2'},
+          'result': <String, dynamic>{},
+        };
+        final event1 = OSNotificationClickEvent(json1);
+        final event2 = OSNotificationClickEvent(json2);
 
-      event1.preventDefault();
-      expect(
-          channelController.state.preventedNotificationId, 'click-prevent-1');
+        event1.preventDefault();
+        expect(
+          channelController.state.preventedNotificationId,
+          'click-prevent-1',
+        );
 
-      event2.preventDefault();
-      expect(
-          channelController.state.preventedNotificationId, 'click-prevent-2');
-    });
+        event2.preventDefault();
+        expect(
+          channelController.state.preventedNotificationId,
+          'click-prevent-2',
+        );
+      },
+    );
   });
 }

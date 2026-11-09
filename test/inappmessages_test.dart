@@ -4,9 +4,7 @@ import 'package:onesignal_flutter/src/inappmessages.dart';
 
 import 'mock_channel.dart';
 
-const validMessageJson = {
-  'message_id': 'test-message-id-123',
-};
+const validMessageJson = {'message_id': 'test-message-id-123'};
 
 const validClickResultJson = {
   'action_id': 'action-123',
@@ -47,17 +45,16 @@ void main() {
     });
 
     group('addTriggers', () {
-      test('invokes OneSignal#addTriggers method with map of triggers',
-          () async {
-        final triggers = {
-          'purchase_made': 'true',
-          'user_level': '5',
-        };
+      test(
+        'invokes OneSignal#addTriggers method with map of triggers',
+        () async {
+          final triggers = {'purchase_made': 'true', 'user_level': '5'};
 
-        await inAppMessages.addTriggers(triggers);
+          await inAppMessages.addTriggers(triggers);
 
-        expect(channelController.state.triggers, triggers);
-      });
+          expect(channelController.state.triggers, triggers);
+        },
+      );
 
       test('handles empty triggers map', () async {
         await inAppMessages.addTriggers({});
@@ -75,14 +72,16 @@ void main() {
     });
 
     group('removeTriggers', () {
-      test('invokes OneSignal#removeTriggers method with list of keys',
-          () async {
-        final keys = ['trigger1', 'trigger2'];
+      test(
+        'invokes OneSignal#removeTriggers method with list of keys',
+        () async {
+          final keys = ['trigger1', 'trigger2'];
 
-        await inAppMessages.removeTriggers(keys);
+          await inAppMessages.removeTriggers(keys);
 
-        expect(channelController.state.removedTriggers, keys);
-      });
+          expect(channelController.state.removedTriggers, keys);
+        },
+      );
 
       test('handles empty keys list', () async {
         await inAppMessages.removeTriggers([]);
@@ -112,13 +111,15 @@ void main() {
     });
 
     group('arePaused', () {
-      test('invokes OneSignal#arePaused method and returns correct value',
-          () async {
-        await inAppMessages.paused(true);
-        final result = await inAppMessages.arePaused();
+      test(
+        'invokes OneSignal#arePaused method and returns correct value',
+        () async {
+          await inAppMessages.paused(true);
+          final result = await inAppMessages.arePaused();
 
-        expect(result, true);
-      });
+          expect(result, true);
+        },
+      );
 
       test('returns false when not paused', () async {
         final result = await inAppMessages.arePaused();
@@ -147,10 +148,7 @@ void main() {
 
         channelController.simulateInAppMessageEvent(
           'OneSignal#onClickInAppMessage',
-          {
-            'message': validMessageJson,
-            'result': validClickResultJson,
-          },
+          {'message': validMessageJson, 'result': validClickResultJson},
         );
 
         expect(listenerCalled, true);
@@ -168,10 +166,7 @@ void main() {
 
         channelController.simulateInAppMessageEvent(
           'OneSignal#onClickInAppMessage',
-          {
-            'message': validMessageJson,
-            'result': validClickResultJson,
-          },
+          {'message': validMessageJson, 'result': validClickResultJson},
         );
 
         expect(listenerCalled, false);
@@ -369,10 +364,7 @@ void main() {
 
         channelController.simulateInAppMessageEvent(
           'OneSignal#onClickInAppMessage',
-          {
-            'message': validMessageJson,
-            'result': validClickResultJson,
-          },
+          {'message': validMessageJson, 'result': validClickResultJson},
         );
 
         expect(listenerCount, 2);

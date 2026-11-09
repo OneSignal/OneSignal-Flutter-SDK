@@ -11,8 +11,9 @@ class OneSignalDebug {
   /// The parameter [logLevel] controls
   /// how verbose logs in the console/logcat are
   Future<void> setLogLevel(OSLogLevel logLevel) async {
-    return await _channel
-        .invokeMethod("OneSignal#setLogLevel", {'logLevel': logLevel.index});
+    return await _channel.invokeMethod("OneSignal#setLogLevel", {
+      'logLevel': logLevel.index,
+    });
   }
 
   /// Sets the log level for the SDK.
@@ -20,7 +21,8 @@ class OneSignalDebug {
   /// The parameter [visualLevel] controls
   /// if the SDK will show alerts for each logged message
   Future<void> setAlertLevel(OSLogLevel visualLevel) async {
-    return await _channel.invokeMethod(
-        "OneSignal#setAlertLevel", {'visualLevel': visualLevel.index});
+    return await _channel.invokeMethod("OneSignal#setAlertLevel", {
+      'visualLevel': visualLevel.index,
+    });
   }
 }

@@ -9,7 +9,8 @@ import 'package:onesignal_flutter/src/utils.dart';
 typedef void OnNotificationPermissionChangeObserver(bool permission);
 
 typedef void OnNotificationWillDisplayListener(
-    OSNotificationWillDisplayEvent event);
+  OSNotificationWillDisplayEvent event,
+);
 
 typedef void OnNotificationClickListener(OSNotificationClickEvent event);
 
@@ -60,8 +61,9 @@ class OneSignalNotifications {
   /// ephemeral, // only available in iOS 14
   Future<OSNotificationPermission> permissionNative() async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return OSNotificationPermission
-          .values[await _channel.invokeMethod("OneSignal#permissionNative")];
+      return OSNotificationPermission.values[await _channel.invokeMethod(
+        "OneSignal#permissionNative",
+      )];
     } else {
       return _permission
           ? OSNotificationPermission.authorized
@@ -78,20 +80,25 @@ class OneSignalNotifications {
   /// Removes a single notification.
   Future<void> removeNotification(int notificationId) async {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return await _channel.invokeMethod(
-          "OneSignal#removeNotification", {'notificationId': notificationId});
+      return await _channel.invokeMethod("OneSignal#removeNotification", {
+        'notificationId': notificationId,
+      });
     }
   }
 
   /// Removes a grouped notification.
   Future<void> removeGroupedNotifications(String notificationGroup) async {
     if (isMissing(
-        notificationGroup, 'removeGroupedNotifications: notificationGroup')) {
+      notificationGroup,
+      'removeGroupedNotifications: notificationGroup',
+    )) {
       return;
     }
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return await _channel.invokeMethod("OneSignal#removeGroupedNotifications",
-          {'notificationGroup': notificationGroup});
+      return await _channel.invokeMethod(
+        "OneSignal#removeGroupedNotifications",
+        {'notificationGroup': notificationGroup},
+      );
     }
   }
 
@@ -103,17 +110,20 @@ class OneSignalNotifications {
   /// Prompt the user for permission to receive push notifications. This will display the native
   /// system prompt to request push notification permission.
   Future<bool> requestPermission(bool fallbackToSettings) async {
-    return await _channel.invokeMethod("OneSignal#requestPermission",
-        {'fallbackToSettings': fallbackToSettings});
+    return await _channel.invokeMethod("OneSignal#requestPermission", {
+      'fallbackToSettings': fallbackToSettings,
+    });
   }
 
   /// Instead of having to prompt the user for permission to send them push notifications,
   /// your app can request provisional authorization.
   Future<bool> registerForProvisionalAuthorization(
-      bool fallbackToSettings) async {
+    bool fallbackToSettings,
+  ) async {
     if (defaultTargetPlatform == TargetPlatform.iOS) {
-      return await _channel
-          .invokeMethod("OneSignal#registerForProvisionalAuthorization");
+      return await _channel.invokeMethod(
+        "OneSignal#registerForProvisionalAuthorization",
+      );
     } else {
       return false;
     }
@@ -128,7 +138,8 @@ class OneSignalNotifications {
 
   // Remove a push subscription observer that has been previously added.
   void removePermissionObserver(
-      OnNotificationPermissionChangeObserver observer) {
+    OnNotificationPermissionChangeObserver observer,
+  ) {
     _observers.remove(observer);
   }
 
@@ -142,8 +153,9 @@ class OneSignalNotifications {
 
   Future<Null> _handleMethod(MethodCall call) async {
     if (call.method == 'OneSignal#onClickNotification') {
-      var event =
-          OSNotificationClickEvent(call.arguments.cast<String, dynamic>());
+      var event = OSNotificationClickEvent(
+        call.arguments.cast<String, dynamic>(),
+      );
       if (_clickListeners.isNotEmpty) {
         for (var listener in _clickListeners) {
           listener(event);
@@ -159,13 +171,18 @@ class OneSignalNotifications {
       }
     } else if (call.method == 'OneSignal#onWillDisplayNotification') {
       for (var listener in _willDisplayListeners) {
-        listener(OSNotificationWillDisplayEvent(
-            call.arguments.cast<String, dynamic>()));
+        listener(
+          OSNotificationWillDisplayEvent(
+            call.arguments.cast<String, dynamic>(),
+          ),
+        );
       }
       var event = OSNotificationWillDisplayEvent(
-          call.arguments.cast<String, dynamic>());
-      _channel.invokeMethod("OneSignal#proceedWithWillDisplay",
-          {'notificationId': event.notification.notificationId});
+        call.arguments.cast<String, dynamic>(),
+      );
+      _channel.invokeMethod("OneSignal#proceedWithWillDisplay", {
+        'notificationId': event.notification.notificationId,
+      });
     } else if (call.method == 'OneSignal#onNotificationPermissionDidChange') {
       this.onNotificationPermissionDidChange(call.arguments["permission"]);
     }
@@ -179,25 +196,29 @@ class OneSignalNotifications {
   }
 
   void addForegroundWillDisplayListener(
-      OnNotificationWillDisplayListener listener) {
+    OnNotificationWillDisplayListener listener,
+  ) {
     _willDisplayListeners.add(listener);
   }
 
   void removeForegroundWillDisplayListener(
-      OnNotificationWillDisplayListener listener) {
+    OnNotificationWillDisplayListener listener,
+  ) {
     _willDisplayListeners.remove(listener);
   }
 
   /// The notification willDisplay listener is called whenever a notification arrives
   /// and the application is in foreground
   void preventDefault(String notificationId) {
-    _channel.invokeMethod(
-        "OneSignal#preventDefault", {'notificationId': notificationId});
+    _channel.invokeMethod("OneSignal#preventDefault", {
+      'notificationId': notificationId,
+    });
   }
 
   void displayNotification(String notificationId) {
-    _channel.invokeMethod(
-        "OneSignal#displayNotification", {'notificationId': notificationId});
+    _channel.invokeMethod("OneSignal#displayNotification", {
+      'notificationId': notificationId,
+    });
   }
 
   /// The notification click listener is called whenever the user opens a
