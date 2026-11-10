@@ -26,7 +26,9 @@ Future<void> main() async {
   final envAppId = dotenv.env['ONESIGNAL_APP_ID'];
   final appId = envAppId?.trim() ?? '';
   if (appId.isEmpty) {
-    throw StateError('ONESIGNAL_APP_ID is not set. Add it to examples/demo-pods/.env.');
+    throw StateError(
+      'ONESIGNAL_APP_ID is not set. Add it to examples/demo-pods/.env.',
+    );
   }
 
   // Initialize OneSignal SDK

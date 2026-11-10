@@ -30,6 +30,12 @@ ONESIGNAL_ANDROID_CHANNEL_ID=
 
 The OneSignal app needs FCM credentials for the `com.onesignal.sdkdemo` Android package and APNs credentials for the `com.onesignal.example` bundle ID on iOS.
 
+Then fetch dependencies:
+
+```bash
+flutter pub get
+```
+
 ### Firebase Installation IDs (optional)
 
 E2E builds register with Firebase Installation IDs. To match locally, put a `google-services.json` for `com.onesignal.sdkdemo` in `android/app/` (it is gitignored) and build with:
@@ -39,12 +45,6 @@ flutter build apk -PFIREBASE_INSTALLATION_ID_ENABLED=true
 ```
 
 The flag is off by default, and the build fails if it is on without `google-services.json`.
-
-Then fetch dependencies:
-
-```bash
-flutter pub get
-```
 
 ## Run
 
