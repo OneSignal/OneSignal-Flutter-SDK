@@ -24,11 +24,21 @@ ONESIGNAL_API_KEY=your-onesignal-api-key
 ONESIGNAL_ANDROID_CHANNEL_ID=
 ```
 
-- `ONESIGNAL_APP_ID`: falls back to a built-in default App ID when empty.
+- `ONESIGNAL_APP_ID`: required. The app throws at startup when it is empty.
 - `ONESIGNAL_API_KEY`: REST API key, used to update and end live activities. Sending notifications from the demo doesn't need it.
 - `ONESIGNAL_ANDROID_CHANNEL_ID`: optional Android notification channel for the sound test notification. Falls back to a built-in default channel.
 
-The OneSignal app needs FCM credentials for Android and APNs credentials for the `com.onesignal.example` bundle ID on iOS.
+The OneSignal app needs FCM credentials for the `com.onesignal.sdkdemo` Android package and APNs credentials for the `com.onesignal.example` bundle ID on iOS.
+
+### Firebase Installation IDs (optional)
+
+E2E builds register with Firebase Installation IDs. To match locally, put a `google-services.json` for `com.onesignal.sdkdemo` in `android/app/` (it is gitignored) and build with:
+
+```bash
+flutter build apk -PFIREBASE_INSTALLATION_ID_ENABLED=true
+```
+
+The flag is off by default, and the build fails if it is on without `google-services.json`.
 
 Then fetch dependencies:
 

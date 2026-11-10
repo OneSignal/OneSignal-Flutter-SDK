@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.onesignal.example"
+    namespace = "com.onesignal.sdkdemo"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -16,7 +16,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.onesignal.example"
+        applicationId = "com.onesignal.sdkdemo"
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
