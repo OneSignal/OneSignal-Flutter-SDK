@@ -14,6 +14,10 @@ runs:
       working-directory: examples/demo
       shell: bash
       run: |
+        if [ -z "${{ inputs.onesignal-app-id }}" ]; then
+          echo "::error::onesignal-app-id is empty; the demo app throws at startup without it"
+          exit 1
+        fi
         {
           echo "ONESIGNAL_APP_ID=${{ inputs.onesignal-app-id }}"
           echo "ONESIGNAL_API_KEY=${{ inputs.onesignal-api-key }}"

@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-    namespace = "com.onesignal.example"
+    namespace = "com.onesignal.sdkdemo"
     compileSdk = flutter.compileSdkVersion
     ndkVersion = flutter.ndkVersion
 
@@ -15,7 +15,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.onesignal.example"
+        applicationId = "com.onesignal.sdkdemo"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

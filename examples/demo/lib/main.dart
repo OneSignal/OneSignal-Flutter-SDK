@@ -12,23 +12,25 @@ import 'services/tooltip_helper.dart';
 import 'theme.dart';
 import 'viewmodels/app_viewmodel.dart';
 
-const String _defaultAppId = '77e32082-ea27-42e3-a898-c72e141824ef';
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
     await dotenv.load(fileName: '.env');
   } catch (_) {
-    debugPrint('.env file not found, using defaults');
+    debugPrint('.env file not found');
   }
 
   final prefs = PreferencesService();
   await prefs.init();
 
   final envAppId = dotenv.env['ONESIGNAL_APP_ID'];
-  final appId =
-      (envAppId != null && envAppId.isNotEmpty) ? envAppId : _defaultAppId;
+  final appId = envAppId?.trim() ?? '';
+  if (appId.isEmpty) {
+    throw StateError(
+      'ONESIGNAL_APP_ID is not set. Add it to examples/demo/.env.',
+    );
+  }
 
   // Initialize OneSignal SDK
   OneSignal.Debug.setLogLevel(OSLogLevel.verbose);

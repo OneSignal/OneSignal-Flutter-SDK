@@ -48,9 +48,15 @@ jobs:
           onesignal-app-id: ${{ vars.APPIUM_ONESIGNAL_APP_ID }}
           onesignal-api-key: ${{ secrets.APPIUM_ONESIGNAL_API_KEY }}
 
+      - name: Write demo google-services.json
+        uses: OneSignal/sdk-shared/.github/actions/setup-google-services@main
+        with:
+          google-services-json: ${{ secrets.APPIUM_GOOGLE_SERVICES_JSON }}
+          path: examples/demo/android/app/google-services.json
+
       - name: Build release APK
         working-directory: examples/demo
-        run: flutter build apk --release
+        run: flutter build apk --release -PFIREBASE_INSTALLATION_ID_ENABLED=true
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
@@ -138,6 +144,7 @@ jobs:
       platform: android
       app-artifact: demo-apk
       app-filename: app-release.apk
+      bundle-id: com.onesignal.sdkdemo
       sdk-type: flutter
       build-name: flutter-android-${{ github.ref_name }}-${{ github.run_number }}
 

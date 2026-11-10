@@ -46,7 +46,7 @@ ONESIGNAL_APP_ID=your-onesignal-app-id
 ONESIGNAL_API_KEY=your-onesignal-api-key
 ```
 
-The `.env` file must exist before the first build because Flutter bundles it as an app asset. If `ONESIGNAL_APP_ID` is empty, the app falls back to a built-in default App ID.
+The `.env` file must exist before the first build because Flutter bundles it as an app asset. The app throws at startup when `ONESIGNAL_APP_ID` is empty.
 
 ## Build Guide
 
