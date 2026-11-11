@@ -30,6 +30,9 @@ jobs:
       github.event.inputs.platform == 'android' ||
       github.event.inputs.platform == 'both'
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        fid: ['on', 'off']
     steps:
       - name: Checkout
         uses: actions/checkout@v6
@@ -52,16 +55,17 @@ jobs:
         uses: OneSignal/sdk-shared/.github/actions/setup-google-services@main
         with:
           google-services-json: ${{ secrets.APPIUM_GOOGLE_SERVICES_JSON }}
+          enabled: ${{ matrix.fid == 'on' }}
           path: examples/demo/android/app/google-services.json
 
       - name: Build release APK
         working-directory: examples/demo
-        run: flutter build apk --release -PFIREBASE_INSTALLATION_ID_ENABLED=true
+        run: flutter build apk --release -PFIREBASE_INSTALLATION_ID_ENABLED=${{ matrix.fid == 'on' }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
         with:
-          name: demo-apk
+          name: demo-apk${{ matrix.fid == 'off' && '-fid-off' || '' }}
           path: examples/demo/build/app/outputs/flutter-apk/app-release.apk
           retention-days: 1
           compression-level: 0
@@ -143,6 +147,7 @@ jobs:
     with:
       platform: android
       app-artifact: demo-apk
+      fid-off-app-artifact: demo-apk-fid-off
       app-filename: app-release.apk
       bundle-id: com.onesignal.sdkdemo
       sdk-type: flutter
