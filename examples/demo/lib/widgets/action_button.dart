@@ -73,12 +73,40 @@ class DestructiveButton extends StatelessWidget {
           foregroundColor: AppColors.osPrimary,
           side: const BorderSide(color: AppColors.osPrimary),
         ),
-        child: Text(label),
+        child: FittedBox(fit: BoxFit.scaleDown, child: Text(label)),
       ),
     );
     if (semanticsLabel != null) {
       button = Semantics(identifier: semanticsLabel, container: true, child: button);
     }
     return button;
+  }
+}
+
+/// Lays out buttons two per row in equal columns; an odd last button spans
+/// both. Callers omit hidden buttons from [children] so the rest reflow.
+class ButtonGrid extends StatelessWidget {
+  final List<Widget> children;
+
+  const ButtonGrid({super.key, required this.children});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      spacing: AppSpacing.gap,
+      children: [
+        for (var i = 0; i < children.length; i += 2)
+          if (i == children.length - 1)
+            children[i]
+          else
+            Row(
+              spacing: AppSpacing.gap,
+              children: [
+                Expanded(child: children[i]),
+                Expanded(child: children[i + 1]),
+              ],
+            ),
+      ],
+    );
   }
 }

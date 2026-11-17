@@ -152,34 +152,37 @@ class UserSection extends StatelessWidget {
             ),
           ),
           AppSpacing.gapBox,
-          PrimaryButton(
-            label: vm.isLoggedIn ? 'SWITCH USER' : 'LOGIN USER',
-            semanticsLabel: 'login_user_button',
-            onPressed: () async {
-              final result = await showDialog<String>(
-                context: context,
-                builder: (_) => const SingleInputDialog(
-                  title: 'Login User',
-                  fieldLabel: 'External User Id',
-                  confirmLabel: 'Login',
-                  semanticsLabel: 'login_user_id_input',
+          ButtonGrid(
+            children: [
+              PrimaryButton(
+                label: vm.isLoggedIn ? 'SWITCH USER' : 'LOGIN USER',
+                semanticsLabel: 'login_user_button',
+                onPressed: () async {
+                  final result = await showDialog<String>(
+                    context: context,
+                    builder: (_) => const SingleInputDialog(
+                      title: 'Login User',
+                      fieldLabel: 'External User Id',
+                      confirmLabel: 'Login',
+                      semanticsLabel: 'login_user_id_input',
+                    ),
+                  );
+                  if (result != null && context.mounted) {
+                    await vm.loginUser(result);
+                  }
+                },
+              ),
+              if (vm.isLoggedIn) ...[
+                DestructiveButton(
+                  label: 'LOGOUT USER',
+                  semanticsLabel: 'logout_user_button',
+                  onPressed: () async {
+                    await vm.logoutUser();
+                  },
                 ),
-              );
-              if (result != null && context.mounted) {
-                await vm.loginUser(result);
-              }
-            },
+              ],
+            ],
           ),
-          if (vm.isLoggedIn) ...[
-            AppSpacing.gapBox,
-            DestructiveButton(
-              label: 'LOGOUT USER',
-              semanticsLabel: 'logout_user_button',
-              onPressed: () async {
-                await vm.logoutUser();
-              },
-            ),
-          ],
         ],
       ),
     );
