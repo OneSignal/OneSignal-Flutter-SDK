@@ -1,6 +1,6 @@
 # iOS Setup: Push Notifications + Live Activities
 
-Configure the demo Flutter iOS project (`com.onesignal.example`) for OneSignal push notifications and live activities. All paths below are relative to the `ios/` directory.
+Configure the demo Flutter iOS project (`com.onesignal.sdkdemo`) for OneSignal push notifications and live activities. All paths below are relative to the `ios/` directory.
 
 ---
 
@@ -53,7 +53,7 @@ Create `Runner/Runner.entitlements`:
 	<string>development</string>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.onesignal.example.onesignal</string>
+		<string>group.com.onesignal.sdkdemo.onesignal</string>
 	</array>
 </dict>
 </plist>
@@ -159,7 +159,7 @@ The App Group must match the one in `Runner.entitlements`.
 <dict>
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.com.onesignal.example.onesignal</string>
+		<string>group.com.onesignal.sdkdemo.onesignal</string>
 	</array>
 </dict>
 </plist>
@@ -385,16 +385,21 @@ The `project.pbxproj` needs native target entries for both extensions. These are
 
 **OneSignalNotificationServiceExtension target** (`com.apple.product-type.app-extension`):
 - Sources, Frameworks, Resources build phases
-- `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.NSE` (must be prefixed with parent app's bundle ID)
+- `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.sdkdemo.NSE` (must be prefixed with parent app's bundle ID)
 - `CODE_SIGN_ENTITLEMENTS = OneSignalNotificationServiceExtension/OneSignalNotificationServiceExtension.entitlements`
 - `INFOPLIST_FILE = OneSignalNotificationServiceExtension/Info.plist`
 - `SKIP_INSTALL = YES`, `SWIFT_VERSION = 5.0`, `IPHONEOS_DEPLOYMENT_TARGET = 15.0`
 
 **OneSignalWidgetExtension target** (`com.apple.product-type.app-extension`):
 - Sources, Frameworks (linking WidgetKit.framework and SwiftUI.framework), Resources build phases
-- `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.example.LA`
+- `PRODUCT_BUNDLE_IDENTIFIER = com.onesignal.sdkdemo.LA`
 - `INFOPLIST_FILE = OneSignalWidget/Info.plist` (note: folder is `OneSignalWidget`, not `OneSignalWidgetExtension`)
 - `SKIP_INSTALL = YES`, `SWIFT_VERSION = 5.0`, `IPHONEOS_DEPLOYMENT_TARGET = 16.2` (Live Activities require iOS 16.2+)
+
+**Signing (all three targets):**
+- `DEVELOPMENT_TEAM = DL8TF3X4K3` (OneSignal Enterprise team)
+- Release: `CODE_SIGN_STYLE = Manual`, `"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution"` (in-house cert), and `"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]"` set to the In House profiles `Appium Demo - Main`, `Appium Demo - NSE` and `Appium Demo - Live Activity`
+- `ios/ExportOptions.plist` uses `method` `enterprise`, so BrowserStack can install the IPA without re-signing it
 
 ---
 
