@@ -6,6 +6,10 @@ import '../services/tooltip_helper.dart';
 import '../theme.dart';
 import 'app_text_field.dart';
 
+/// Dialog doesn't apply the top safe area, so top-anchored dialogs add it.
+EdgeInsets dialogInsets(BuildContext context) =>
+    EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + 24, 16, 24);
+
 // Single input dialog (login, email, sms)
 class SingleInputDialog extends StatefulWidget {
   final String title;
@@ -39,7 +43,7 @@ class _SingleInputDialogState extends State<SingleInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: Text(widget.title),
       content: SizedBox(
         width: double.maxFinite,
@@ -113,7 +117,7 @@ class _PairInputDialogState extends State<PairInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: Text(widget.title),
       content: SizedBox(
         width: double.maxFinite,
@@ -238,7 +242,7 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: Text(widget.title),
       content: SizedBox(
         width: double.maxFinite,
@@ -349,7 +353,7 @@ class _MultiSelectRemoveDialogState extends State<MultiSelectRemoveDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: Text(widget.title),
       content: SizedBox(
         width: double.maxFinite,
@@ -434,7 +438,7 @@ class _OutcomeDialogState extends State<OutcomeDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: const Text('Send Outcome'),
       content: SizedBox(
         width: double.maxFinite,
@@ -580,7 +584,7 @@ class _TrackEventDialogState extends State<TrackEventDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: const Text('Custom Event'),
       content: SizedBox(
         width: double.maxFinite,
@@ -672,7 +676,7 @@ class _CustomNotificationDialogState extends State<CustomNotificationDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: const Text('Custom Notification'),
       content: SizedBox(
         width: double.maxFinite,
@@ -721,7 +725,7 @@ class TooltipDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: Semantics(
         identifier: 'tooltip_title',
         container: true,

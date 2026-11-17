@@ -75,8 +75,11 @@ class AppTheme {
           disabledForegroundColor: AppColors.osGrey500,
         ),
       ),
+      // Top-anchored: a dialog that moves while open desyncs XCUITest frame
+      // reporting from the rendered layout.
       dialogTheme: const DialogThemeData(
         backgroundColor: Colors.white,
+        alignment: Alignment.topCenter,
       ),
       dividerColor: AppColors.osDivider,
       inputDecorationTheme: InputDecorationTheme(

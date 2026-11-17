@@ -36,64 +36,65 @@ class TriggersSection extends StatelessWidget {
             ),
           ),
           AppSpacing.gapBox,
-          PrimaryButton(
-            label: 'ADD TRIGGER',
-            semanticsLabel: 'add_trigger_button',
-            onPressed: () async {
-              final result = await showDialog<MapEntry<String, String>>(
-                context: context,
-                builder: (_) => const PairInputDialog(
-                  title: 'Add Trigger',
-                  keySemanticsLabel: 'trigger_key_input',
-                  valueSemanticsLabel: 'trigger_value_input',
+          ButtonGrid(
+            children: [
+              PrimaryButton(
+                label: 'ADD TRIGGER',
+                semanticsLabel: 'add_trigger_button',
+                onPressed: () async {
+                  final result = await showDialog<MapEntry<String, String>>(
+                    context: context,
+                    builder: (_) => const PairInputDialog(
+                      title: 'Add Trigger',
+                      keySemanticsLabel: 'trigger_key_input',
+                      valueSemanticsLabel: 'trigger_value_input',
+                    ),
+                  );
+                  if (result != null) {
+                    vm.addTrigger(result.key, result.value);
+                  }
+                },
+              ),
+              PrimaryButton(
+                label: 'ADD TRIGGERS',
+                semanticsLabel: 'add_multiple_triggers_button',
+                onPressed: () async {
+                  final result = await showDialog<Map<String, String>>(
+                    context: context,
+                    builder: (_) => const MultiPairInputDialog(
+                      title: 'Add Multiple Triggers',
+                    ),
+                  );
+                  if (result != null) {
+                    vm.addTriggers(result);
+                  }
+                },
+              ),
+              if (vm.triggersList.isNotEmpty) ...[
+                DestructiveButton(
+                  label: 'REMOVE TRIGGERS',
+                  semanticsLabel: 'remove_triggers_button',
+                  onPressed: () async {
+                    final result = await showDialog<List<String>>(
+                      context: context,
+                      builder: (_) => MultiSelectRemoveDialog(
+                        title: 'Remove Triggers',
+                        items: vm.triggersList,
+                      ),
+                    );
+                    if (result != null) {
+                      vm.removeSelectedTriggers(result);
+                    }
+                  },
                 ),
-              );
-              if (result != null) {
-                vm.addTrigger(result.key, result.value);
-              }
-            },
-          ),
-          AppSpacing.gapBox,
-          PrimaryButton(
-            label: 'ADD MULTIPLE TRIGGERS',
-            semanticsLabel: 'add_multiple_triggers_button',
-            onPressed: () async {
-              final result = await showDialog<Map<String, String>>(
-                context: context,
-                builder: (_) => const MultiPairInputDialog(
-                  title: 'Add Multiple Triggers',
+                DestructiveButton(
+                  label: 'CLEAR ALL',
+                  semanticsLabel: 'clear_triggers_button',
+                  onPressed: vm.clearAllTriggers,
                 ),
-              );
-              if (result != null) {
-                vm.addTriggers(result);
-              }
-            },
+              ],
+            ],
           ),
-          if (vm.triggersList.isNotEmpty) ...[
-            AppSpacing.gapBox,
-            DestructiveButton(
-              label: 'REMOVE TRIGGERS',
-              semanticsLabel: 'remove_triggers_button',
-              onPressed: () async {
-                final result = await showDialog<List<String>>(
-                  context: context,
-                  builder: (_) => MultiSelectRemoveDialog(
-                    title: 'Remove Triggers',
-                    items: vm.triggersList,
-                  ),
-                );
-                if (result != null) {
-                  vm.removeSelectedTriggers(result);
-                }
-              },
-            ),
-            AppSpacing.gapBox,
-            DestructiveButton(
-              label: 'CLEAR ALL TRIGGERS',
-              semanticsLabel: 'clear_triggers_button',
-              onPressed: vm.clearAllTriggers,
-            ),
-          ],
         ],
       ),
     );
