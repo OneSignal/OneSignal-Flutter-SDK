@@ -71,23 +71,28 @@ class _LiveActivitiesSectionState extends State<LiveActivitiesSection> {
             ),
           ),
           AppSpacing.gapBox,
-          PrimaryButton(
-            label: 'START LIVE ACTIVITY',
-            onPressed: activityEmpty ? null : () => vm.startLiveActivity(),
-          ),
-          AppSpacing.gapBox,
-          PrimaryButton(
-            label: 'UPDATE → ${vm.nextStatusLabel}',
-            onPressed: activityEmpty || vm.isLaUpdating || !vm.hasApiKey
-                ? null
-                : () => vm.updateLiveActivity(),
-          ),
-          AppSpacing.gapBox,
-          DestructiveButton(
-            label: 'END LIVE ACTIVITY',
-            onPressed: activityEmpty || !vm.hasApiKey
-                ? null
-                : () => vm.endLiveActivity(),
+          ButtonGrid(
+            children: [
+              PrimaryButton(
+                label: 'START ACTIVITY',
+                semanticsLabel: 'start_live_activity_button',
+                onPressed: activityEmpty ? null : () => vm.startLiveActivity(),
+              ),
+              PrimaryButton(
+                label: 'UPDATE → ${vm.nextStatusLabel}',
+                semanticsLabel: 'update_live_activity_button',
+                onPressed: activityEmpty || vm.isLaUpdating || !vm.hasApiKey
+                    ? null
+                    : () => vm.updateLiveActivity(),
+              ),
+              DestructiveButton(
+                label: 'END ACTIVITY',
+                semanticsLabel: 'end_live_activity_button',
+                onPressed: activityEmpty || !vm.hasApiKey
+                    ? null
+                    : () => vm.endLiveActivity(),
+              ),
+            ],
           ),
         ],
       ),

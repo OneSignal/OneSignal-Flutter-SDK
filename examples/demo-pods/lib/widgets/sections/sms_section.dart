@@ -39,6 +39,7 @@ class SmsSection extends StatelessWidget {
           AppSpacing.gapBox,
           PrimaryButton(
             label: 'ADD SMS',
+            semanticsLabel: 'add_sms_button',
             onPressed: () async {
               final result = await showDialog<String>(
                 context: context,
@@ -47,6 +48,7 @@ class SmsSection extends StatelessWidget {
                       title: 'Add SMS',
                       fieldLabel: 'SMS Number',
                       keyboardType: TextInputType.phone,
+                      semanticsLabel: 'sms_input',
                     ),
               );
               if (result != null) {

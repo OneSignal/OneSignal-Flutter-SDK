@@ -6,12 +6,17 @@ import '../services/tooltip_helper.dart';
 import '../theme.dart';
 import 'app_text_field.dart';
 
+/// Dialog doesn't apply the top safe area, so top-anchored dialogs add it.
+EdgeInsets dialogInsets(BuildContext context) =>
+    EdgeInsets.fromLTRB(16, MediaQuery.paddingOf(context).top + 24, 16, 24);
+
 // Single input dialog (login, email, sms)
 class SingleInputDialog extends StatefulWidget {
   final String title;
   final String fieldLabel;
   final String confirmLabel;
   final TextInputType keyboardType;
+  final String? semanticsLabel;
 
   const SingleInputDialog({
     super.key,
@@ -19,6 +24,7 @@ class SingleInputDialog extends StatefulWidget {
     required this.fieldLabel,
     this.confirmLabel = 'Add',
     this.keyboardType = TextInputType.text,
+    this.semanticsLabel,
   });
 
   @override
@@ -37,12 +43,12 @@ class _SingleInputDialogState extends State<SingleInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: Text(widget.title),
       content: SizedBox(
         width: double.maxFinite,
         child: Semantics(
-          identifier: '${widget.fieldLabel}_input',
+          identifier: widget.semanticsLabel ?? '${widget.fieldLabel}_input',
           container: true,
           child: AppTextField(
             controller: _controller,
@@ -57,11 +63,16 @@ class _SingleInputDialogState extends State<SingleInputDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _controller.text.isEmpty
-              ? null
-              : () => Navigator.pop(context, _controller.text),
-          child: Text(widget.confirmLabel),
+        Semantics(
+          identifier: 'singleinput_confirm_button',
+          container: true,
+          button: true,
+          child: TextButton(
+            onPressed: _controller.text.isEmpty
+                ? null
+                : () => Navigator.pop(context, _controller.text),
+            child: Text(widget.confirmLabel),
+          ),
         ),
       ],
     );
@@ -75,7 +86,6 @@ class PairInputDialog extends StatefulWidget {
   final String valueLabel;
   final String? keySemanticsLabel;
   final String? valueSemanticsLabel;
-  final String? confirmSemanticsLabel;
 
   const PairInputDialog({
     super.key,
@@ -84,7 +94,6 @@ class PairInputDialog extends StatefulWidget {
     this.valueLabel = 'Value',
     this.keySemanticsLabel,
     this.valueSemanticsLabel,
-    this.confirmSemanticsLabel,
   });
 
   @override
@@ -108,7 +117,7 @@ class _PairInputDialogState extends State<PairInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: Text(widget.title),
       content: SizedBox(
         width: double.maxFinite,
@@ -146,8 +155,9 @@ class _PairInputDialogState extends State<PairInputDialog> {
           child: const Text('Cancel'),
         ),
         Semantics(
-          identifier: widget.confirmSemanticsLabel ?? 'confirm_button',
+          identifier: 'singlepair_confirm_button',
           container: true,
+          button: true,
           child: TextButton(
             onPressed: _isValid
                 ? () => Navigator.pop(
@@ -232,7 +242,7 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: Text(widget.title),
       content: SizedBox(
         width: double.maxFinite,
@@ -246,7 +256,7 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
                 children: [
                   Expanded(
                     child: Semantics(
-                      identifier: '${widget.keyLabel}_input_$i',
+                      identifier: 'multipair_key_$i',
                       container: true,
                       child: AppTextField(
                         controller: _keyControllers[i],
@@ -260,7 +270,7 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Semantics(
-                      identifier: '${widget.valueLabel}_input_$i',
+                      identifier: 'multipair_value_$i',
                       container: true,
                       child: AppTextField(
                         controller: _valueControllers[i],
@@ -279,10 +289,15 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
                 ],
               ),
             ],
-              TextButton.icon(
-                onPressed: _addRow,
-                icon: const Icon(Icons.add, size: 18),
-                label: const Text('Add Row'),
+              Semantics(
+                identifier: 'multipair_add_row_button',
+                container: true,
+                button: true,
+                child: TextButton.icon(
+                  onPressed: _addRow,
+                  icon: const Icon(Icons.add, size: 18),
+                  label: const Text('Add Row'),
+                ),
               ),
             ],
           ),
@@ -293,18 +308,23 @@ class _MultiPairInputDialogState extends State<MultiPairInputDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _allValid
-              ? () {
-                  final pairs = <String, String>{};
-                  for (var i = 0; i < _keyControllers.length; i++) {
-                    pairs[_keyControllers[i].text] =
-                        _valueControllers[i].text;
+        Semantics(
+          identifier: 'multipair_confirm_button',
+          container: true,
+          button: true,
+          child: TextButton(
+            onPressed: _allValid
+                ? () {
+                    final pairs = <String, String>{};
+                    for (var i = 0; i < _keyControllers.length; i++) {
+                      pairs[_keyControllers[i].text] =
+                          _valueControllers[i].text;
+                    }
+                    Navigator.pop(context, pairs);
                   }
-                  Navigator.pop(context, pairs);
-                }
-              : null,
-          child: const Text('Add All'),
+                : null,
+            child: const Text('Add All'),
+          ),
         ),
       ],
     );
@@ -333,7 +353,7 @@ class _MultiSelectRemoveDialogState extends State<MultiSelectRemoveDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: Text(widget.title),
       content: SizedBox(
         width: double.maxFinite,
@@ -369,64 +389,15 @@ class _MultiSelectRemoveDialogState extends State<MultiSelectRemoveDialog> {
           onPressed: () => Navigator.pop(context),
           child: const Text('Cancel'),
         ),
-        TextButton(
-          onPressed: _selected.isEmpty
-              ? null
-              : () => Navigator.pop(context, _selected.toList()),
-          child: Text('Remove (${_selected.length})'),
-        ),
-      ],
-    );
-  }
-}
-
-// Login dialog
-class LoginDialog extends StatefulWidget {
-  const LoginDialog({super.key});
-
-  @override
-  State<LoginDialog> createState() => _LoginDialogState();
-}
-
-class _LoginDialogState extends State<LoginDialog> {
-  final _controller = TextEditingController();
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-      title: const Text('Login User'),
-      content: SizedBox(
-        width: double.maxFinite,
-        child: Semantics(
-          identifier: 'login_user_id_input',
-          container: true,
-          child: AppTextField(
-            controller: _controller,
-            decoration: const InputDecoration(labelText: 'External User Id'),
-            onChanged: (_) => setState(() {}),
-          ),
-        ),
-      ),
-      actions: [
-        TextButton(
-          onPressed: () => Navigator.pop(context),
-          child: const Text('Cancel'),
-        ),
         Semantics(
-          identifier: 'login_confirm_button',
+          identifier: 'multiselect_confirm_button',
           container: true,
+          button: true,
           child: TextButton(
-            onPressed: _controller.text.isEmpty
+            onPressed: _selected.isEmpty
                 ? null
-                : () => Navigator.pop(context, _controller.text),
-            child: const Text('Login'),
+                : () => Navigator.pop(context, _selected.toList()),
+            child: Text('Remove (${_selected.length})'),
           ),
         ),
       ],
@@ -467,7 +438,7 @@ class _OutcomeDialogState extends State<OutcomeDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: const Text('Send Outcome'),
       content: SizedBox(
         width: double.maxFinite,
@@ -480,20 +451,35 @@ class _OutcomeDialogState extends State<OutcomeDialog> {
                 onChanged: (v) => setState(() { if (v != null) _type = v; }),
                 child: Column(
                   children: [
-                    RadioListTile<OutcomeType>(
-                      title: const Text('Normal Outcome'),
-                      value: OutcomeType.normal,
-                      contentPadding: EdgeInsets.zero,
+                    Semantics(
+                      identifier: 'outcome_type_normal_radio',
+                      container: true,
+                      button: true,
+                      child: RadioListTile<OutcomeType>(
+                        title: const Text('Normal Outcome'),
+                        value: OutcomeType.normal,
+                        contentPadding: EdgeInsets.zero,
+                      ),
                     ),
-                    RadioListTile<OutcomeType>(
-                      title: const Text('Unique Outcome'),
-                      value: OutcomeType.unique,
-                      contentPadding: EdgeInsets.zero,
+                    Semantics(
+                      identifier: 'outcome_type_unique_radio',
+                      container: true,
+                      button: true,
+                      child: RadioListTile<OutcomeType>(
+                        title: const Text('Unique Outcome'),
+                        value: OutcomeType.unique,
+                        contentPadding: EdgeInsets.zero,
+                      ),
                     ),
-                    RadioListTile<OutcomeType>(
-                      title: const Text('Outcome with Value'),
-                      value: OutcomeType.withValue,
-                      contentPadding: EdgeInsets.zero,
+                    Semantics(
+                      identifier: 'outcome_type_value_radio',
+                      container: true,
+                      button: true,
+                      child: RadioListTile<OutcomeType>(
+                        title: const Text('Outcome with Value'),
+                        value: OutcomeType.withValue,
+                        contentPadding: EdgeInsets.zero,
+                      ),
                     ),
                   ],
                 ),
@@ -598,7 +584,7 @@ class _TrackEventDialogState extends State<TrackEventDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: const Text('Custom Event'),
       content: SizedBox(
         width: double.maxFinite,
@@ -690,7 +676,7 @@ class _CustomNotificationDialogState extends State<CustomNotificationDialog> {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: const Text('Custom Notification'),
       content: SizedBox(
         width: double.maxFinite,
@@ -739,7 +725,7 @@ class TooltipDialog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return AlertDialog(
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
+      insetPadding: dialogInsets(context),
       title: Semantics(
         identifier: 'tooltip_title',
         container: true,

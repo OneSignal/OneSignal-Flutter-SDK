@@ -36,19 +36,24 @@ class LocationSection extends StatelessWidget {
             ),
           ),
           AppSpacing.gapBox,
-          PrimaryButton(
-            label: 'PROMPT LOCATION',
-            onPressed: vm.promptLocation,
-          ),
-          AppSpacing.gapBox,
-          PrimaryButton(
-            label: 'CHECK LOCATION SHARED',
-            onPressed: () async {
-              final shared = await vm.checkLocationShared();
-              if (context.mounted) {
-                context.showSnackBar('Location shared: $shared');
-              }
-            },
+          ButtonGrid(
+            children: [
+              PrimaryButton(
+                label: 'PROMPT LOCATION',
+                semanticsLabel: 'prompt_location_button',
+                onPressed: vm.promptLocation,
+              ),
+              PrimaryButton(
+                label: 'CHECK LOCATION',
+                semanticsLabel: 'check_location_button',
+                onPressed: () async {
+                  final shared = await vm.checkLocationShared();
+                  if (context.mounted) {
+                    context.showSnackBar('Location shared: $shared');
+                  }
+                },
+              ),
+            ],
           ),
         ],
       ),

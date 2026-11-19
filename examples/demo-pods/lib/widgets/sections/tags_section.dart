@@ -37,59 +37,62 @@ class TagsSection extends StatelessWidget {
             ),
           ),
           AppSpacing.gapBox,
-          PrimaryButton(
-            label: 'ADD TAG',
-            semanticsLabel: 'add_tag_button',
-            onPressed: () async {
-              final result = await showDialog<MapEntry<String, String>>(
-                context: context,
-                builder:
-                    (_) => const PairInputDialog(
-                      title: 'Add Tag',
-                      keySemanticsLabel: 'tag_key_input',
-                      valueSemanticsLabel: 'tag_value_input',
-                      confirmSemanticsLabel: 'tag_confirm_button',
-                    ),
-              );
-              if (result != null) {
-                vm.addTag(result.key, result.value);
-              }
-            },
+          ButtonGrid(
+            children: [
+              PrimaryButton(
+                label: 'ADD TAG',
+                semanticsLabel: 'add_tag_button',
+                onPressed: () async {
+                  final result = await showDialog<MapEntry<String, String>>(
+                    context: context,
+                    builder:
+                        (_) => const PairInputDialog(
+                          title: 'Add Tag',
+                          keySemanticsLabel: 'tag_key_input',
+                          valueSemanticsLabel: 'tag_value_input',
+                        ),
+                  );
+                  if (result != null) {
+                    vm.addTag(result.key, result.value);
+                  }
+                },
+              ),
+              PrimaryButton(
+                label: 'ADD TAGS',
+                semanticsLabel: 'add_multiple_tags_button',
+                onPressed: () async {
+                  final result = await showDialog<Map<String, String>>(
+                    context: context,
+                    builder:
+                        (_) =>
+                            const MultiPairInputDialog(title: 'Add Multiple Tags'),
+                  );
+                  if (result != null) {
+                    vm.addTags(result);
+                  }
+                },
+              ),
+              if (vm.tagsList.isNotEmpty) ...[
+                DestructiveButton(
+                  label: 'REMOVE TAGS',
+                  semanticsLabel: 'remove_tags_button',
+                  onPressed: () async {
+                    final result = await showDialog<List<String>>(
+                      context: context,
+                      builder:
+                          (_) => MultiSelectRemoveDialog(
+                            title: 'Remove Tags',
+                            items: vm.tagsList,
+                          ),
+                    );
+                    if (result != null) {
+                      vm.removeSelectedTags(result);
+                    }
+                  },
+                ),
+              ],
+            ],
           ),
-          AppSpacing.gapBox,
-          PrimaryButton(
-            label: 'ADD MULTIPLE TAGS',
-            onPressed: () async {
-              final result = await showDialog<Map<String, String>>(
-                context: context,
-                builder:
-                    (_) =>
-                        const MultiPairInputDialog(title: 'Add Multiple Tags'),
-              );
-              if (result != null) {
-                vm.addTags(result);
-              }
-            },
-          ),
-          if (vm.tagsList.isNotEmpty) ...[
-            AppSpacing.gapBox,
-            DestructiveButton(
-              label: 'REMOVE TAGS',
-              onPressed: () async {
-                final result = await showDialog<List<String>>(
-                  context: context,
-                  builder:
-                      (_) => MultiSelectRemoveDialog(
-                        title: 'Remove Tags',
-                        items: vm.tagsList,
-                      ),
-                );
-                if (result != null) {
-                  vm.removeSelectedTags(result);
-                }
-              },
-            ),
-          ],
         ],
       ),
     );

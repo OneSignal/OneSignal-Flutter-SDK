@@ -22,6 +22,7 @@ class OutcomesSection extends StatelessWidget {
       onInfoTap: onInfoTap,
       child: PrimaryButton(
         label: 'SEND OUTCOME',
+        semanticsLabel: 'send_outcome_button',
         onPressed: () async {
           final result = await showDialog<Map<String, dynamic>>(
             context: context,

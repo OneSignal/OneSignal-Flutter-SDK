@@ -39,6 +39,7 @@ class EmailsSection extends StatelessWidget {
           AppSpacing.gapBox,
           PrimaryButton(
             label: 'ADD EMAIL',
+            semanticsLabel: 'add_email_button',
             onPressed: () async {
               final result = await showDialog<String>(
                 context: context,
@@ -47,6 +48,7 @@ class EmailsSection extends StatelessWidget {
                       title: 'Add Email',
                       fieldLabel: 'Email',
                       keyboardType: TextInputType.emailAddress,
+                      semanticsLabel: 'email_input',
                     ),
               );
               if (result != null) {

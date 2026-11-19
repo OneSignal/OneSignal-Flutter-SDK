@@ -3,6 +3,7 @@ import 'package:onesignal_flutter/onesignal_flutter.dart';
 
 import '../models/in_app_message_type.dart';
 import '../models/notification_type.dart';
+import '../services/log_service.dart';
 import '../services/onesignal_api_service.dart';
 import '../services/preferences_service.dart';
 
@@ -43,6 +44,17 @@ class AppViewModel extends ChangeNotifier {
   // Loading state
   bool _isLoading = false;
   bool get isLoading => _isLoading;
+
+  // Increments per fetchUserDataFromApi() call so stale results are dropped
+  // when a newer fetch is already in flight (e.g. cold-start fetch racing the
+  // user-change observer's fetch right after login).
+  int _fetchSequence = 0;
+
+  // Last identity pair seen by the User observer. Some native SDK versions
+  // re-fire the observer on every user model hydration (e.g. after addEmail
+  // or addTag), so only refetch when the identity actually changes.
+  String? _observedOnesignalId;
+  String? _observedExternalId;
 
   // App state
   String _appId = '';
@@ -156,21 +168,15 @@ class AppViewModel extends ChangeNotifier {
 
     final onesignalId = await OneSignal.User.getOnesignalId();
     _oneSignalId = onesignalId;
+    _observedOnesignalId ??= onesignalId;
+    _observedExternalId ??= await OneSignal.User.getExternalId();
 
     notifyListeners();
 
     if (onesignalId == null) return;
 
-    _isLoading = true;
-    notifyListeners();
-    try {
-      await fetchUserDataFromApi();
-    } catch (e) {
-      debugPrint('Error fetching initial user data: $e');
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
+    // fetchUserDataFromApi owns _isLoading + notifyListeners.
+    await fetchUserDataFromApi();
   }
 
   // Observers
@@ -185,7 +191,7 @@ class AppViewModel extends ChangeNotifier {
         return t.length > 8 ? '${t.substring(0, 8)}…' : t;
       }
 
-      debugPrint(
+      LogService.show(
         'Push subscription changed: '
         'id=${state.previous.id ?? 'null'} → ${state.current.id ?? 'null'}, '
         'optedIn=${state.previous.optedIn} → ${state.current.optedIn}, '
@@ -196,38 +202,71 @@ class AppViewModel extends ChangeNotifier {
 
     OneSignal.Notifications.addPermissionObserver((permission) {
       _hasNotificationPermission = permission;
-      debugPrint('Permission changed: $permission');
+      LogService.show('Permission changed: $permission');
       notifyListeners();
     });
 
     OneSignal.User.addObserver((state) {
-      debugPrint(
-        'User changed: onesignalId=${state.current.onesignalId ?? 'null'}, externalId=${state.current.externalId ?? 'null'}',
+      final nextOnesignalId = state.current.onesignalId;
+      LogService.show(
+        'User changed: onesignalId=${nextOnesignalId ?? 'null'}, '
+        'externalId=${state.current.externalId ?? 'null'}',
       );
-      _oneSignalId = state.current.onesignalId;
+
+      final nextExternalId = state.current.externalId;
+      final identityChanged =
+          nextOnesignalId != _observedOnesignalId ||
+          nextExternalId != _observedExternalId;
+      _observedOnesignalId = nextOnesignalId;
+      _observedExternalId = nextExternalId;
+
+      _oneSignalId = nextOnesignalId;
       notifyListeners();
+
+      if (!identityChanged) return;
+
+      // Drive the post-login fetch from the observer so it runs only once the
+      // SDK has actually assigned a new onesignalId. Logout clears it to null;
+      // skip the fetch in that case (logoutUser already clears local lists).
+      if (nextOnesignalId == null) return;
+      fetchUserDataFromApi();
     });
   }
 
-  // Fetch user data from API. Caller owns the isLoading toggle (try/finally).
+  // Fetch user data from API. Owns the isLoading toggle and uses a
+  // request-sequence guard so stale results are dropped if a newer fetch
+  // started before this one finishes.
   Future<void> fetchUserDataFromApi() async {
-    final onesignalId = await OneSignal.User.getOnesignalId();
-    if (onesignalId == null) return;
-
-    final userData = await _apiService.fetchUser(onesignalId);
-    if (userData == null) return;
-
-    _aliasesList = _mergePairs(_aliasesList, userData.aliases);
-    _tagsList = _mergePairs(_tagsList, userData.tags);
-    _emailsList = _mergeUnique(_emailsList, userData.emails);
-    _smsNumbersList = _mergeUnique(_smsNumbersList, userData.smsNumbers);
-
-    if (userData.externalId != null) {
-      _externalUserId = userData.externalId;
-      await _prefs.setExternalUserId(userData.externalId);
-    }
-
+    final requestId = ++_fetchSequence;
+    _isLoading = true;
     notifyListeners();
+
+    try {
+      final onesignalId = await OneSignal.User.getOnesignalId();
+      if (onesignalId == null) return;
+
+      final userData = await _apiService.fetchUser(onesignalId);
+      if (userData == null) return;
+
+      if (_fetchSequence != requestId) return;
+
+      _aliasesList = _mergePairs(_aliasesList, userData.aliases);
+      _tagsList = _mergePairs(_tagsList, userData.tags);
+      _emailsList = _mergeUnique(_emailsList, userData.emails);
+      _smsNumbersList = _mergeUnique(_smsNumbersList, userData.smsNumbers);
+
+      if (userData.externalId != null) {
+        _externalUserId = userData.externalId;
+        await _prefs.setExternalUserId(userData.externalId);
+      }
+    } catch (e) {
+      debugPrint('fetchUserDataFromApi error: $e');
+    } finally {
+      if (_fetchSequence == requestId) {
+        _isLoading = false;
+      }
+      notifyListeners();
+    }
   }
 
   // Login / Logout
@@ -245,14 +284,11 @@ class AppViewModel extends ChangeNotifier {
       await OneSignal.login(externalUserId);
       await _prefs.setExternalUserId(externalUserId);
       await _resetLanguagePicker();
-      debugPrint('Logged in as: $externalUserId');
-      // Drive the post-login fetch ourselves so isLoading always clears,
-      // even when OneSignal.login() doesn't emit a user change event
-      // (e.g. logging in with the same external ID).
-      await fetchUserDataFromApi();
+      LogService.info('Logged in as: $externalUserId');
+      // The User observer runs fetchUserDataFromApi once the new onesignalId
+      // is assigned; that call clears _isLoading in its finally.
     } catch (e) {
-      debugPrint('Login error: $e');
-    } finally {
+      LogService.error('Login error: $e');
       _isLoading = false;
       notifyListeners();
     }
@@ -271,9 +307,9 @@ class AppViewModel extends ChangeNotifier {
       await OneSignal.logout();
       await _prefs.setExternalUserId(null);
       await _resetLanguagePicker();
-      debugPrint('Logged out');
+      LogService.info('Logged out');
     } catch (e) {
-      debugPrint('Logout error: $e');
+      LogService.error('Logout error: $e');
     }
   }
 
@@ -293,11 +329,11 @@ class AppViewModel extends ChangeNotifier {
     try {
       await OneSignal.User.setLanguage(language);
       await _prefs.setLanguage(language);
-      debugPrint(
+      LogService.info(
         'Language set to: ${language.isEmpty ? 'device default' : language}',
       );
     } catch (e) {
-      debugPrint('Set language error: $e');
+      LogService.error('Set language error: $e');
     }
   }
 
@@ -329,7 +365,7 @@ class AppViewModel extends ChangeNotifier {
     }
     _pushEnabled = enabled;
     notifyListeners();
-    debugPrint('Push ${enabled ? "enabled" : "disabled"}');
+    LogService.info('Push ${enabled ? "enabled" : "disabled"}');
   }
 
   Future<void> promptPush() => OneSignal.Notifications.requestPermission(true);
@@ -338,21 +374,21 @@ class AppViewModel extends ChangeNotifier {
   Future<void> sendNotification(NotificationType type) async {
     final subscriptionId = OneSignal.User.pushSubscription.id;
     if (subscriptionId == null) {
-      debugPrint('No subscription ID for notification');
+      LogService.info('No subscription ID for notification');
       return;
     }
     final success = await _apiService.sendNotification(type, subscriptionId);
     if (success) {
-      debugPrint('Notification sent: ${type.name}');
+      LogService.info('Notification sent: ${type.name}');
     } else {
-      debugPrint('Failed to send notification');
+      LogService.info('Failed to send notification');
     }
   }
 
   Future<void> sendCustomNotification(String title, String body) async {
     final subscriptionId = OneSignal.User.pushSubscription.id;
     if (subscriptionId == null) {
-      debugPrint('No subscription ID for custom notification');
+      LogService.info('No subscription ID for custom notification');
       return;
     }
     final success = await _apiService.sendCustomNotification(
@@ -361,15 +397,15 @@ class AppViewModel extends ChangeNotifier {
       subscriptionId,
     );
     if (success) {
-      debugPrint('Custom notification sent');
+      LogService.info('Custom notification sent');
     } else {
-      debugPrint('Failed to send notification');
+      LogService.info('Failed to send notification');
     }
   }
 
   void clearAllNotifications() {
     OneSignal.Notifications.clearAll();
-    debugPrint('All notifications cleared');
+    LogService.info('All notifications cleared');
   }
 
   // IAM
@@ -384,7 +420,7 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.InAppMessages.addTrigger('iam_type', type.triggerValue);
     _triggersList = _mergePairs(_triggersList, {'iam_type': type.triggerValue});
     notifyListeners();
-    debugPrint('Sent In-App Message: ${type.label}');
+    LogService.info('Sent In-App Message: ${type.label}');
   }
 
   // Aliases
@@ -392,14 +428,14 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.addAlias(label, id);
     _aliasesList = _mergePairs(_aliasesList, {label: id});
     notifyListeners();
-    debugPrint('Alias added: $label');
+    LogService.info('Alias added: $label');
   }
 
   void addAliases(Map<String, String> aliases) {
     OneSignal.User.addAliases(aliases);
     _aliasesList = _mergePairs(_aliasesList, aliases);
     notifyListeners();
-    debugPrint('${aliases.length} alias(es) added');
+    LogService.info('${aliases.length} alias(es) added');
   }
 
   // Emails
@@ -407,14 +443,14 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.addEmail(email);
     _emailsList = _mergeUnique(_emailsList, [email]);
     notifyListeners();
-    debugPrint('Email added: $email');
+    LogService.info('Email added: $email');
   }
 
   void removeEmail(String email) {
     OneSignal.User.removeEmail(email);
     _emailsList = List.from(_emailsList)..remove(email);
     notifyListeners();
-    debugPrint('Email removed: $email');
+    LogService.info('Email removed: $email');
   }
 
   // SMS
@@ -422,14 +458,14 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.addSms(smsNumber);
     _smsNumbersList = _mergeUnique(_smsNumbersList, [smsNumber]);
     notifyListeners();
-    debugPrint('SMS added: $smsNumber');
+    LogService.info('SMS added: $smsNumber');
   }
 
   void removeSms(String smsNumber) {
     OneSignal.User.removeSms(smsNumber);
     _smsNumbersList = List.from(_smsNumbersList)..remove(smsNumber);
     notifyListeners();
-    debugPrint('SMS removed: $smsNumber');
+    LogService.info('SMS removed: $smsNumber');
   }
 
   // Tags
@@ -437,28 +473,28 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.User.addTagWithKey(key, value);
     _tagsList = _mergePairs(_tagsList, {key: value});
     notifyListeners();
-    debugPrint('Tag added: $key');
+    LogService.info('Tag added: $key');
   }
 
   void addTags(Map<String, String> tags) {
     OneSignal.User.addTags(tags);
     _tagsList = _mergePairs(_tagsList, tags);
     notifyListeners();
-    debugPrint('${tags.length} tag(s) added');
+    LogService.info('${tags.length} tag(s) added');
   }
 
   void removeTag(String key) {
     OneSignal.User.removeTag(key);
     _tagsList = List.from(_tagsList)..removeWhere((e) => e.key == key);
     notifyListeners();
-    debugPrint('Tag removed: $key');
+    LogService.info('Tag removed: $key');
   }
 
   void removeSelectedTags(List<String> keys) {
     OneSignal.User.removeTags(keys);
     _tagsList = List.from(_tagsList)..removeWhere((e) => keys.contains(e.key));
     notifyListeners();
-    debugPrint('${keys.length} tag(s) removed');
+    LogService.info('${keys.length} tag(s) removed');
   }
 
   // Triggers (in-memory only)
@@ -466,21 +502,21 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.InAppMessages.addTrigger(key, value);
     _triggersList = _mergePairs(_triggersList, {key: value});
     notifyListeners();
-    debugPrint('Trigger added: $key');
+    LogService.info('Trigger added: $key');
   }
 
   void addTriggers(Map<String, String> triggers) {
     OneSignal.InAppMessages.addTriggers(triggers);
     _triggersList = _mergePairs(_triggersList, triggers);
     notifyListeners();
-    debugPrint('${triggers.length} trigger(s) added');
+    LogService.info('${triggers.length} trigger(s) added');
   }
 
   void removeTrigger(String key) {
     OneSignal.InAppMessages.removeTrigger(key);
     _triggersList = List.from(_triggersList)..removeWhere((e) => e.key == key);
     notifyListeners();
-    debugPrint('Trigger removed: $key');
+    LogService.info('Trigger removed: $key');
   }
 
   void removeSelectedTriggers(List<String> keys) {
@@ -488,36 +524,36 @@ class AppViewModel extends ChangeNotifier {
     _triggersList = List.from(_triggersList)
       ..removeWhere((e) => keys.contains(e.key));
     notifyListeners();
-    debugPrint('${keys.length} trigger(s) removed');
+    LogService.info('${keys.length} trigger(s) removed');
   }
 
   void clearAllTriggers() {
     OneSignal.InAppMessages.clearTriggers();
     _triggersList = [];
     notifyListeners();
-    debugPrint('All triggers cleared');
+    LogService.info('All triggers cleared');
   }
 
   // Outcomes
   void sendOutcome(String name) {
     OneSignal.Session.addOutcome(name);
-    debugPrint('Outcome sent: $name');
+    LogService.info('Outcome sent: $name');
   }
 
   void sendUniqueOutcome(String name) {
     OneSignal.Session.addUniqueOutcome(name);
-    debugPrint('Unique outcome sent: $name');
+    LogService.info('Unique outcome sent: $name');
   }
 
   void sendOutcomeWithValue(String name, double value) {
     OneSignal.Session.addOutcomeWithValue(name, value);
-    debugPrint('Outcome sent: $name = $value');
+    LogService.info('Outcome sent: $name = $value');
   }
 
   // Custom Events
   void trackEvent(String name, Map<String, dynamic>? properties) {
     OneSignal.User.trackEvent(name, properties);
-    debugPrint('Event tracked: $name');
+    LogService.info('Event tracked: $name');
   }
 
   // Live Activities
@@ -541,7 +577,7 @@ class AppViewModel extends ChangeNotifier {
       content,
     );
     notifyListeners();
-    debugPrint('Started Live Activity: $_activityId');
+    LogService.info('Started Live Activity: $_activityId');
   }
 
   Future<void> updateLiveActivity() async {
@@ -559,9 +595,9 @@ class AppViewModel extends ChangeNotifier {
     _isLaUpdating = false;
     if (success) {
       _statusIndex = nextIndex;
-      debugPrint('Updated Live Activity: $_activityId');
+      LogService.info('Updated Live Activity: $_activityId');
     } else {
-      debugPrint('Failed to update Live Activity');
+      LogService.info('Failed to update Live Activity');
     }
     notifyListeners();
   }
@@ -570,9 +606,9 @@ class AppViewModel extends ChangeNotifier {
     final success = await _apiService.endLiveActivity(_activityId);
     if (success) {
       _statusIndex = 0;
-      debugPrint('Ended Live Activity: $_activityId');
+      LogService.info('Ended Live Activity: $_activityId');
     } else {
-      debugPrint('Failed to end Live Activity');
+      LogService.info('Failed to end Live Activity');
     }
     notifyListeners();
   }
@@ -583,7 +619,7 @@ class AppViewModel extends ChangeNotifier {
     OneSignal.Location.setShared(shared);
     await _prefs.setLocationShared(shared);
     notifyListeners();
-    debugPrint('Location sharing ${shared ? "enabled" : "disabled"}');
+    LogService.info('Location sharing ${shared ? "enabled" : "disabled"}');
   }
 
   void promptLocation() {

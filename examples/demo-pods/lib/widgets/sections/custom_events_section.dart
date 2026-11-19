@@ -22,6 +22,7 @@ class CustomEventsSection extends StatelessWidget {
       onInfoTap: onInfoTap,
       child: PrimaryButton(
         label: 'TRACK EVENT',
+        semanticsLabel: 'track_event_button',
         onPressed: () async {
           final result = await showDialog<Map<String, dynamic>>(
             context: context,

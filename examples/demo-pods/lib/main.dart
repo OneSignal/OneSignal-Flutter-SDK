@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'screens/home_screen.dart';
 import 'services/onesignal_api_service.dart';
+import 'services/log_service.dart';
 import 'services/preferences_service.dart';
 import 'services/tooltip_helper.dart';
 import 'theme.dart';
@@ -27,7 +28,7 @@ Future<void> main() async {
   final appId = envAppId?.trim() ?? '';
   if (appId.isEmpty) {
     throw StateError(
-      'ONESIGNAL_APP_ID is not set. Add it to examples/demo-pods/.env.',
+      'ONESIGNAL_APP_ID is not set. Add it to examples/demo/.env.',
     );
   }
 
@@ -50,30 +51,58 @@ Future<void> main() async {
 
   // Register IAM listeners
   OneSignal.InAppMessages.addWillDisplayListener((event) {
-    debugPrint('IAM will display: ${event.message.messageId}');
+    LogService.show('IAM willDisplay: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addDidDisplayListener((event) {
-    debugPrint('IAM did display: ${event.message.messageId}');
+    LogService.show('IAM didDisplay: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addWillDismissListener((event) {
-    debugPrint('IAM will dismiss: ${event.message.messageId}');
+    LogService.show('IAM willDismiss: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addDidDismissListener((event) {
-    debugPrint('IAM did dismiss: ${event.message.messageId}');
+    LogService.show('IAM didDismiss: ${event.message.messageId}');
   });
   OneSignal.InAppMessages.addClickListener((event) {
-    debugPrint('IAM clicked: ${event.message.messageId}');
+    LogService.show('IAM click: ${event.message.messageId}');
   });
 
   // Register notification listeners
   OneSignal.Notifications.addClickListener((event) {
-    debugPrint('Notification clicked: ${event.notification.title}');
-  });
-  OneSignal.Notifications.addForegroundWillDisplayListener((event) {
-    debugPrint(
-      'Notification foreground will display: ${event.notification.title}',
+    LogService.show(
+      'Notification click: ${event.notification.notificationId} '
+      '${event.notification.title ?? ''}',
     );
-    event.notification.display();
+
+    // Uncomment to see the full event object.
+    // debugPrint('[OneSignal] click event: ${event.jsonRepresentation()}');
+  });
+
+  OneSignal.Notifications.addForegroundWillDisplayListener((event) {
+    LogService.show(
+      'Notification foregroundWillDisplay: '
+      '${event.notification.notificationId} ${event.notification.title ?? ''}',
+    );
+
+    // Uncomment to see the full event object.
+    // debugPrint('[OneSignal] will display event: ${event.notification.jsonRepresentation()}');
+
+    // Uncomment to test preventing the default display behavior.
+    // event.preventDefault();
+
+    // Can be called after preventDefault (within ~25 seconds) to force display.
+    // event.notification.display();
+
+    // Example with a delay (assumes preventDefault was called).
+    // debugPrint('[OneSignal] Forcing notification display in 24 seconds');
+    // () async {
+    //   var seconds = 24;
+    //   while (seconds > 0) {
+    //     await Future<void>.delayed(const Duration(seconds: 1));
+    //     seconds--;
+    //     debugPrint('[OneSignal] Displaying notification in $seconds seconds');
+    //   }
+    //   event.notification.display();
+    // }();
   });
 
   // Set up API service
@@ -81,16 +110,17 @@ Future<void> main() async {
   try {
     apiKey = dotenv.env['ONESIGNAL_API_KEY'] ?? '';
   } catch (_) {
-    debugPrint('API key not found, continuing without it');
+    debugPrint('[OneSignal] API key not found, continuing without it');
   }
-  final apiService = OneSignalApiService()
-    ..setAppId(appId)
-    ..setApiKey(apiKey);
+  final apiService =
+      OneSignalApiService()
+        ..setAppId(appId)
+        ..setApiKey(apiKey);
 
   // Fetch tooltips in background
   TooltipHelper().init();
 
-  debugPrint('OneSignal initialized with app ID: $appId');
+  debugPrint('[OneSignal] Initialized with app ID: $appId');
 
   runApp(
     ChangeNotifierProvider(
