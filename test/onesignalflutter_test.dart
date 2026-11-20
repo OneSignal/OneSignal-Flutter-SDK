@@ -23,6 +23,17 @@ void main() {
       expect(channelController.state.userLifecycleInitCalled, isTrue);
     });
 
+    test(
+      'initialize forwards an empty appId and still runs lifecycle',
+      () async {
+        await OneSignal.initialize('');
+
+        expect(channelController.state.appId, equals(''));
+        expect(channelController.state.lifecycleInitCalled, isTrue);
+        expect(channelController.state.userLifecycleInitCalled, isTrue);
+      },
+    );
+
     group('login', () {
       test('login invokes native method with externalId', () async {
         await OneSignal.login('user-123');
@@ -30,14 +41,11 @@ void main() {
         expect(channelController.state.externalId, equals('user-123'));
       });
 
-      test(
-        'login forwards an empty externalId to native, which ignores it',
-        () async {
-          await OneSignal.login('');
+      test('login forwards an empty externalId to native', () async {
+        await OneSignal.login('');
 
-          expect(channelController.state.externalId, equals(''));
-        },
-      );
+        expect(channelController.state.externalId, equals(''));
+      });
     });
 
     group('loginWithJWT', () {
