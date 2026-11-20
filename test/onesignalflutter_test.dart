@@ -30,11 +30,14 @@ void main() {
         expect(channelController.state.externalId, equals('user-123'));
       });
 
-      test('login rejects empty externalId', () async {
-        await OneSignal.login('');
+      test(
+        'login forwards an empty externalId to native, which ignores it',
+        () async {
+          await OneSignal.login('');
 
-        expect(channelController.state.externalId, isNull);
-      });
+          expect(channelController.state.externalId, equals(''));
+        },
+      );
     });
 
     group('loginWithJWT', () {
