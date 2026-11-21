@@ -150,6 +150,10 @@ jobs:
 
           # Update Package.swift with new version
           sed -i '' "s|\.package(url: \"https://github.com/OneSignal/OneSignal-XCFramework\", exact: \"[^\"]*\")|.package(url: \"https://github.com/OneSignal/OneSignal-XCFramework\", exact: \"${VERSION}\")|" ios/onesignal_flutter/Package.swift
+          if ! grep -q "OneSignal-XCFramework\", exact: \"${VERSION}\"" ios/onesignal_flutter/Package.swift; then
+            echo "::error::Failed to update iOS SDK version in Package.swift to ${VERSION}"
+            exit 1
+          fi
           echo "✓ Updated ios/onesignal_flutter/Package.swift with iOS SDK ${VERSION}"
 
           # Only commit if there are changes
