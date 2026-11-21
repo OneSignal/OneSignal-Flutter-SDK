@@ -64,8 +64,7 @@ To test the bundled iOS notification action icons, follow
 
 ## Other demos
 
-- [`demo-pods`](../demo-pods): same app using CocoaPods for iOS
-- [`demo-no-location`](../demo-no-location) and [`demo-no-location-pods`](../demo-no-location-pods): minimal apps without the native location module
+- [`demo-no-location`](../demo-no-location): minimal app without the native location module
 - [`flutter-local-notif`](../flutter-local-notif): OneSignal alongside `flutter_local_notifications`
 
 ## Build Guide

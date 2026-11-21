@@ -104,7 +104,7 @@ jobs:
           # Get versions from target branch (not the release branch)
           CURRENT_VERSION=$(git show origin/${{ inputs.target_branch }}:pubspec.yaml | grep "^version:" | sed 's/version: //' | tr -d ' ')
           ANDROID_VERSION=$(git show origin/${{ inputs.target_branch }}:android/build.gradle | sed -n "s/^def oneSignalVersion = ['\"]\([^'\"]*\)['\"].*/\1/p")
-          IOS_VERSION=$(git show origin/${{ inputs.target_branch }}:ios/onesignal_flutter.podspec | sed -n "s/^[[:space:]]*onesignal_xcframework_version = ['\"]\([^'\"]*\)['\"].*/\1/p")
+          IOS_VERSION=$(git show origin/${{ inputs.target_branch }}:ios/onesignal_flutter/Package.swift | sed -n 's|.*OneSignal-XCFramework", exact: "\([^"]*\)".*|\1|p')
 
           echo "flutter_from=$CURRENT_VERSION" >> $GITHUB_OUTPUT
           echo "android_from=$ANDROID_VERSION" >> $GITHUB_OUTPUT
@@ -148,13 +148,12 @@ jobs:
             exit 1
           fi
 
-          # Update onesignal_flutter.podspec with new version
-          # macOS sed syntax
-          sed -i '' -E "s|^([[:space:]]*onesignal_xcframework_version = )['\"][^'\"]*['\"]|\\1'${VERSION}'|" ios/onesignal_flutter.podspec
-          echo "✓ Updated ios/onesignal_flutter.podspec with iOS SDK ${VERSION}"
-
           # Update Package.swift with new version
           sed -i '' "s|\.package(url: \"https://github.com/OneSignal/OneSignal-XCFramework\", exact: \"[^\"]*\")|.package(url: \"https://github.com/OneSignal/OneSignal-XCFramework\", exact: \"${VERSION}\")|" ios/onesignal_flutter/Package.swift
+          if ! grep -q "OneSignal-XCFramework\", exact: \"${VERSION}\"" ios/onesignal_flutter/Package.swift; then
+            echo "::error::Failed to update iOS SDK version in Package.swift to ${VERSION}"
+            exit 1
+          fi
           echo "✓ Updated ios/onesignal_flutter/Package.swift with iOS SDK ${VERSION}"
 
           # Only commit if there are changes
@@ -174,10 +173,6 @@ jobs:
           # Update pubspec.yaml version
           sed -i '' "s/^version:.*/version: $NEW_VERSION/" pubspec.yaml
           echo "✓ Updated pubspec.yaml version to ${NEW_VERSION}"
-
-          # Update podspec version
-          sed -i '' "s|s\.version[[:space:]]*=[[:space:]]*'[^']*'|s.version          = '${NEW_VERSION}'|" ios/onesignal_flutter.podspec
-          echo "✓ Updated ios/onesignal_flutter.podspec version to ${NEW_VERSION}"
 
           # Update android build.gradle version
           sed -i '' "s|^version '[^']*'|version '${NEW_VERSION}'|" android/build.gradle
