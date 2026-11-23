@@ -61,7 +61,7 @@ jobs:
 
       - name: Build release APK
         working-directory: examples/demo
-        run: flutter build apk --release -PFIREBASE_INSTALLATION_ID_ENABLED=${{ matrix.fid == 'on' }}
+        run: flutter build apk --release -PDEMO_BUNDLE_ID=com.onesignal.sdkdemo -PFIREBASE_INSTALLATION_ID_ENABLED=${{ matrix.fid == 'on' }}
 
       - name: Upload APK
         uses: actions/upload-artifact@v7
@@ -107,6 +107,7 @@ jobs:
       - name: Build signed IPA
         working-directory: examples/demo
         run: |
+          printf 'DEMO_BUNDLE_ID = com.onesignal.sdkdemo\nDEMO_TEAM_ID = DL8TF3X4K3\n' > ios/e2e.xcconfig
           flutter build ipa --release \
             --export-options-plist=ios/ExportOptions.plist \
             --split-debug-info=build/symbols

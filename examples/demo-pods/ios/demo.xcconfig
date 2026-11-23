@@ -1,0 +1,7 @@
+// E2E builds write e2e.xcconfig with DEMO_BUNDLE_ID = com.onesignal.sdkdemo and
+// DEMO_TEAM_ID = DL8TF3X4K3; that bundle ID is registered to the enterprise team only.
+DEMO_BUNDLE_ID = com.onesignal.example
+DEMO_TEAM_ID = 99SW8E36CT
+
+#include? "local.xcconfig"
+#include? "e2e.xcconfig"

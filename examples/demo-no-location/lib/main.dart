@@ -7,7 +7,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:onesignal_flutter/onesignal_flutter.dart';
 
-const _defaultOneSignalAppId = 'YOUR-ONESIGNAL-APP-ID';
+const _defaultOneSignalAppId = '1154c350-e715-4b71-a58b-1b84b6745baa';
 const _brandRed = Color(0xFFE54B4D);
 
 late final String _oneSignalAppId;
@@ -16,7 +16,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   try {
-    await dotenv.load(fileName: '.env');
+    await dotenv.load(fileName: 'env/.env');
   } catch (_) {
     debugPrint('.env file not found, using defaults');
   }

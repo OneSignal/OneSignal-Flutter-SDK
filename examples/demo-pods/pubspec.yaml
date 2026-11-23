@@ -38,4 +38,4 @@ flutter:
   uses-material-design: true
   assets:
     - assets/onesignal_logo.svg
-    - .env
+    - env/
