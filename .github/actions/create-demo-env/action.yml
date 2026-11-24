@@ -1,5 +1,5 @@
 name: "Create demo .env"
-description: "Writes the demo app's .env file used by E2E builds"
+description: "Writes the demo app's env/.env file used by E2E builds"
 inputs:
   onesignal-app-id:
     description: "OneSignal App ID for the demo app"
@@ -15,10 +15,10 @@ runs:
       shell: bash
       run: |
         if [ -z "${{ inputs.onesignal-app-id }}" ]; then
-          echo "::error::onesignal-app-id is empty; the demo app throws at startup without it"
+          echo "::error::onesignal-app-id is empty; the demo app would fall back to the default app"
           exit 1
         fi
         {
           echo "ONESIGNAL_APP_ID=${{ inputs.onesignal-app-id }}"
           echo "ONESIGNAL_API_KEY=${{ inputs.onesignal-api-key }}"
-        } > .env
+        } > env/.env

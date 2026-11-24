@@ -64,8 +64,8 @@ flutter_launcher_icons:
 
 ### Environment variables
 
-- `flutter_dotenv` loads `.env` from the `pubspec.yaml` `assets:` block (`.env` is listed alongside `assets/onesignal_logo.svg`).
-- `ONESIGNAL_APP_ID` -- OneSignal app id. Required; `main.dart` throws a `StateError` when unset or empty.
+- `flutter_dotenv` loads `env/.env` from the `pubspec.yaml` `assets:` block (the `env/` folder is listed alongside `assets/onesignal_logo.svg`). `env/` is tracked with a `.gitkeep` so the build works without `env/.env`; `env/.env` itself is gitignored.
+- `ONESIGNAL_APP_ID` -- OneSignal app id. Optional; `main.dart` falls back to `1154c350-e715-4b71-a58b-1b84b6745baa` when unset or empty.
 - `ONESIGNAL_API_KEY` -- REST API key used by `OneSignalApiService` for Live Activity update/end and notification sends.
 - `ONESIGNAL_ANDROID_CHANNEL_ID` -- optional Android notification channel id used by the REST send paths.
 
@@ -125,7 +125,7 @@ OneSignal.Location.setShared(prefs.locationShared);
 - IAM: `addWillDisplayListener`, `addDidDisplayListener`, `addWillDismissListener`, `addDidDismissListener`, `addClickListener`
 - Notifications: `addClickListener`, `addForegroundWillDisplayListener` (calls `event.notification.display()`)
 - `TooltipHelper().init()` fetches tooltip content in the background.
-- `appId` comes from `ONESIGNAL_APP_ID` in `.env`; there is no default.
+- `appId` comes from `ONESIGNAL_APP_ID` in `env/.env`, falling back to `1154c350-e715-4b71-a58b-1b84b6745baa`.
 
 `PreferencesService` is the source of truth for restored UI state. In `AppViewModel.loadInitialState(appId)`, read UI state from `_prefs` (not from the SDK):
 ```dart
@@ -254,7 +254,8 @@ examples/demo/
 ├── ios/
 │   ├── OneSignalWidget/
 │   └── OneSignalNotificationServiceExtension/
-├── .env
+├── env/
+│   └── .env (gitignored)
 └── pubspec.yaml
 ```
 

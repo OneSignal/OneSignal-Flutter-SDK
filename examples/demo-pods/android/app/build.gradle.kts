@@ -4,6 +4,10 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+// E2E passes `-PDEMO_BUNDLE_ID=com.onesignal.sdkdemo` to match its google-services.json.
+val demoBundleId =
+    (findProperty("DEMO_BUNDLE_ID") as? String)?.trim()?.takeIf { it.isNotEmpty() } ?: "com.onesignal.example"
+
 android {
     namespace = "com.onesignal.sdkdemo"
     compileSdk = flutter.compileSdkVersion
@@ -16,7 +20,7 @@ android {
 
     defaultConfig {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
-        applicationId = "com.onesignal.sdkdemo"
+        applicationId = demoBundleId
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

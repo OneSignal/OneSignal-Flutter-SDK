@@ -4,6 +4,9 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+val demoBundleId =
+    (findProperty("DEMO_BUNDLE_ID") as? String)?.trim()?.takeIf { it.isNotEmpty() } ?: "com.onesignal.example"
+
 android {
     namespace = "com.onesignal.sdkdemo"
     compileSdk = flutter.compileSdkVersion
@@ -15,7 +18,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.onesignal.sdkdemo"
+        applicationId = demoBundleId
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion

@@ -21,20 +21,13 @@ This demo proves the no-location configuration works in a small app:
 
 ## Setup
 
-Copy `.env.example` to `.env` and set your OneSignal app ID:
+The demo runs on the shared OneSignal demo app (`1154c350-e715-4b71-a58b-1b84b6745baa`) without any setup. To use your own app, copy `.env.example` to `env/.env` (gitignored) and set `ONESIGNAL_APP_ID`:
 
 ```sh
-cp .env.example .env
+cp .env.example env/.env
 ```
 
-Then edit `.env`:
-
-```sh
-ONESIGNAL_APP_ID=your-onesignal-app-id
-```
-
-The `.env` file must exist before the first build because Flutter bundles it as
-an app asset.
+Older checkouts kept `.env` in the demo root; move it to `env/.env`, since the root file is no longer read.
 
 ## iOS
 
