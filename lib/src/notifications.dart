@@ -262,4 +262,8 @@ class OneSignalNotifications {
   void removeClickListener(OnNotificationClickListener listener) {
     _clickListeners.remove(listener);
   }
+
+  void removeAllClickListeners() {
+    _clickListeners.clear();
+  }
 }
